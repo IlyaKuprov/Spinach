@@ -8,3 +8,5 @@ Finite-drive regressions include the two-spin zero-drift z-drive acceptance prob
 
 Preparation selectors verified for the example migration: `transition.ms=[-0.5 0.5]` for E4, `[-1 1]` for E3, `[-0.5 0.5;-0.5 0.5]` for two electrons, and `[-0.5 0.5;3.5 3.5]` for E/51V. `transition.spins` follows the observed-spin order. These select the equal two-manifold superpositions without manually assembled vectors.
 Regression coverage includes native coherent error bounds and spectral residuals at zero tolerance, observed-transition parity against stock construction, lower-order numerical masks, and complete-bath validity when the requested error budget is deliberately smaller than the computed estimate.
+
+Coherent projected Hahn spectral products are additionally compared with the general interval path for an arbitrary complex observed preparation, phased receiver and both normalization settings. Error auxiliaries must remain positive and finite.

@@ -1,11 +1,11 @@
 % Planar high-spin 11B/14N bath with explicit quadrupolar tensors.
 % doi:10.1038/s41563-024-01869-4; isotope and EFG material inputs are gated.
 % The deliberately small model is not a published material reproduction.
-% Syntax: result=cce_hbn_quadrupoles()
+% Syntax: [answer,diagnostics]=cce_hbn_quadrupoles()
 %
 % ilya.kuprov@weizmann.ac.il
 
-function result=cce_hbn_quadrupoles()
+function [answer,diagnostics]=cce_hbn_quadrupoles()
 
 % Magnet and isotopes
 sys.magnet=0.01; sys.isotopes={'E','11B','14N'};
@@ -26,92 +26,27 @@ inter.coupling.matrix{3,3}=diag([-1 -1 2])*5e4;
 % Coordinates define the toy geometry; all couplings above are explicit
 inter=rmfield(inter,'coordinates');
 
-% Compile physical metadata without a full-bath basis
-spin_system=create(sys,inter);
+% Basis policy for retained clusters
+bas.formalism='zeeman-hilb'; bas.approximation='none';
 
-% Projected observed-spin Hahn signal and a complete small-bath graph
-parameters.observed_spins=1; parameters.bath_spins=2:3;
-parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='signal'; parameters.order=2;
-parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
-parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
-parameters.interaction_cutoff=Inf; parameters.meanfield='none';
-parameters.graph=struct('mode','complete');
+% Projected transition and total echo times in seconds
+parameters.observed=1; parameters.cce.bath_spins=2:3;
+parameters.transition.spins=1; parameters.transition.ms=[1/2 -1/2];
 parameters.times=linspace(0,200e-6,41);
-parameters.sequence=struct('type','ideal','target',1,'axis','x',...
-                           'angle',pi,'placement','fraction','at',0.5);
-parameters.bath_state=struct('mode','mixed_product');
-parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.cce.order=2; parameters.cce.approximation='projected';
+parameters.cce.graph=struct('mode','complete');
+parameters.cce.bath_state.mode='mixed_product';
+parameters.cce.basis=bas;
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                             'max_memory_bytes',2^28);
 
+% Execute the named Hahn echo through the cluster-expansion context
+spin_system=create(sys,inter);
+[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
-% Run the cluster expansion and report its physical input boundary
-result=cce(spin_system,parameters);
-fprintf('cce_hbn_quadrupoles: %d/%d valid values; finite-cluster demonstration.\n',...
-        nnz(result.valid),numel(result.valid));
-fprintf('11B/14N toy quadrupoles: no claimed hBN isotope-enhancement curve.\n');
-
-% Independently assemble projected bath Hamiltonians from input Hz tensors
-bath=parameters.bath_spins; dimensions=spin_system.comp.mults(bath);
-dimension=prod(dimensions); operators=cell(numel(bath),3);
-for j=1:numel(bath)
-
-    % Angular momentum matrices in descending magnetic-quantum-number order
-    q=(dimensions(j)-1)/2; m=q:-1:-q;
-    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
-    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
-    for a=1:3
-
-        % Embed a physical bath operator with dense Kronecker products
-        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
-            kron(local{a},eye(prod(dimensions(j+1:end)))));
-    end
-end
-bath_h=zeros(dimension); difference=zeros(dimension);
-for j=1:numel(bath)
-
-    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
-    id=bath(j);
-    if sys.isotopes{id}(1)~='E'
-        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
-    end
-    for a=1:3
-
-        % Projected hyperfine difference and on-site quadratic terms
-        if ~isempty(inter.coupling.matrix{1,id})
-            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
-        end
-        for b=1:3
-            if ~isempty(inter.coupling.matrix{id,id})
-                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
-            end
-        end
-    end
-    for k=j+1:numel(bath)
-        for a=1:3
-            for b=1:3
-
-                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
-                tensor=inter.coupling.matrix{id,bath(k)};
-                if ~isempty(tensor)
-                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
-                end
-            end
-        end
-    end
-end
-ha=bath_h+difference/2; hb=bath_h-difference/2;
-reference=complex(zeros(numel(result.times),1));
-for n=1:numel(result.times)
-
-    % Independent full-bath Hahn propagators for a maximally mixed state
-    ua=expm(-1i*ha*result.times(n)/2); ub=expm(-1i*hb*result.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
-end
-result.reference_error=max(abs(result.value-reference));
-fprintf('Independent dense Hahn maximum complex error: %.3g.\n',result.reference_error);
-
-% Plot the projected complex signal
-kfigure(); plot(1e6*result.times,real(result.value),'b-',...
-                1e6*result.times,imag(result.value),'r--');
+% Plot the complex echo amplitude
+figure(); plot(1e6*parameters.times,real(answer),'b-',...
+                1e6*parameters.times,imag(answer),'r--');
 xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 

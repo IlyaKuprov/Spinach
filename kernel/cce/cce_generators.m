@@ -80,6 +80,8 @@ if projected
     H=struct('kind','cce_projected','left',left,'right',right,...
              'formalism',cluster_system.formalism,'physical_ids',ids,...
              'dissipator',[],'swap_matrix',[]);
+    H.hamiltonian_abs_error_bound=meta.roundoff_bound;
+    H.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)
         H.dissipator=dissipator(cluster_system,jumps,va,vb,parameters);
         H.swap_matrix=commutation(db);

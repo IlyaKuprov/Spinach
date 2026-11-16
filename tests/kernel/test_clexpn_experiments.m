@@ -124,6 +124,7 @@ for n=1:numel(p.times)
 end
 result=test_close(result,'Fractional finite-drive placement',actual,expected,3e-14,0,...
                   'The duration remains in seconds while start scales with elapsed time.');
+
 % Noncommuting drift remains active throughout a finite control interval
 inter.coupling.matrix{1,2}=diag([1 2 3]); system=create(sys,inter);
 p.sequence.at=0; p.sequence.duration=0.1; p.sequence.axis='x';
@@ -237,6 +238,36 @@ result=test_true(result,'Exact-reference validity is separate from budget',...
 result=test_true(result,'Lower-order masks retain propagated errors',...
                    any(~d.reduction.by_order_valid(:,:,1),'all'),...
                    'The lower-order numerical budget still masks unresolved elements.');
+
+% Projected spectral products retain arbitrary preparation and receiver scaling
+sys=struct('magnet',0.03,'isotopes',{{'E','1H'}},...
+           'output','hush','parallel',{{'local',1}});
+inter=struct(); inter.zeeman.matrix={zeros(3),zeros(3)};
+inter.coupling.matrix=cell(2); inter.coupling.matrix{1,2}=[0 0 2;0 0 1;0 0 3];
+system=create(sys,inter); p=struct('observed',1,'times',[0 1e-5 3e-5]);
+p.transition=struct('spins',1,'ms',[0.5 -0.5]);
+p.cce=struct('approximation','projected','order',1);
+p.preparation=struct('states',{{[1 -2i;2i 4]/5}},'spins',1);
+p.coil=exp(0.37i)*[0 1;0 0]; p.normalized=false;
+[~,diagnostics]=clexpn(system,@hahn_echo,p,'labframe');
+model=cce_compile(system,diagnostics.parameters,'labframe');
+config=rmfield(diagnostics.ensemble.spin_config,'assignment');
+[cluster,~]=cce_subsystem(model,2,config,[]);
+[H,R,K,p]=cce_generators(cluster,diagnostics.parameters,[]);
+[actual,aux]=hahn_echo(cluster,p,H,R,K);
+plain=rmfield(H,{'hamiltonian_abs_error_bound','hamiltonian_norm'});
+expected=hahn_echo(cluster,p,plain,R,K);
+result=test_close(result,'Projected unnormalised spectral pulse products',...
+                  actual,expected,2e-14,2e-14,...
+                  'Arbitrary coherent preparation and receiver phase retain their scale.');
+result=test_true(result,'Projected spectral diagnostics',...
+                 all(aux.abs_error_bound>0)&&aux.hamiltonian_bound>=0,...
+                 'Numerical bounds and backward residuals remain attached to the signal.');
+p.normalized=true;
+actual=hahn_echo(cluster,p,H,R,K); expected=hahn_echo(cluster,p,plain,R,K);
+result=test_close(result,'Projected normalized spectral pulse products',...
+                  actual,expected,2e-14,2e-14,...
+                  'Normalization uses the detected initial amplitude, including its phase.');
 
 end
 

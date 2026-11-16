@@ -10,3 +10,5 @@ Explicit function-handle registry, version 2. Free evolution and Hahn echo admit
 
 Hahn echo also supports generalized `output='density'`, with column-vectorised observed density rows and the same elementwise reduction/full-bath override as free evolution. Projected coherence blocks do not expose a density.
 The free-evolution evaluator forwards experiment-owned coherent absolute error bounds and spectral residuals to raw records. Bounds are numerical estimates, not cluster-truncation estimates; they are not replaced by zeros.
+
+The registered Hahn-echo evaluator transports the optional spectral/error auxiliaries exactly as for coherent free evolution. Experiments without these auxiliaries retain their existing contract.

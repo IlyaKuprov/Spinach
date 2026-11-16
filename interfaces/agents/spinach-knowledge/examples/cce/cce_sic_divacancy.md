@@ -1,17 +1,7 @@
-# examples/cce/cce_sic_divacancy.m
+# cce_sic_divacancy
 
-- Signature: `result=cce_sic_divacancy()`
+Syntax: `[answer,diagnostics]=cce_sic_divacancy()`. The numeric answer is the projected Hahn-echo amplitude; diagnostics is the separate clexpn audit record.
 
-## Purpose
+The example uses standard sys/inter/bas/parameters blocks, a declarative magnetic-quantum-number transition, and `clexpn(spin_system,@hahn_echo,parameters,'labframe')`. Its field, isotopes, coordinates, coupling tensors, time grid, bath ensemble and complete cluster graph are unchanged.
 
-Mixed 13C/29Si nuclear bath around a divacancy-like centre. The example prints a comparison against a separately implemented dense Kronecker/expm calculation.
-
-## Spin system and sequence
-
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_sic_divacancy.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_sic_divacancy.m).
+Independent dense Hamiltonian, branch propagators and complex echo comparison live in test_cce_examples. This small model is illustrative, not a material-specific quantitative reproduction.

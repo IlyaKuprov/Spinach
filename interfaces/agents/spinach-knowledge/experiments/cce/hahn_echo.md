@@ -9,3 +9,5 @@ GKSL relaxation follows `L=H+1i*R+1i*K`. Projected propagation acts on an alpha/
 For an odd number of observed-spin branch swaps, the projected trace labels the opposite coherence from a fixed generalized receiver. Preserve the explicitly selected receiver convention; complex traces may be conjugates even when magnitudes agree.
 
 Hahn echo also supports generalized `output='density'`, with column-vectorised observed density rows and the same elementwise reduction/full-bath override as free evolution. Projected coherence blocks do not expose a density.
+
+The optional second output carries spectral residuals, orthogonality residuals and absolute numerical error estimates for coherent projected Hahn echoes. The two invariant-branch spectra are resolved once per retained cluster. Branch propagator products preserve the physical ideal-pulse phase and the zero-time identity; no legacy driver or event-array adapter is called.

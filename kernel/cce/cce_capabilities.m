@@ -51,7 +51,8 @@ if isfield(physical,'assignment'), physical=rmfield(physical,'assignment'); end
 [spin_system,~]=cce_subsystem(model,cluster.sites,physical,[]);
 [H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
 pulse_sequence=schedule.pulse_sequence;
-if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)
+if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)||...
+   isequal(pulse_sequence,@hahn_echo)
     [answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
 else
     answer=pulse_sequence(spin_system,parameters,H,R,K);

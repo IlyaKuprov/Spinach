@@ -26,7 +26,28 @@ for n=1:numel(names)
 
     % Execute each public example and retain the standard harness fields only
     started=tic;
-    if ismember(names{n},{'gcce_sic_clock','gcce_highspin_siv','gcce_votpp'})
+    if ismember(names{n},{'cce_erbium_cawo4','cce_hbn_quadrupoles','cce_methyl_molecular','cce_sic_divacancy','cce_sip_donor'})
+        [answer,diagnostics]=feval(names{n});
+        switch names{n}
+            case 'cce_erbium_cawo4'
+                [reference_error,snapshot]=reference_cce_erbium_cawo4(answer);
+            case 'cce_hbn_quadrupoles'
+                [reference_error,snapshot]=reference_cce_hbn_quadrupoles(answer);
+            case 'cce_methyl_molecular'
+                [reference_error,snapshot]=reference_cce_methyl_molecular(answer);
+            case 'cce_sic_divacancy'
+                [reference_error,snapshot]=reference_cce_sic_divacancy(answer);
+            case 'cce_sip_donor'
+                [reference_error,snapshot]=reference_cce_sip_donor(answer);
+        end
+        actual=struct('value',answer,'reference_error',reference_error,...
+                      'valid',diagnostics.reduction.valid,'density',[]);
+        reference_capture.(names{n})=snapshot;
+        reference_capture.(names{n}).diagnostics=diagnostics;
+        result=test_true(result,[names{n} ' projected error bounds'],...
+                         all(diagnostics.reduction.abs_error_bound>0),...
+                         'Projected spectral error bounds must reach the reducer.');
+    elseif ismember(names{n},{'gcce_sic_clock','gcce_highspin_siv','gcce_votpp'})
         [answer,diagnostics]=feval(names{n});
         actual=diagnostics.reduction; actual.times=diagnostics.parameters.times(:);
 
@@ -174,6 +195,7 @@ for n=1:numel(times)
     reference(n,:)=reduced(:).';
 end
 reference_error=max(abs(answer-reference),[],'all');
+
 % Preserve independent physical arrays for the stage-0 comparison
 snapshot=struct('a',a,'b',b,'db',db,'d_obs',d_obs,...
                 'dimension',dimension,'dimensions',dimensions,'h',h,...
@@ -246,6 +268,7 @@ for n=1:numel(times)
     reference(n,:)=reduced(:).';
 end
 reference_error=max(abs(answer-reference),[],'all');
+
 % Preserve independent physical arrays for the stage-0 comparison
 snapshot=struct('a',a,'b',b,'db',db,'d_obs',d_obs,...
                 'dimension',dimension,'dimensions',dimensions,'h',h,...
@@ -318,6 +341,7 @@ for n=1:numel(times)
     reference(n,:)=reduced(:).';
 end
 reference_error=max(abs(answer-reference),[],'all');
+
 % Preserve independent physical arrays for the stage-0 comparison
 snapshot=struct('a',a,'b',b,'db',db,'d_obs',d_obs,...
                 'dimension',dimension,'dimensions',dimensions,'h',h,...
@@ -325,6 +349,550 @@ snapshot=struct('a',a,'b',b,'db',db,'d_obs',d_obs,...
                 'plus',plus,'reduced',reduced,'reference',reference,...
                 'rho',rho,'rho0',rho0,'u',u,'v',v,'observed',observed,...
                 'reference_error',reference_error,'tensor',tensor,'ids',ids);
+
+end
+
+% Independent dense projected reference for cce_erbium_cawo4
+function [reference_error,snapshot]=reference_cce_erbium_cawo4(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E','183W','183W'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
+inter.coordinates={[0 0 0];[8 0 2];[0 10 -1]};
+inter.zeeman.matrix=repmat({zeros(3)},1,3);
+inter.coupling.matrix=cell(3);
+
+% Explicit illustrative hyperfine and bath coupling tensors in Hz
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;3000 1200 2000].';
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;-900 400 1000].';
+inter.coupling.matrix{2,3}=diag([80 80 -160]);
+
+% Coordinates define the toy geometry; all couplings above are explicit
+inter=rmfield(inter,'coordinates');
+
+spin_system=create(sys,inter);
+parameters.bath=2:3;
+parameters.times=linspace(0,200e-6,41);
+
+% Independently assemble projected bath Hamiltonians from input Hz tensors
+bath=parameters.bath; dimensions=spin_system.comp.mults(bath);
+dimension=prod(dimensions); operators=cell(numel(bath),3);
+for j=1:numel(bath)
+
+    % Angular momentum matrices in descending magnetic-quantum-number order
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+
+        % Embed a physical bath operator with dense Kronecker products
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+bath_h=zeros(dimension); difference=zeros(dimension);
+for j=1:numel(bath)
+
+    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
+    id=bath(j);
+    if sys.isotopes{id}(1)~='E'
+        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
+    end
+    for a=1:3
+
+        % Projected hyperfine difference and on-site quadratic terms
+        if ~isempty(inter.coupling.matrix{1,id})
+            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
+        end
+        for b=1:3
+            if ~isempty(inter.coupling.matrix{id,id})
+                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
+            end
+        end
+    end
+    for k=j+1:numel(bath)
+        for a=1:3
+            for b=1:3
+
+                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
+                tensor=inter.coupling.matrix{id,bath(k)};
+                if ~isempty(tensor)
+                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
+                end
+            end
+        end
+    end
+end
+ha=bath_h+difference/2; hb=bath_h-difference/2;
+reference=complex(zeros(numel(parameters.times),1));
+for n=1:numel(parameters.times)
+
+    % Independent full-bath Hahn propagators for a maximally mixed state
+    ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
+    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+end
+reference_error=max(abs(answer-reference));
+
+snapshot=struct();
+snapshot.a=a; snapshot.b=b;
+snapshot.bath=bath;
+snapshot.dimensions=dimensions;
+snapshot.dimension=dimension;
+snapshot.operators=operators;
+snapshot.q=q;
+snapshot.m=m;
+snapshot.plus=plus;
+snapshot.local=local;
+snapshot.bath_h=bath_h;
+snapshot.difference=difference;
+snapshot.id=id;
+snapshot.tensor=tensor;
+snapshot.ha=ha;
+snapshot.hb=hb;
+snapshot.reference=reference;
+snapshot.ua=ua;
+snapshot.ub=ub;
+snapshot.reference_error=reference_error;
+
+end
+
+% Independent dense projected reference for cce_hbn_quadrupoles
+function [reference_error,snapshot]=reference_cce_hbn_quadrupoles(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E','11B','14N'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
+inter.coordinates={[0 0 0];[1.45 0 0];[-0.725 1.2557 0]};
+inter.zeeman.matrix=repmat({zeros(3)},1,3);
+inter.coupling.matrix=cell(3);
+
+% Explicit illustrative hyperfine and bath coupling tensors in Hz
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;40000 0 20000].';
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;20000 0 -10000].';
+inter.coupling.matrix{2,3}=diag([500 500 -1000]);
+inter.coupling.matrix{2,2}=diag([-1 -1 2])*2e5;
+inter.coupling.matrix{3,3}=diag([-1 -1 2])*5e4;
+
+% Coordinates define the toy geometry; all couplings above are explicit
+inter=rmfield(inter,'coordinates');
+
+spin_system=create(sys,inter);
+parameters.bath=2:3;
+parameters.times=linspace(0,200e-6,41);
+
+% Independently assemble projected bath Hamiltonians from input Hz tensors
+bath=parameters.bath; dimensions=spin_system.comp.mults(bath);
+dimension=prod(dimensions); operators=cell(numel(bath),3);
+for j=1:numel(bath)
+
+    % Angular momentum matrices in descending magnetic-quantum-number order
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+
+        % Embed a physical bath operator with dense Kronecker products
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+bath_h=zeros(dimension); difference=zeros(dimension);
+for j=1:numel(bath)
+
+    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
+    id=bath(j);
+    if sys.isotopes{id}(1)~='E'
+        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
+    end
+    for a=1:3
+
+        % Projected hyperfine difference and on-site quadratic terms
+        if ~isempty(inter.coupling.matrix{1,id})
+            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
+        end
+        for b=1:3
+            if ~isempty(inter.coupling.matrix{id,id})
+                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
+            end
+        end
+    end
+    for k=j+1:numel(bath)
+        for a=1:3
+            for b=1:3
+
+                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
+                tensor=inter.coupling.matrix{id,bath(k)};
+                if ~isempty(tensor)
+                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
+                end
+            end
+        end
+    end
+end
+ha=bath_h+difference/2; hb=bath_h-difference/2;
+reference=complex(zeros(numel(parameters.times),1));
+for n=1:numel(parameters.times)
+
+    % Independent full-bath Hahn propagators for a maximally mixed state
+    ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
+    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+end
+reference_error=max(abs(answer-reference));
+
+snapshot=struct();
+snapshot.a=a; snapshot.b=b;
+snapshot.bath=bath;
+snapshot.dimensions=dimensions;
+snapshot.dimension=dimension;
+snapshot.operators=operators;
+snapshot.q=q;
+snapshot.m=m;
+snapshot.plus=plus;
+snapshot.local=local;
+snapshot.bath_h=bath_h;
+snapshot.difference=difference;
+snapshot.id=id;
+snapshot.tensor=tensor;
+snapshot.ha=ha;
+snapshot.hb=hb;
+snapshot.reference=reference;
+snapshot.ua=ua;
+snapshot.ub=ub;
+snapshot.reference_error=reference_error;
+
+end
+
+% Independent dense projected reference for cce_methyl_molecular
+function [reference_error,snapshot]=reference_cce_methyl_molecular(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E','1H','1H','1H'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
+inter.coordinates={[0 0 0];[5 1 0];[5 -0.5 0.866];[5 -0.5 -0.866]};
+inter.zeeman.matrix=repmat({zeros(3)},1,4);
+inter.coupling.matrix=cell(4);
+
+% Explicit illustrative hyperfine and bath coupling tensors in Hz
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;7000 0 5000].';
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;5000 0 4000].';
+inter.coupling.matrix{1,4}=[0 0 0;0 0 0;6000 0 3000].';
+inter.coupling.matrix{2,3}=2000*eye(3);
+inter.coupling.matrix{2,4}=2000*eye(3);
+inter.coupling.matrix{3,4}=2000*eye(3);
+
+% Coordinates define the toy geometry; all couplings above are explicit
+inter=rmfield(inter,'coordinates');
+
+spin_system=create(sys,inter);
+parameters.bath=2:4;
+parameters.times=linspace(0,200e-6,41);
+
+% Independently assemble projected bath Hamiltonians from input Hz tensors
+bath=parameters.bath; dimensions=spin_system.comp.mults(bath);
+dimension=prod(dimensions); operators=cell(numel(bath),3);
+for j=1:numel(bath)
+
+    % Angular momentum matrices in descending magnetic-quantum-number order
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+
+        % Embed a physical bath operator with dense Kronecker products
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+bath_h=zeros(dimension); difference=zeros(dimension);
+for j=1:numel(bath)
+
+    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
+    id=bath(j);
+    if sys.isotopes{id}(1)~='E'
+        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
+    end
+    for a=1:3
+
+        % Projected hyperfine difference and on-site quadratic terms
+        if ~isempty(inter.coupling.matrix{1,id})
+            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
+        end
+        for b=1:3
+            if ~isempty(inter.coupling.matrix{id,id})
+                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
+            end
+        end
+    end
+    for k=j+1:numel(bath)
+        for a=1:3
+            for b=1:3
+
+                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
+                tensor=inter.coupling.matrix{id,bath(k)};
+                if ~isempty(tensor)
+                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
+                end
+            end
+        end
+    end
+end
+ha=bath_h+difference/2; hb=bath_h-difference/2;
+reference=complex(zeros(numel(parameters.times),1));
+for n=1:numel(parameters.times)
+
+    % Independent full-bath Hahn propagators for a maximally mixed state
+    ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
+    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+end
+reference_error=max(abs(answer-reference));
+
+snapshot=struct();
+snapshot.a=a; snapshot.b=b;
+snapshot.bath=bath;
+snapshot.dimensions=dimensions;
+snapshot.dimension=dimension;
+snapshot.operators=operators;
+snapshot.q=q;
+snapshot.m=m;
+snapshot.plus=plus;
+snapshot.local=local;
+snapshot.bath_h=bath_h;
+snapshot.difference=difference;
+snapshot.id=id;
+snapshot.tensor=tensor;
+snapshot.ha=ha;
+snapshot.hb=hb;
+snapshot.reference=reference;
+snapshot.ua=ua;
+snapshot.ub=ub;
+snapshot.reference_error=reference_error;
+
+end
+
+% Independent dense projected reference for cce_sic_divacancy
+function [reference_error,snapshot]=reference_cce_sic_divacancy(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E','13C','29Si'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
+inter.coordinates={[0 0 0];[4 0 1];[0 5 2]};
+inter.zeeman.matrix=repmat({zeros(3)},1,3);
+inter.coupling.matrix=cell(3);
+
+% Explicit illustrative hyperfine and bath coupling tensors in Hz
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;9000 0 -4000].';
+inter.coupling.matrix{2,3}=diag([250 250 -500]);
+
+% Coordinates define the toy geometry; all couplings above are explicit
+inter=rmfield(inter,'coordinates');
+
+spin_system=create(sys,inter);
+parameters.bath=2:3;
+parameters.times=linspace(0,200e-6,41);
+
+% Independently assemble projected bath Hamiltonians from input Hz tensors
+bath=parameters.bath; dimensions=spin_system.comp.mults(bath);
+dimension=prod(dimensions); operators=cell(numel(bath),3);
+for j=1:numel(bath)
+
+    % Angular momentum matrices in descending magnetic-quantum-number order
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+
+        % Embed a physical bath operator with dense Kronecker products
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+bath_h=zeros(dimension); difference=zeros(dimension);
+for j=1:numel(bath)
+
+    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
+    id=bath(j);
+    if sys.isotopes{id}(1)~='E'
+        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
+    end
+    for a=1:3
+
+        % Projected hyperfine difference and on-site quadratic terms
+        if ~isempty(inter.coupling.matrix{1,id})
+            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
+        end
+        for b=1:3
+            if ~isempty(inter.coupling.matrix{id,id})
+                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
+            end
+        end
+    end
+    for k=j+1:numel(bath)
+        for a=1:3
+            for b=1:3
+
+                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
+                tensor=inter.coupling.matrix{id,bath(k)};
+                if ~isempty(tensor)
+                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
+                end
+            end
+        end
+    end
+end
+ha=bath_h+difference/2; hb=bath_h-difference/2;
+reference=complex(zeros(numel(parameters.times),1));
+for n=1:numel(parameters.times)
+
+    % Independent full-bath Hahn propagators for a maximally mixed state
+    ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
+    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+end
+reference_error=max(abs(answer-reference));
+
+snapshot=struct();
+snapshot.a=a; snapshot.b=b;
+snapshot.bath=bath;
+snapshot.dimensions=dimensions;
+snapshot.dimension=dimension;
+snapshot.operators=operators;
+snapshot.q=q;
+snapshot.m=m;
+snapshot.plus=plus;
+snapshot.local=local;
+snapshot.bath_h=bath_h;
+snapshot.difference=difference;
+snapshot.id=id;
+snapshot.tensor=tensor;
+snapshot.ha=ha;
+snapshot.hb=hb;
+snapshot.reference=reference;
+snapshot.ua=ua;
+snapshot.ub=ub;
+snapshot.reference_error=reference_error;
+
+end
+
+% Independent dense projected reference for cce_sip_donor
+function [reference_error,snapshot]=reference_cce_sip_donor(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E','29Si','29Si'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
+inter.coordinates={[0 0 0];[8 4 0];[12 2 4]};
+inter.zeeman.matrix=repmat({zeros(3)},1,3);
+inter.coupling.matrix=cell(3);
+
+% Explicit illustrative hyperfine and bath coupling tensors in Hz
+a=25; k0=0.85*2*pi/5.43;
+for n=2:3
+
+    % Hydrogenic envelope and six-valley interference, illustrative scale
+    r=inter.coordinates{n};
+    contact=2e5*exp(-2*norm(r)/a)*(sum(cos(k0*r))/3)^2;
+
+    % Retain observed Sz only for the explicitly projected donor model
+    inter.coupling.matrix{1,n}=diag([0 0 contact]);
+end
+inter.coupling.matrix{2,3}=diag([200 200 -400]);
+
+% Coordinates define the toy geometry; all couplings above are explicit
+inter=rmfield(inter,'coordinates');
+
+spin_system=create(sys,inter);
+parameters.bath=2:3;
+parameters.times=linspace(0,200e-6,41);
+
+% Independently assemble projected bath Hamiltonians from input Hz tensors
+bath=parameters.bath; dimensions=spin_system.comp.mults(bath);
+dimension=prod(dimensions); operators=cell(numel(bath),3);
+for j=1:numel(bath)
+
+    % Angular momentum matrices in descending magnetic-quantum-number order
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+
+        % Embed a physical bath operator with dense Kronecker products
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+bath_h=zeros(dimension); difference=zeros(dimension);
+for j=1:numel(bath)
+
+    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
+    id=bath(j);
+    if sys.isotopes{id}(1)~='E'
+        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
+    end
+    for a=1:3
+
+        % Projected hyperfine difference and on-site quadratic terms
+        if ~isempty(inter.coupling.matrix{1,id})
+            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
+        end
+        for b=1:3
+            if ~isempty(inter.coupling.matrix{id,id})
+                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
+            end
+        end
+    end
+    for k=j+1:numel(bath)
+        for a=1:3
+            for b=1:3
+
+                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
+                tensor=inter.coupling.matrix{id,bath(k)};
+                if ~isempty(tensor)
+                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
+                end
+            end
+        end
+    end
+end
+ha=bath_h+difference/2; hb=bath_h-difference/2;
+reference=complex(zeros(numel(parameters.times),1));
+for n=1:numel(parameters.times)
+
+    % Independent full-bath Hahn propagators for a maximally mixed state
+    ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
+    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+end
+reference_error=max(abs(answer-reference));
+
+snapshot=struct();
+snapshot.a=a; snapshot.b=b;
+snapshot.bath=bath;
+snapshot.dimensions=dimensions;
+snapshot.dimension=dimension;
+snapshot.operators=operators;
+snapshot.q=q;
+snapshot.m=m;
+snapshot.plus=plus;
+snapshot.local=local;
+snapshot.bath_h=bath_h;
+snapshot.difference=difference;
+snapshot.id=id;
+snapshot.tensor=tensor;
+snapshot.ha=ha;
+snapshot.hb=hb;
+snapshot.reference=reference;
+snapshot.ua=ua;
+snapshot.ub=ub;
+snapshot.reference_error=reference_error;
+snapshot.r=r; snapshot.contact=contact; snapshot.k0=k0;
 
 end
 

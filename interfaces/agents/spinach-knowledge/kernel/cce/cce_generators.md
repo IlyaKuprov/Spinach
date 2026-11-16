@@ -13,3 +13,5 @@ cce_backend selects auto/direct/stock; this is an expert service construction ov
 Conventional evolution uses `L=H+1i*R+1i*K`; GKSL rates are inverse seconds. Projected generators carry left/right branch Hamiltonians and a coherence-block dissipator, not a physical density matrix. Branch exchange transforms the dissipator with `swap_matrix*conj(dissipator)*swap_matrix'`. Ordinary and projected dissipative experiments share this service.
 
 First-order projected Hamiltonians are conditional approximations, not a requirement that the full Hamiltonian preserve observed populations. The omitted-manifold coupling norm is recorded as `projection_leakage`. Jump operators must still preserve the selected manifolds. With nonempty GKSL jumps, projected master dynamics additionally retains the existing full-Hamiltonian manifold-invariance requirement.
+
+Coherent projected generators additionally expose the compiled Hamiltonian round-off estimate and full retained Hamiltonian Frobenius norm for experiment-owned propagation error accounting.

@@ -14,3 +14,5 @@ Sampled assignments use configuration-indexed Threefry substreams, preserving de
 Resolved transition policy metadata is copied from the compiled model; transition construction is not repeated in options validation. Coherent free-evolution raw records preserve measured spectral residuals and absolute propagation-error estimates. Exact-reference validity and budget satisfaction are distinct.
 
 The polarized-bath, two-observed-centre, and dissipative-bath examples use native hahn_echo/free_evolution calls and return [answer,diagnostics]. Sampled probability tables are rows; the 'uniform' basis selector names the standard Zeeman basis independently of the supplied probabilities. Reduced-density columns use column-major matrix ordering. Independent dense and exhaustive reference calculations are in test_cce_examples.
+
+Native noise descriptors carry physical bath-spin support without building a full-bath matrix. Graph selection uses these supports for unconnected or sampled noise, preserving cross terms. The native context computes optional parameters.spectrum only after ensemble reduction and returns diagnostics.spectrum; the Fourier convention remains explicit.

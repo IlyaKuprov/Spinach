@@ -1,48 +1,42 @@
 % Ordered noise correlations and a finite-window spectrum of one nucleus.
 % A precessing transverse spin has C(t)=cos(omega*t)/4 in a mixed state.
-% This example compares that identity, not a phenomenological T1 fit.
-% Syntax: result=cce_noise_spectrum()
+% The regression test checks that identity, not a phenomenological T1 fit.
+% Syntax: [answer,diagnostics]=cce_noise_spectrum()
 %
 % ilya.kuprov@weizmann.ac.il
 
-function result=cce_noise_spectrum()
+function [answer,diagnostics]=cce_noise_spectrum()
 
 % Magnet and isotopes
 sys.magnet=0.01; sys.isotopes={'E','13C'};
 sys.output='hush'; sys.parallel={'local',1};
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
+bas.formalism='zeeman-hilb'; bas.approximation='none';
 spin_system=create(sys,inter);
 
 % Additive connected noise of the transverse nuclear operator
-x=[0 1;1 0]/2; omega=-spin('13C')*sys.magnet;
-parameters.observed_spins=1; parameters.bath_spins=2;
-parameters.method='noise'; parameters.expansion='standard';
-parameters.quantity='autocorrelation'; parameters.order=1;
-parameters.rho0=eye(2)/2; parameters.assumptions='labframe';
-parameters.orientation=[0 0 0]; parameters.interaction_cutoff=Inf;
-parameters.graph=struct('mode','complete'); parameters.meanfield='none';
+omega=-spin('13C')*sys.magnet;
+parameters.observed=1;
+parameters.cce.order=1; parameters.cce.basis=bas;
+parameters.cce.graph=struct('mode','complete');
+parameters.preparation.state='mixed';
 parameters.times=linspace(0,10*2*pi/abs(omega),401);
-parameters.sequence=struct([]); parameters.bath_state=struct('mode','mixed_product');
-parameters.noise=struct('ordering','ordered','connected',true,...
-                       'terms',struct('support',2,'operator',x));
-parameters.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^28);
-
-% Compare the additive expansion with an independent analytic correlation
-result=cce(spin_system,parameters); reference=cos(omega*result.times(:))/4;
-result.reference_error=max(abs(result.value-reference));
-fprintf('Noise analytic cosine maximum error: %.3g.\n',result.reference_error);
+parameters.noise.descriptors=struct('operators','Lx','spins',2,'coefficient',1);
+parameters.noise.ordering='ordered'; parameters.noise.connected=true;
+parameters.noise.manifold='bath_only';
+parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^28);
 
 % Extend the stationary mixed-state correlation without a Markov assumption
 parameters.spectrum=struct('frequency_grid',linspace(-2*abs(omega),2*abs(omega),401),...
     'convention','exp(+i*omega*t)','sidedness','two-sided','window','hann',...
     'time_domain','positive','weights','trapezoid','stationary',true);
-spectrum=cce_spectrum(result.times,result.value,parameters); result.spectrum=spectrum;
+[answer,diagnostics]=clexpn(spin_system,@noise_correlation,parameters,'labframe');
 
 % Plot the physical correlation and its finite-window transform
-kfigure(); subplot(1,2,1); plot(1e6*result.times,real(result.value));
+kfigure(); subplot(1,2,1); plot(1e6*parameters.times,real(answer));
 xlabel('lag / microseconds'); ylabel('C(t)'); kgrid();
-subplot(1,2,2); plot(spectrum.omega/(2*pi*1e3),real(spectrum.value));
+subplot(1,2,2); plot(diagnostics.spectrum.omega/(2*pi*1e3),real(diagnostics.spectrum.value));
 xlabel('frequency / kHz'); ylabel('finite-window spectrum / s'); kgrid();
 
 end

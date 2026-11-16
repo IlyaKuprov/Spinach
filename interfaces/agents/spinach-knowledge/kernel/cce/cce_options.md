@@ -26,3 +26,16 @@ This staged input service is independent of the unchanged old driver. The clexpn
 
 Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalized dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
 Transition eigensystem construction belongs to compilation, after native options validation. `cce_options` does not construct the observed Hamiltonian or return resolved transition metadata. The context still exposes the compiled transition and metadata in its policy diagnostics.
+
+## Array-free fluctuation descriptors
+
+Instead of noise.terms, supply a nonempty structure array noise.descriptors.
+Every element has operators (Lx, Ly, Lz, or E), spins (a nonempty row of
+unique physical bath IDs), and coefficient (a finite real scalar in the
+fluctuation units). It denotes the coefficient times the sum of those
+one-spin operators. The experiment constructs only retained-cluster matrices;
+selected exterior spins contribute zero in that retained cluster. All physical
+IDs are validated before restriction, including for the empty cluster.
+Descriptors and explicit matrix terms are mutually exclusive. Unknown fields,
+non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
+are rejected. Connected ensemble and Fourier conventions are unchanged.

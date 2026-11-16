@@ -27,6 +27,8 @@
 % averaging completed expansions. Explicit physical populations, quadrupoles,
 % polarisation, jump directions/rates and second-order projection are never
 % invented. Canonical tensors and declared pump frequencies are not converted.
+% noise.descriptors contains operators, spins and coefficient; its physical
+% validation and retained-cluster matrix construction belong to noise_correlation.
 % New experiment-specific fields must be added explicitly to this contract.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -373,11 +375,16 @@ if isfield(p,'sequence')
     end
 end
 if isfield(p,'noise')
-    fields(p.noise,{'terms','connected','ordering','manifold'},'noise');
+    fields(p.noise,{'terms','descriptors','connected','ordering','manifold'},'noise');
     if isfield(p.noise,'terms')
         for k=1:numel(p.noise.terms)
             fields(p.noise.terms(k),{'support','operator'},'noise.terms');
         end
+    end
+end
+if isfield(p,'noise')&&isfield(p.noise,'descriptors')
+    for k=1:numel(p.noise.descriptors)
+        fields(p.noise.descriptors(k),{'operators','spins','coefficient'},'noise.descriptors');
     end
 end
 if isfield(p,'spectrum')

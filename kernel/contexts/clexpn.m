@@ -14,6 +14,8 @@
 % wrapper. diagnostics includes raw cluster responses, reduction, resolved
 % policy, physical ordering and elapsed time. This closed-system stage uses
 % multiplicative reduction; density and additive noise are separate contracts.
+% For noise_correlation, parameters.spectrum requests cce_spectrum after the
+% completed ensemble reduction; the result is diagnostics.spectrum.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -23,8 +25,9 @@ function [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assum
 grumble(spin_system,pulse_sequence,parameters,assumptions);
 started=tic; contract=cce_capabilities(pulse_sequence);
 [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions);
-if isfield(parameters,'noise')&&~isequal(pulse_sequence,@noise_correlation)
-    error('clexpn:noise','Noise parameters belong to the noise_correlation experiment.');
+if (isfield(parameters,'noise')||isfield(parameters,'spectrum'))&&...
+   ~isequal(pulse_sequence,@noise_correlation)
+    error('clexpn:noise','Noise and spectrum parameters belong to the noise_correlation experiment.');
 end
 if isequal(pulse_sequence,@noise_correlation)&&...
    strcmp(parameters.cce.bath_state.mode,'interlaced')
@@ -115,6 +118,10 @@ diagnostics.reduction=reduced; diagnostics.policy=policy;
 diagnostics.parameters=parameters; diagnostics.contract=contract;
 diagnostics.physical_ids=model.physical_ids; diagnostics.observed_ids=model.observed_ids;
 diagnostics.bath_ids=model.bath_ids; diagnostics.ensemble=ensemble;
+if isfield(parameters,'spectrum')
+    diagnostics.spectrum=cce_spectrum(parameters.times,answer,...
+                                      struct('spectrum',parameters.spectrum));
+end
 diagnostics.elapsed_seconds=toc(started);
 
 end

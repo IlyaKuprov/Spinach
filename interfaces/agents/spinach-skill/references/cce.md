@@ -273,3 +273,18 @@ The projected echo examples cce_erbium_cawo4, cce_hbn_quadrupoles, cce_methyl_mo
 The single-nucleus, NV, P1 and partitioned-electron-layer examples now return `[answer,diagnostics]` through clexpn and hahn_echo. Analytic/source-pinned/dense references, including the partitioned versus full-order comparison, live in test_cce_examples. Legacy entry points remain available during the remaining migration.
 
 Projected zero-duration Hahn propagation evaluates the retained bath density trace, preserving floating-point identity for mixed baths whose dimension is not a power of two. The six-state electron/nitrogen regression checks this exactly.
+
+## Array-free fluctuation descriptors
+
+Instead of noise.terms, supply a nonempty structure array noise.descriptors.
+Every element has operators (Lx, Ly, Lz, or E), spins (a nonempty row of
+unique physical bath IDs), and coefficient (a finite real scalar in the
+fluctuation units). It denotes the coefficient times the sum of those
+one-spin operators. The experiment constructs only retained-cluster matrices;
+selected exterior spins contribute zero in that retained cluster. All physical
+IDs are validated before restriction, including for the empty cluster.
+Descriptors and explicit matrix terms are mutually exclusive. Unknown fields,
+non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
+are rejected. Connected ensemble and Fourier conventions are unchanged.
+
+With no bath dissipator, noise_correlation evaluates the explicitly ordered or symmetrized correlation in Hilbert space using the Hermitian bath eigensystem. It transports the existing unitary round-off estimate. Dissipative noise retains Liouville propagation. Optional parameters.spectrum is evaluated after the completed native ensemble and returned in diagnostics.spectrum, not per cluster.

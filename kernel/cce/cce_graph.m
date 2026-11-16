@@ -32,6 +32,9 @@
 %   observed_mediated, approximate, omitted_bath_ids, selection_mode and
 %   requires_convergence.
 %
+% Native noise support can also be specified by noise.descriptors.spins;
+% these physical IDs participate in the same nonzero-mean support graph.
+%
 % See also cce_clusters, cce_partition.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -137,7 +140,12 @@ if strcmp(parameters.method,'noise')&&isfield(parameters,'noise')
     sampled=isfield(parameters,'bath_state')&&...
             ismember(parameters.bath_state.mode,{'sampled','interlaced'});
     if ~parameters.noise.connected||sampled
-        observed=ismember(model.bath_ids,[parameters.noise.terms.support]);
+        if isfield(parameters.noise,'terms')
+            support=[parameters.noise.terms.support];
+        else
+            support=[parameters.noise.descriptors.spins];
+        end
+        observed=ismember(model.bath_ids,support);
         adjacency(observed,observed)=true; adjacency(1:n+1:end)=false;
     end
 end

@@ -26,12 +26,14 @@ for n=1:numel(names)
 
     % Execute each public example and retain the standard harness fields only
     started=tic;
-    if ismember(names{n},{'cce_single_nucleus','cce_nv_diamond',...
+    if ismember(names{n},{'cce_noise_spectrum','cce_single_nucleus','cce_nv_diamond',...
                          'cce_p1_electron_bath','pcce_electron_layer',...
                          'cce_erbium_cawo4','cce_hbn_quadrupoles',...
                          'cce_methyl_molecular','cce_sic_divacancy','cce_sip_donor'})
         [answer,diagnostics]=feval(names{n});
         switch names{n}
+            case 'cce_noise_spectrum'
+                [reference_error,snapshot]=reference_cce_noise_spectrum(answer);
             case 'cce_single_nucleus'
                 [reference_error,snapshot]=reference_cce_single_nucleus(answer);
             case 'cce_nv_diamond'
@@ -1577,6 +1579,14 @@ sampling_error=max(abs(answer-exact));
 snapshot=struct('population',population,'exact',exact,...
                 'exact_diagnostics',exact_diagnostics,'sampling_error',sampling_error);
 
+end
+
+% Independent analytic transverse-noise reference and original physical arrays
+function [reference_error,snapshot]=reference_cce_noise_spectrum(answer)
+omega=-spin('13C')*0.01; times=linspace(0,10*2*pi/abs(omega),401);
+reference=cos(omega*times(:))/4; x=[0 1;1 0]/2;
+reference_error=max(abs(answer-reference));
+snapshot=struct('omega',omega,'reference',reference,'x',x,'reference_error',reference_error);
 end
 
 

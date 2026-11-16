@@ -1,17 +1,13 @@
-# examples/cce/cce_noise_spectrum.m
+# cce_noise_spectrum
 
-- Signature: `result=cce_noise_spectrum()`
+Syntax: [answer,diagnostics]=cce_noise_spectrum().
 
-## Purpose
-
-Ordered noise correlations and a finite-window spectrum of one nucleus. The noise correlation is checked against cos(omega*t)/4; the explicit stationary extension, Hann window, trapezoid weights and exp(+i*omega*t) convention determine the finite-window spectrum.
-
-## Spin system and sequence
-
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_noise_spectrum.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_noise_spectrum.m).
+A mixed carbon-13 nuclear spin in a 0.01 T field supplies the ordered,
+connected transverse fluctuation correlation. The example defines ordinary
+Spinach system tensors and a named Lx fluctuation descriptor, then calls
+clexpn(spin_system,@noise_correlation,parameters,'labframe') once. The
+spectrum is returned in diagnostics.spectrum; plots retain the same time
+and angular-frequency grids, Hann window, trapezoidal quadrature and
+stationary two-sided Fourier convention. No hand-built operator or state is
+required. The independent cosine reference and its numerical error are
+checked in test_cce_examples, not in the example.

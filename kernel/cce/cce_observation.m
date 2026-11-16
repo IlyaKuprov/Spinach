@@ -6,7 +6,8 @@
 % Explicit rho0 is an observed-spin density matrix; coil is an observed
 % detector matrix or cell row. Otherwise preparation is 'transition' (the
 % equal alpha/beta superposition) or a structure with states and spins for
-% cce_state; detection is 'transition' (alpha*beta') or a structure with
+% cce_state; 'transverse' prepares (identity+2*Lx)/2 for one spin one-half.
+% detection is 'transition' (alpha*beta') or a structure with
 % operators and spins for cce_operator. Descriptor spins are physical IDs.
 % A selected transition supplies the standard preparation/detection only
 % when neither an explicit override nor a descriptor is present. No
@@ -46,6 +47,8 @@ if isfield(parameters,'rho0')
        abs(trace(observed)-1)>tolerance||min(eig(full((observed+observed')/2)))<-tolerance
         error('cce_observation:density','An explicit preparation is a positive trace-one density matrix.');
     end
+elseif isfield(parameters,'preparation')&&isequal(parameters.preparation,'transverse')
+    observed=(eye(dc)+2*cce_operator(local,'Lx',ids))/2;
 elseif isfield(parameters,'preparation')&&isstruct(parameters.preparation)
     spec=parameters.preparation; observed=cce_state(local,spec.states,spec.spins);
 elseif isfield(model,'transition')
@@ -146,6 +149,9 @@ for name={'preparation','detection'}
         value=parameters.(name{1});
         if ischar(value)
             valid=strcmp(value,'transition')&&isfield(system.model,'transition');
+            if strcmp(name{1},'preparation')&&strcmp(value,'transverse')
+                valid=isscalar(system.model.observed_ids)&&system.observed_dimension==2;
+            end
         elseif isstruct(value)&&isscalar(value)
             if strcmp(name{1},'preparation'), field='states'; else, field='operators'; end
             valid=all(isfield(value,{field,'spins'}));

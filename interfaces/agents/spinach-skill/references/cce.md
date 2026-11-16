@@ -252,3 +252,11 @@ Hahn echo also supports generalized `output='density'`, with column-vectorised o
 ### Standalone decay analysis
 
 `cce_analyse(result,parameters)` validates `parameters.analysis` locally. Native `clexpn` options may be retained in `parameters`: algorithm choices do not affect an explicitly selected fitting window or model. Unknown analysis fields remain errors. No driver-level parameter translator is involved.
+
+### Native finite controls and preparation
+
+Use `clexpn(...,@free_evolution,parameters,assumptions)` with generalized approximation for finite controls. `parameters.sequence` contains only finite events: physical target IDs, axis (x/y/z or unit vector), amplitude and optional detuning in rad/s, duration in seconds, and placement/at (absolute seconds or fraction of each requested elapsed time). Drives add on overlap and retain drift and relaxation. Exterior driven bath spins and projected drives are unsupported; named echo experiments own ideal pulses. `preparation=transverse` prepares the positive `(identity+2*Lx)/2` density for one observed spin one-half; use descriptors for other populations.
+
+The already-native bath utility is `[sys,inter,bath]=spin_bath(sys,inter,specification)`, in `kernel/utilities/`; it generates/appends native isotope, Angstrom coordinate and Hz interaction tables with stable physical IDs and metadata. It has no legacy-driver dependency. Do not create a second bath service during the example migration.
+
+Preparation selectors verified for the example migration: `transition.ms=[-0.5 0.5]` for E4, `[-1 1]` for E3, `[-0.5 0.5;-0.5 0.5]` for two electrons, and `[-0.5 0.5;3.5 3.5]` for E/51V. `transition.spins` follows the observed-spin order. These select the equal two-manifold superpositions without manually assembled vectors.

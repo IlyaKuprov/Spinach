@@ -49,3 +49,7 @@ The noise example uses native operator descriptors. The cosine reference and ori
 gcce_finite_drive returns native answer/diagnostics. Its independent two-spin expm propagation and frozen physical reference arrays now live in the test, not in the example.
 
 The migrated cce_deer_bandwidth example returns [answer,diagnostics]. Its independent test uses direct three-spin density-matrix expm propagation with an observed refocusing pulse and selected bath pulse. A native clexpn check moves the spectral window away, verifies the no-pump limit, and verifies allow_empty=false rejects the empty selector. No legacy parameter assembly is used for this example.
+
+## Native molecular powder
+
+cce_molecular_powder returns numeric answer and separate native diagnostics. Its independent full-bath reference assembles rotated physical tensors with Cartesian spin matrices, the stock ordered-pair tensor convention and expm, then averages completed Hahn echoes. Tests cover agreement, the analytic unit initial signal, the final expansion order and orientation-resolved numerical bounds. There is no legacy entry-point call in any examples/cce file.

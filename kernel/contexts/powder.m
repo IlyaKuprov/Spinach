@@ -2,7 +2,7 @@
 % superoperator, the initial state, the coil state, then passes them 
 % on to the pulse sequence function. Syntax:
 %
-%      [answer,sph_grid]=powder(spin_system,pulse_sequence,...
+%      [answer,sph_grid,diagnostics]=powder(spin_system,pulse_sequence,...
 %                               parameters,assumptions)
 %
 % Parameters:
@@ -77,6 +77,14 @@
 %                        'labframe', etc.) - see the pulse sequence
 %                        header for information on this setting.
 %
+% A context_task(@clexpn,...) descriptor may replace pulse_sequence. This
+% branch accepts parameters.grid as a grid name or an explicit structure
+% with alphas, betas, gammas, weights vectors; all experiment parameters reside
+% in the task. No full-system basis or generators are constructed. The
+% optional third output contains orientation_average diagnostics; it is
+% empty on the ordinary pulse-sequence branch. Assumptions must match the
+% descriptor. See orientation_average for averaging-order semantics.
+%
 % Outputs:
 %
 %   answer    - powder average of whatever it is that the pulse 
@@ -105,8 +113,20 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=powder.m>
 
-function [answer,sph_grid]=powder(spin_system,pulse_sequence,...
+function [answer,sph_grid,diagnostics]=powder(spin_system,pulse_sequence,...
                                   parameters,assumptions)
+
+% Dispatch deferred contexts before defaults, basis or generator construction
+diagnostics=[];
+if isstruct(pulse_sequence)
+    if ~ischar(assumptions)||~isrow(assumptions)||...
+       ~isfield(pulse_sequence,'assumptions')||...
+       ~isequal(assumptions,pulse_sequence.assumptions)
+        error('powder:assumptions','Outer and deferred context assumptions must agree.');
+    end
+    [answer,diagnostics]=orientation_average(spin_system,pulse_sequence,parameters);
+    sph_grid=diagnostics.grid; return
+end
 
 % Show the banner
 banner(spin_system,'sequence_banner'); 
@@ -359,7 +379,6 @@ end
 % Consistency checking
 function grumble(spin_system,pulse_sequence,parameters,assumptions)
 
-% Spherical grid
 if ~isfield(parameters,'grid')
     error('spherical averaging grid must be specified in parameters.grid variable.');
 elseif isempty(parameters.grid)

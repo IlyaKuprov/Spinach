@@ -1,0 +1,166 @@
+% Orientational averaging of a deferred clexpn calculation, without a
+% full-bath basis or averaged Hamiltonian. Syntax:
+%
+%     [answer,diagnostics]=orientation_average(spin_system,task,parameters)
+%
+% Parameters:
+%
+%   spin_system     - Spinach system returned by create
+%   task            - descriptor returned by context_task(@clexpn,...)
+%   parameters.grid - powder grid name, or scalar structure with equally
+%                     long real finite alphas, betas, gammas and weights vectors;
+%                     angles are radians, weights nonnegative with positive sum
+%
+% Outputs:
+%
+%   answer      - natural experiment output, averaged in the selected order
+%   diagnostics - grid, per-orientation diagnostics in orientations, numeric
+%                 values in a cell per orientation, and averaged reduction
+%
+% task.parameters.cce.averaging selects after_expansion (default) or
+% internal_then_expansion. The latter averages raw cluster responses and
+% their observed-only references before inclusion-exclusion, across both
+% orientations and spin configurations; it requires identical cluster families
+% at every orientation. Each orientation still constructs its own generators,
+% transition selectors and graph. Zero-weight orientations are omitted.
+% Deferred grid weights are normalized. Nested parameters.orientation
+% is replaced; all other experiment parameters belong to the deferred task.
+%
+% ilya.kuprov@weizmann.ac.il
+
+function [answer,diagnostics]=orientation_average(spin_system,task,parameters)
+
+% Validate the descriptor before invoking any nested calculation
+grumble(spin_system,task,parameters); started=tic;
+if ischar(parameters.grid)
+    grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',parameters.grid),...
+              'alphas','betas','gammas','weights');
+else
+    grid=parameters.grid;
+end
+grid=check_grid(grid); count=numel(grid.weights);
+
+% Run independently rotated physical systems without a full-bath basis
+orientations=cell(1,count); values=cell(1,count);
+for n=1:count
+    nested=task.parameters;
+    nested.orientation=[grid.alphas(n) grid.betas(n) grid.gammas(n)];
+    [values{n},orientations{n}]=task.context(spin_system,...
+                           task.pulse_sequence,nested,task.assumptions);
+end
+
+% Select the prescribed ordering of orientational and cluster reductions
+parameters=orientations{1}.parameters;
+reduction=orientations{1}.reduction;
+if strcmp(parameters.cce.averaging,'internal_then_expansion')
+    raw={};
+    for n=1:count
+        if ~isequal(orientations{n}.clusters,orientations{1}.clusters)
+            error('orientation_average:clusters',...
+                  'Internal averaging requires identical cluster families at every orientation.');
+        end
+        records=orientations{n}.raw;
+        for s=1:numel(records)
+            for k=1:numel(records{s})
+                records{s}(k).weight=grid.weights(n)*records{s}(k).weight;
+            end
+        end
+        raw=[raw records]; %#ok<AGROW>
+    end
+    reduction=cce_reduce(raw,orientations{1}.clusters,parameters);
+else
+
+    % Accumulate completed expansions and conservative absolute error bounds
+    fields={'value','by_order','abs_error_bound','by_order_error'};
+    for k=1:numel(fields), reduction.(fields{k})=0*reduction.(fields{k}); end
+    for n=1:count
+        current=orientations{n}.reduction;
+        for k=1:numel(fields)
+            name=fields{k};
+            reduction.(name)=reduction.(name)+grid.weights(n)*current.(name);
+        end
+        reduction.valid=reduction.valid&current.valid;
+        reduction.by_order_valid=reduction.by_order_valid&current.by_order_valid;
+        failed=~current.by_order_valid;
+        reduction.by_order_reason(failed)=current.by_order_reason(failed);
+    end
+    reduction.reason=reduction.by_order_reason(:,:,end);
+
+    % Reuse the same sampled spin states across orientations before estimating error
+    samples=reduction.samples;
+    for k=1:numel(samples)
+        for j=1:numel(fields), samples{k}.(fields{j})=0*samples{k}.(fields{j}); end
+        for n=1:count
+            current=orientations{n}.reduction;
+            if ~isequal(current.weights,reduction.weights)||numel(current.samples)~=numel(samples)
+                error('orientation_average:states','Orientation sampling requires a common spin ensemble.');
+            end
+            for j=1:numel(fields)
+                name=fields{j};
+                samples{k}.(name)=samples{k}.(name)+grid.weights(n)*current.samples{k}.(name);
+            end
+            samples{k}.valid=samples{k}.valid&current.samples{k}.valid;
+            samples{k}.by_order_valid=samples{k}.by_order_valid&current.samples{k}.by_order_valid;
+            failed=~current.samples{k}.by_order_valid;
+            samples{k}.by_order_reason(failed)=current.samples{k}.by_order_reason(failed);
+        end
+    end
+    for k=1:numel(samples), samples{k}.reason=samples{k}.by_order_reason(:,:,end); end
+    reduction.samples=samples; reduction.sampling_standard_error=zeros(size(reduction.value));
+    if numel(samples)>1&&all(abs(reduction.weights-1/numel(samples))<=eps)
+        sampled=cellfun(@(x)x.value,samples,'UniformOutput',false);
+        reduction.sampling_standard_error=std(cat(3,sampled{:}),0,3)/sqrt(numel(samples));
+    end
+end
+
+% Return the numeric answer separately from orientation-resolved evidence
+answer=reduction.value; diagnostics.grid=grid;
+diagnostics.orientations=orientations; diagnostics.values=values;
+diagnostics.parameters=parameters; diagnostics.reduction=reduction;
+diagnostics.elapsed_seconds=toc(started);
+
+end
+
+% Validate all descriptor fields and the grid source
+function grumble(spin_system,task,parameters)
+if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'comp')
+    error('orientation_average:system','Supply a Spinach system returned by create.');
+end
+fields={'context','pulse_sequence','parameters','assumptions'};
+if ~isstruct(task)||~isscalar(task)||~all(isfield(task,fields))||...
+   numel(fieldnames(task))~=numel(fields)
+    error('orientation_average:task','Supply a context_task descriptor.');
+end
+context_task(task.context,task.pulse_sequence,task.parameters,task.assumptions);
+if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'grid')||...
+   ~(isstruct(parameters.grid)||(ischar(parameters.grid)&&...
+     isrow(parameters.grid)&&~isempty(parameters.grid)))
+    error('orientation_average:grid','Supply a grid name or explicit quadrature structure.');
+end
+end
+
+% Validate and normalize the same Euler-angle quadrature used by powder
+function grid=check_grid(grid)
+fields={'alphas','betas','gammas','weights'};
+if ~isstruct(grid)||~isscalar(grid)||~all(isfield(grid,fields))||...
+   numel(fieldnames(grid))~=numel(fields)
+    error('orientation_average:grid','Grid fields must be alphas, betas, gammas and weights.');
+end
+count=numel(grid.weights);
+for n=1:numel(fields)
+    value=grid.(fields{n});
+    if ~isnumeric(value)||~isreal(value)||~isvector(value)||...
+       numel(value)~=count||any(~isfinite(value))
+        error('orientation_average:grid','Grid fields must be equally long finite real vectors.');
+    end
+    grid.(fields{n})=double(value(:));
+end
+if any(grid.weights<0)||~isfinite(sum(grid.weights))||sum(grid.weights)<=0
+    error('orientation_average:weights','Quadrature weights must be nonnegative with positive sum.');
+end
+keep=grid.weights>0;
+for n=1:numel(fields), grid.(fields{n})=grid.(fields{n})(keep); end
+grid.weights=grid.weights/sum(grid.weights);
+end
+
+

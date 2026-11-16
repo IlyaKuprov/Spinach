@@ -17,6 +17,10 @@
 %
 % Optional aux contains spectral/error diagnostics for coherent projected echoes.
 %
+% Generalized unitary Zeeman-Hilbert echoes retain observed density matrices,
+% spectral residuals and absolute forward-error bounds in aux. The response
+% remains time-by-detector, or column-vectorized observed density by time.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [E,aux]=hahn_echo(spin_system,parameters,H,R,K)
@@ -53,6 +57,15 @@ a=model.transition.alpha; b=model.transition.beta;
 rotation=eye(dc)-a*a'-b*b'-1i*(a*b'+b*a');
 rotation=kron(rotation,eye(db));
 fractions=0.5;
+
+% Reuse one Hermitian spectrum and retain its forward-error diagnostics
+if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
+   ~any(R(:))&&~any(K(:))&&~isfield(parameters,'pump')&&...
+   isfield(parameters,'cce_aux')
+    rotation=expm(-1i*pi*kron((a*b'+b*a')/2,eye(db)));
+    [E,aux]=generalized_echo(spin_system,parameters,H,rho0,coil,meta,rotation,density);
+    return
+end
 
 % At zero elapsed time no control is applied, matching the reference signal
 for n=1:numel(parameters.times)
@@ -173,6 +186,66 @@ aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
            'orthogonality_residual',orthogonality,...
            'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
            'backend',parameters.cce_aux.backend);
+
+end
+
+% Propagate a generalized Hahn echo with retained observed density and bounds
+function [answer,aux]=generalized_echo(system,parameters,H,rho0,coil,meta,pulse,density)
+
+% Diagonalize the complete retained-cluster Hamiltonian once
+H=(H+H')/2; [vectors,energies]=eig(full(H),'vector'); energies=real(energies);
+residual=norm(H*vectors-vectors.*energies.','fro');
+orthogonality=norm(vectors'*vectors-eye(size(H)),'fro');
+dc=system.observed_dimension; db=system.bath_dimension; count=numel(parameters.times);
+detectors=cellfun(@(x)x(1:db:end,1:db:end),coil,'UniformOutput',false);
+answer=complex(zeros(count,numel(meta.normalization_divisor)));
+if density, answer=complex(zeros(count,dc^2)); end
+aux.density=complex(zeros(dc,dc,count)); bounds=zeros(size(answer));
+
+% Spectral and detector norms are constant over the requested time mesh
+operations=20*size(H,1)^3; gamma=operations*eps/(1-operations*eps);
+hnorm=norm(H,'fro'); hbound=parameters.cce_aux.roundoff_bound;
+detector_norms=cellfun(@(x)norm(x,2),detectors);
+divisors=meta.normalization_divisor;
+
+% Compose both free intervals and the physical pi rotation in time order
+for n=1:count
+    time=parameters.times(n); propagator=eye(size(H));
+    if time>0
+        free=(vectors.*exp(-1i*energies*(time/2)).')*vectors';
+        propagator=free*propagator; propagator=pulse*propagator;
+        propagator=free*propagator;
+    end
+    rho=propagator*rho0*propagator'; observed=complex(zeros(dc));
+    for k=1:db
+        indices=k:db:dc*db; observed=observed+rho(indices,indices);
+    end
+    aux.density(:,:,n)=observed;
+    if density
+        answer(n,:)=observed(:).';
+    else
+        for k=1:numel(meta.normalization_divisor)
+            answer(n,k)=trace(detectors{k}'*observed)/divisors(k);
+        end
+    end
+
+    % Bound spectral residuals, tensor assembly and floating-point products
+    bound=2*time*(residual+hbound)+...
+          8*orthogonality+gamma*(1+time*hnorm);
+    if density
+        bounds(n,:)=bound;
+    else
+        for k=1:numel(meta.normalization_divisor)
+            bounds(n,k)=bound*detector_norms(k)/abs(divisors(k));
+        end
+    end
+end
+
+% Keep generator and propagation evidence alongside the natural response
+aux.abs_error_bound=bounds; aux.eigen_residual=residual;
+aux.orthogonality_residual=orthogonality;
+aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
+aux.backend=parameters.cce_aux.backend;
 
 end
 

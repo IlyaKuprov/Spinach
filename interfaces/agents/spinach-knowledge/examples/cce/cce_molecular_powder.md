@@ -1,21 +1,11 @@
 # examples/cce/cce_molecular_powder.m
 
-- Signature: `result=cce_molecular_powder()`
+```matlab
+[answer,diagnostics]=cce_molecular_powder();
+```
 
-## Purpose
+Illustrative molecular Hahn echo of an electron and two deuterons. The example creates the physical system, declares a generalized second-order clexpn calculation and transverse electron preparation, binds the named hahn_echo experiment with context_task, and calls powder. No full-bath basis, explicit state or detector, pulse-event array, transition vector or manual orientation loop is assembled.
 
-Orientation-averaged molecular Hahn echo with explicit quadrature weights. The example reports its finite-cluster result without claiming a published material fit.
+The unchanged three orientations are (0,0,0), (0,pi/2,0), (pi/2,pi/2,0), with equal weights. The unchanged 41-point time mesh spans 0 to 200 microseconds. This is a small illustration, not a converged powder grid or a published-material reproduction.
 
-## Spin system and sequence
-
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_molecular_powder.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_molecular_powder.m).
-
-Uses generalized CCE with an explicit observed superposition: powder rotation creates transverse observed terms, so fixed projected manifolds are not assumed.
-
-Response aliases, by-order values and masks, numerical bounds, and raw propagation records are now aggregated over the same positive quadrature weights; numerical diagnostics and budget flags are recomputed for the powder average. Orientation-resolved absolute bounds are retained in `orientation_abs_error_bound`.
+answer is a 41-by-1 normalized complex echo amplitude. diagnostics.reduction contains averaged order-resolved responses, validity and absolute numerical bounds. diagnostics.orientations retains complete per-orientation evidence, including generalized Hahn raw observed densities and spectral diagnostics. Dense independent Kronecker/expm checks and the analytic zero-time limit reside in test_cce_examples.

@@ -103,6 +103,11 @@ for n=1:numel(names)
         actual=diagnostics.reduction; actual.value=answer; actual.density=[];
         [actual.reference_error,reference_capture.cce_deer_bandwidth]=...
             cce_deer_bandwidth_reference(answer,diagnostics);
+    elseif strcmp(names{n},'cce_molecular_powder')
+        [answer,diagnostics]=cce_molecular_powder();
+        actual=diagnostics.reduction; actual.value=answer; actual.density=[];
+        [actual.reference_error,reference_capture.cce_molecular_powder]=...
+            reference_cce_molecular_powder(answer,diagnostics);
     elseif strcmp(names{n},'cce_polarized_bath')
         [answer,diagnostics]=cce_polarized_bath();
         actual=diagnostics.reduction; actual.value=answer;
@@ -163,25 +168,33 @@ for n=1:numel(names)
     end
     if strcmp(names{n},'cce_molecular_powder')
 
-        % All public response arrays must describe the powder average
-        result=test_close(result,'Powder response alias',actual.response,...
-                          actual.value,0,0,...
-                          'The response alias must equal the plotted powder signal.');
+        % Completed orientation expansions must reproduce the powder average
+        values=cell2mat(diagnostics.values);
+        result=test_close(result,'Powder weighted response',actual.value,...
+                          values*diagnostics.grid.weights,2e-15,2e-15,...
+                          'Powder averages completed physical responses.');
         result=test_close(result,'Powder final order response',...
-                          actual.by_order(:,:,end),actual.value,1e-14,...
-                          1e-14,'The final order must be orientation-averaged.');
-        expected=zeros(size(actual.abs_error_bound));
-        for k=1:numel(actual.orientation_weights)
-            expected=expected+actual.orientation_weights(k)*...
-                              actual.orientation_abs_error_bound(:,k);
+                          actual.by_order(:,:,end),actual.value,0,0,...
+                          'The final expansion order equals the returned signal.');
+        result=test_true(result,'Powder finite diagnostics',...
+                         isequal(size(actual.abs_error_bound),size(actual.value))&&...
+                         all(isfinite(actual.abs_error_bound)),...
+                         'Numerical bounds retain the powder output shape.');
+        expected=zeros(size(actual.abs_error_bound)); valid=true(size(actual.valid));
+        for k=1:numel(diagnostics.grid.weights)
+            current=diagnostics.orientations{k}.reduction;
+            expected=expected+diagnostics.grid.weights(k)*current.abs_error_bound;
+            valid=valid&current.valid;
         end
         result=test_close(result,'Powder averaged numerical bounds',...
                           actual.abs_error_bound,expected,0,0,...
                           'Positive quadrature weights also average absolute bounds.');
-        result=test_close(result,'Powder diagnostic numerical bounds',...
-                          actual.diagnostics.numerical_error,actual.abs_error_bound,...
-                          0,0,...
-                          'Diagnostics must be recomputed for the powder result.');
+        result=test_true(result,'Powder combined numerical validity',...
+                         isequal(actual.valid,valid),...
+                         'Every contributing orientation must satisfy numerical validity.');
+        result=test_close(result,'Powder zero-time analytic limit',...
+                          actual.value(1),1,2e-15,0,...
+                          'The normalized initial Hahn signal is unity.');
     end
     fprintf('Example %s completed in %.3f s.\n',names{n},toc(started));
     close all;
@@ -1655,6 +1668,71 @@ for n=1:numel(times)
 end
 reference_error=max(abs(answer-reference));
 snapshot=struct('reference',reference,'reference_error',reference_error);
+
+end
+
+% Compare molecular powder echoes with independently assembled dense propagators
+function [reference_error,snapshot]=reference_cce_molecular_powder(answer,diagnostics)
+
+% Define the same physical tensors without a cluster-expansion service
+sys.magnet=0.01; sys.isotopes={'E','2H','2H'};
+sys.output='hush'; sys.parallel={'local',1};
+inter.zeeman.matrix=repmat({zeros(3)},1,3); inter.coupling.matrix=cell(3);
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;40000 0 20000];
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;20000 0 -10000];
+inter.coupling.matrix{2,3}=diag([500 500 -1000]);
+inter.coupling.matrix{2,2}=diag([-1 -1 2])*2e5;
+inter.coupling.matrix{3,3}=diag([-1 -1 2])*5e4;
+spin_system=create(sys,inter); dimensions=spin_system.comp.mults;
+operators=cell(3,3); dimension=prod(dimensions);
+for j=1:3
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+
+% Rotate every tensor and contract it with explicit Cartesian spin matrices
+grid=diagnostics.grid; times=diagnostics.parameters.times;
+values=complex(zeros(numel(times),numel(grid.weights)));
+rho0=kron(ones(2)/2,eye(dimension/2)/(dimension/2));
+pulse=expm(-1i*pi*operators{1,1});
+for n=1:numel(grid.weights)
+    rotation=euler2dcm(grid.alphas(n),grid.betas(n),grid.gammas(n)); h=zeros(dimension);
+    for j=1:3
+        tensor=rotation*spin_system.inter.zeeman.matrix{j}*rotation';
+        for a=1:3, h=h+tensor(3,a)*operators{j,a}; end
+        for k=j:3
+            tensor=spin_system.inter.coupling.matrix{j,k};
+            if isempty(tensor), continue; end
+
+            % Ordered Spinach pair cells contract in transposed Cartesian order
+            if k~=j, tensor=tensor.'; end
+            tensor=rotation*tensor*rotation';
+            for a=1:3
+                for b=1:3, h=h+tensor(a,b)*operators{j,a}*operators{k,b}; end
+            end
+        end
+    end
+
+    % Full-bath exponentials do not use the CCE eigensolver or its reduction
+    for k=1:numel(times)
+        u=eye(dimension);
+        if times(k)>0
+            free=expm(-1i*h*times(k)/2); u=free*pulse*free;
+        end
+        rho=u*rho0*u'; observed=zeros(2);
+        for j=1:dimension/2
+            indices=j:dimension/2:dimension; observed=observed+rho(indices,indices);
+        end
+        values(k,n)=2*observed(1,2);
+    end
+end
+reference=values*grid.weights; reference_error=max(abs(reference-answer));
+snapshot=struct('reference',reference,'orientation_values',values,'reference_error',reference_error);
 
 end
 

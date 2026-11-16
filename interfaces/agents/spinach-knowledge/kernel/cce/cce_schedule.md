@@ -56,3 +56,5 @@ Native nested parameters.cce selects deterministic native task scheduling with a
 Native nested CCE controls produce deterministic configuration/state/cluster tasks, including the empty reference. Serial and outer parallel batches preserve assembly order. A checkpoint binds model, experiment, contract version, configuration assignments and task IDs; resume requires exact identity. Raw noise moments, masks and uncertainty survive unchanged. Interlacing invokes the supplied evaluator recursively and on the complete bath. The existing old task form remains only until the stage-4 cutover.
 
 When the complete bath is retained in an interlaced expansion, only its physical raw average is evaluated. Lower-order records/prefixes are explicitly marked not evaluated, avoiding both singular denominator work and false convergence information.
+
+Generalized Zeeman-Hilbert hahn_echo raw-ledger budgeting includes retained observed density diagnostics (complex observed-dimension squared per time point and task). The Hahn registry contract version is 3, so checkpoints predating retained generalized propagation evidence are rejected rather than reusing incomplete records.

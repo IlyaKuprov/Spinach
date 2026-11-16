@@ -25,6 +25,7 @@ contract.projected=true; contract.dissipative=false;
 contract.reduction='multiplicative'; contract.density_reduction=false;
 contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
+if isequal(pulse_sequence,@hahn_echo), contract.version=3; end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
@@ -76,6 +77,12 @@ if exist('aux','var')&&isfield(aux,'eigen_residual')
     raw.orthogonality_residual=aux.orthogonality_residual;
     raw.hamiltonian_bound=aux.hamiltonian_bound; raw.backend=aux.backend;
 end
+
+% Retain generalized echo density and numerical propagation diagnostics
+if exist('aux','var')&&isfield(aux,'density')
+    raw.density=aux.density;
+end
+
 if exist('aux','var')&&isfield(aux,'moment')
     raw.moment=aux.moment; raw.mean_time=aux.mean_time; raw.mean_zero=aux.mean_zero;
     raw.abs_error_bound=aux.abs_error_bound; raw.valid=aux.valid;

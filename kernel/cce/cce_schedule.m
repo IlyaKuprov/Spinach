@@ -282,6 +282,13 @@ elseif isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
 bytes=ns*nc*(1024+numel(parameters.times)*(25*components+48));
+
+% Retained generalized Hahn density diagnostics also occupy the raw ledger
+if isequal(schedule.pulse_sequence,@hahn_echo)&&...
+   strcmp(options.approximation,'generalized')&&strcmp(model.formalism,'zeeman-hilb')
+    bytes=bytes+ns*nc*16*numel(parameters.times)*...
+                prod(model.multiplicities(model.observed_ids))^2;
+end
 if bytes>options.numerics.max_memory_bytes
     error('cce_schedule:memory','The task ledger exceeds the declared memory budget.');
 end
@@ -301,6 +308,7 @@ end
 if isfield(payload.model.parameters.cce,'checkpoint')
     payload.model.parameters.cce=rmfield(payload.model.parameters.cce,'checkpoint');
 end
+
 % The model is hashed from its full physical content, not its derived cache key
 payload.model=rmfield(payload.model,'source_hash');
 ids=zeros(ns*nc,3); indices=zeros(ns*nc,2); position=0;

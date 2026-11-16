@@ -292,3 +292,18 @@ With no bath dissipator, noise_correlation evaluates the explicitly ordered or s
 For an array-free finite rectangular observed-spin drive, use @finite_drive through clexpn. Supply parameters.drive.spins, axis, amplitude (rad/s), detuning (rad/s), duration (s); times are zero or no shorter than duration. Use a named preparation and output=density where appropriate. Do not construct event arrays or observed density matrices in examples. Projected generators are not supported by this experiment.
 
 Bath-pumped Hahn evaluation uses `clexpn(spin_system,@bath_pumped_hahn,parameters,assumptions)`. The five-argument experiment optionally returns `[E,aux]`; coherent projected propagation supplies spectral residuals, Hamiltonian round-off bounds and signal error estimates to the native reducer. The pump selects canonical axial Zeeman frequencies, with explicit Hz or rad/s units, an inclusive nonnegative halfwidth, a fraction in [0,1], logical allow_empty, and optional distinct physical bath sites or isotope-label cells. No-field product-density ensembles allow selected spins outside a retained cluster; static exterior mean-field pumping remains explicitly unsupported.
+
+## Native powder composition
+
+For new examples, bind the experiment parameters before assigning the outer grid:
+
+```matlab
+task=context_task(@clexpn,@hahn_echo,parameters,'labframe');
+parameters.grid=struct('alphas',[0 0],'betas',[0 pi/2],...
+                       'gammas',[0 0],'weights',[1 1]);
+[answer,grid,diagnostics]=powder(spin_system,task,parameters,'labframe');
+```
+
+Do not construct a full-bath basis or loop over legacy cce calls. cce_molecular_powder demonstrates this contract. Use task.parameters.cce.averaging=after_expansion for completed-expansion averaging, or internal_then_expansion for raw-response averaging before inclusion-exclusion. Never average Hamiltonians. Internal averaging requires an identical retained cluster family at every point; descriptors and every explicit-grid field are validated. The returned second powder output remains the quadrature, while third-output diagnostics contains orientation-resolved evidence and the combined reduction. Independent dense and analytic checks belong in tests, not the example. All 19 CCE examples now use native experiments; legacy entry points remain only until their separate removal stage.
+
+For paired timing in fresh worktrees, exclude each tree's generated scratch directory from the MATLAB search path after restoredefaultpath. genpath otherwise includes accumulated job directories, and the unchanged startup name-resolution checks then measure unequal workspace histories rather than the two implementations. Keep the physical grid and source paths matched and measure parallel-pool startup separately.

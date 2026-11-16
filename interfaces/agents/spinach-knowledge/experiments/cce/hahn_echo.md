@@ -15,3 +15,7 @@ The optional second output carries spectral residuals, orthogonality residuals a
 Projected zero-duration Hahn propagation evaluates the retained bath density trace, preserving floating-point identity for mixed baths whose dimension is not a power of two. The six-state electron/nitrogen regression checks this exactly.
 
 The polarized two-proton example supplies sampled Zeeman-basis populations through parameters.cce.bath_state and averages after expansion. The returned signal remains separate from estimator standard error and deterministic summation bounds in diagnostics.reduction.
+
+## Generalized unitary Hahn propagation
+
+For generalized Zeeman-Hilbert dynamics with zero R and K and no bath pump, the experiment diagonalizes the Hermitian retained-cluster Hamiltonian once, composes the two free intervals with the physical transition pi rotation, and retains observed densities in aux.density. aux also reports absolute numerical bounds, eigensystem and orthogonality residuals, the Hamiltonian assembly bound and backend. The registered evaluator retains this evidence in raw cluster records. Bounds use the same spectral and arithmetic operation count as the legacy generalized Hahn evaluator; density output is column-vectorized and scalar/multiple detectors retain their normalization divisors.

@@ -38,3 +38,7 @@ result=test_cce_lunghi_fixtures()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+
+## Native interface
+
+The source-matrix reference is compiled with cce_compile and the selective transition is propagated through clexpn with hahn_echo. Each independent fixture starts with a fresh native parameter structure; its source eigenstates, dense reference propagators and declared normalized detected amplitude are unchanged. Physical transition support is explicit in transition.spins.

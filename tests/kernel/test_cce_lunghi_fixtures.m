@@ -57,17 +57,18 @@ for case_id=1:2
     end
 
     % Derive the selected observed-spin eigenstates and selective Hahn rotation
-    p.observed_spins=[1 2]; p.bath_spins=[3 4]; p.method='gcce';
-    p.expansion='standard'; p.quantity='signal'; p.order=2;
-    p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
-    p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
-    p.bath_state.mode='mixed_product'; p.times=input.compute.times_ms(:).'*1e-3;
-    p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
-    p.sequence=[]; p.transition.alpha=eye(observed_dimension,1);
+    p=struct(); p.observed=[1 2]; p.cce.bath_spins=[3 4]; p.cce.approximation='generalized';
+    p.cce.order=2;
+    p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
+    p.cce.graph=struct('mode','complete','score','coupling_norm'); p.cce.meanfield='none';
+    p.cce.bath_state.mode='mixed_product'; p.times=input.compute.times_ms(:).'*1e-3;
+    p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+    p.transition.spins=p.observed; p.transition.alpha=eye(observed_dimension,1);
     p.transition.beta=circshift(p.transition.alpha,1);
-    model=cce_prepare(ss,p); [hamiltonian,~]=cce_hamiltonian(model,[],struct());
+    model=cce_compile(ss,p,'labframe'); [hamiltonian,~]=cce_hamiltonian(model,[],struct());
     states=jsondecode(fileread(fullfile(states_folder,[name '_states.json'])));
     a=states.alpha_real+1i*states.alpha_imag; b=states.beta_real+1i*states.beta_imag;
+
     % External Hc is the source observed-spin Hamiltonian label
     source=load(fullfile(states_folder,[name '_diagnostic.mat']),'H','Hc');
     observed_error=norm(hamiltonian/(2*pi*1000)-source.Hc,'fro');
@@ -80,9 +81,7 @@ for case_id=1:2
     result=test_true(result,[name ' exported eigenstates'],residual<100*eps,...
                      'Explicit source eigenvector phases define initial state and selected-transition axes.');
     p.transition.alpha=a; p.transition.beta=b; p.rho0=(a+b)*(a+b)'/2;
-    p.sequence=struct('type','ideal','target',[1 2],'placement','fraction','at',0.5,...
-                      'operator',pi*(a*b'+b*a')/2);
-    p.normalized=true; actual=cce(ss,p);
+    p.normalized=true; actual=clexpn(ss,@hahn_echo,p,'labframe');
 
     % Separate the stored source pulse from the unitary Spinach selective pulse
     [full_hamiltonian,~]=cce_hamiltonian(model,[3 4],struct());
@@ -116,7 +115,7 @@ for case_id=1:2
     reference=expected(:,2)+1i*expected(:,3); errors(case_id)=max(abs(source-reference));
     result=test_close(result,[name ' stored source pulse'],source,reference,1e-10,0,...
                       'Stored source uses -i sigma_x with zero spectator block.');
-    result=test_close(result,[name ' unitary CCE pulse'],actual.value,independent,1e-10,0,...
+    result=test_close(result,[name ' unitary CCE pulse'],actual,independent,1e-10,0,...
                       'Spinach uses exp(-i pi sigma_x/2), retaining spectator levels.');
     result=test_true(result,[name ' distinct pulse semantics'],norm(source_pulse'*source_pulse-eye(4*observed_dimension),'fro')>1,...
                      'Do not equate the source fixture pulse with a full unitary.');

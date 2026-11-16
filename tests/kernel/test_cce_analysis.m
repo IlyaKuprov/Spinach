@@ -1,4 +1,5 @@
 % Declared-window envelope fitting and invalid-data diagnostics.
+% Syntax: result=test_cce_analysis()
 %
 % ilya.kuprov@weizmann.ac.il
 

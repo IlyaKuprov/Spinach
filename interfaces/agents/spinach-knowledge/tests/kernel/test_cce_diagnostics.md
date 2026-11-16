@@ -40,3 +40,7 @@ result=test_cce_diagnostics()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_diagnostics.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native contract
+
+Native migration is blocked by missing result diagnostics. `clexpn` exposes raw records, reduction, policy, ensemble, and identifiers, but not the coverage/error-budget acceptance report or reduced-density physicality checks exercised here. The test remains unchanged, including unmodified nonphysical densities, minimum eigenvalues, trace/Hermiticity residuals, and sampling-prefix assertions.

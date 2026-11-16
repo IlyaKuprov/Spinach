@@ -38,3 +38,7 @@ Checks sparse unconnected noise for independent polarized sites, time-dependent 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
 Direct noise spin_configs with nontracial bath states are checked against dense ordered and symmetrized connected correlations; the initial moments come from the supplied bath state.
+
+## Native contract
+
+Native migration is blocked by the internal connected-covariance uncertainty contract. The existing assertion requires `sampling_standard_error` to be NaN for `internal_then_expansion`; the native reduction returns a finite value and the migrated assertion fails. The original test remains unchanged, preserving all ordered, symmetrized, sampled, supplied-state, disconnected, and allocation assertions.

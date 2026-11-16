@@ -33,3 +33,7 @@ result=test_cce_spectrum()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_spectrum.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native contract
+
+The standalone native Fourier service uses `cce_spectrum(times,correlation,parameters)`. No legacy CCE driver, compiler, or method dispatch is used. All direct-transform, normalization, Lorentzian, filter-unit, stationarity, one-sided ordering, and per-column scale assertions remain in this test.

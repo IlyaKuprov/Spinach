@@ -39,3 +39,7 @@ result=test_cce_convergence()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_convergence.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native contract
+
+Native migration is blocked by the convergence service interface. `cce_converge` still has the two-argument legacy signature and calls `cce`; no registered-experiment native signature is implemented. Its independent ladders, work cap, held-out sampling, graph, mesh, and invalid-numerics assertions remain unchanged.

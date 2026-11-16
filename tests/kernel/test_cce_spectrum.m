@@ -1,4 +1,5 @@
 % Fourier normalization, Lorentzian, odd/even lengths and filter units.
+% Syntax: result=test_cce_spectrum()
 %
 % ilya.kuprov@weizmann.ac.il
 

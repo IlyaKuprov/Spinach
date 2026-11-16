@@ -42,3 +42,7 @@ result=test_mecce_exact()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Supplied-spin_config regression checks compare gCCE and ME-gCCE density, signal and observables (raw and normalized) with an independent diagonal Hamiltonian solution. They also verify projected bath phases and swapped user projections, and require informative rejection of unsupported spin_config state/projection/reference aliases.
+
+## Native contract
+
+Native migration is blocked by the selective instantaneous bath-operator pulse tested at fraction 0.4. `free_evolution` accepts finite events only; the native call with this ideal event is rejected with `free_evolution:sequence`. Named Hahn sequences do not represent this arbitrary off-midpoint selective pulse. The test is retained unchanged; no physical assertion is removed.

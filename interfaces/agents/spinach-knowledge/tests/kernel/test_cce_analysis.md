@@ -35,3 +35,7 @@ result=test_cce_analysis()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Native parameter structures preserve fitted amplitude, time constant and exponent bitwise. A misspelled analysis option is rejected by the local analysis contract.
+
+## Native contract
+
+The standalone native analysis service accepts a numeric-record structure containing `times`, `value`, and `valid`, plus `parameters.analysis`. No legacy CCE driver, compiler, or method dispatch is used. The test retains all fitting, interval, confidence, invalid-window, nondecay, immutability, and unknown-field assertions.

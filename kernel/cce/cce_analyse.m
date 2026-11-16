@@ -29,9 +29,6 @@
 
 function analysis=cce_analyse(result,parameters)
 
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
-
 % Validate retained raw data and the explicit fitting contract
 grumble(result,parameters);
 analysis=struct('times',result.times,'value',result.value,'valid',result.valid,...
@@ -114,12 +111,20 @@ if ~isstruct(result)||~all(isfield(result,{'times','value','valid'}))||...
    any(~isfinite(result.times))||any(result.times<0)||any(diff(result.times)<=0)||...
    ~isnumeric(result.value)||size(result.value,1)~=numel(result.times)||...
    ~islogical(result.valid)||~isequal(size(result.valid),size(result.value))||...
-   ~isstruct(parameters)
+   ~isstruct(parameters)||~isscalar(parameters)
     error('Result requires increasing nonnegative times, values and matching logical validity.');
 end
 if ~isfield(parameters,'analysis'), return; end
 a=parameters.analysis;
-if ~isstruct(a)||~isfield(a,'fit')||~islogical(a.fit)||~isscalar(a.fit)
+allowed={'fit','observable','envelope','model','interval','weights',...
+         'confidence','confidence_level','t1'};
+if ~isstruct(a)||~isscalar(a)||any(~ismember(fieldnames(a),allowed))
+    error('cce_analyse:analysis','Unknown or invalid analysis option.');
+end
+if isfield(a,'t1')&&(~islogical(a.t1)||~isscalar(a.t1))
+    error('cce_analyse:t1','analysis.t1 must be a logical scalar.');
+end
+if ~isfield(a,'fit')||~islogical(a.fit)||~isscalar(a.fit)
     error('analysis.fit must be a scalar logical.');
 end
 if ~a.fit, return; end

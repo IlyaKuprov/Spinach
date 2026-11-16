@@ -33,3 +33,7 @@ analysis=cce_analyse(result,parameters)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_analyse.m)
 - [cce_diagnostics.m](cce_diagnostics.md)
+
+## Native context inputs
+
+This standalone post-processing service validates only its retained-data and `parameters.analysis` contracts. Native `observed`, `times`, and nested `cce` algorithm options are permitted but do not alter fitting. Unknown analysis fields and nonscalar options are rejected locally; no legacy driver validation is used.

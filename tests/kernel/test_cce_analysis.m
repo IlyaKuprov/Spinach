@@ -30,6 +30,27 @@ r.valid(:)=true; r.value=exp(-t).*(1+0.3*cos(20*t)); p.analysis.envelope='real';
 oscillatory=cce_analyse(r,p);
 result=test_true(result,'C7 contract check',strcmp(oscillatory.status,'not_decay')&&~isempty(oscillatory.warnings),...
                  'Oscillatory windows require an explicit valid envelope.');
+
+% Native algorithm fields are unrelated to explicit post-processing
+native=p; native.analysis.envelope='magnitude'; native.cce=struct('order',1,'approximation','generalized');
+native.observed=1; native.times=t; native.analysis.weights=ones(size(t));
+native_data=struct('times',t,'value',envelope.*exp(4i*t),'valid',true(size(t)));
+actual=cce_analyse(native_data,native);
+result=test_close(result,'Native parameters preserve fitted values',...
+                  [actual.fit.amplitude actual.fit.time_constant actual.fit.beta],...
+                  [a.fit.amplitude a.fit.time_constant a.fit.beta],0,0,...
+                  'Algorithm policy does not alter standalone decay analysis.');
+
+% Reject misspelled analysis options without a driver-level validator
+invalid=p; invalid.analysis.weigths=ones(size(r.times)); rejected=false;
+try
+    cce_analyse(r,invalid);
+catch exception
+    rejected=strcmp(exception.identifier,'cce_analyse:analysis');
+end
+result=test_true(result,'Local analysis contract rejects unknown fields',rejected,...
+                 'Standalone analysis retains strict fitting validation.');
+
 fprintf('Fit A %.10g T %.10g beta %.10g; weighted RMS %.3g\n',...
         a.fit.amplitude,a.fit.time_constant,a.fit.beta,a.fit.weighted_rms);
 

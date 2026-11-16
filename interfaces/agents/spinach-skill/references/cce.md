@@ -248,3 +248,7 @@ Closed-system stage: standard cluster expansion, mixed or explicit product bath 
 Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalized elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.
 
 Hahn echo also supports generalized `output='density'`, with column-vectorised observed density rows and the same elementwise reduction/full-bath override as free evolution. Projected coherence blocks do not expose a density.
+
+### Standalone decay analysis
+
+`cce_analyse(result,parameters)` validates `parameters.analysis` locally. Native `clexpn` options may be retained in `parameters`: algorithm choices do not affect an explicitly selected fitting window or model. Unknown analysis fields remain errors. No driver-level parameter translator is involved.

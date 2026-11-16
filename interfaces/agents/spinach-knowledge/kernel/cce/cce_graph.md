@@ -30,7 +30,7 @@ graph=cce_graph(model,parameters)
 **Inputs**
 
 - `model` — physical IDs, observed/bath IDs, multiplicities, coordinates in Angstrom and pair records (`ids`, real Cartesian `tensor` in rad/s).
-- `parameters.graph` — `mode`; mode-specific `radius` (Angstrom), `threshold` (rad/s), or `adjacency`; `score` is `coupling_norm` (default), `resonance` (mismatch matrix and positive mismatch_scale, both rad/s), or `supplied` (scores matrix); optional bath_radius defaults to Inf.
+- `parameters.graph` — `mode`; mode-specific `radius` (Angstrom), `threshold` (rad/s), or `adjacency`; `score` is `coupling_norm` (default), `resonance` (mismatch matrix and positive mismatch_scale, both rad/s), or `supplied` (scores matrix).
 
 **Outputs**
 
@@ -47,3 +47,11 @@ Second-order projected CCE also retains bath edges mediated by the joint observe
 For unconnected noise, the cluster graph joins observable-support sites even without a bare Hamiltonian edge, retaining disconnected moment products. Sampled connected noise retains the same support edges to preserve cross-site covariance of the actual finite sampled mixture; deterministic product-state connected noise keeps the ordinary coupling graph. Both ordered and symmetrized reductions use this common graph.
 
 Native noise descriptors carry physical bath-spin support without building a full-bath matrix. Graph selection uses these supports for unconnected or sampled noise, preserving cross terms. The native context computes optional parameters.spectrum only after ensemble reduction and returns diagnostics.spectrum; the Fourier convention remains explicit.
+
+## Internal physical selection option
+
+This table describes the retained graph engine input, not an additional public context signature.
+
+| Field at the engine parameter root | Meaning |
+|---|---|
+| `bath_radius` | Maximum distance in Angstrom from an observed spin for retaining a bath site; default Inf. This is separate from the graph edge radius. |

@@ -16,3 +16,5 @@ The optional second output in `[answer,aux]=free_evolution(spin_system,parameter
 ## Generalized Liouville density transport
 
 For density output without finite events, the zeeman-liouv path uses the stock step exponential action (or stock propagator when explicitly selected), with prop_chop=0. Its auxiliary absolute error estimate is 64*eps*dimension*(1+norm(generator,1)*time) per density element. This preserves the established master-equation numerical path and its diagnostics. Coherent Hilbert, projected, controlled, and signal-only paths retain their existing contracts.
+
+Controlled Hilbert evolution uses segmentwise matrix exponentials in the original multiplication order, including the initial zero-duration interval. Its existing arithmetic estimate is 16*d^3*eps times the sum of 1+abs(dt)*norm(H,2) over segments; density entries inherit that estimate. The named finite_drive experiment compiles its declarative rectangular drive through this path.

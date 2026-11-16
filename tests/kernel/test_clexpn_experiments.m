@@ -145,6 +145,43 @@ end
 result=test_close(result,'Finite-drive coupled drift',actual,expected,6e-14,0,...
                   'Dense full-bath propagation includes noncommuting dipolar drift.');
 
+% Named finite drives compile the same control without a public event array
+q=rmfield(p,'sequence');
+q.drive=struct('spins',1,'axis','x','amplitude',7,'detuning',2,'duration',0.1);
+selected=p.times==0|p.times>=q.drive.duration; q.times=p.times(selected);
+named=clexpn(system,@finite_drive,q,'labframe');
+result=test_close(result,'Named finite-drive contract',named,actual(selected,:),0,0,...
+                  'The declarative drive preserves the controlled density bitwise.');
+invalid={struct('spins',2),struct('axis',[1 1 0]),struct('amplitude',Inf),...
+         struct('detuning',1i),struct('duration',0),struct('extra',1)};
+for n=1:numel(invalid)
+    bad=q; field=fieldnames(invalid{n}); bad.drive.(field{1})=invalid{n}.(field{1});
+    rejected=false;
+    try
+        clexpn(system,@finite_drive,bad,'labframe');
+    catch
+        rejected=true;
+    end
+    result=test_true(result,['Named finite-drive validation ' field{1}],rejected,...
+                      'Every declarative drive field is validated.');
+end
+bad=q; bad.times=[0 0.02]; rejected=false;
+try
+    clexpn(system,@finite_drive,bad,'labframe');
+catch
+    rejected=true;
+end
+result=test_true(result,'Named finite-drive observation time',rejected,...
+                  'An observation cannot precede completion of the finite pulse.');
+bad=q; bad.sequence=p.sequence; rejected=false;
+try
+    clexpn(system,@finite_drive,bad,'labframe');
+catch
+    rejected=true;
+end
+result=test_true(result,'Named finite-drive event ownership',rejected,...
+                  'A competing event array is rejected.');
+
 % Relaxation remains simultaneous with a finite observed drive
 inter.coupling.matrix=cell(2); system=create(sys,inter);
 p.cce.basis.formalism='zeeman-liouv';

@@ -13,7 +13,7 @@ function contract=cce_capabilities(pulse_sequence)
 
 % Require an actual registered function handle
 grumble(pulse_sequence);
-registered={@free_evolution,@hahn_echo,@cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
+registered={@free_evolution,@finite_drive,@hahn_echo,@cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
 if ~any(cellfun(@(sequence)isequal(sequence,pulse_sequence),registered))
     error('cce_capabilities:unregistered','Experiment is not registered for clexpn.');
 end
@@ -25,11 +25,16 @@ contract.projected=true; contract.dissipative=false;
 contract.reduction='multiplicative'; contract.density_reduction=false;
 contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
-if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@hahn_echo)
+if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
+   isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
 end
-if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@hahn_echo)
+if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
+   isequal(pulse_sequence,@hahn_echo)
     contract.density_reduction=true; contract.outputs{end+1}='density';
+end
+if isequal(pulse_sequence,@finite_drive)
+    contract.projected=false;
 end
 if isequal(pulse_sequence,@noise_correlation)
     contract.projected=false; contract.dissipative=true;
@@ -52,7 +57,7 @@ if isfield(physical,'assignment'), physical=rmfield(physical,'assignment'); end
 [H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
 pulse_sequence=schedule.pulse_sequence;
 if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)||...
-   isequal(pulse_sequence,@hahn_echo)
+   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@hahn_echo)
     [answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
 else
     answer=pulse_sequence(spin_system,parameters,H,R,K);

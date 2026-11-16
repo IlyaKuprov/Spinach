@@ -64,7 +64,7 @@ for n=1:numel(names)
                          all(diagnostics.reduction.abs_error_bound>0),...
                          'Projected spectral error bounds must reach the reducer.');
     elseif ismember(names{n},{'gcce_sic_clock','gcce_highspin_siv','gcce_votpp',...
-                             'gcce_two_centres','mecce_dissipative_bath'})
+                             'gcce_two_centres','gcce_finite_drive','mecce_dissipative_bath'})
         [answer,diagnostics]=feval(names{n});
         actual=diagnostics.reduction; actual.times=diagnostics.parameters.times(:);
 
@@ -85,6 +85,8 @@ for n=1:numel(names)
                 [actual.reference_error,reference_capture.gcce_highspin_siv]=gcce_highspin_siv_reference(answer);
             case 'gcce_votpp'
                 [actual.reference_error,reference_capture.gcce_votpp]=gcce_votpp_reference(answer);
+            case 'gcce_finite_drive'
+                [actual.reference_error,reference_capture.gcce_finite_drive]=gcce_finite_drive_reference(answer,diagnostics);
             case 'gcce_two_centres'
                 [actual.reference_error,reference_capture.gcce_two_centres]=...
                     gcce_two_centres_reference(answer,diagnostics);
@@ -1587,6 +1589,37 @@ omega=-spin('13C')*0.01; times=linspace(0,10*2*pi/abs(omega),401);
 reference=cos(omega*times(:))/4; x=[0 1;1 0]/2;
 reference_error=max(abs(answer-reference));
 snapshot=struct('omega',omega,'reference',reference,'x',x,'reference_error',reference_error);
+end
+
+% Independent dense reference for the migrated finite-drive example
+function [reference_error,snapshot]=gcce_finite_drive_reference(answer,diagnostics)
+
+% Independent two-spin Hamiltonian including the finite rectangular drive
+x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2; z=diag([1 -1])/2;
+v=[1;1]/sqrt(2); rho0=kron(v*v',eye(2)/2);
+h=2*pi*(1100*kron(x,x)+900*kron(y,y)+2200*kron(z,z));
+drive=4e4*kron(x,eye(2));
+times=diagnostics.parameters.times(:); exact=zeros(size(answer));
+for n=1:numel(times)
+
+    % Keep the independent expm calculation and its original arithmetic order
+    t=times(n);
+    duration=min(t,20e-6);
+    u=expm(-1i*h*(t-duration))*expm(-1i*(h+4e4*kron(x,eye(2)))*duration);
+    fullrho=u*rho0*u'; small=zeros(2);
+    for k=1:2
+        ids=k:2:4; small=small+fullrho(ids,ids);
+    end
+    exact(n,:)=small(:).';
+end
+
+% Preserve the physical reference arrays retained by the stage-zero capture
+reference_error=max(abs(answer-exact),[],'all');
+populations=real(answer(:,1:3:end));
+snapshot=struct('drive',drive,'duration',duration,'exact',exact,...
+    'fullrho',fullrho,'h',h,'ids',ids,'populations',populations,...
+    'rho0',rho0,'small',small,'t',t,'u',u,'v',v,'x',x,'y',y,'z',z);
+
 end
 
 

@@ -9,6 +9,9 @@
 % to true for signals. output is signal, observable or density; density output
 % is the column-vectorised observed density, one row per elapsed time.
 % Optional aux retains coherent spectral residuals and absolute error bounds.
+% Finite Hilbert controls use segmentwise expm and preserve the original
+% 16*d^3*eps*sum(1+abs(dt)*norm(H,2)) arithmetic bound, including the initial
+% zero-duration interval.
 % sequence is an optional finite-event array: target physical IDs, axis
 % (x/y/z or a unit vector), amplitude and detuning in rad/s, duration in
 % seconds, placement (absolute/fraction) and at (seconds/fraction). Drift
@@ -46,6 +49,8 @@ end
 
 % Reuse the coherent spectrum and retain its measured numerical diagnostics
 aux=struct();
+controlled=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
+if controlled, aux.abs_error_bound=zeros(size(answer)); end
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
 liouville=density&&isempty(events)&&~isstruct(H)&&...
           strcmp(spin_system.formalism,'zeeman-liouv');
@@ -102,8 +107,17 @@ for n=1:numel(parameters.times)
     elseif isempty(events)
         rho=cce_evolution(spin_system,generator,[],rho0,parameters.times(n),1,'final');
     else
-        rho=driven_evolution(spin_system,generator,rho0,parameters.times(n),...
+        [rho,bound]=driven_evolution(spin_system,generator,rho0,parameters.times(n),...
                              events,starts(:,n),drives);
+        if controlled
+            if density
+                aux.abs_error_bound(n,:)=bound;
+            else
+                norms=cellfun(@(detector)norm(full(detector),2),detectors);
+                if meta.normalized, norms=norms./abs(reference); end
+                aux.abs_error_bound(n,:)=bound*norms;
+            end
+        end
     end
     if density
         dc=spin_system.observed_dimension; db=spin_system.bath_dimension;
@@ -191,15 +205,24 @@ end
 end
 
 % Split every observation interval at drive starts and stops
-function rho=driven_evolution(system,L,rho,total,events,starts,drives)
+function [rho,bound]=driven_evolution(system,L,rho,total,events,starts,drives)
 stops=starts+reshape([events.duration],[],1);
+scale=0; coherent=strcmp(system.formalism,'zeeman-hilb');
 boundaries=unique([0;total;starts(starts>0&starts<total);stops(stops>0&stops<total)]);
+if coherent, boundaries=[0;boundaries]; end
 for k=1:numel(boundaries)-1
     left=boundaries(k); right=boundaries(k+1); generator=L;
     active=find(starts<right&stops>left);
     for n=reshape(active,1,[]), generator=generator+drives{n}; end
-    rho=cce_evolution(system,generator,[],rho,right-left,1,'final');
+    if coherent
+        propagator=eye(size(generator))*expm(-1i*(right-left)*generator);
+        rho=propagator*rho*propagator';
+        scale=scale+1+abs(right-left)*norm(full(generator),2);
+    else
+        rho=cce_evolution(system,generator,[],rho,right-left,1,'final');
+    end
 end
+bound=16*system.dimension^3*eps*scale;
 end
 
 % Validate the experiment-owned time axis and retained subsystem

@@ -12,3 +12,5 @@ Regression coverage includes native coherent error bounds and spectral residuals
 Coherent projected Hahn spectral products are additionally compared with the general interval path for an arbitrary complex observed preparation, phased receiver and both normalization settings. Error auxiliaries must remain positive and finite.
 
 The projected Hahn six-state electron/nitrogen bath checks zero-duration amplitude against the evaluated mixed-density trace with zero tolerance. This catches replacement by a mathematically equivalent literal one that changes the frozen floating-point result.
+
+Named finite_drive coverage compares the declarative drive to the finite-control density bitwise and rejects invalid spins, axis, amplitude, detuning, duration, extra fields, early observation and competing events.

@@ -45,3 +45,5 @@ The single-nucleus, NV, P1 and partitioned-electron-layer examples now return `[
 The native polarized-bath, two-observed-centre and dissipative-bath examples return [answer,diagnostics]. Their exhaustive sampling comparison, independent dense propagations, negativity, and physical reference arrays live here. The optional reference_capture records those quantities. Assertions explicitly verify the weighted-summation arithmetic bound and transport of positive stock-Liouville arithmetic estimates. Legacy examples continue to run until their separate native-interface gaps are resolved.
 
 The noise example uses native operator descriptors. The cosine reference and original transverse operator are retained in the example-test capture. Native noise tests compare descriptors and explicit Hermitian matrices before connected ensemble reduction and reject invalid descriptor fields.
+
+gcce_finite_drive returns native answer/diagnostics. Its independent two-spin expm propagation and frozen physical reference arrays now live in the test, not in the example.

@@ -39,3 +39,5 @@ IDs are validated before restriction, including for the empty cluster.
 Descriptors and explicit matrix terms are mutually exclusive. Unknown fields,
 non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
 are rejected. Connected ensemble and Fourier conventions are unchanged.
+
+parameters.drive is owned by finite_drive (also admitted during internal cce_compile validation); it is rejected for other experiments. The experiment validates every descriptor field.

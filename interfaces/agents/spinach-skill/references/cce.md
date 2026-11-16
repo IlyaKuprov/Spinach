@@ -288,3 +288,5 @@ non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
 are rejected. Connected ensemble and Fourier conventions are unchanged.
 
 With no bath dissipator, noise_correlation evaluates the explicitly ordered or symmetrized correlation in Hilbert space using the Hermitian bath eigensystem. It transports the existing unitary round-off estimate. Dissipative noise retains Liouville propagation. Optional parameters.spectrum is evaluated after the completed native ensemble and returned in diagnostics.spectrum, not per cluster.
+
+For an array-free finite rectangular observed-spin drive, use @finite_drive through clexpn. Supply parameters.drive.spins, axis, amplitude (rad/s), detuning (rad/s), duration (s); times are zero or no shorter than duration. Use a named preparation and output=density where appropriate. Do not construct event arrays or observed density matrices in examples. Projected generators are not supported by this experiment.

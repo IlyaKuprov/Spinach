@@ -12,3 +12,5 @@ Hahn echo also supports generalized `output='density'`, with column-vectorised o
 The free-evolution evaluator forwards experiment-owned coherent absolute error bounds and spectral residuals to raw records. Bounds are numerical estimates, not cluster-truncation estimates; they are not replaced by zeros.
 
 The registered Hahn-echo evaluator transports the optional spectral/error auxiliaries exactly as for coherent free evolution. Experiments without these auxiliaries retain their existing contract.
+
+finite_drive is registered for conventional Hilbert and Liouville generators, signal/observable/density output and density reduction; projected branches are rejected. Its auxiliary numerical error estimate is transported to the reducer.

@@ -1,11 +1,11 @@
 % Finite observed spin-lock drive including the coupled nuclear drift.
-% Piecewise constant drive in rad/s; independent full-Hilbert expm check.
+% Piecewise constant drive in rad/s; dense reference is in test_cce_examples.
 % This small illustrative model is not a published material reproduction.
-% Syntax: result=gcce_finite_drive()
+% Syntax: [answer,diagnostics]=gcce_finite_drive()
 %
 % ilya.kuprov@weizmann.ac.il
 
-function result=gcce_finite_drive()
+function [answer,diagnostics]=gcce_finite_drive()
 
 % Magnet and isotopes; zero electron g isolates the model energy scales
 sys.magnet=0; sys.isotopes={'E','13C'};
@@ -19,57 +19,26 @@ inter.coupling.matrix{1,2}=diag([1100 900 2200]);
 % Compile metadata, without a full-bath basis
 spin_system=create(sys,inter);
 
-% Generalised CCE propagates the entire observed density matrix
-parameters.observed_spins=1;
-parameters.bath_spins=2;
-parameters.method='gcce'; parameters.expansion='standard';
-parameters.quantity='density'; parameters.order=1;
-v=[1;1]/sqrt(2); parameters.rho0=v*v';
-parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
-parameters.interaction_cutoff=Inf; parameters.meanfield='none';
-parameters.graph=struct('mode','complete');
-parameters.times=[0 linspace(20e-6,200e-6,30)]; parameters.sequence=struct([]);
-parameters.bath_state=struct('mode','mixed_product');
-parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+% Basis formalism for retained clusters
+bas.formalism='zeeman-hilb';
 
-% A finite event is driven while the complete cluster Hamiltonian remains active
-parameters.sequence=struct('type','finite','target',1,'axis','x',...
-    'amplitude',4e4,'detuning',0,'placement','fraction','at',0,'duration',20e-6);
+% Experiment parameters
+parameters.observed=1;
+parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
+parameters.preparation='transition'; parameters.output='density';
+parameters.times=[0 linspace(20e-6,200e-6,30)];
+parameters.drive=struct('spins',1,'axis','x','amplitude',4e4,...
+                        'detuning',0,'duration',20e-6);
+parameters.cce.bath_spins=2; parameters.cce.approximation='generalized';
+parameters.cce.order=1; parameters.cce.basis=bas;
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
-% Run full order for the small bath, retaining all observed density-matrix off-diagonal elements
-result=cce(spin_system,parameters);
-fprintf('gcce_finite_drive: trace error %.3g; minimum eigenvalue %.3g.\n',...
-        max(result.diagnostics.trace_error),min(result.diagnostics.minimum_eigenvalue));
+% Run the named finite-drive experiment
+[answer,diagnostics]=clexpn(spin_system,@finite_drive,parameters,'labframe');
 
-% Independent dense two-spin propagator during drive plus free evolution
-x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2; z=diag([1 -1])/2;
-h=2*pi*(1100*kron(x,x)+900*kron(y,y)+2200*kron(z,z));
-rho0=kron(parameters.rho0,eye(2)/2); exact=zeros(size(result.value));
-for n=1:numel(parameters.times)
-
-    % A fixed 20-microsecond drive is followed by variable free evolution
-    t=parameters.times(n);
-    duration=min(t,20e-6);
-    u=expm(-1i*h*(t-duration))*expm(-1i*(h+4e4*kron(x,eye(2)))*duration);
-    fullrho=u*rho0*u'; small=zeros(2);
-    for k=1:2
-
-        % Trace over the explicit nuclear tensor factor
-        ids=k:2:4; small=small+fullrho(ids,ids);
-    end
-    exact(n,:)=small(:).';
-end
-result.reference_error=max(abs(result.value-exact),[],'all');
-fprintf('Finite-drive dense expm maximum error: %.3g.\n',result.reference_error);
-
-% Plot observed populations without silently repairing the density matrix
-populations=zeros(numel(result.times),2);
-for n=1:numel(result.times)
-
-    % Read the diagonal in the documented observed tensor-product order
-    populations(n,:)=real(diag(result.density(:,:,n))).';
-end
-kfigure(); plot(1e6*result.times,populations);
+% Plot observed-spin populations
+populations=real(answer(:,1:sqrt(size(answer,2))+1:end));
+kfigure(); plot(1e6*parameters.times,populations);
 xlabel('time / microseconds'); ylabel('observed populations'); kgrid();
 
 end

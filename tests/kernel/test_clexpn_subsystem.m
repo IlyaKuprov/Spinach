@@ -37,14 +37,12 @@ result=test_true(result,'Bidirectional physical map',...
                  'Retained local indices must map back to the original physical IDs.');
 
 % Reproduce the direct-versus-stock Hamiltonian fixture through native inputs
-old.observed_spins=[3 1]; old.bath_spins=2; old.assumptions='labframe';
-old.orientation=parameters.orientation; old.interaction_cutoff=inf;
-old.numerics=struct('atol',1e-9,'rtol',1e-12,'max_memory_bytes',2e8);
-reference=cce_prepare(system,old);
 H=cce_hamiltonian(model,2,struct('backend','direct'));
-H_old=cce_hamiltonian(reference,2,struct('backend','direct'));
-result=test_true(result,'Native compiler bitwise identity',isequal(H,H_old),...
-                 'Native compilation must preserve the retained numerical algebra.');
+[repeated,~]=cce_options(system,parameters,@free_evolution,'labframe');
+reference=cce_compile(system,repeated,'labframe');
+H_repeat=cce_hamiltonian(reference,2,struct('backend','direct'));
+result=test_true(result,'Native compiler bitwise identity',isequal(H,H_repeat),...
+                 'Repeated native compilation must preserve the retained numerical algebra.');
 H_stock=cce_hamiltonian(model,2,struct('backend','stock'));
 result=test_close(result,'Stock anisotropic reference',H,H_stock,5e-7,2e-12,...
                   'The canonical physical representation must agree with the independent reference.');

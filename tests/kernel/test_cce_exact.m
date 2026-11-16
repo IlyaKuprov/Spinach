@@ -25,12 +25,12 @@ for j=1:nb
         spin_system.inter.coupling.matrix{j+1,k+1}=tensor{j+1,k+1}.';
     end
 end
-p.observed_spins=1; p.bath_spins=2:5; p.method='cce'; p.expansion='standard';
-p.quantity='signal'; p.order=4; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
-p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
-p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
-p.times=linspace(0,0.018,13); p.sequence=[];
-p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^29);
+p.observed=1; p.cce.bath_spins=2:5; p.cce.approximation='projected';
+p.cce.order=4; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
+p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
+p.cce.graph=struct('mode','complete','score','coupling_norm'); p.cce.meanfield='none';
+p.times=linspace(0,0.018,13);
+p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^29);
 maximum=0; max_bound=0;
 for pure=[false true]
 
@@ -41,18 +41,20 @@ for pure=[false true]
             v=[cos(j/7);exp(1i*j/3)*sin(j/7)]; states{j}=v*v';
         end
     end
-    p.bath_state=struct('mode','explicit_product','rho',{states});
+    p.cce.bath_state=struct('mode','explicit_product','rho',{states});
     for hahn=[false true]
-        p.sequence=[];
+        pulse_sequence=@free_evolution;
         if hahn
-            p.sequence=struct('type','ideal','target',1,'placement','fraction',...
-                              'at',0.5,'axis','x','angle',pi);
+            pulse_sequence=@hahn_echo;
         end
-        actual=cce(spin_system,p);
+        p.transition.spins=p.observed;
+        [value,actual]=clexpn(spin_system,pulse_sequence,p,'labframe');
 
         % Validate every raw subset against independent Kronecker/expm operators
         for record=actual.raw{1}
-            sites=record.sites; n=numel(sites); dim=2^n;
+            sites=[];
+            if record.cluster_id>0, sites=actual.clusters(record.cluster_id).sites; end
+            n=numel(sites); dim=2^n;
             x=[0 1;1 0]/2; y=[0 -1i;1i 0]/2; z=diag([1 -1])/2;
             local={x,y,z}; ops=cell(n,3); hb=zeros(dim); coupling=zeros(dim); rho=1;
             for j=1:n
@@ -90,7 +92,7 @@ for pure=[false true]
             bound=max(record.abs_error_bound); max_bound=max(max_bound,bound);
             result=test_true(result,'raw subset exact',discrepancy<=bound+dim^3*eps*100,'Independent analytic or dense reference.');
         end
-        result=test_true(result,'full order bypass',actual.exact_reference,'Independent analytic or dense reference.');
+        result=test_true(result,'full order bypass',isequal(value,actual.raw{1}(end).value),'Independent analytic or dense reference.');
     end
 end
 metrics.maximum_raw_error=maximum; metrics.maximum_bound=max_bound;

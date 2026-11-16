@@ -19,10 +19,10 @@ inter.coupling.matrix{2,3}=[8 -5 4;3 -7 9;1 6 13]*31;
 inter.coupling.matrix{1,3}=diag([7 9 13])*17;
 inter.coupling.matrix{2,2}=[2 1 0;1 -3 2;0 2 1]*41;
 system=create(sys,inter);
-parameters.observed_spins=2; parameters.bath_spins=[3 1];
-parameters.orientation=[0 0 0]; parameters.assumptions='labframe';
-parameters.interaction_cutoff=Inf;
-parameters.numerics=struct('atol',1e-5,'rtol',1e-12,'max_memory_bytes',1e8);
+parameters.times=0; parameters.observed=2; parameters.cce.bath_spins=[3 1];
+parameters.orientation=[0 0 0];
+parameters.cce.interaction_cutoff=Inf;
+parameters.cce.numerics=struct('atol',1e-5,'rtol',1e-12,'max_memory_bytes',1e8);
 
 % Exercise every validated assumption, Euler choice and retention selection
 max_error=0; max_relative=0; max_propagator=0; comparisons=0;
@@ -30,9 +30,9 @@ for angles={[0 0 0],[0.3 0.7 -0.2]}
     parameters.orientation=angles{1};
     for assumption={'labframe','nmr','esr','deer','deer-zz'}
         for retention={'','zeeman','couplings'}
-            parameters.assumptions=assumption{1};
-            if ~isempty(retention{1}), parameters.assumptions={assumption{1},retention{1}}; end
-            model=cce_prepare(system,parameters);
+            assumptions=assumption{1};
+            if ~isempty(retention{1}), assumptions={assumption{1},retention{1}}; end
+            model=cce_compile(system,parameters,assumptions);
             [H,meta]=cce_hamiltonian(model,[3 1],struct('backend','direct'));
             reference=cce_hamiltonian(model,[3 1],struct('backend','stock'));
             error_norm=norm(H-reference,'fro');
@@ -43,7 +43,7 @@ for angles={[0 0 0],[0.3 0.7 -0.2]}
                                   expm(full(-1i*reference*1e-7)),'fro');
             max_propagator=max(max_propagator,propagator_error);
             result=test_true(result,'dense propagator parity',...
-                              propagator_error<=parameters.numerics.atol,...
+                              propagator_error<=parameters.cce.numerics.atol,...
                               'Independent dense exponentials obey the requested observable budget.');
             result=test_true(result,[assumption{1} '/' retention{1} ' parity'],...
                   error_norm<=meta.roundoff_bound&&error_norm<=meta.observable_budget,'Stock/direct error must satisfy roundoff and requested budgets.');
@@ -55,11 +55,11 @@ fprintf('CCE Hamiltonian: %d parity cases, max Frobenius=%g, max relative=%g\n',
 fprintf('CCE Hamiltonian: max dense propagator error=%g\n',max_propagator);
 
 % Demonstrate that transposing a single ordered nonsymmetric cell is detected
-parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
-model=cce_prepare(system,parameters);
+assumptions='labframe'; parameters.orientation=[0 0 0];
+model=cce_compile(system,parameters,assumptions);
 [reference,meta]=cce_hamiltonian(model,[3 1],struct('backend','stock'));
 mutant=system; mutant.inter.coupling.matrix{1,2}=mutant.inter.coupling.matrix{1,2}.';
-wrong=cce_hamiltonian(cce_prepare(mutant,parameters),[3 1],struct());
+wrong=cce_hamiltonian(cce_compile(mutant,parameters,assumptions),[3 1],struct());
 result=test_true(result,'transpose mutation rejected',...
                   norm(wrong-reference,'fro')>100*meta.roundoff_bound,'Antisymmetric ordered-cell convention is observable.');
 
@@ -67,7 +67,7 @@ result=test_true(result,'transpose mutation rejected',...
 half=system; tensor=half.inter.coupling.matrix{1,2};
 half.inter.coupling.matrix{1,2}=tensor/2;
 half.inter.coupling.matrix{2,1}=tensor.'/2;
-H=cce_hamiltonian(cce_prepare(half,parameters),[3 1],struct());
+H=cce_hamiltonian(cce_compile(half,parameters,assumptions),[3 1],struct());
 result=test_close(result,'nonsymmetric half cells',...
                   H,reference,meta.roundoff_bound,0,'Reverse ordered cell requires tensor transpose.');
 
@@ -76,16 +76,16 @@ permutation=[3 1 2]; permuted_sys=sys;
 permuted_sys.isotopes=sys.isotopes(permutation);
 permuted_inter=inter; permuted_inter.zeeman.matrix=inter.zeeman.matrix(permutation);
 permuted_inter.coupling.matrix=inter.coupling.matrix(permutation,permutation);
-permuted_parameters=parameters; permuted_parameters.observed_spins=3;
-permuted_parameters.bath_spins=[1 2];
-permuted=cce_prepare(create(permuted_sys,permuted_inter),permuted_parameters);
+permuted_parameters=parameters; permuted_parameters.observed=3;
+permuted_parameters.cce.bath_spins=[1 2];
+permuted=cce_compile(create(permuted_sys,permuted_inter),permuted_parameters,assumptions);
 H=cce_hamiltonian(permuted,[1 2],struct());
 result=test_close(result,'physical spin permutation',...
                   H,reference,meta.roundoff_bound,0,'Relabelling leaves the ordered physical Hamiltonian invariant.');
 
 % Check a observed-spin system in nonascending physical order and a proper subset
-parameters.observed_spins=[3 1]; parameters.bath_spins=2;
-model=cce_prepare(system,parameters);
+parameters.observed=[3 1]; parameters.cce.bath_spins=2;
+model=cce_compile(system,parameters,assumptions);
 [H,meta]=cce_hamiltonian(model,2,struct());
 reference=cce_hamiltonian(model,2,struct('backend','stock'));
 result=test_close(result,'multiple observed spins',...
@@ -96,8 +96,8 @@ result=test_close(result,'observed-spin-only subset',...
                   H,reference,meta.roundoff_bound,0,'Metadata slicing preserves physical indices.');
 
 % Compare exterior fields with an explicit partial expectation of the full system
-parameters.observed_spins=1; parameters.bath_spins=[2 3];
-model=cce_prepare(system,parameters);
+parameters.observed=1; parameters.cce.bath_spins=[2 3];
+model=cce_compile(system,parameters,assumptions);
 [full_H,full_meta]=cce_hamiltonian(model,[2 3],struct());
 spin_config.exterior_ids=3; spin_config.exterior_expectations=[0 0 1/2];
 [H,meta]=cce_hamiltonian(model,2,spin_config);
@@ -109,8 +109,8 @@ result=test_close(result,'exterior expectation',...
 
 % Test finite physical cutoffs independently of graph pruning
 cut=system; cut.inter.coordinates={[0 0 0],[0 0 2],[0 0 20]};
-parameters.interaction_cutoff=3;
-model=cce_prepare(cut,parameters);
+parameters.cce.interaction_cutoff=3;
+model=cce_compile(cut,parameters,assumptions);
 [H,meta]=cce_hamiltonian(model,[2 3],struct());
 reference=cce_hamiltonian(model,[2 3],struct('backend','stock'));
 result=test_close(result,'physical distance cutoff',...
@@ -119,35 +119,35 @@ result=test_true(result,'cutoff omission count',...
                   size(model.omitted_pairs,1)==2,'Two physical pairs exceed three Angstrom.');
 
 % Reject a declared memory budget before allocating cluster-sized matrices
-small=parameters; small.interaction_cutoff=Inf; small.numerics.max_memory_bytes=1;
+small=parameters; small.cce.interaction_cutoff=Inf; small.cce.numerics.max_memory_bytes=1;
 rejected=false;
 try
-    cce_hamiltonian(cce_prepare(system,small),[2 3],struct());
-catch
-    rejected=true;
+    cce_hamiltonian(cce_compile(system,small,assumptions),[2 3],struct());
+catch exception
+    rejected=contains(exception.message,'max_memory_bytes');
 end
 result=test_true(result,'memory ceiling rejected',...
                   rejected,'Insufficient explicit memory must stop before operator allocation.');
 
 % Reject an assumption name that has no declared physical meaning
-parameters.interaction_cutoff=Inf; parameters.assumptions='unsupported';
+parameters.cce.interaction_cutoff=Inf; assumptions='unsupported';
 rejected=false;
 try
-    cce_prepare(system,parameters);
+    cce_compile(system,parameters,assumptions);
 catch
     rejected=true;
 end
 result=test_true(result,'unsupported assumption rejected',...
                   rejected,'A physical approximation cannot be inferred from an unknown name.');
-parameters.assumptions='labframe';
+assumptions='labframe';
 
 % Force automatic fallback for a nonzero rank-three giant-spin term
 sys.isotopes={'E4'}; sys.magnet=0.01;
 inter=struct(); inter.giant.coeff={{zeros(3,1),zeros(5,1),[0;0;0;37;0;0;0]}};
 inter.giant.euler={{[0 0 0],[0 0 0],[0 0 0]}};
-parameters.observed_spins=1; parameters.bath_spins=[];
-parameters.interaction_cutoff=Inf;
-model=cce_prepare(create(sys,inter),parameters);
+parameters.observed=1; parameters.cce.bath_spins=[];
+parameters.cce.interaction_cutoff=Inf;
+model=cce_compile(create(sys,inter),parameters,assumptions);
 [H,meta]=cce_hamiltonian(model,[],struct());
 reference=cce_hamiltonian(model,[],struct('backend','stock'));
 result=test_close(result,'rank-three fallback',...

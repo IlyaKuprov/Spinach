@@ -29,6 +29,7 @@ for f=1:numel(fixtures)
     sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
     inter.zeeman.matrix=repmat({zeros(3)},1,nb+1); inter.coupling.matrix=cell(nb+1);
     spin_system=create(sys,inter); field=fixture.simulator.magnetic_field(:).';
+
     % External PyCCE central labels map to the observed-spin Hamiltonian
     spin_system.inter.zeeman.matrix{1}(3,:)=-fixture.central.gyro*field*1000;
     D=fixture.central.D; E=fixture.central.E;
@@ -55,23 +56,25 @@ for f=1:numel(fixtures)
     end
 
     % Resolve the exact observed-state and selective logical-pulse convention
-    p.observed_spins=1; p.bath_spins=2:nb+1; p.method=fixture.compute.method;
-    p.expansion='standard'; p.quantity='signal'; p.order=2;
-    p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
-    p.graph=struct('mode','complete','score','coupling_norm'); p.meanfield='none';
-    p.bath_state=struct('mode','mixed_product'); p.times=fixture.times_ms(:).'/1000;
-    p.numerics=struct('atol',1e-5,'rtol',1e-5,'max_memory_bytes',2^29);
+    p.observed=1; p.cce.bath_spins=2:nb+1; p.cce.approximation='generalized';
+    if strcmp(fixture.compute.method,'cce'), p.cce.approximation='projected'; end
+    p.cce.order=2;
+    p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
+    p.cce.graph=struct('mode','complete','score','coupling_norm'); p.cce.meanfield='none';
+    p.cce.bath_state=struct('mode','mixed_product'); p.times=fixture.times_ms(:).'/1000;
+    p.cce.numerics=struct('atol',1e-5,'rtol',1e-5,'max_memory_bytes',2^29);
     a=fixture.alpha_real+1i*fixture.alpha_imag;
     b=fixture.beta_real+1i*fixture.beta_imag;
     p.rho0=(a+b)*(a+b)'/2; p.transition=struct('alpha',a,'beta',b);
-    p.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
-                      'operator',pi*(a*b'+b*a')/2);
-    p.normalized=strcmp(p.method,'gcce'); actual=cce(spin_system,p);
+    pulse_sequence=@hahn_echo;
+    p.normalized=true; p.transition.spins=p.observed;
+    [value,actual]=clexpn(spin_system,pulse_sequence,p,'labframe');
 
     % Compare the raw traces, not only the final absolute echo envelope
     for j=1:numel(fixture.raw)
         expected=fixture.raw(j); sites=sort(expected.sites(:).');
-        index=find(arrayfun(@(r) isequal(r.sites,sites),actual.raw{1}),1);
+        index=find(arrayfun(@(r)isequal(r.sites,sites),actual.clusters),1)+1;
+        if isempty(sites), index=1; end
         record=actual.raw{1}(index); reference=expected.real-1i*expected.imag;
         discrepancy=max(abs(record.value-reference));
         raw_errors(f)=max(raw_errors(f),discrepancy);
@@ -80,22 +83,27 @@ for f=1:numel(fixtures)
         result=test_true(result,'PyCCE raw subset',discrepancy<=2*bound,...
                          'Two eigensolvers plus exact decimal input serialization bounds.');
     end
+
     % Preserve external signal-column labels and the documented phase convention
     reference=fixture.coherence_real-1i*fixture.coherence_imag;
-    final_errors(f)=max(abs(actual.value-reference));
+    final_errors(f)=max(abs(value-reference));
     result=test_true(result,'PyCCE final signal',...
-                     final_errors(f)<=2*max(actual.abs_error_bound),...
+                     final_errors(f)<=2*max(actual.reduction.abs_error_bound),...
                      'Complex amplitude and phase are compared without clipping.');
 
     % Isolate the subset algebra using only the externally supplied raw traces
     records=actual.raw{1}; records(1).value(:)=1;
     for j=1:numel(fixture.raw)
         expected=fixture.raw(j); sites=sort(expected.sites(:).');
-        index=find(arrayfun(@(r) isequal(r.sites,sites),records),1);
+        index=find(arrayfun(@(r)isequal(r.sites,sites),actual.clusters),1)+1;
+        if isempty(sites), index=1; end
         records(index).value=expected.real-1i*expected.imag;
     end
     for j=1:numel(records), records(j).abs_error_bound(:)=0; end
-    reduced=cce_reduce(records,actual.clusters,p);
+    reduction=struct('method',fixture.compute.method,'order',p.cce.order,...
+                     'numerics',p.cce.numerics);
+    reduction.quantity='signal'; reduction.times=p.times;
+    reduced=cce_reduce(records,actual.clusters,reduction);
     operations=numel(records)^2*numel(p.times);
     rounding=operations*eps/(1-operations*eps);
     result=test_close(result,'PyCCE reduction only',reduced.value,reference,...

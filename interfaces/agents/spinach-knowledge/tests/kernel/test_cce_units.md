@@ -36,3 +36,7 @@ result=test_cce_units()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_units.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native interface
+
+Uses `cce_options` and `cce_compile` with `parameters.observed`, `parameters.cce.bath_spins` and `parameters.cce.numerics`. The explicit labframe assumption is a separate argument. Canonical scalar, dipolar, signed-Zeeman and ordered-cell assertions are unchanged.

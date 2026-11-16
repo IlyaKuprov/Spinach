@@ -33,3 +33,7 @@ result=test_cce_ccex_fixtures()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_ccex_fixtures.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native interface
+
+Uses `clexpn` with `@free_evolution` or `@hahn_echo` and projected expansion policy. Physical support is looked up in `diagnostics.clusters`; raw responses and numerical bounds remain in `diagnostics.raw` and `diagnostics.reduction`. Every pinned CCEX complex-trace comparison is retained.

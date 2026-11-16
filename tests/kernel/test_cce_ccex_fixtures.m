@@ -47,32 +47,32 @@ for f=1:numel(data)
     end
 
     % Use ms=+1 and ms=0 manifolds and a selective logical pi pulse
-    p.observed_spins=1; p.bath_spins=2:nb+1; p.method='cce'; p.expansion='standard';
-    p.quantity='signal'; p.order=fixture.order; p.transition.alpha=[1;0;0];
-    p.transition.beta=[0;1;0]; p.assumptions='labframe'; p.orientation=[0 0 0];
-    p.interaction_cutoff=Inf; p.graph=struct('mode','distance','radius',fixture.rdip,...
+    p.observed=1; p.cce.bath_spins=2:nb+1; p.cce.approximation='projected';
+    p.cce.order=fixture.order; p.transition.alpha=[1;0;0];
+    p.transition.beta=[0;1;0]; p.orientation=[0 0 0];
+    p.cce.interaction_cutoff=Inf; p.cce.graph=struct('mode','distance','radius',fixture.rdip,...
                                          'score','coupling_norm');
-    p.meanfield='none'; p.times=fixture.times_ms(:).'/1000;
-    p.bath_state=struct('mode','mixed_product'); p.sequence=[];
-    p.numerics=struct('atol',1e-7,'rtol',1e-7,'max_memory_bytes',2^29);
+    p.cce.meanfield='none'; p.times=fixture.times_ms(:).'/1000;
+    p.cce.bath_state=struct('mode','mixed_product'); pulse_sequence=@free_evolution;
+    p.cce.numerics=struct('atol',1e-7,'rtol',1e-7,'max_memory_bytes',2^29);
     if fixture.pulses==1
-        a=p.transition.alpha; b=p.transition.beta;
-        p.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
-                          'operator',pi*(a*b'+b*a')/2);
+        pulse_sequence=@hahn_echo;
     end
-    actual=cce(spin_system,p); reference=fixture.real+1i*fixture.imag;
-    errors(f)=max(abs(actual.value-reference));
+    p.transition.spins=p.observed;
+    [value,actual]=clexpn(spin_system,pulse_sequence,p,'labframe'); reference=fixture.real+1i*fixture.imag;
+    errors(f)=max(abs(value-reference));
     if isfield(fixture,'raw')
         for j=1:numel(fixture.raw)
             expected=fixture.raw(j); sites=sort(expected.sites(:).');
-            index=find(arrayfun(@(r) isequal(r.sites,sites),actual.raw{1}),1);
+            index=find(arrayfun(@(r)isequal(r.sites,sites),actual.clusters),1)+1;
+            if isempty(sites), index=1; end
             record=actual.raw{1}(index); ref=expected.real+1i*expected.imag;
             result=test_true(result,'CCEX raw subset',...
                 max(abs(record.value-ref))<=max(record.abs_error_bound)+sqrt(2)*0.5e-10,...
                 'Raw singleton and pair traces agree before expansion.');
         end
     end
-    budget=max(actual.abs_error_bound)+sqrt(2)*0.5e-10;
+    budget=max(actual.reduction.abs_error_bound)+sqrt(2)*0.5e-10;
     result=test_true(result,'CCEX printed curve',errors(f)<=budget,...
                      'Half the last printed unit plus measured propagation/reduction bound.');
 end

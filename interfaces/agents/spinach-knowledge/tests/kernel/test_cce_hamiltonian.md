@@ -45,3 +45,7 @@ result=test_cce_hamiltonian()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_hamiltonian.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native interface
+
+Uses `cce_compile(spin_system,parameters,assumptions)` and retained `cce_hamiltonian` direct/stock engines. Native physical IDs and nested expansion policy replace the flat parameter structure; all Hamiltonian, propagator, ordering, retention, fallback and memory assertions are preserved.

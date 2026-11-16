@@ -47,3 +47,7 @@ result=test_cce_bath()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_bath.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native interface
+
+Uses `spin_bath(sys,inter,specification)` with `sys.magnet` owning the magnetic field and row-vector isotope labels. All lattice, occupancy, covariance, tensor, candidate-ID and exclusion assertions remain.

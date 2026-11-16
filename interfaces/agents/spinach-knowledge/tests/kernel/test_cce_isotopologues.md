@@ -41,3 +41,7 @@ result=test_cce_isotopologues()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+
+## Native interfaces
+
+The registered test constructs configurations with `spin_bath(sys,inter,specification)` and propagates normalized numeric signals with `clexpn(spin_system,@free_evolution,p,'labframe')`. The observed physical ID and transition selector are explicit; the remaining physical spins form the bath; expansion controls are nested under `p.cce`. The independent isotope-specific analytic phase averages and all probability, dimension, RNG, sampling and ceiling assertions are retained.

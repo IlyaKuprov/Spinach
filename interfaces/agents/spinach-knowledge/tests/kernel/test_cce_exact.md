@@ -33,3 +33,7 @@ result=test_cce_exact()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_exact.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native interface
+
+Uses `clexpn` with `@free_evolution` or `@hahn_echo`. `parameters.transition.spins` states physical transition support. Natural numeric output and separate raw-cluster diagnostics are checked against independent dense manifold calculations. Full-order bypass is checked by exact equality to the full-cluster raw response.

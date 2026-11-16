@@ -35,4 +35,8 @@ result=test_cce_pycce_fixtures()
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_pycce_fixtures.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-Projected PyCCE signal is intrinsically normalized; only the generalized fixtures request the optional generalized-observation normalization flag. All raw-trace and final-complex-signal comparisons remain unchanged.
+The native projected and generalized experiments both request normalized detected amplitude explicitly. All raw-trace and final-complex-signal comparisons remain unchanged.
+
+## Native interface
+
+Uses `clexpn` with `@hahn_echo`, explicit transition support and `normalized=true` for both projected and generalized physical signals. Approximation is selected with `parameters.cce.approximation`. Separate raw/subset/final and external-only reduction assertions remain unchanged.

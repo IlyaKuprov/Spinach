@@ -1,19 +1,7 @@
-# examples/cce/cce_p1_electron_bath.m
+# cce_p1_electron_bath
 
-- Signature: `result=cce_p1_electron_bath()`
+Syntax: `[answer,diagnostics]=cce_p1_electron_bath()`. The numeric answer is the projected Hahn-echo amplitude; diagnostics is the separate clexpn audit record.
 
-## Purpose
+The example uses standard sys/inter/bas/parameters blocks, a declarative magnetic-quantum-number transition, and `clexpn(spin_system,@hahn_echo,parameters,'labframe')`. Physical tensors, elapsed-time grid, graph, retained order and bath state are unchanged.
 
-Sparse electron bath with an explicit internal nitrogen hyperfine group. The example prints a comparison against a separately implemented dense Kronecker/expm calculation.
-
-## Spin system and sequence
-
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_p1_electron_bath.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_p1_electron_bath.m).
-
-Observed-spin transverse coupling columns are explicitly removed in this projected model; bath internal hyperfine and exchange terms are unchanged.
+Independent analytic, source-pinned or dense checks and frozen physical arrays are retained in `tests/kernel/test_cce_examples.m`.

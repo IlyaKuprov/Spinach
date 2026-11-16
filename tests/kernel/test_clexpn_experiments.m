@@ -269,6 +269,21 @@ result=test_close(result,'Projected normalized spectral pulse products',...
                   actual,expected,2e-14,2e-14,...
                   'Normalization uses the detected initial amplitude, including its phase.');
 
+% A six-state bath retains the evaluated mixed-density trace at zero time
+sys.magnet=0; sys.isotopes={'E','E','14N'};
+inter=struct(); inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
+system=create(sys,inter); p=struct();
+p.observed=1; p.transition=struct('spins',1,'ms',[1/2 -1/2]);
+p.times=0; p.cce.approximation='projected'; p.cce.order=1;
+p.cce.expansion='partition'; p.cce.groups={[2 3]};
+p.cce.partition=struct('mode','user','max_dimension',6);
+p.cce.graph=struct('mode','complete');
+actual=clexpn(system,@hahn_echo,p,'labframe');
+rho_b=kron(eye(2)/2,eye(3)/3);
+result=test_close(result,'Projected six-state zero-time trace',...
+                  actual,trace(rho_b),0,0,...
+                  'Zero-duration propagation evaluates the supplied density trace.');
+
 end
 
 

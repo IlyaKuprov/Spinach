@@ -10,3 +10,5 @@ Preparation selectors verified for the example migration: `transition.ms=[-0.5 0
 Regression coverage includes native coherent error bounds and spectral residuals at zero tolerance, observed-transition parity against stock construction, lower-order numerical masks, and complete-bath validity when the requested error budget is deliberately smaller than the computed estimate.
 
 Coherent projected Hahn spectral products are additionally compared with the general interval path for an arbitrary complex observed preparation, phased receiver and both normalization settings. Error auxiliaries must remain positive and finite.
+
+The projected Hahn six-state electron/nitrogen bath checks zero-duration amplitude against the evaluated mixed-density trace with zero tolerance. This catches replacement by a mathematically equivalent literal one that changes the frozen floating-point result.

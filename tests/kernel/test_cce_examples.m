@@ -26,9 +26,23 @@ for n=1:numel(names)
 
     % Execute each public example and retain the standard harness fields only
     started=tic;
-    if ismember(names{n},{'cce_erbium_cawo4','cce_hbn_quadrupoles','cce_methyl_molecular','cce_sic_divacancy','cce_sip_donor'})
+    if ismember(names{n},{'cce_single_nucleus','cce_nv_diamond',...
+                         'cce_p1_electron_bath','pcce_electron_layer',...
+                         'cce_erbium_cawo4','cce_hbn_quadrupoles',...
+                         'cce_methyl_molecular','cce_sic_divacancy','cce_sip_donor'})
         [answer,diagnostics]=feval(names{n});
         switch names{n}
+            case 'cce_single_nucleus'
+                [reference_error,snapshot]=reference_cce_single_nucleus(answer);
+            case 'cce_nv_diamond'
+                [reference_error,snapshot]=reference_cce_nv_diamond(answer);
+            case 'cce_p1_electron_bath'
+                [reference_error,snapshot]=reference_cce_p1_electron_bath(answer);
+            case 'pcce_electron_layer'
+                [reference_error,snapshot]=reference_pcce_electron_layer(answer);
+                result=test_true(result,'Partition full-order identity',...
+                    snapshot.full_order_error<1e-9,...
+                    'The retained pair agrees with the unpartitioned full bath.');
             case 'cce_erbium_cawo4'
                 [reference_error,snapshot]=reference_cce_erbium_cawo4(answer);
             case 'cce_hbn_quadrupoles'
@@ -893,6 +907,427 @@ snapshot.ua=ua;
 snapshot.ub=ub;
 snapshot.reference_error=reference_error;
 snapshot.r=r; snapshot.contact=contact; snapshot.k0=k0;
+
+end
+
+% Independent reference retained from cce_single_nucleus
+function [reference_error,snapshot]=reference_cce_single_nucleus(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E3','13C'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Nuclear Zeeman frequency and projected hyperfine components, rad/s
+omega=-spin('13C')*sys.magnet; apar=0.3*abs(omega);
+aper=0.6*abs(omega);
+
+% Standard Spinach tensors: electron g, nuclear ppm, and coupling Hz
+inter.zeeman.matrix={zeros(3),zeros(3)};
+inter.coupling.matrix=cell(2);
+inter.coupling.matrix{1,2}=[0 0 aper;0 0 0;0 0 apar]/(2*pi);
+
+% Compile metadata without constructing a full-bath basis
+
+create(sys,inter);
+
+% Projected signal; static explicit operators include their angle
+parameters.observed_spins=1; parameters.bath_spins=2;
+parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='signal'; parameters.order=1;
+parameters.transition.alpha=[0;1;0]; parameters.transition.beta=[1;0;0];
+parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
+parameters.interaction_cutoff=Inf; parameters.meanfield='none';
+parameters.graph=struct('mode','complete');
+parameters.times=linspace(0,8*pi/abs(omega),101);
+parameters.sequence=struct('type','ideal','target',1,...
+                           'operator',pi*[0 1 0;1 0 0;0 0 0]/2,...
+                           'angle',1,'placement','fraction','at',0.5);
+parameters.bath_state=struct('mode','mixed_product');
+parameters.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^28);
+
+% Run CCE and calculate an independent analytic echo
+result=struct('value',answer,'times',parameters.times(:),'valid',true(size(answer)));
+omega1=sqrt((omega+apar)^2+aper^2);
+reference=1-2*(aper/omega1)^2*sin(omega*parameters.times(:)/4).^2.*...
+          sin(omega1*parameters.times(:)/4).^2;
+result.reference=reference; result.reference_error=max(abs(result.value-reference));
+fprintf('Single-nucleus analytic Hahn maximum error: %.3g\n',result.reference_error);
+
+reference_error=result.reference_error;
+snapshot=struct();
+snapshot.apar=apar;
+snapshot.aper=aper;
+snapshot.omega=omega;
+snapshot.omega1=omega1;
+snapshot.reference=reference;
+snapshot.reference_error=reference_error;
+
+end
+
+% Independent reference retained from cce_nv_diamond
+function [reference_error,snapshot]=reference_cce_nv_diamond(answer)
+
+% Standard Spinach system with source gyromagnetic ratios mapped to g/ppm
+sys.magnet=500*1e-4; sys.isotopes={'E3','13C','13C','13C','13C'};
+sys.output='hush'; sys.parallel={'local',1};
+inter.zeeman.matrix=cell(1,5); inter.coupling.matrix=cell(5);
+gfree=2.00231930436256;
+inter.zeeman.matrix{1}=gfree*(-17608.59705*1e7/spin('E3'))*eye(3);
+for n=2:5
+
+    % Source rad/(ms Gauss) to Spinach nuclear chemical shift in ppm
+    inter.zeeman.matrix{n}=1e6*(6.7282853242747445*1e7/spin('13C')-1)*eye(3);
+end
+
+% Source zero-field splitting and explicit hyperfine tensors, converted kHz to Hz
+inter.coupling.matrix{1,1}=1000*diag([-960000 -960000 1920000]);
+inter.coupling.matrix{1,2}=1000*[62.09198322383363 42.918773452863142 86.078663610517651;42.918773452863142 -52.625936690744069 28.63925630406008;86.078663610517651 28.63925630406008 -9.4660465330895676];
+inter.coupling.matrix{1,3}=1000*[46.846946007935479 41.7131493536275 20.798152899007547;41.7131493536275 -15.576682609001635 10.413661409461005;20.798152899007547 10.413661409461005 -31.270263398933857];
+inter.coupling.matrix{1,4}=1000*[7.7040985952493219 -41.664463528969883 -27.802268186621028;-41.664463528969883 7.7040985952493219 27.802268186621028;-27.802268186621028 27.802268186621028 -15.408197190498676];
+inter.coupling.matrix{1,5}=1000*[14.689630582202209 -18.600579331667948 -27.874817765944968;-18.600579331667948 -13.146092067661488 13.956956441013119;-27.874817765944968 13.956956441013119 -1.5435385145407345];
+
+% Declare the reference's observed-Sz projected approximation before propagation
+for n=2:5, inter.coupling.matrix{1,n}(:,1:2)=0; end
+
+% Explicit bath coordinates and point-dipole bath couplings in Hz
+xyz=[5.3499999999999996 1.78 3.5699999999999998;7.1299999999999999 3.5699999999999998 1.78;-5.3499999999999996 5.3499999999999996 3.5699999999999998;-7.1299999999999999 3.5699999999999998 5.3499999999999996];
+for j=1:4
+    for k=j+1:4
+
+        % Independent source-unit conversion; displacement is in Angstrom
+        r=(xyz(k,:)-xyz(j,:))*1e-10; u=r/norm(r);
+        angular=1e-7*1.054571817e-34*(6.7282853242747445*1e7)^2/norm(r)^3;
+        inter.coupling.matrix{j+1,k+1}=angular*(eye(3)-3*(u.'*u))/(2*pi);
+    end
+end
+
+
+create(sys,inter);
+
+% The source selected two-level transition is mS=-1/+1; a selective static operator includes its angle
+parameters.observed_spins=1; parameters.bath_spins=2:5;
+parameters.method='cce'; parameters.expansion='standard';
+parameters.quantity='signal'; parameters.order=2;
+parameters.transition.alpha=[0 0 1].';
+parameters.transition.beta=[1 0 0].';
+parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
+parameters.interaction_cutoff=Inf; parameters.meanfield='none';
+parameters.graph=struct('mode','complete');
+parameters.times=1e-3*[0 0.012500000000000001 0.025000000000000001 0.037500000000000006 0.050000000000000003 0.0625 0.075000000000000011 0.087500000000000008 0.10000000000000001 0.1125 0.125 0.13750000000000001 0.15000000000000002 0.16250000000000001 0.17500000000000002 0.1875 0.20000000000000001 0.21250000000000002 0.22500000000000001 0.23750000000000002 0.25 0.26250000000000001 0.27500000000000002 0.28750000000000003 0.30000000000000004 0.3125 0.32500000000000001 0.33750000000000002 0.35000000000000003 0.36250000000000004 0.375 0.38750000000000001 0.40000000000000002 0.41250000000000003 0.42500000000000004 0.4375 0.45000000000000001 0.46250000000000002 0.47500000000000003 0.48750000000000004 0.5];
+a=parameters.transition.alpha; b=parameters.transition.beta;
+parameters.sequence=struct('type','ideal','target',1,'operator',...
+                           pi*(a*b'+b*a')/2,'angle',1,...
+                           'placement','fraction','at',0.5);
+parameters.bath_state=struct('mode','mixed_product');
+parameters.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
+
+% PyCCE reports the opposite off-diagonal element: conjugate its complex trace
+result=struct('value',answer,'times',parameters.times(:),'valid',true(size(answer)));
+reference=[1.0000000000000073 0.80412187352127196 0.97076472650584211 0.97345787001549855 0.92208749592281747 0.89487943408951576 0.97304683857265373 0.93078025774994988 0.86125671741742393 0.99661776302799532 0.76355437703758766 0.99904105154528788 0.9882134199268271 0.95383133371749873 0.86766134502112169 0.98965017367005748 0.89372993555346014 0.8732162021890324 0.98602797149751487 0.82356170821295749 0.99419409116745483 0.93938769167121006 0.9940891681376085 0.86777114512359543 0.9860547697233486 0.84220648442521762 0.93028570851733106 0.98826030630667416 0.82912496114994416 0.97421567083728422 0.95985232702599865 0.98902742105821617 0.86305059097592329 0.99445386679999404 0.79888714808310557 0.97200285714316348 0.96135900760617921 0.85148111754718481 0.96346493820569012 0.97793634578837296 0.9615196189824301].'+...
+          1i*[3.4800759960904551e-33 -2.3669791480982818e-06 3.9053578383864199e-08 4.1251546477359897e-06 1.3322998842642245e-06 -1.9800296667105094e-05 2.7234071561477375e-06 -4.4544694809084375e-06 -4.2527858745940881e-06 -4.0487554818223102e-08 3.5977740510985286e-05 1.2251660190342334e-07 6.6845336712676628e-07 8.2300776394647603e-06 -1.6303824478936545e-05 9.7554193182357096e-07 -3.5152718524314725e-05 -4.581728372659567e-05 3.2348614343623995e-07 8.2517282974561609e-06 -2.5910341445473197e-06 2.4206767247835291e-05 3.6414673240542315e-06 1.0680014272253585e-05 5.5858781900956123e-06 4.8774427328959467e-05 1.3601894267783467e-05 -5.3571546260425495e-06 -1.8314667050526693e-05 -2.0325127606064874e-05 1.7291666493708969e-05 -2.6488761044315708e-06 -0.00015685884541566557 4.8639994138961556e-06 0.00013334140466861785 -9.8320747276684197e-06 3.1600752332004179e-05 0.00014601325410634766 9.4604540883105856e-06 1.1986705000717478e-05 -3.3514391192247085e-05].';
+result.reference_error=max(abs(result.value-conj(reference)));
+fprintf('NV pinned PyCCE CCE2 maximum complex error: %.3g.\n',result.reference_error);
+fprintf('Seo ensemble T2=0.796 ms,n=2.220 is not a four-nucleus target.\n');
+
+reference_error=result.reference_error;
+snapshot=struct();
+snapshot.a=a;
+snapshot.angular=angular;
+snapshot.b=b;
+snapshot.gfree=gfree;
+snapshot.r=r;
+snapshot.reference=reference;
+snapshot.u=u;
+snapshot.xyz=xyz;
+snapshot.reference_error=reference_error;
+
+end
+
+% Independent reference retained from cce_p1_electron_bath
+function [reference_error,snapshot]=reference_cce_p1_electron_bath(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E','E','14N'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
+inter.coordinates={[0 0 0];[35 0 0];[35 0 1]};
+inter.zeeman.matrix=repmat({zeros(3)},1,3);
+inter.coupling.matrix=cell(3);
+
+% Explicit illustrative hyperfine and bath coupling tensors in Hz
+inter.coupling.matrix{1,2}=diag([2000 2000 -4000]);
+inter.coupling.matrix{2,3}=diag([81 81 114])*1e6;
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;400 0 200].';
+
+% Declare observed-Sz projection for this projected electron-bath model
+for n=2:numel(sys.isotopes)
+    if ~isempty(inter.coupling.matrix{1,n}), inter.coupling.matrix{1,n}(:,1:2)=0; end
+end
+
+% Coordinates define the toy geometry; all couplings above are explicit
+inter=rmfield(inter,'coordinates');
+
+% Compile physical metadata without a full-bath basis
+spin_system=create(sys,inter);
+
+% Projected observed-spin Hahn signal and a complete small-bath graph
+parameters.observed_spins=1; parameters.bath_spins=2:3;
+parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='signal'; parameters.order=2;
+parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
+parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
+parameters.interaction_cutoff=Inf; parameters.meanfield='none';
+parameters.graph=struct('mode','complete');
+parameters.times=linspace(0,200e-6,41);
+parameters.sequence=struct('type','ideal','target',1,'axis','x',...
+                           'angle',pi,'placement','fraction','at',0.5);
+parameters.bath_state=struct('mode','mixed_product');
+parameters.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
+
+% Keep the electron and its nitrogen in the same physical group
+parameters.expansion='partition'; parameters.groups={[2 3]};
+parameters.partition=struct('mode','user','max_dimension',6);
+parameters.order=1;
+
+% Run the cluster expansion and report its physical input boundary
+result=struct('value',answer,'times',parameters.times(:),'valid',true(size(answer)));
+fprintf('cce_p1_electron_bath: %d/%d valid values; finite-cluster demonstration.\n',...
+        nnz(result.valid),numel(result.valid));
+fprintf('No P1 density/T2 claim: one explicit hyperfine-bound group.\n');
+
+% Independently assemble projected bath Hamiltonians from input Hz tensors
+bath=parameters.bath_spins; dimensions=spin_system.comp.mults(bath);
+dimension=prod(dimensions); operators=cell(numel(bath),3);
+for j=1:numel(bath)
+
+    % Angular momentum matrices in descending magnetic-quantum-number order
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+
+        % Embed a physical bath operator with dense Kronecker products
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+bath_h=zeros(dimension); difference=zeros(dimension);
+for j=1:numel(bath)
+
+    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
+    id=bath(j);
+    if sys.isotopes{id}(1)~='E'
+        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
+    end
+    for a=1:3
+
+        % Projected hyperfine difference and on-site quadratic terms
+        if ~isempty(inter.coupling.matrix{1,id})
+            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
+        end
+        for b=1:3
+            if ~isempty(inter.coupling.matrix{id,id})
+                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
+            end
+        end
+    end
+    for k=j+1:numel(bath)
+        for a=1:3
+            for b=1:3
+
+                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
+                tensor=inter.coupling.matrix{id,bath(k)};
+                if ~isempty(tensor)
+                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
+                end
+            end
+        end
+    end
+end
+ha=bath_h+difference/2; hb=bath_h-difference/2;
+reference=complex(zeros(numel(result.times),1));
+for n=1:numel(result.times)
+
+    % Independent full-bath Hahn propagators for a maximally mixed state
+    ua=expm(-1i*ha*result.times(n)/2); ub=expm(-1i*hb*result.times(n)/2);
+    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+end
+result.reference_error=max(abs(result.value-reference));
+fprintf('Independent dense Hahn maximum complex error: %.3g.\n',result.reference_error);
+
+reference_error=result.reference_error;
+snapshot=struct();
+snapshot.a=a;
+snapshot.b=b;
+snapshot.bath=bath;
+snapshot.bath_h=bath_h;
+snapshot.difference=difference;
+snapshot.dimension=dimension;
+snapshot.dimensions=dimensions;
+snapshot.ha=ha;
+snapshot.hb=hb;
+snapshot.id=id;
+snapshot.local=local;
+snapshot.m=m;
+snapshot.operators=operators;
+snapshot.plus=plus;
+snapshot.reference=reference;
+snapshot.tensor=tensor;
+snapshot.ua=ua;
+snapshot.ub=ub;
+snapshot.reference_error=reference_error;
+
+end
+
+% Independent reference retained from pcce_electron_layer
+function [reference_error,snapshot]=reference_pcce_electron_layer(answer)
+
+% Magnet and isotopes
+sys.magnet=0.01; sys.isotopes={'E','E','E','E'};
+sys.output='hush'; sys.parallel={'local',1};
+
+% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
+inter.coordinates={[0 0 0];[20 0 0];[21 0 0];[0 30 0]};
+inter.zeeman.matrix=repmat({zeros(3)},1,4);
+inter.coupling.matrix=cell(4);
+
+% Explicit illustrative hyperfine and bath coupling tensors in Hz
+inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
+inter.coupling.matrix{1,3}=[0 0 0;0 0 0;-12000 0 6000].';
+inter.coupling.matrix{1,4}=[0 0 0;0 0 0;4000 0 3000].';
+inter.coupling.matrix{2,3}=diag([2e5 2e5 -4e5]);
+inter.coupling.matrix{3,4}=diag([300 300 -600]);
+
+% Declare observed-Sz projection for this projected electron-bath model
+for n=2:numel(sys.isotopes)
+    if ~isempty(inter.coupling.matrix{1,n}), inter.coupling.matrix{1,n}(:,1:2)=0; end
+end
+
+% Coordinates define the toy geometry; all couplings above are explicit
+inter=rmfield(inter,'coordinates');
+
+% Compile physical metadata without a full-bath basis
+spin_system=create(sys,inter);
+
+% Projected observed-spin Hahn signal and a complete small-bath graph
+parameters.observed_spins=1; parameters.bath_spins=2:4;
+parameters.expansion='standard'; parameters.method='cce'; parameters.quantity='signal'; parameters.order=3;
+parameters.transition.alpha=[1;0]; parameters.transition.beta=[0;1];
+parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
+parameters.interaction_cutoff=Inf; parameters.meanfield='none';
+parameters.graph=struct('mode','complete');
+parameters.times=linspace(0,200e-6,41);
+parameters.sequence=struct('type','ideal','target',1,'axis','x',...
+                           'angle',pi,'placement','fraction','at',0.5);
+parameters.bath_state=struct('mode','mixed_product');
+parameters.numerics=struct('atol',1e-5,'rtol',1e-5,'max_memory_bytes',2^28);
+
+% Freeze the strongly coupled pair as one partition
+parameters.expansion='partition'; parameters.groups={[2 3],4};
+parameters.partition=struct('mode','user','max_dimension',4);
+parameters.order=2;
+
+% Run the cluster expansion and report its physical input boundary
+result=struct('value',answer,'times',parameters.times(:),'valid',true(size(answer)));
+fprintf('pcce_electron_layer: %d/%d valid values; finite-cluster demonstration.\n',...
+        nnz(result.valid),numel(result.valid));
+
+% Compare with a separate unpartitioned full-order expansion
+full_parameters=rmfield(parameters,{'partition','groups'});
+full_parameters.expansion='standard'; full_parameters.order=3;
+native_parameters=struct('observed',1,'times',parameters.times,...
+    'transition',struct('spins',1,'ms',[1/2 -1/2]),...
+    'cce',struct('bath_spins',2:4,'order',3,'approximation','projected',...
+    'graph',parameters.graph,'numerics',parameters.numerics));
+[full_result.value,full_diagnostics]=clexpn(spin_system,@hahn_echo,native_parameters,'labframe');
+result.reference_error=max(abs(result.value-full_result.value));
+fprintf('Partition/full-order maximum difference: %.3g (same Hamiltonian).\n',...
+        result.reference_error);
+
+% Independently assemble projected bath Hamiltonians from input Hz tensors
+bath=parameters.bath_spins; dimensions=spin_system.comp.mults(bath);
+dimension=prod(dimensions); operators=cell(numel(bath),3);
+for j=1:numel(bath)
+
+    % Angular momentum matrices in descending magnetic-quantum-number order
+    q=(dimensions(j)-1)/2; m=q:-1:-q;
+    plus=diag(sqrt(q*(q+1)-m(2:end).*(m(2:end)+1)),1);
+    local={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
+    for a=1:3
+
+        % Embed a physical bath operator with dense Kronecker products
+        operators{j,a}=kron(eye(prod(dimensions(1:j-1))),...
+            kron(local{a},eye(prod(dimensions(j+1:end)))));
+    end
+end
+bath_h=zeros(dimension); difference=zeros(dimension);
+for j=1:numel(bath)
+
+    % Nuclear Zeeman terms; the illustrative electron g tensors are zero
+    id=bath(j);
+    if sys.isotopes{id}(1)~='E'
+        bath_h=bath_h-spin(sys.isotopes{id})*sys.magnet*operators{j,3};
+    end
+    for a=1:3
+
+        % Projected hyperfine difference and on-site quadratic terms
+        if ~isempty(inter.coupling.matrix{1,id})
+            difference=difference+2*pi*inter.coupling.matrix{1,id}(a,3)*operators{j,a};
+        end
+        for b=1:3
+            if ~isempty(inter.coupling.matrix{id,id})
+                bath_h=bath_h+2*pi*inter.coupling.matrix{id,id}(a,b)*operators{j,a}*operators{j,b};
+            end
+        end
+    end
+    for k=j+1:numel(bath)
+        for a=1:3
+            for b=1:3
+
+                % Explicit pair tensors, with no call to the CCE Hamiltonian builder
+                tensor=inter.coupling.matrix{id,bath(k)};
+                if ~isempty(tensor)
+                    bath_h=bath_h+2*pi*tensor(a,b)*operators{j,a}*operators{k,b};
+                end
+            end
+        end
+    end
+end
+ha=bath_h+difference/2; hb=bath_h-difference/2;
+reference=complex(zeros(numel(result.times),1));
+for n=1:numel(result.times)
+
+    % Independent full-bath Hahn propagators for a maximally mixed state
+    ua=expm(-1i*ha*result.times(n)/2); ub=expm(-1i*hb*result.times(n)/2);
+    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+end
+result.reference_error=max(abs(result.value-reference));
+fprintf('Independent dense Hahn maximum complex error: %.3g.\n',result.reference_error);
+
+reference_error=result.reference_error;
+snapshot=struct();
+snapshot.a=a;
+snapshot.b=b;
+snapshot.bath=bath;
+snapshot.bath_h=bath_h;
+snapshot.difference=difference;
+snapshot.dimension=dimension;
+snapshot.dimensions=dimensions;
+snapshot.full_parameters=full_parameters;
+snapshot.ha=ha;
+snapshot.hb=hb;
+snapshot.id=id;
+snapshot.local=local;
+snapshot.m=m;
+snapshot.operators=operators;
+snapshot.plus=plus;
+snapshot.reference=reference;
+snapshot.tensor=tensor;
+snapshot.ua=ua;
+snapshot.ub=ub;
+snapshot.reference_error=reference_error;
+snapshot.full_order_error=max(abs(answer-full_result.value));
+snapshot.full_answer=full_result.value;
+snapshot.full_diagnostics=full_diagnostics;
 
 end
 

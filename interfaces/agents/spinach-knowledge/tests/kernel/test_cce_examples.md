@@ -39,3 +39,5 @@ Powder checks require response/value equality, the averaged final-order response
 The generalized high-spin examples gcce_sic_clock, gcce_highspin_siv and gcce_votpp now return numeric density arrays and separate clexpn diagnostics. Their independent dense references are local functions of this registered test. Its optional second output, reference_capture, retains the independently constructed physical arrays for numerical-regression capture; the ordinary test-runner first output is unchanged.
 
 The Er:CaWO4, hBN quadrupole, coherent methyl exchange, SiC divacancy and Si:P donor examples return numeric clexpn answers and separate diagnostics. Their unchanged independent dense bath Hamiltonians, branch propagators, complex amplitudes and diagnostic arrays are retained in local reference companions and the optional reference_capture output.
+
+The single-nucleus, NV, P1 and partitioned-electron-layer examples now return `[answer,diagnostics]` through clexpn and hahn_echo. Analytic/source-pinned/dense references, including the partitioned versus full-order comparison, live in test_cce_examples. Legacy entry points remain available during the remaining migration.

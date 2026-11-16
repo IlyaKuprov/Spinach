@@ -1,19 +1,7 @@
-# examples/cce/cce_nv_diamond.m
+# cce_nv_diamond
 
-- Signature: `result=cce_nv_diamond()`
+Syntax: `[answer,diagnostics]=cce_nv_diamond()`. The numeric answer is the projected Hahn-echo amplitude; diagnostics is the separate clexpn audit record.
 
-## Purpose
+The example uses standard sys/inter/bas/parameters blocks, a declarative magnetic-quantum-number transition, and `clexpn(spin_system,@hahn_echo,parameters,'labframe')`. Physical tensors, elapsed-time grid, graph, retained order and bath state are unchanged.
 
-Projected NV Hahn echo for the pinned PyCCE four-nucleus numerical fixture. The example prints the maximum complex discrepancy against the pinned PyCCE four-nucleus CCE2 fixture at commit d74d3cb683bf3caa07231654314e554f440833b4. The PyCCE off-diagonal trace is explicitly conjugated to Spinach’s convention. The source selected two-level transition is mS=-1/+1 at 500 G, not the planned 65 G ensemble application.
-
-## Spin system and sequence
-
-Standard Spinach sys/inter inputs are passed to create; the CCE driver compiles metadata without creating a full-bath basis. The example is self-contained, takes no inputs, uses SI times and explicit Hz coupling tensors, and opens a plot. It uses a local one-worker pool. Spinach and EasySpin must not share the MATLAB path.
-
-## Observable and limits
-
-The returned structure is the public cce result with any printed comparison metrics added by the example. Density examples return all observed density elements; the two-centre example checks trace/positivity before computing spin correlations. Other examples plot complex signal or noise. Validity masks and conservative numerical bounds remain visible; no clipping or positivity repair is applied.
-
-Except for the explicit pinned NV fixture and analytic identities, these are deliberately small illustrative systems, not publication-scale material reproductions. Material structures, tensor frames, defect origins and source licences must be resolved before quantitative experimental comparisons. A finite bath does not establish a thermodynamic T2 or microscopic T1. Read the header and printed source gate in [cce_nv_diamond.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/cce/cce_nv_diamond.m).
-
-The input explicitly removes observed transverse hyperfine columns to declare the pinned conventional-CCE reference model; the solver no longer silently discards them.
+Independent analytic, source-pinned or dense checks and frozen physical arrays are retained in `tests/kernel/test_cce_examples.m`.

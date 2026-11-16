@@ -149,7 +149,7 @@ E=complex(zeros(numel(parameters.times),1)); bounds=zeros(size(E));
 for n=1:numel(parameters.times)
     time=parameters.times(n);
     if time==0
-        value=1;
+        value=trace(rho_b);
     else
         ua=eye(db); ub=eye(db); dt=time/2;
         ua=((va.*exp(-1i*ea.'*dt))*va')*ua;

@@ -11,6 +11,9 @@
 % H,R,K are conventional angular-frequency generators or explicitly tagged
 % projected branches from cce_generators. No pulse or receiver is implicit.
 %
+% GKSL relaxation uses L=H+1i*R+1i*K. Projected propagation carries a
+% coherence block, not a physical density; density requires generalized CCE.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function answer=free_evolution(spin_system,parameters,H,R,K)
@@ -18,6 +21,10 @@ function answer=free_evolution(spin_system,parameters,H,R,K)
 % Preparation and detection belong to this experiment, not to its context
 grumble(spin_system,parameters,H,R,K);
 if ~isfield(parameters,'normalized'), parameters.normalized=true; end
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')
+    parameters.normalized=false;
+    if ~isfield(parameters,'coil'), parameters.coil=eye(spin_system.observed_dimension); end
+end
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
 if isstruct(H), generator=H; else, generator=H+1i*R+1i*K; end
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');

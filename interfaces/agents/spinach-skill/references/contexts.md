@@ -538,3 +538,7 @@ Observation owns preparation/detection descriptors, physical-ID ordering, receiv
 ## Native context and closed-system experiments
 
 clexpn(spin_system,pulse_sequence,parameters,assumptions) follows the Spinach context contract. Its explicit registry calls pulse_sequence(spin_system,parameters,H,R,K), never cce() or a legacy wrapper.
+
+## Native dissipative, noise and ensemble contracts
+
+Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalized elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.

@@ -222,8 +222,8 @@ if isfield(p,'bath_jumps')
             error('cce_options:jumps','Every bath jump needs support, operator and rate.');
         end
         spin_ids(j.support,nspins,'bath_jumps.support',false);
-        if ~all(ismember(j.support,bath))
-            error('cce_options:jumps','Bath jump support must belong to the selected bath.');
+        if ~all(ismember(j.support,[ids bath]))
+            error('cce_options:jumps','Jump support must belong to selected observed or bath spins.');
         end
         nonnegative(j.rate,'bath_jumps.rate',false);
         if ischar(j.operator)

@@ -12,16 +12,28 @@
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
 % conventional generators or explicitly tagged projected branch generators.
 %
+% output=density returns column-vectorised generalized observed density.
+% It requires a physical initial density and does not normalize a receiver.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function E=hahn_echo(spin_system,parameters,H,R,K)
 
-% Preparation and detection are owned by this experiment
+% Preparation and detection are owned by this experiment; projected states are coherence blocks
 grumble(spin_system,parameters,H,R,K);
 if ~isfield(parameters,'normalized'), parameters.normalized=true; end
+density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
+if density
+    parameters.normalized=false;
+    if ~isfield(parameters,'coil'), parameters.coil=eye(spin_system.observed_dimension); end
+end
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
 if ~iscell(coil), coil={coil}; end
 projected=isstruct(H); E=complex(zeros(numel(parameters.times),numel(reference)));
+if density
+    if projected, error('hahn_echo:density','Projected blocks do not define an observed density.'); end
+    E=complex(zeros(numel(parameters.times),spin_system.observed_dimension^2));
+end
 if projected, generator=H; else, generator=H+1i*R+1i*K; end
 
 % Build ideal observed-spin transition pulses without a global bath basis
@@ -41,7 +53,12 @@ for n=1:numel(parameters.times)
     if parameters.times(n)>0
         for j=1:numel(fractions)
             segment=generator;
-            if projected&&swapped, segment.left=H.right; segment.right=H.left; end
+            if projected&&swapped
+                segment.left=H.right; segment.right=H.left;
+                if ~isempty(H.dissipator)
+                    segment.dissipator=H.swap_matrix*conj(H.dissipator)*H.swap_matrix';
+                end
+            end
             duration=(fractions(j)-previous)*parameters.times(n);
             rho=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
             if projected
@@ -54,8 +71,22 @@ for n=1:numel(parameters.times)
         end
     end
     segment=generator;
-    if projected&&swapped, segment.left=H.right; segment.right=H.left; end
+    if projected&&swapped
+        segment.left=H.right; segment.right=H.left;
+        if ~isempty(H.dissipator)
+            segment.dissipator=H.swap_matrix*conj(H.dissipator)*H.swap_matrix';
+        end
+    end
     rho=cce_evolution(spin_system,segment,[],rho,(1-previous)*parameters.times(n),1,'final');
+    if density
+        rho=reshape(rho,dc*db,dc*db); observed=complex(zeros(dc));
+        for a=1:dc
+            for b=1:dc
+                observed(a,b)=trace(rho((a-1)*db+(1:db),(b-1)*db+(1:db)));
+            end
+        end
+        E(n,:)=reshape(observed,1,[]); continue
+    end
     for k=1:numel(coil)
         if isvector(rho), value=coil{k}'*rho;
         else, value=trace(coil{k}'*rho); end
@@ -77,9 +108,6 @@ if ~isstruct(spin_system)||~isfield(spin_system,'kind')||...
 end
 if isfield(parameters,'sequence')&&~isempty(parameters.sequence)
     error('hahn_echo:sequence','This named experiment defines its own controls.');
-end
-if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-    error('hahn_echo:density','This experiment returns detected signal or observables.');
 end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('hahn_echo:generators','Supply conventional or tagged projected generators.');

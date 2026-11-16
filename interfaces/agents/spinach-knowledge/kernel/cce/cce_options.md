@@ -23,3 +23,5 @@ Validate the new clexpn input ownership and resolve nonphysical defaults, withou
 - Pump controls specify center/halfwidth with explicit Hz or rad/s units, fraction and allow_empty. Optional sites and isotope-species cell rows intersect the selected bath; absent filters mean that selected bath. No frequency conversion occurs here; policy.pump_frequency_units records the declared input units for the experiment-owned conversion. Nonzero second-order projection requires projected evolution and explicit gap/overlap criteria.
 
 This staged input service is independent of the unchanged old driver. The clexpn context and experiment registry are introduced later; no legacy translator is supplied.
+
+Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalized dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.

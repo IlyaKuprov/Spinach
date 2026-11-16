@@ -55,3 +55,7 @@ The selected `reference_state` preserves its supplied observed density. Its bath
 ## Native context and closed-system experiments
 
 Optional sixth argument evaluator explicitly supplies the physical cluster evaluator. Every conditional subset and complete-bath recursion retains that handle and the parent conditioning cylinders. Raw value and irreducible factor remain separate fields; five-argument existing engine callers retain their prior evaluator selection.
+
+## Native dissipative, noise and ensemble contract
+
+Native interlacing enumerates physical assignments within an explicit state and memory budget. The conditioning union is inherited unchanged by all denominator subsets and the empty reference. Every raw calculation calls the supplied evaluator, including the full-bath path. Returned kinds distinguish irreducible factors from raw_full_bath records, preventing double reduction. The full-bath record is the exact averaged physical result, not a quotient.

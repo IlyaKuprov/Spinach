@@ -40,6 +40,11 @@ if ~isa(evaluator,'function_handle')
     error('cce_interlace:evaluator','evaluator must be a function handle.');
 end
 
+% Native contexts carry nested algorithm controls and an explicit evaluator
+if isfield(parameters,'cce')
+    raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator); return
+end
+
 % Reject unsupported optional inputs before selecting an execution path
 cce_validate(parameters);
 
@@ -253,6 +258,117 @@ raw.distribution_signature=struct('assignments',assignments,'weights',weights);
 end
 
 % Check all public inputs before enumerating any states
+% Average a raw cluster or recursively divide parent-conditioned subset records
+function raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
+spec=parameters.cce.interlaced;
+if ~isfield(spec,'max_states')||~isscalar(spec.max_states)||~isfinite(spec.max_states)||...
+   spec.max_states<1||spec.max_states~=fix(spec.max_states)
+    error('cce_interlace:budget','An explicit positive integer state budget is required.');
+end
+reference=ensemble.spin_config(spec.reference_state);
+if isfield(spec,'condition_sites')
+    cylinders=spec.condition_sites;
+else
+    cylinders={};
+    for k=1:numel(model.clusters)
+        parent=model.clusters(k);
+        if all(ismember(cluster.sites,parent.sites)), cylinders{end+1}=parent.sites; end %#ok<AGROW>
+    end
+    if isempty(cylinders), cylinders={cluster.sites}; end
+end
+% Remove contained cylinders before charging the explicit enumeration budget
+keep=true(size(cylinders));
+for j=1:numel(cylinders)
+    for k=1:numel(cylinders)
+        if j~=k&&all(ismember(cylinders{j},cylinders{k}))&&...
+           (numel(cylinders{j})<numel(cylinders{k})||j>k)
+            keep(j)=false;
+        end
+    end
+end
+cylinders=cylinders(keep);
+nb=numel(model.bath_ids); dimensions=model.multiplicities(model.bath_ids);
+counts=cellfun(@(sites)prod(dimensions(ismember(model.bath_ids,sites))),cylinders);
+count=sum(counts);
+if count>spec.max_states||8*count*max(1,nb)>parameters.cce.numerics.max_memory_bytes
+    error('cce_interlace:budget','Native conditioning enumeration exceeds its explicit budget.');
+end
+assignments=zeros(count,nb); position=0;
+for k=1:numel(cylinders)
+    varied=find(ismember(model.bath_ids,cylinders{k}));
+    for n=1:counts(k)
+        position=position+1; assignments(position,:)=reference.assignment; index=n-1;
+        for j=fliplr(varied)
+            assignments(position,j)=mod(index,dimensions(j))+1; index=floor(index/dimensions(j));
+        end
+    end
+end
+assignments=unique(assignments,'rows'); count=size(assignments,1); weights=zeros(count,1);
+for n=1:count
+    weight=1;
+    for j=1:nb, weight=weight*ensemble.probabilities{j}(assignments(n,j)); end
+    weights(n)=weight;
+end
+if sum(weights)==0, error('cce_interlace:weight','Conditioning event has zero probability.'); end
+weights=weights/sum(weights); retained=find(weights>0);
+for n=reshape(retained,1,[])
+    configuration=reference; configuration.assignment=assignments(n,:);
+    for j=1:nb
+        vector=ensemble.bases{j}(:,assignments(n,j)); configuration.bath_rho{j}=vector*vector';
+    end
+    item=evaluator(model,cluster,configuration,schedule,parameters);
+    if n==retained(1)
+        raw=item; raw.value(:)=0; raw.abs_error_bound(:)=0; raw.valid(:)=true;
+    end
+    raw.value=raw.value+weights(n)*item.value;
+    raw.abs_error_bound=raw.abs_error_bound+weights(n)*item.abs_error_bound;
+    raw.valid=raw.valid&item.valid;
+end
+raw.condition_sites=cylinders; raw.assignment_count=numel(retained);
+raw.reference=raw.value; raw.reference_error=raw.abs_error_bound;
+raw.full_bath=isequal(sort(cluster.sites),sort(model.bath_ids));
+if isfield(spec,'raw_only')&&spec.raw_only, return; end
+
+% Every denominator receives exactly the parent's conditioning event
+if ~isempty(cluster.sites)&&~raw.full_bath
+    local=parameters; local.cce.interlaced.condition_sites=cylinders;
+    local.cce.interlaced.raw_only=true;
+    family=model.clusters;
+    included=arrayfun(@(member)all(ismember(member.sites,cluster.sites)),family);
+    family=family(included); records=cell(1,numel(family)+1);
+    empty=struct('id',0,'sites',[]);
+    records{1}=native_interlace(model,empty,ensemble,schedule,local,evaluator);
+    for k=1:numel(family)
+        if isequal(family(k).sites,cluster.sites), records{k+1}=raw;
+        else, records{k+1}=native_interlace(model,family(k),ensemble,schedule,local,evaluator); end
+    end
+    factors=records{1}.value; errors=records{1}.abs_error_bound;
+    for k=1:numel(family)
+        item=records{k+1}; denominator=records{1}.value;
+        denominator_error=records{1}.abs_error_bound; valid=records{1}.valid&item.valid;
+        for j=family(k).proper_subsets
+            position=find([family.id]==model.clusters(j).id,1);
+            if isempty(position), continue; end
+            factor=records{position+1};
+            denominator_error=abs(denominator).*factor.abs_error_bound+...
+                              abs(factor.value).*denominator_error+...
+                              denominator_error.*factor.abs_error_bound;
+            denominator=denominator.*factor.value; valid=valid&factor.valid;
+        end
+        safe=abs(denominator)>denominator_error;
+        item.abs_error_bound=(item.abs_error_bound+abs(item.value./denominator).*...
+                              denominator_error)./(abs(denominator)-denominator_error);
+        item.value=item.value./denominator; item.valid=valid&safe&isfinite(item.value);
+        item.value(~item.valid)=NaN; item.abs_error_bound(~item.valid)=Inf;
+        records{k+1}=item;
+    end
+    position=find([family.id]==cluster.id,1); raw=records{position+1};
+    raw.reference=factors; raw.reference_error=errors;
+end
+raw.kind='irreducible';
+if raw.full_bath, raw.kind='raw_full_bath'; end
+end
+
 function grumble(model,cluster,ensemble,parameters)
 if ~isstruct(model)||~all(isfield(model,{'bath_ids','multiplicities'}))||...
    ~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...

@@ -742,3 +742,9 @@ Observation owns preparation/detection descriptors, physical-ID ordering, receiv
 ## Native context and closed-system experiments
 
 Native closed-system experiments own times, transition, rho0/coil, preparation, normalized, nloops and pump selectors. Context-owned approximation, graph, order, bath state and numerical controls remain under parameters.cce. Signal normalization is experiment-owned, not a resolver default.
+
+## Native dissipative, noise and ensemble contracts
+
+Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalized elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.
+
+Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalized dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.

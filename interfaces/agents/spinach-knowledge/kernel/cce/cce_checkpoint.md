@@ -38,3 +38,7 @@ state=cce_checkpoint(filename,action,state)
 ## Native context and closed-system experiments
 
 Native identities, when present, require experiment and capability_version. Existing physical payload hashing remains exact. Native context checkpoint execution is introduced separately.
+
+## Native dissipative, noise and ensemble contract
+
+Versioned checksummed task ledger; actions read, write and validate. Native payloads include the experiment contract version, immutable physical inputs, task IDs and assignment weights. Raw moments, first moments, masks and uncertainty are stored before reduction. Checkpoint file and resume switches do not change physical identity; existing files require explicit resume.

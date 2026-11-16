@@ -250,32 +250,133 @@ if isfield(parameters,'checkpoint')
 end
 end
 
-% Evaluate native tasks in deterministic configuration and cluster order
+% Evaluate native tasks with deterministic assembly, parallel batches and checkpoints
 function raw=native_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
-
-% Reject unfinished execution policies rather than silently ignoring them
 if ~isa(evaluator,'function_handle')
     error('cce_schedule:evaluator','Native scheduling requires a registered evaluator.');
 end
-if isfield(parameters.cce,'parallel')&&...
-   ~strcmp(parameters.cce.parallel.mode,'serial')
-    error('cce_schedule:native_parallel','Native parallel scheduling is not yet available.');
+options=parameters.cce; ns=numel(ensemble.spin_config); nc=numel(clusters)+1;
+mode='serial'; workers=0; batch_size=1;
+if isfield(options,'parallel'), mode=options.parallel.mode; end
+if ~ismember(mode,{'serial','clusters','states'})
+    error('cce_schedule:parallel','Choose serial, clusters or states parallelism.');
 end
-if isfield(parameters.cce,'checkpoint')
-    error('cce_schedule:native_checkpoint','Native checkpointing is not yet available.');
+if ~strcmp(mode,'serial')
+    pool=gcp('nocreate');
+    if isempty(pool)||~isfield(model.spin_system.sys,'parallel')||...
+       pool.NumWorkers~=model.spin_system.sys.parallel{2}
+        error('cce_schedule:pool','Parallel scheduling requires an explicitly configured pool.');
+    end
+    workers=pool.NumWorkers; batch_size=workers;
+end
+if isfield(options,'parallel')&&isfield(options.parallel,'batch_size')
+    batch_size=options.parallel.batch_size;
+end
+if ~isscalar(batch_size)||~isfinite(batch_size)||batch_size<1||batch_size~=fix(batch_size)
+    error('cce_schedule:batch','Batch size must be a finite positive integer.');
+end
+components=1;
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')
+    components=prod(model.multiplicities(model.observed_ids))^2;
+elseif isfield(parameters,'coil')&&iscell(parameters.coil)
+    components=numel(parameters.coil);
+end
+bytes=ns*nc*(1024+numel(parameters.times)*(25*components+48));
+if bytes>options.numerics.max_memory_bytes
+    error('cce_schedule:memory','The task ledger exceeds the declared memory budget.');
+end
+model.clusters=clusters;
+if strcmp(options.bath_state.mode,'interlaced')&&...
+   (~strcmp(options.bath_state.mode,'interlaced')||~isfield(options,'interlaced'))
+    error('cce_schedule:interlaced','Interlaced expansion needs sampled states and an enumeration budget.');
 end
 
-% Every configuration includes the observed-spin-only reference task
-empty=struct('id',0,'sites',[]); raw=cell(size(ensemble.spin_config));
-for n=1:numel(ensemble.spin_config)
-    records=cell(1,numel(clusters)+1);
-    records{1}=evaluator(model,empty,ensemble.spin_config(n),schedule,parameters);
-    for k=1:numel(clusters)
-        records{k+1}=evaluator(model,clusters(k),ensemble.spin_config(n),schedule,parameters);
+% Hash physical and experiment inputs, not checkpoint filenames or resume switches
+payload=struct('model',model,'clusters',clusters,'ensemble',ensemble,...
+               'parameters',parameters,'experiment',func2str(schedule.pulse_sequence),...
+               'contract_version',schedule.contract.version);
+if isfield(payload.parameters.cce,'checkpoint')
+    payload.parameters.cce=rmfield(payload.parameters.cce,'checkpoint');
+end
+if isfield(payload.model.parameters.cce,'checkpoint')
+    payload.model.parameters.cce=rmfield(payload.model.parameters.cce,'checkpoint');
+end
+% The model is hashed from its full physical content, not its derived cache key
+payload.model=rmfield(payload.model,'source_hash');
+ids=zeros(ns*nc,3); indices=zeros(ns*nc,2); position=0;
+for n=1:ns
+    for k=1:nc
+        position=position+1; id=0; if k>1, id=clusters(k-1).id; end
+        ids(position,:)=[ensemble.spin_config(n).configuration_id ensemble.spin_config(n).state_id id];
+        indices(position,:)=[n k];
+    end
+end
+[ids,order]=sortrows(ids,[1 2 3]); indices=indices(order,:);
+identity=struct();
+if isfield(options,'checkpoint')
+    identity=struct('model',md5_hash(payload.model),'parameters',md5_hash(payload.parameters),...
+                    'clusters',md5_hash(clusters),'schedule',md5_hash(payload.experiment),...
+                    'samples',md5_hash(ensemble),'code',payload.contract_version);
+end
+state=struct('version',1,'identity',identity,'payload',payload,...
+             'task_ids',ids,'completed',false(ns*nc,1),'records',{cell(ns*nc,1)},...
+             'checksum',''); filename='';
+if isfield(options,'checkpoint')
+    filename=options.checkpoint.file;
+    if isfield(options.checkpoint,'resume')&&options.checkpoint.resume
+        state=cce_checkpoint(filename,'read',state);
+    elseif isfile(filename)
+        error('cce_schedule:exists','Explicitly resume an existing checkpoint or choose another filename.');
+    end
+end
+pending=find(~state.completed);
+for first=1:batch_size:numel(pending)
+    selected=pending(first:min(first+batch_size-1,numel(pending)));
+    records=cell(numel(selected),1); tasks=indices(selected,:);
+    if strcmp(mode,'serial')
+        for j=1:numel(selected)
+            records{j}=native_task(model,clusters,ensemble,schedule,parameters,evaluator,tasks(j,:));
+        end
+    else
+        parfor (j=1:numel(selected),workers)
+            records{j}=native_task(model,clusters,ensemble,schedule,parameters,evaluator,tasks(j,:));
+        end
+    end
+    state.records(selected)=records; state.completed(selected)=true;
+    if ~isempty(filename), state=cce_checkpoint(filename,'write',state); end
+end
+raw=cell(1,ns);
+for n=1:ns
+    records=cell(1,nc);
+    for k=1:nc
+        position=find(indices(:,1)==n&indices(:,2)==k,1); records{k}=state.records{position};
     end
     raw{n}=[records{:}];
 end
+end
 
+% Invoke exactly the registered evaluator on ordinary and conditioned paths
+function raw=native_task(model,clusters,ensemble,schedule,parameters,evaluator,index)
+cluster=struct('id',0,'sites',[]);
+if index(2)>1, cluster=clusters(index(2)-1); end
+if strcmp(parameters.cce.bath_state.mode,'interlaced')
+    parameters.cce.interlaced.reference_state=index(1);
+    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.bath_ids)),clusters));
+    if complete&&~isequal(sort(cluster.sites),sort(model.bath_ids))
+        channels=1;
+        if isfield(parameters,'coil')&&iscell(parameters.coil), channels=numel(parameters.coil); end
+        raw=struct('cluster_id',cluster.id,'value',NaN(numel(parameters.times),channels),...
+                   'abs_error_bound',Inf(numel(parameters.times),channels),...
+                   'valid',false(numel(parameters.times),channels),...
+                   'weight',ensemble.spin_config(index(1)).weight,...
+                   'condition_sites',{{}},'assignment_count',0,'reference',[],...
+                   'reference_error',[],'full_bath',false,'kind','not_evaluated');
+    else
+        raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator);
+    end
+else
+    raw=evaluator(model,cluster,ensemble.spin_config(index(1)),schedule,parameters);
+end
 end
 
 

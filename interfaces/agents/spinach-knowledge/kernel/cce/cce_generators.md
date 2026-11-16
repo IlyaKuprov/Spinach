@@ -7,3 +7,9 @@ The subsystem is cce_subsystem output; parameters uses the native cce_options co
 Projected output is an explicitly tagged H structure: kind=cce_projected, left/right conditional bath Hamiltonians, formalism, physical_ids, dissipator and swap_matrix. R and K are empty. Pass this object directly to cce_evolution, never to stock evolution or an arbitrary pulse sequence. Swap left/right for refocusing; for projected dissipation, the swapped dissipator is swap_matrix*conj(dissipator)*swap_matrix. Projection-changing Hamiltonians/jumps and dissipative virtual-state corrections are rejected. The existing static coherent second-order susceptibility is retained.
 
 cce_backend selects auto/direct/stock; this is an expert service construction override, not a translated legacy field. Returned parameters.cce_aux reports the retained Hamiltonian construction metadata and rounding bound. The exact generator cache is separate from the subsystem cache; changed orientation, configuration, parameters or formalism invalidates reuse. No full-bath basis is allocated, and direct construction does not repeat create/basis.
+
+## Native dissipative, noise and ensemble contract
+
+Conventional evolution uses `L=H+1i*R+1i*K`; GKSL rates are inverse seconds. Projected generators carry left/right branch Hamiltonians and a coherence-block dissipator, not a physical density matrix. Branch exchange transforms the dissipator with `swap_matrix*conj(dissipator)*swap_matrix'`. Ordinary and projected dissipative experiments share this service.
+
+First-order projected Hamiltonians are conditional approximations, not a requirement that the full Hamiltonian preserve observed populations. The omitted-manifold coupling norm is recorded as `projection_leakage`. Jump operators must still preserve the selected manifolds. With nonempty GKSL jumps, projected master dynamics additionally retains the existing full-Hamiltonian manifold-invariance requirement.

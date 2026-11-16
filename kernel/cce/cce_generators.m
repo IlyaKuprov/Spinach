@@ -6,7 +6,9 @@
 % cluster_system is cce_subsystem output; parameters is a resolved native
 % experiment structure. Conventional generators obey L=H+1i*R+1i*K and
 % exp(-1i*L*t). R is the GKSL dissipator in s^-1; K is zero. Dissipation
-% requires zeeman-liouv, except explicitly tagged projected branches.
+% requires zeeman-liouv, except explicitly tagged projected branches. A
+% projected dissipator acts on an alpha/beta coherence block, not a density.
+% Its swapped branch is swap_matrix*conj(dissipator)*swap_matrix'.
 % parameters.bath_jumps uses support, operator and rate; supported spin
 % descriptors are L+, L-, Lx, Ly and Lz, or explicit ordered matrices.
 % Projected H has kind='cce_projected', left/right Hamiltonians and a
@@ -64,10 +66,11 @@ if projected
     va=kron(transition.alpha,eye(db)); vb=kron(transition.beta,eye(db));
     left=va'*ham*va; right=vb'*ham*vb;
     leakage=max(norm(ham*va-va*left,'fro'),norm(ham*vb-vb*right,'fro'));
-    second=parameters.cce.second_order.enabled;
-    if ~second&&leakage>d*eps*norm(ham,'fro')
-        error('cce:population_transfer','Projected branches require invariant observed states.');
+    parameters.cce_aux.projection_leakage=leakage;
+    if ~isempty(jumps)&&leakage>d*eps*norm(ham,'fro')
+        error('cce:population_transfer','Projected master dynamics requires invariant observed manifolds.');
     end
+    second=parameters.cce.second_order.enabled;
     if second
         if ~isempty(jumps)
             error('cce:capability','Dissipative virtual-state corrections are unsupported.');

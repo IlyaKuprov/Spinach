@@ -2,7 +2,12 @@
 
 Syntax: `[answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)`
 
-The native context takes create output, an explicit registered five-argument experiment handle, native parameters and an interaction assumption string. Physical observed spin IDs live in parameters.observed; algorithm controls live in parameters.cce. No legacy input or result wrapper is accepted.
+Native context over create output and a registered five-argument experiment. Physical observed IDs are in `parameters.observed`; algorithm controls are in `parameters.cce`. It compiles subsystem generators, schedules raw records and returns the natural numeric experiment output separately from diagnostics.
 
-Closed-system stage: standard cluster expansion, mixed or explicit product bath states, Hilbert or Liouville generators and explicitly tagged projected branches. Dissipative, noise, sampled/interlaced context policies, partition expansions, native checkpoint/resume and density reduction are reserved for the next stage and fail explicitly here.
-The context compiles immutable physical data, constructs retained generators, invokes the registered experiment and reduces raw responses. Natural numeric output is separate from diagnostics. Missing accuracy defaults are sqrt(eps); default memory budget is half the currently free physical memory. Missing order selects the included-bath order.
+Supports mixed, explicit and deterministic sampled product states; `after_expansion` and `internal_then_expansion` estimators; explicit, coupling and spatial partitions; serial or outer parallel scheduling and exact checkpoint resume. Interlaced product states use the supplied evaluator on every subset and the complete bath, with common parent conditioning. Irreducible factors are consumed once.
+
+Free evolution and Hahn echo support GKSL dissipation; the context selects Liouville representation for jumps unless a representation is explicit. Generalized free evolution supports elementwise observed density reconstruction, which need not remain positive at truncated order. Noise correlation retains first moments and centres after ensemble averaging. No legacy parameter translation occurs. Adaptive partition and convergence controllers remain unavailable; omitted order uses the included bath order.
+
+Hahn echo also supports generalized `output='density'`, with column-vectorised observed density rows and the same elementwise reduction/full-bath override as free evolution. Projected coherence blocks do not expose a density.
+
+Sampled assignments use configuration-indexed Threefry substreams, preserving deterministic physical state IDs independently of worker scheduling. Density-only free evolution needs an observed initial density but no receiver operator.

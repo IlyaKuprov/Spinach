@@ -256,7 +256,7 @@ invalid{4}=explicit; invalid{4}.cce.bath_spins=1;
 invalid{5}=explicit; invalid{5}.cce.bath_state.rho={diag([1.2 -0.2])};
 invalid{6}=explicit; invalid{6}.bath_jumps.rate=-1;
 invalid{7}=explicit; invalid{7}.bath_jumps=rmfield(invalid{7}.bath_jumps,'rate');
-invalid{8}=explicit; invalid{8}.bath_jumps.support=1;
+invalid{8}=explicit; invalid{8}.bath_jumps.support=system.comp.nspins+1;
 invalid{9}=p; invalid{9}.spins=1;
 invalid{10}=p; invalid{10}.times=[0 0];
 invalid{11}=p; invalid{11}.cce.bath_state=struct('mode','sampled','seed',NaN);

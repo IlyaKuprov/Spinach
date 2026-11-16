@@ -6,7 +6,9 @@
 % state contains version=1, identity (model/parameter/cluster/schedule/
 % sample hashes), payload, task_ids, completed, records and checksum.
 % Read requires the expected identity and task_ids in state. Validation
-% checks the full schema and checksum without modifying the file. Write
+% Native payloads also bind the registered experiment contract version and
+% retain noise moments, uncertainty and validity masks without reduction.
+% Validation checks the full schema and checksum without modifying the file. Write
 % closes a same-directory temporary before atomic POSIX replacement;
 % an existing file with different identity is never overwritten.
 %

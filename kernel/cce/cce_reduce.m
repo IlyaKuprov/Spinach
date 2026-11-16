@@ -48,6 +48,11 @@
 
 function reduced=cce_reduce(raw,clusters,parameters)
 
+% Native ensemble reduction retains experiment-owned output axes
+if isfield(parameters,'cce')
+    reduced=native_reduce(raw,clusters,parameters); return
+end
+
 % Reject unsupported optional inputs before selecting an execution path
 cce_validate(parameters);
 
@@ -283,6 +288,135 @@ else
     bound=exp(amplitude+log_error);
 end
 
+end
+
+% Reduce complete configuration estimates or internally averaged raw records
+function reduced=native_reduce(raw,clusters,parameters)
+options=parameters.cce; count=numel(raw); weights=zeros(1,count);
+for n=1:count, weights(n)=raw{n}(1).weight; end
+if any(~isfinite(weights))||any(weights<0)||abs(sum(weights)-1)>count*eps
+    error('cce_reduce:weights','Configuration weights must be normalized and nonnegative.');
+end
+selection=struct('method','gcce','order',options.order,...
+                 'reducer',options.reducer,'numerics',options.numerics,'expansion',options.expansion);
+selection.numerics.zero_policy='mask';
+additive=isfield(parameters,'noise');
+if additive, selection.method='noise'; end
+
+% Centre every conditional moment with the ensemble means before inclusion-exclusion
+if isfield(parameters,'noise')&&parameters.noise.connected
+    for k=1:numel(raw{1})
+        mean_time=zeros(size(raw{1}(k).mean_time)); mean_zero=0;
+        for n=1:count
+            mean_time=mean_time+weights(n)*raw{n}(k).mean_time;
+            mean_zero=mean_zero+weights(n)*raw{n}(k).mean_zero;
+        end
+        for n=1:count
+            raw{n}(k).value=raw{n}(k).moment-mean_time*mean_zero;
+            raw{n}(k).valid=raw{n}(k).valid&isfinite(mean_time)&isfinite(mean_zero);
+        end
+    end
+end
+
+% The internal-first estimator includes the observed-spin-only reference
+if strcmp(options.averaging,'internal_then_expansion')&&count>1
+    records=raw{1};
+    for k=1:numel(records)
+        records(k).value(:)=0; records(k).abs_error_bound(:)=0; records(k).valid(:)=true;
+        for n=1:count
+            if weights(n)==0, continue; end
+            records(k).value=records(k).value+weights(n)*raw{n}(k).value;
+            records(k).abs_error_bound=records(k).abs_error_bound+...
+                                      weights(n)*raw{n}(k).abs_error_bound;
+            records(k).valid=records(k).valid&raw{n}(k).valid;
+        end
+    end
+    raw={records}; weights=1; count=1;
+end
+
+% Interlaced records already contain parent-conditioned irreducible factors
+if strcmp(options.bath_state.mode,'interlaced')
+    if additive, error('cce_reduce:interlaced','Interlacing requires multiplicative signals.'); end
+    if ~strcmp(options.averaging,'after_expansion')
+        error('cce_reduce:interlaced','Interlaced factors require after_expansion averaging.');
+    end
+    parts=cell(1,count);
+    for n=1:count, parts{n}=interlaced_product(raw{n},clusters,selection); end
+else
+    parts=cell(1,count);
+    for n=1:count
+        parts{n}=cce_reduce(raw{n},clusters,selection);
+        complete=find(arrayfun(@(item)isequal(sort(item.sites),sort(options.bath_spins)),clusters),1);
+        if ~isempty(complete)&&~(isfield(parameters,'noise')&&parameters.noise.connected)
+            exact=raw{n}(complete+1); parts{n}.value=exact.value;
+            parts{n}.valid=exact.valid; parts{n}.abs_error_bound=exact.abs_error_bound;
+            parts{n}.by_order(:,:,end)=exact.value;
+            parts{n}.by_order_valid(:,:,end)=exact.valid;
+            parts{n}.by_order_error(:,:,end)=exact.abs_error_bound;
+        end
+    end
+end
+reduced=parts{1}; reduced.value(:)=0; reduced.abs_error_bound(:)=0;
+reduced.valid(:)=true; reduced.by_order(:)=0;
+reduced.by_order_error(:)=0; reduced.by_order_valid(:)=true;
+for n=1:count
+    if weights(n)==0, continue; end
+    reduced.value=reduced.value+weights(n)*parts{n}.value;
+    reduced.abs_error_bound=reduced.abs_error_bound+weights(n)*parts{n}.abs_error_bound;
+    reduced.valid=reduced.valid&parts{n}.valid;
+    reduced.by_order=reduced.by_order+weights(n)*parts{n}.by_order;
+    reduced.by_order_error=reduced.by_order_error+weights(n)*parts{n}.by_order_error;
+    reduced.by_order_valid=reduced.by_order_valid&parts{n}.by_order_valid;
+end
+reduced.valid=reduced.valid&isfinite(reduced.value)&...
+              reduced.abs_error_bound<=options.numerics.atol+...
+              options.numerics.rtol*abs(reduced.value);
+reduced.reason=repmat({'ok'},size(reduced.value));
+reduced.reason(~reduced.valid)={'ensemble_invalid'};
+reduced.by_order_reason=repmat({'ok'},size(reduced.by_order));
+reduced.by_order_reason(~reduced.by_order_valid)={'ensemble_invalid'};
+if strcmp(options.bath_state.mode,'interlaced')&&any([raw{1}.full_bath])
+    reduced.by_order_reason(:,:,1:end-1)={'not_evaluated'};
+end
+if strcmp(options.numerics.zero_policy,'error')&&any(~reduced.valid,'all')
+    error('cce_reduce:unresolved','The native expansion contains unresolved output elements.');
+end
+reduced.samples=parts; reduced.weights=weights;
+reduced.sampling_standard_error=zeros(size(reduced.value));
+if count>1&&all(abs(weights-1/count)<=eps)
+    values=cellfun(@(part)part.value,parts,'UniformOutput',false);
+    values=cat(3,values{:});
+    reduced.sampling_standard_error=std(values,0,3)/sqrt(count);
+end
+end
+
+% Multiply each irreducible factor once, without feeding it into a raw reducer
+function reduced=interlaced_product(raw,clusters,selection)
+empty=selection; empty.order=0; baseline=raw(1);
+complete=find([raw.full_bath],1);
+if ~isempty(complete)
+    baseline=raw(complete); baseline.cluster_id=0;
+end
+reduced=cce_reduce(baseline,clusters([]),empty);
+orders=0:selection.order; shape=[size(raw(1).value) numel(orders)];
+reduced.by_order=complex(zeros(shape)); reduced.by_order_error=zeros(shape);
+reduced.by_order_valid=false(shape);
+for order=orders
+    value=raw(1).value; bound=raw(1).abs_error_bound; valid=raw(1).valid;
+    for k=find([clusters.order]<=order)
+        factor=raw(k+1); bound=abs(value).*factor.abs_error_bound+...
+                             abs(factor.value).*bound+bound.*factor.abs_error_bound;
+        value=value.*factor.value; valid=valid&factor.valid;
+    end
+    full=find([raw.full_bath],1);
+    if ~isempty(full)&&full>1&&clusters(full-1).order<=order
+        value=raw(full).value; bound=raw(full).abs_error_bound; valid=raw(full).valid;
+    end
+    reduced.by_order(:,:,order+1)=value; reduced.by_order_error(:,:,order+1)=bound;
+    reduced.by_order_valid(:,:,order+1)=valid;
+end
+reduced.value=value; reduced.abs_error_bound=bound; reduced.valid=valid;
+reduced.orders=orders;
 end
 
 % Validate raw gather indexing, scalar budgets and the subset order

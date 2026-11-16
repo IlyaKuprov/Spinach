@@ -1,4 +1,13 @@
 # cce_subsystem — retained physical-spin ownership
+
+## Native role and invocation
+
+Internal physical-ID-preserving stock subsystem and basis constructor used only after bath-cluster selection.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `[cluster_system,cache]=cce_subsystem(model,sites,configuration,cache)`. Engine records are not public experiment parameter structures.
+
 Keywords: cce_subsystem clexpn physical IDs ordering cache density meanfield isotopes multiplicities
 
 `[cluster_system,cache]=cce_subsystem(model,sites,configuration,cache)` accepts cce_compile output, an ordered row of distinct physical bath IDs, a scalar configuration, and [] or a previously returned cache. Empty sites retains the full observed subsystem. Tensor-product order is [model.observed_ids sites], never sorted physical IDs.

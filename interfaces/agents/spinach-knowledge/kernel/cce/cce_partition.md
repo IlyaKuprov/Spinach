@@ -1,5 +1,13 @@
 # kernel/cce/cce_partition.m
 
+## Native role and invocation
+
+Internal partition construction and hybrid-group metadata service used by cce_clusters.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `partition=cce_partition(model,graph,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_partition.m)
 
 ## Purpose
@@ -10,7 +18,6 @@ Freeze bounded physical spin groups for partitioned CCE.
 
 - `numerics.max_memory_bytes` bounds partition graph/candidate storage, resident pilot/held-out configurations and patch diagnostic vectors, and retained patch cluster records before allocation (`cce_partition:memory`). Pilot and held-out configurations remain caller-supplied arrays.
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Supports user groups, deterministic coupling/spatial grouping, and pilot-based adaptive regrouping; the resulting groups are frozen before production. Pilot and held-out patch evaluations omit production checkpoint options; a fresh or resumed production ledger remains owned by `cce_schedule`.
 - Enforces physical size and Hilbert-dimension bounds without imposing graph-edge thresholds on strongly coupled members within a group.

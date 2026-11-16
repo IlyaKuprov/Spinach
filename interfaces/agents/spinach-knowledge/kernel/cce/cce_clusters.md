@@ -1,5 +1,13 @@
 # kernel/cce/cce_clusters.m
 
+## Native role and invocation
+
+Internal deterministic, downward-closed cluster-family enumerator. clexpn supplies a compiled model and resolved selection policy.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `clusters=cce_clusters(model,graph,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_clusters.m)
 
 ## Purpose
@@ -10,7 +18,6 @@ Enumerate a deterministic subset-closed CCE cluster family.
 
 - When `numerics.max_memory_bytes` is supplied, graph/frontier growth, closure/sorting copies, decimal family signatures and final cluster/subset metadata are checked before allocation (`cce_clusters:memory`). A cluster-count cap does not substitute for a byte budget; standalone combinatorial calls without `numerics` retain their existing unbudgeted contract.
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Enumerates connected candidate clusters through the requested order; disconnected subsets required by retained clusters are restored for recursive reduction.
 - Applies optional per-order cluster caps and explicit group-cluster selection deterministically, preserving physical-ID and subset bookkeeping.

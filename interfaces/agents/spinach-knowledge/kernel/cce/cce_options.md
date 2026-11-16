@@ -1,10 +1,18 @@
 # kernel/cce/cce_options.m
 
+## Native role and invocation
+
+Native parameter validator and default-policy resolver called by clexpn before model or generator construction.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `[parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_options.m)
 
 ## Purpose
 
-Validate the new clexpn input ownership and resolve nonphysical defaults, without translating old CCE parameters.
+Validate native clexpn input ownership and resolve nonphysical defaults, with native experiment and algorithm ownership.
 
 ## Syntax
 
@@ -22,7 +30,7 @@ Validate the new clexpn input ownership and resolve nonphysical defaults, withou
 - Bath jumps require explicit support, operator and nonnegative rate in inverse seconds. Named L+/L-/Lx/Ly/Lz jumps have one bath-spin support; matrix jumps match the ordered support dimension. No jump rate/direction or physical population is invented.
 - Pump controls specify center/halfwidth with explicit Hz or rad/s units, fraction and allow_empty. Optional sites and isotope-species cell rows intersect the selected bath; absent filters mean that selected bath. No frequency conversion occurs here; policy.pump_frequency_units records the declared input units for the experiment-owned conversion. Nonzero second-order projection requires projected evolution and explicit gap/overlap criteria.
 
-This staged input service is independent of the unchanged old driver. The clexpn context and experiment registry are introduced later; no legacy translator is supplied.
+The context and registered experiment capabilities jointly enforce this native input contract.
 
 Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalized dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
 Transition eigensystem construction belongs to compilation, after native options validation. `cce_options` does not construct the observed Hamiltonian or return resolved transition metadata. The context still exposes the compiled transition and metadata in its policy diagnostics.
@@ -38,6 +46,6 @@ selected exterior spins contribute zero in that retained cluster. All physical
 IDs are validated before restriction, including for the empty cluster.
 Descriptors and explicit matrix terms are mutually exclusive. Unknown fields,
 non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
-are rejected. Connected ensemble and Fourier conventions are unchanged.
+are rejected. Connected ensemble and Fourier conventions remain explicit.
 
 parameters.drive is owned by finite_drive (also admitted during internal cce_compile validation); it is rejected for other experiments. The experiment validates every descriptor field.

@@ -1,309 +1,84 @@
 # Cluster correlation expansions
 
-## Choose the physical approximation
+## Native context and experiments
 
-Use `cce` for observed-spin/bath dynamics when a hierarchy of small bath clusters
-is more tractable than the complete Hilbert space. Keep every observed spin in
-every cluster. Projected `method='cce'` projects the observed-spin system onto explicit
-orthogonal alpha/beta states and returns manifold signal; choose `gcce` when
-observed-state mixing, observed-spin system density, arbitrary observables, or generalized
-controls must be propagated. A projected projection is a modelling choice,
-not an automatic substitute for generalized dynamics.
-
-`expansion='partition'` selects pCCE: freeze bounded physical groups, solve
-within-group interactions exactly, and expand in the number of groups. Use it
-for strongly correlated local groups; check grouping and inter-group order
-separately. `method='mecce'` and `'megcce'` add explicitly declared local
-GKSL jumps to projected/generalized dynamics. They do not derive rates from
-a bath or justify a universal product approximation for population T1.
-
-`method='noise'`, `quantity='autocorrelation'` uses additive connected-cluster
-subtraction rather than multiplying density-matrix off-diagonal elements. Declare operator ordering and
-connected subtraction before computing a spectrum.
-
-## Reduction convention
-
-Write `L(C)` for a raw cluster observable and `L(empty)` for the shared
-observed baseline. The multiplicative expansion uses `F(C)=L(C)/L(empty)`,
-`K(C)=F(C)/product(K(S))` over nonempty proper subsets, and
-`L_approx=L(empty)*product(K(C))` over the retained family. Noise instead uses
-`K(C)=L(C)-L(empty)-sum(K(S))` and adds the connected contributions.
-Subset closure and consistent state/conditioning spin_configs are essential.
-Unresolved denominators produce explicit invalid masks, not epsilon repairs.
-
-## Minimal projected calculation
-
-This deliberately small example checks the API and exact full-bath limit; it
-is not a converged material model. Use a clean MATLAB path containing Spinach,
-not EasySpin. `create` converts its public interaction units; do not reconvert
-its output.
+Use `clexpn` for observed-spin/bath dynamics represented by a hierarchy of retained bath clusters. Supply a system returned by `create`; do not build a full-bath basis first. Every retained subsystem contains every observed spin, followed by its selected bath spins. Physical spin IDs remain those of the supplied system.
 
 ```matlab
-% Define a two-spin lab-frame model
-sys.isotopes={'13C','13C'}; sys.magnet=0;
-inter.zeeman.scalar={0,0};
-inter.coupling.scalar=cell(2); inter.coupling.scalar{1,2}=25;
-spin_system=create(sys,inter);
-
-% Declare the observed-spin system, bath and projected observable
-p.observed_spins=1; p.bath_spins=2;
-p.method='cce'; p.expansion='standard';
-p.quantity='signal'; p.order=1;
-p.transition.alpha=[1;0]; p.transition.beta=[0;1];
-
-% Declare the Hamiltonian, connectivity and initial bath state
-p.assumptions='labframe'; p.orientation=[0 0 0];
-p.interaction_cutoff=Inf;
-p.graph=struct('mode','complete','score','coupling_norm');
-p.bath_state=struct('mode','mixed_product'); p.meanfield='none';
-
-% Supply total sequence times and numerical budgets
-p.times=linspace(0,0.02,21); p.sequence=[];
-p.numerics=struct('atol',1e-9,'rtol',1e-9,...
-                  'max_memory_bytes',2^28);
-r=cce(spin_system,p);
-
-% Inspect validity before using values
-assert(all(r.valid,'all'));
-assert(r.exact_reference);
+[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,assumptions);
 ```
 
-For generalized density dynamics, set `p.method='gcce'`,
-`p.quantity='density'` and `p.rho0` to a normalized observed-spin system density
-matrix. Scalar generalized signal/observable requests also require explicit
-`p.normalized`; `p.coil` supplies one matrix or a cell of matrices for
-`quantity='observable'`. Normalization uses `rho0`, not the first
-requested time.
+`parameters.observed` is the ordered row of observed physical IDs; `parameters.times` is a nonempty, strictly increasing row of nonnegative total elapsed times in seconds. `assumptions` is an explicit stock assumption string, not an approximation inferred from isotope names. The context returns the numerical experiment answer first and validity, error, convergence and execution evidence second. Invalid values remain invalid; inspect `diagnostics.valid` and `diagnostics.invalid_reasons` before fitting or plotting an inferred decay.
 
-## Parameter structure: units and actual defaults
+The registered five-argument experiments in `experiments/cce/` are:
 
-The driver does **not** fill a broad default parameter structure. Unless a
-default is named below, supply the field explicitly and obey its source
-`grumble` contract. The numbers in the example are selected values, not defaults.
+| Handle | Experiment and native restrictions |
+|---|---|
+| `@free_evolution` | Free evolution; generalized or projected generators; signal, observable and density outputs; registered dissipative support |
+| `@hahn_echo` | Ideal midpoint pi pulse; total duration is twice the free interval; signal, observable and density outputs; registered dissipative support |
+| `@cpmg_echo` | Ideal CPMG/XY4/XY8/UDD trains via `parameters.decoupling`; signal or observable output |
+| `@bath_pumped_hahn` | Hahn echo with a spectrally selected bath pump; `parameters.pump` declares the window and selected sites/species |
+| `@cce_eseem` | Two-pulse ESEEM with ideal pi/2 preparation and a midpoint pi pulse |
+| `@finite_drive` | Generalized finite-duration rotating-frame control; signal, observable and density outputs; registered dissipative support |
+| `@noise_correlation` | Generalized bath correlation with additive cluster cumulants; `output='correlation'`; not dissipative |
 
-| Field | Meaning and units | Default/requirement |
-|---|---|---|
-| `observed_spins`, `bath_spins` | Disjoint physical spin IDs in the created system | Required; observed-spin system tensor order follows observed IDs |
-| `method`, `expansion`, `quantity`, `order` | Method above; standard/partition; signal/density/observable/autocorrelation; maximum cluster-group order | Required |
-| `transition.alpha`, `.beta` | Normalised orthogonal column vectors in observed_spins product order | Projected manifolds and signal projection |
-| `rho0` | Normalized Hermitian positive observed-spin system density | Required for generalized dynamics; projected manifolds may use the alpha/beta superposition |
-| `coil` | Observed-spin receiver matrix or cell array; signal is trace(coil'*rho) | Required for quantity='observable'; non-Hermitian coils are supported |
-| `assumptions`, `orientation` | Stock assumption name or `{name,retention}`; three Euler angles in rad | Required |
-| `interaction_cutoff` | Physical Hamiltonian distance cutoff, Angstrom | Required, `Inf` allowed; distinct from graph and mean-field cutoffs |
-| `hamiltonian_backend` | auto/direct/stock | auto; unsupported direct models are rejected |
-| `graph.mode` | complete/distance/coupling/explicit | Required; radius in Angstrom, threshold in rad/s, or adjacency as appropriate |
-| `graph.score` | coupling_norm/resonance/supplied | coupling_norm; resonance additionally requires mismatch matrix and positive mismatch_scale in rad/s |
-| `bath_radius` | Bath selection radius in Angstrom | Inf; omitted sites require convergence checks |
-| `groups`, `clusters`, `cluster_cap` | Physical group partition; explicit group-ID clusters; per-order caps | Singleton groups; generated connected family; Inf cap |
-| `bath_state.mode` | mixed_product/explicit_product/sampled/interlaced | Required; explicit `rho` cells follow bath IDs |
-| `bath_state.basis`, `.probabilities`, `.samples`, `.seed` | Product-state sampling declarations | Sampled/interlaced modes require basis/probabilities (cells or `uniform`), sample count and seed |
-| `meanfield` | none/static exterior product-state field | Required; same global exterior assignment for every cluster of a state |
-| `meanfield_radius` | Exterior-field cutoff in Angstrom | Inf when omitted |
-| `times`, `sequence` | Nonnegative sorted total sequence times in seconds; pulse events | Required; `sequence=[]` is FID |
-| `numerics.atol`, `.rtol`, `.max_memory_bytes` | Observable error tolerances and memory budget in bytes | Required; budgets can invalidate outputs or refuse allocation |
-| `numerics.zero_policy`, `reducer` | mask/error; powers/direct | mask; powers. No epsilon denominator repair |
-| `numerics.precision` | Arithmetic precision | Only double accepted when specified |
-| `parallel.mode`, `.batch_size`, `.max_tasks` | serial/clusters/states; tasks per batch; intentional stop boundary | serial, one task (parallel: pool size), Inf |
-| `checkpoint.file`, `.resume` | MAT checkpoint path and explicit resume flag | No checkpoint when file absent/empty; resume false |
-| `analysis.fit` | Enable explicit-window envelope fit | false; fit model/window/weights/confidence must be supplied when enabled |
+`cce_capabilities` checks handle identity and rejects unregistered callbacks before generator construction. A five-argument signature alone does not establish compatibility. Experiments receive `(cluster_system,parameters,H,R,K)`. The context owns retained subsystem construction, state sampling, cluster enumeration and reduction; the experiment owns propagation, preparation/detection and pulse timing.
 
-A finite `meanfield_radius` requires finite real observed and exterior coordinates;
-missing geometry raises `cce:coordinates`. Use a nonnegative scalar in Angstrom,
-or `Inf` for no spatial cutoff (no coordinates required).
+## Physical approximation and input ownership
 
-For second-order projected projection, enable `second_order.enabled`
-and supply `gap_tolerance` in rad/s and `overlap_tolerance`; disabled otherwise.
-For pCCE supply `partition.mode=user|coupling|spatial|adaptive` and
-`partition.max_dimension` (the group Hilbert-dimension ceiling). Explicit
-groups belong in top-level `groups`; expansion semantics belong in top-level
-`expansion` and `order`. Spatial grouping requires `group_count` and `max_rounds`.
-Adaptive grouping uses `mode=adaptive` or `partition.adaptive=true` and requires `patches`,
-`patch_atol`, `patch_rtol`, `pilot_configs`, `heldout_configs`, `max_rounds`,
-and `max_probes`; it is not an online regrouping of production samples.
+Set `parameters.cce.approximation` to `generalized` (default) or `projected`. Generalized evolution retains the observed-spin Hilbert space; projected evolution uses explicit orthogonal alpha/beta states of an observed transition. Use generalized evolution for observed-state mixing, finite drives and density output. Projected coherent generators require the selected manifolds to be invariant within their declared tolerance; projected dissipation has its own conditional cross-density propagation, not a scalar attenuation substitute. A transition selector does not itself prepare a population or polarization.
 
-Interlacing uses `interlaced.max_states`, `reference_state`, and optional
-`condition_sites`. Numerator and denominator subsets must share the same
-projected cylinder set. The helper explicitly enumerates within the budget;
-it does not invent an approximate sampler when the space is too large.
+Use `cce_transition(spin_system,parameters,assumptions)` to resolve an ordered physical observed-spin selector into states and diagnostics. Explicit alpha/beta states are appropriate when a degeneracy prevents an unambiguous automatic choice. Preparation and detection belong at experiment level: `transition`, `rho0`, `coil`, `preparation`, `detection`, `receiver_phase`, `normalized` and `output`. An explicit `rho0` is the observed-spin density matrix, not a full-bath state. `cce_observation` tensors it with the retained bath state and compiles physical-ID operators. Normalized experiments divide once by the actual complex initial detector response; the observation service itself defaults to unnormalized output. State whether a requested amplitude is absolute or normalized.
 
-## Pulse and open-system conventions
+| Native field | Meaning |
+|---|---|
+| `cce.bath_spins` | Ordered physical bath IDs, disjoint from observed IDs; default is the complement |
+| `cce.order` | Maximum retained order; omission requests the context convergence policy, not an assertion of full-bath convergence |
+| `cce.expansion` | `standard`, `pcce` or `hybrid`; partitioned forms require groups or an explicit partition policy |
+| `cce.graph` | `complete`, distance, coupling or explicit connectivity, with the corresponding radius/threshold/sparse logical adjacency |
+| `cce.bath_state` | Mixed or sampled product bath states; supplied samples/probabilities/seeds define the sampling problem |
+| `cce.meanfield`, `cce.meanfield_radius` | Exterior product-state field policy and optional distance cutoff |
+| `cce.groups`, `cce.partition` | Physical bath grouping and bounded partition policy |
+| `cce.backend` | `auto`, `direct` or `stock` retained-Hamiltonian construction within validated support |
+| `cce.numerics` | Absolute/relative accuracy and memory budget, precision and conditioning policy |
+| `cce.parallel`, `cce.checkpoint` | Scheduling and checkpoint controls |
+| `cce.convergence` | Context convergence controls; inspected through returned diagnostics |
+| `cce.basis` | Retained `zeeman-hilb` or `zeeman-liouv` basis declaration |
 
-Ideal events declare `type='ideal'`, physical `target` IDs, axis, angle in rad,
-`placement='fraction'|'absolute'`, and `at`. Fractional placement is relative
-to each **total sequence duration**, not an interpulse delay. projected CCE
-accepts complete-observed-spin system ideal pi swaps; arbitrary observed-spin system or bath pulses
-need generalized CCE. Named hahn/cpmg/xy4/xy8/udd schedules are supported by
-`cce_controls`; follow its `name,count,axis,target` contract.
+`cce_options` validates the complete nested vocabulary. Unknown fields are errors. Algorithm controls belong under `parameters.cce`; physical input tensors belong in `sys`/`inter`; pulse, drive, preparation and detector choices belong to the experiment. The internal model and reducer records are not public parameter containers.
 
-Finite events additionally use `duration` in seconds, `amplitude` and
-`detuning` in rad/s. They are constant rotating-frame segments; supply separate
-events for a piecewise envelope. Simultaneous finite drives, and finite or
-correlation-generating exterior pulses, are refused. Static exterior one-site ideal
-rotations update the sampled field exactly.
+## Units and tensor construction
 
-For ME-CCE, `parameters.jumps` records contain ordered physical `support`, an
-`operator` in that tensor order and a nonnegative `rate` in s^-1. A correlated
-jump cut across a cluster boundary is refused. Dynamics uses column-major
-vectorization; the module does not silently reinterpret a Hamiltonian matrix
-as a Liouvillian.
+Spinach input frequencies are in Hz; canonical tensors after `create` are already in rad/s and must not receive a second `2*pi`. The native `finite_drive` descriptor uses amplitude and detuning in rad/s, while explicit pulse events declare their units. Coordinates and distance cutoffs are in Angstrom, elapsed times in seconds, Euler angles and pulse angles in radians, and jump rates in inverse seconds. A pump window explicitly declares Hz or rad/s units.
 
-## Convergence and diagnostics
+`cce_compile` retains canonical tensors, physical ordering, assumptions and state metadata without a full-bath basis. `cce_subsystem` constructs the retained stock system; `cce_generators` constructs compatible `H,R,K`, including observation metadata and retained jumps. Keep the full tensor physics and explicit assumptions consistent when comparing a direct retained-Hilbert assembly with stock Spinach construction. Do not introduce a second bath Zeeman term or dipolar interaction already present in the canonical input.
 
-1. First reproduce the full-bath result of a small problem, independently when
-   possible. The exact-reference bypass checks the same physical model, not
-   the validity of a projected projection or a chosen bath truncation.
-2. Increase order with bath, graph, state sampling and pulses fixed. Repeat
-   independently for physical bath size, graph threshold/radius, cluster caps,
-   Hamiltonian cutoff and exterior-field radius. For pCCE also vary grouping.
-3. Increase product-state samples with a fixed seed, then check a different
-   seed. Average complete per-state reductions, not raw factors across global
-   states. Inspect reported sample uncertainty.
-4. Refine a nested time grid and the finite-pulse discretization independently.
-   Check `valid`, `abs_error_bound`, invalid reasons and density trace,
-   Hermiticity and minimum eigenvalue. A truncated density is not repaired by
-   clipping, renormalization or a positivity projection.
-5. Use `cce_converge` with explicit `convergence.ladders` records (`field`,
-   cell-row `values`), `atol`, `rtol`, and `max_work`. Supported automated
-   ladders are order, bath_spins, graph.threshold, graph.radius,
-   bath_state.samples and times. Other checks use `convergence.checks`, a cell
-   of complete parameter structures. Sampling ladders require an independent
-   seed check; time ladders require exact nested sample points.
+## Cluster algebra and advanced state treatment
 
-An unresolved multiplicative denominator is a convergence/conditioning result,
-not permission to divide by epsilon. Full-bath raw values can remain valid at
-zeros that make an intermediate product invalid. Preserve the complex phase
-and validity mask when plotting or exporting. A plateau at one order is not
-evidence that bath size, graph pruning or sampling is converged.
+The family is downward closed: every proper subset needed by the recurrence is present. The empty-bath response is the observed-system baseline, not an invented unit signal. Multiplicative irreducible factors divide each raw response by its proper-subset contributions, with propagated uncertainty and conditioning checks. Small unresolved denominators are not replaced by epsilon. A complete physical full-bath family uses the exact full-cluster response where the reducer contract permits it.
 
-`cce_spectrum` requires explicit convention `exp(+i*omega*t)`, angular
-frequency grid in rad/s, one/two-sidedness, full/positive time domain,
-rectangle/trapezoid weights and none/Hann window. Positive-time extension
-requires `stationary=true`. There is no window-power renormalization.
-Call spectrum and analysis helpers separately; `cce` does not attach their
-outputs automatically. `cce_analyse` only fits the explicitly declared real/magnitude envelope,
-interval, model, weights and confidence choice; it does not label an arbitrary
-fit as T1.
+Generalized observables and density matrices require entrywise handling with the declared observed dimension and detector. A non-informative density entry remains invalid rather than being replaced by a population from another cluster. Noise correlation uses additive inclusion-exclusion, never multiplicative coherence division. The requested reduction algebra comes from the registered experiment.
 
-Parallel modes require a pool already started by `create` with explicit
-`sys.parallel`; never start a nested pool per cluster. Checkpoint resumption
-requires matching physical identity and task IDs. CSV export has a JSON
-sidecar that is the round-trip authority; retain it.
+For sampled bath states, one global product assignment is shared by every cluster of a sample. Perform cluster reduction for each assignment, then ensemble-average; averaging raw cluster signals before nonlinear reduction changes the approximation. Static exterior fields must use that same assignment. Interlaced sampling averages explicit neighbor configurations at the appropriate irreducible-cluster stage; it is an advanced engine operation, not a new public experiment handle.
 
-## Source and regression routes
+Partitioned CCE counts complete groups, not individual sites; subset closure must not split a group. Hybrid families combine group clusters with cross-group monomer clusters under the selected policy. Partition pilot scores are construction evidence, not a certificate of physical convergence. Refine graph thresholds, bath extent, cluster/group order and state samples independently.
 
-- [CCE driver and kernel entries](../../spinach-knowledge/kernel/cce/cce.md)
-- [Independent projected reference](../../spinach-knowledge/tests/kernel/test_cce_exact.md)
-- [Generalized density reference](../../spinach-knowledge/tests/kernel/test_gcce_density.md)
-- [Open-system reference](../../spinach-knowledge/tests/kernel/test_mecce_exact.md)
-- [Numerical conditioning](../../spinach-knowledge/tests/kernel/test_cce_conditioning.md)
-- [Convergence tests](../../spinach-knowledge/tests/kernel/test_cce_convergence.md)
-- [Import/export tests](../../spinach-knowledge/tests/kernel/test_cce_io.md)
+## Pulses, dissipation and noise
 
-Method references: [projected CCE](https://doi.org/10.1103/PhysRevB.78.085315),
-[generalized CCE](https://doi.org/10.1103/PRXQuantum.2.010311),
-[pCCE](https://doi.org/10.1103/PhysRevB.110.L220302), and
-[ME-CCE](https://doi.org/10.1103/PhysRevLett.132.250401).
+Hahn/CPMG timing is expressed against each total elapsed time, not an interpulse delay. CPMG/XY trains declare pulse count and phase cycle; UDD positions follow the declared sequence. The `finite_drive` descriptor declares observed physical `spins`, `axis`, `amplitude`, `detuning` and `duration`; it applies a rectangular drive followed by free evolution. Each requested time must be zero or at least the drive duration. Explicit pulse events separately declare placement and units. Competing drive and pulse specifications are rejected. Bath-pump selection is based on the declared transition-frequency window, not merely an isotope label; a complete ideal observed-spin manifold swap is the restricted projected-control case.
 
-Read the local `kernel/cce/*.m` headers and `grumble` checks before extending
-these structures; the implementation is the authority for supported fields.
+Local dissipators are supplied as `parameters.bath_jumps`, with ordered physical `support`, a matching `operator` matrix and a nonnegative `rate`. Conventional dissipative propagation requires a retained Liouville basis; explicitly tagged projected branches use their conditional representation. Jump supports must lie in the selected observed-plus-bath system. They are included once in the retained generator, separately from stock relaxation; nonzero exchange is rejected by `cce_generators`. For projected dissipative evolution, actual alpha/beta jump blocks propagate the cross-density. A raising operator pumps toward the upper magnetic sublevel; neither its population preparation nor an inferred longitudinal relaxation time should be assumed from the word pumping.
 
-## Supplied spin configurations
+`noise_correlation` owns the noise operator/correlation convention and the context reduces additive cluster cumulants. When requested, `parameters.spectrum` invokes `cce_spectrum` on the completed ensemble result and returns the spectrum in `diagnostics.spectrum`. Specify angular-frequency grid, sign convention, sidedness, time domain, quadrature and window. Positive-time stationary extension is an explicit physical assumption. A correlation spectrum or envelope fit is not automatically a T1 prediction.
 
-For direct generalized evaluator calls, `spin_config.rho0` overrides the parameter-level initial observed density; all evaluator paths take their product bath state from `spin_config.bath_rho`. Both static and finite-control gCCE and ME-gCCE normalize against that same spin_config observed state. projected CCE/ME-CCE return normalized manifold traces for the supplied bath state; noise is a bath-only correlation with connected references from that bath state. Specify manifold projections through `parameters.transition.alpha/beta`, not extra spin_config fields. Unsupported spin_config fields and `parameters.initial_rho` are rejected. Interlaced references must have bath densities consistent with their basis assignments; their supplied observed state is retained.
+## Numerical evidence and resource limits
 
-Receiver detection uses the Spinach convention trace(coil'*rho). The initial observed-spin density is parameters.rho0; transition contains only alpha and beta. result.response is the generic alias of result.value, including density and noise outputs.
+`cce.numerics.atol`, `rtol` and `max_memory_bytes` define the propagation/reduction budget. Omitted accuracy or resource values are resolved by `clexpn` and recorded in `diagnostics.policy`; lower-level compilation requires resolved values. Graph closure, state storage, retained generators, density propagation and reduction buffers are memory consumers, not just the final answer.
 
-## Staged clexpn input contract
+Inspect numerical error, denominator conditioning, density validity and sampling error separately. A converged cluster order does not prove bath-radius, graph-cutoff, partition or sample-count convergence. For controlled comparisons, hold the bath realization, physical spin ordering, transition phase, pulse schedule and normalization fixed; compare complete-bath raw responses with an independently constructed small-system calculation.
 
-Use [sys,inter,bath]=spin_bath(sys,inter,specification) to construct/append finite physical baths; sys.magnet owns the field, native input units remain authoritative, and bath.spins/spin_groups distinguish physical indices from stable candidate labels. Do not call an old wrapper from new services.
+`cce_analyse` fits only an explicitly declared observable, envelope, model, interval and weighting. `cce_spectrum`, `cce_import` and `cce_export` are explicit analysis/interchange utilities, not implicit context stages. The standalone `cce_converge` helper has no native `clexpn` invocation contract in the current implementation; perform explicit native runs for independent refinement ladders instead.
 
-[parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions) owns new-contract validation and declared defaults. Required observed/times and any transition selector are separate from cce approximation and ensemble controls. Projected evolution requires a selector; generalized-state experiments may instead supply an explicit density. It records mixed-product/no-mean-field assumptions, resolves the selector through cce_transition and flags unresolved order, accuracy and resources for the context. It never silently supplies physical populations or jump rates. The powers/direct reducer choice is separate from experiment-owned additive/multiplicative algebra.
+## Orientation composition
 
-[transition,meta]=cce_transition(spin_system,parameters,assumptions) accepts ordered ms, energy levels or explicit orthonormal alpha/beta states, constructs only the observed subsystem and reports rad/s energies/gaps and eigenstate residuals. Unresolved energy-index degeneracy is rejected. Use canonical tensors without multiplying by 2*pi again.
-
-These are isolated native input services; the existing driver is still unchanged until the planned atomic cutover. Do not invent clexpn execution or experiments/cce entry points before their implementation. No compatibility switch, adapter or deprecated-field translator is provided.
-
-## Native compilation and retained descriptors
-
-The services are model=cce_compile(spin_system,parameters,assumptions), [cluster_system,cache]=cce_subsystem(model,sites,configuration,cache), A=cce_operator(cluster_system,operators,spins) and rho=cce_state(cluster_system,states,spins). Native bath selection is cce.bath_spins. The calling context resolves cce.numerics.atol, rtol and max_memory_bytes; the compiler does not guess tolerances or physical populations. It preserves rad/s tensors, Angstrom coordinates, isotope labels, physical groups, assumptions and resolved transition projectors.
-
-Local ordering is observed IDs followed by the supplied bath-site order, including empty bath clusters. Only complete zeeman-hilb and zeeman-liouv are supported; absent basis means zeeman-hilb. Global basis arrays are discarded, not reused after restriction. The explicit single-entry cache keys the complete model, ordered sites and configuration, including representation and assumptions. Bath densities bind one common exterior assignment across clusters; nonuniform populations are neither guessed nor resampled.
-
-Operator labels E, Lx, Ly, Lz, L+ and L- use physical-ID/isotope sums and cell-row ordered products. Hilbert matrices use pauli normalisation; Liouville operators are commutators and states are column-major vectors. Explicit cce_state populations/densities require every retained spin once and are trace-one positive Hermitian matrices. These are local services, not a new stock formalism, a compatibility adapter or a replacement of kernel/operator.m and kernel/state.m. Registered tests: kernel/clexpn_subsystem and kernel/clexpn_descriptors.
-
-## Native retained generators, evolution and observation
-
-Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps and supported pairs.
-
-Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase and the actual complex initial reference. The returned state/detector are not pre-normalized: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation. Old callers remain unchanged only until the planned atomic caller cutover; no translator or compatibility adapter is introduced.
-
-## Native context and closed-system experiments
-
-The native context takes create output, an explicit registered five-argument experiment handle, native parameters and an interaction assumption string. Physical observed spin IDs live in parameters.observed; algorithm controls live in parameters.cce. No legacy input or result wrapper is accepted.
-
-Closed-system stage: standard cluster expansion, mixed or explicit product bath states, Hilbert or Liouville generators and explicitly tagged projected branches. Dissipative, noise, sampled/interlaced context policies, partition expansions, native checkpoint/resume and density reduction are reserved for the next stage and fail explicitly here.
-
-## Native dissipative, noise and ensemble contracts
-
-Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalized elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.
-
-Hahn echo also supports generalized `output='density'`, with column-vectorised observed density rows and the same elementwise reduction/full-bath override as free evolution. Projected coherence blocks do not expose a density.
-
-### Standalone decay analysis
-
-`cce_analyse(result,parameters)` validates `parameters.analysis` locally. Native `clexpn` options may be retained in `parameters`: algorithm choices do not affect an explicitly selected fitting window or model. Unknown analysis fields remain errors. No driver-level parameter translator is involved.
-
-### Native finite controls and preparation
-
-Use `clexpn(...,@free_evolution,parameters,assumptions)` with generalized approximation for finite controls. `parameters.sequence` contains only finite events: physical target IDs, axis (x/y/z or unit vector), amplitude and optional detuning in rad/s, duration in seconds, and placement/at (absolute seconds or fraction of each requested elapsed time). Drives add on overlap and retain drift and relaxation. Exterior driven bath spins and projected drives are unsupported; named echo experiments own ideal pulses. `preparation=transverse` prepares the positive `(identity+2*Lx)/2` density for one observed spin one-half; use descriptors for other populations.
-
-The already-native bath utility is `[sys,inter,bath]=spin_bath(sys,inter,specification)`, in `kernel/utilities/`; it generates/appends native isotope, Angstrom coordinate and Hz interaction tables with stable physical IDs and metadata. It has no legacy-driver dependency. Do not create a second bath service during the example migration.
-
-Preparation selectors verified for the example migration: `transition.ms=[-0.5 0.5]` for E4, `[-1 1]` for E3, `[-0.5 0.5;-0.5 0.5]` for two electrons, and `[-0.5 0.5;3.5 3.5]` for E/51V. `transition.spins` follows the observed-spin order. These select the equal two-manifold superpositions without manually assembled vectors.
-
-## Native generalized-density examples
-
-The examples gcce_sic_clock, gcce_highspin_siv and gcce_votpp use sys/inter/bas/parameters blocks and `[answer,diagnostics]=clexpn(spin_system,@free_evolution,parameters,'labframe')`. A product-ms transition selector supplies the equal coherent preparation; parameters.output is density and parameters.cce.basis carries the retained-cluster formalism. Numeric answer rows are column-major density matrices. Plot populations from diagonal columns. Independent dense references belong in test_cce_examples, not in demonstration code. Other examples and legacy entry points remain unchanged pending the atomic migration.
-### Numerical diagnostics during native example migration
-
-Preserve raw absolute error estimates and spectral residuals as well as final densities. Coherent free evolution returns these in its optional second output and reuses one eigensystem over the time grid. Complete-bath validity is not budget satisfaction: compare the error estimate against the requested absolute/relative budget separately; lower-order masks must remain unchanged. Resolve transition Hamiltonians once in compilation, using the native observed-only generator only in its supported product-ms coherent mixed-product regime. Timing comparisons must exclude generated scratch folders from both MATLAB paths and warm both paths after every switch.
-
-The projected echo examples cce_erbium_cawo4, cce_hbn_quadrupoles, cce_methyl_molecular, cce_sic_divacancy and cce_sip_donor use [answer,diagnostics]=example() and clexpn(...,@hahn_echo,...). Set parameters.transition.spins and transition.ms; cluster settings use cce.bath_spins and cce.approximation=projected. Independent dense checks belong in test_cce_examples, not in the examples. For numerical-identity audits preserve all propagation residuals and bounds, and full-bath lower-order validity masks; compare every frozen field, not just the signal.
-
-The single-nucleus, NV, P1 and partitioned-electron-layer examples now return `[answer,diagnostics]` through clexpn and hahn_echo. Analytic/source-pinned/dense references, including the partitioned versus full-order comparison, live in test_cce_examples. Legacy entry points remain available during the remaining migration.
-
-Projected zero-duration Hahn propagation evaluates the retained bath density trace, preserving floating-point identity for mixed baths whose dimension is not a power of two. The six-state electron/nitrogen regression checks this exactly.
-
-## Array-free fluctuation descriptors
-
-Instead of noise.terms, supply a nonempty structure array noise.descriptors.
-Every element has operators (Lx, Ly, Lz, or E), spins (a nonempty row of
-unique physical bath IDs), and coefficient (a finite real scalar in the
-fluctuation units). It denotes the coefficient times the sum of those
-one-spin operators. The experiment constructs only retained-cluster matrices;
-selected exterior spins contribute zero in that retained cluster. All physical
-IDs are validated before restriction, including for the empty cluster.
-Descriptors and explicit matrix terms are mutually exclusive. Unknown fields,
-non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
-are rejected. Connected ensemble and Fourier conventions are unchanged.
-
-With no bath dissipator, noise_correlation evaluates the explicitly ordered or symmetrized correlation in Hilbert space using the Hermitian bath eigensystem. It transports the existing unitary round-off estimate. Dissipative noise retains Liouville propagation. Optional parameters.spectrum is evaluated after the completed native ensemble and returned in diagnostics.spectrum, not per cluster.
-
-For an array-free finite rectangular observed-spin drive, use @finite_drive through clexpn. Supply parameters.drive.spins, axis, amplitude (rad/s), detuning (rad/s), duration (s); times are zero or no shorter than duration. Use a named preparation and output=density where appropriate. Do not construct event arrays or observed density matrices in examples. Projected generators are not supported by this experiment.
-
-Bath-pumped Hahn evaluation uses `clexpn(spin_system,@bath_pumped_hahn,parameters,assumptions)`. The five-argument experiment optionally returns `[E,aux]`; coherent projected propagation supplies spectral residuals, Hamiltonian round-off bounds and signal error estimates to the native reducer. The pump selects canonical axial Zeeman frequencies, with explicit Hz or rad/s units, an inclusive nonnegative halfwidth, a fraction in [0,1], logical allow_empty, and optional distinct physical bath sites or isotope-label cells. No-field product-density ensembles allow selected spins outside a retained cluster; static exterior mean-field pumping remains explicitly unsupported.
-
-## Native powder composition
-
-For new examples, bind the experiment parameters before assigning the outer grid:
-
-```matlab
-task=context_task(@clexpn,@hahn_echo,parameters,'labframe');
-parameters.grid=struct('alphas',[0 0],'betas',[0 pi/2],...
-                       'gammas',[0 0],'weights',[1 1]);
-[answer,grid,diagnostics]=powder(spin_system,task,parameters,'labframe');
-```
-
-Do not construct a full-bath basis or loop over legacy cce calls. cce_molecular_powder demonstrates this contract. Use task.parameters.cce.averaging=after_expansion for completed-expansion averaging, or internal_then_expansion for raw-response averaging before inclusion-exclusion. Never average Hamiltonians. Internal averaging requires an identical retained cluster family at every point; descriptors and every explicit-grid field are validated. The returned second powder output remains the quadrature, while third-output diagnostics contains orientation-resolved evidence and the combined reduction. Independent dense and analytic checks belong in tests, not the example. All 19 CCE examples now use native experiments; legacy entry points remain only until their separate removal stage.
-
-For paired timing in fresh worktrees, exclude each tree's generated scratch directory from the MATLAB search path after restoredefaultpath. genpath otherwise includes accumulated job directories, and the unchanged startup name-resolution checks then measure unequal workspace histories rather than the two implementations. Keep the physical grid and source paths matched and measure parallel-pool startup separately.
+`clexpn` accepts a fixed `parameters.orientation`. For orientation averaging, obtain a deferred task with `parameters.context.mode='defer'`, then pass that descriptor to `orientation_average` with the declared grid/rank and matching assumptions. Reduction occurs separately at each orientation before the orientation-weighted numerical answers are combined. Never average Hamiltonians or irreducible factors as a replacement for averaging completed experiment results. `powder` can accept the same registered deferred descriptor; its ordinary five-argument callback path is distinct. See [Contexts](contexts.md).

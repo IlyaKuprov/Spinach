@@ -1,5 +1,13 @@
 # kernel/cce/cce_schedule.m
 
+## Native role and invocation
+
+Internal serial/parallel raw-record scheduler and checkpoint owner used by clexpn.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_schedule.m)
 
 ## Purpose
@@ -13,7 +21,6 @@ The scheduler validates and consumes checkpoint options, then removes them befor
 - Every completed ME record reserves its retained manifold Hamiltonians, embedded physical spin operators and included left/right jump matrices, multiplied by the sampled-spin_config and ledger-copy counts. The active task also reserves this operator cache.
 - Each concurrent task reserves full observed-spin system-times-bath Hamiltonian construction and physical pulse storage separately from projected bath Hilbert/Liouville propagation. Stock spherical-component storage is included; projected CCE, ME-CCE and noise do not replace the construction dimension with the bath dimension.
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Resident output accounting includes every requested observable column (one for a numeric operator matrix, the cell count for multiple operators), all density components, and the additional noise moments. This common preflight applies to closed-system and master-equation evaluators before allocating their task ledger.
 
@@ -45,7 +52,6 @@ raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_schedule.m)
 - [cce_checkpoint.m](cce_checkpoint.md)
-- [cce_cluster.m](cce_cluster.md)
 
 ## Native context and closed-system experiments
 

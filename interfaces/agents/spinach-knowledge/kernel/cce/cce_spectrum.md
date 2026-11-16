@@ -1,5 +1,13 @@
 # kernel/cce/cce_spectrum.m
 
+## Native role and invocation
+
+Explicit correlation-spectrum transform; clexpn invokes it only when noise_correlation is used with parameters.spectrum.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `spectrum=cce_spectrum(times,correlation,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_spectrum.m)
 
 ## Purpose
@@ -8,7 +16,6 @@ Integrate a declared bath correlation into a finite-window spectrum.
 
 ## Behaviour
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Uses the explicit angular-frequency grid and rectangle or trapezoid weights with convention exp(+i*omega*t).
 - A positive-time domain is extended only under an explicitly stationary correlation assumption; two-sided data are used as declared.
@@ -35,4 +42,3 @@ spectrum=cce_spectrum(times,correlation,parameters)
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_spectrum.m)
-- [cce_noise.m](cce_noise.md)

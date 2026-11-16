@@ -1,5 +1,13 @@
 # kernel/cce/cce_liouvillian.m
 
+## Native role and invocation
+
+Expert local-jump Liouvillian construction service. Native retained generator construction is owned by cce_generators.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `[G,meta]=cce_liouvillian(model,sites,spin_config,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_liouvillian.m)
 
 ## Purpose
@@ -12,7 +20,6 @@ Projected ME evolution checks invariance of both supplied observed manifold subs
 
 - The per-call memory ceiling includes full observed-spin system physical operators, the projected Liouvillian and both retained embedded matrices for every fully included jump, and is checked before constructing any of them.
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Projected manifold-leakage checks scale with the jump and loss-operator norms; reciprocal jump/rate rescaling cannot conceal manifold-changing dynamics.
 
@@ -40,6 +47,5 @@ Projected jumps must preserve both selected manifolds under the jump operator an
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_liouvillian.m)
-- [cce_master.m](cce_master.md)
 - [cce_hamiltonian.m](cce_hamiltonian.md)
 - [Method reference](https://doi.org/10.1103/PhysRevLett.132.250401)

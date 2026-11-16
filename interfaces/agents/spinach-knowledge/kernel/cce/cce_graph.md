@@ -1,5 +1,13 @@
 # kernel/cce/cce_graph.m
 
+## Native role and invocation
+
+Internal physical bath connectivity and deterministic cluster-selection scoring service. clexpn supplies resolved engine selection options.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `graph=cce_graph(model,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_graph.m)
 
 ## Purpose
@@ -8,7 +16,6 @@ Construct physical bath connectivity and deterministic cluster-selection scores.
 
 ## Behaviour
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Builds complete, distance, coupling-threshold or explicit adjacency graphs in stable bath-ID order.
 - Uses the spectral norm of the spin-operator pair interaction for coupling connectivity; generalized observed-mediated connections are included when required by the method.

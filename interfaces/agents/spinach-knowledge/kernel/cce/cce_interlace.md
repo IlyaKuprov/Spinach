@@ -1,61 +1,19 @@
-# kernel/cce/cce_interlace.m
+# cce_interlace — native conditional state averaging
+
+## Native role and invocation
+
+`raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator)` is an internal service called by `cce_schedule` with a registered experiment evaluator. Public calculations enter through `clexpn`; native interlaced controls are nested in `parameters.cce`. The evaluator is propagated through every recursive conditional calculation.
+
+## Conditional averaging
+
+Interlaced sampling changes selected bath assignments on an explicitly constructed conditioning domain while preserving the outer realization elsewhere. The implementation forms maximal conditioning cylinders, removes contained cylinders, enumerates supported basis levels and deduplicates assignment rows. Enumeration is bounded by `max_combinations` and the resolved memory budget; these limits are explicit rejection thresholds, not silent truncations.
+
+Each assignment is passed to the registered retained-cluster evaluator. Conditional means retain absolute error and validity evidence. For an irreducible cluster, required subset responses are recomputed under the same conditioning domain before denominator formation. Error propagation, denominator-resolution checks and invalid masks accompany the quotient; unresolved factors remain invalid. Per-state nonlinear reduction must precede the outer ensemble average.
+
+With `raw_only=true`, the service returns the conditional physical raw average instead of a recursively divided factor. This is an engine control, not an additional public experiment. The returned metadata includes `interlaced`, `interlaced_irreducible` and the number of conditional assignments.
+
+## Native restrictions
+
+`clexpn` rejects interlaced `noise_correlation`: connected noise uses ordinary ensemble moment averaging. Checkpoint ownership remains with the native scheduler; the interlaced evaluator returns raw records rather than publishing checkpoint files itself. The registered evaluator, not a method-name dispatch or an inferred callback signature, determines physical propagation.
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_interlace.m)
-
-## Purpose
-
-Evaluate projected product-state averages for interlaced CCE.
-
-## Behaviour
-
-- Before enumeration, `numerics.max_memory_bytes` bounds the conditioning assignments, cylinder block, sorting copies, index/weight vectors and conditional subset factors; exceeding it raises `cce_interlace:memory`, independently of `interlaced.max_states`.
-
-Checkpoint options are unsupported and rejected with `cce:checkpoint` before projected enumeration, both directly and through `cce`. No restart protection is implied for interlaced runs.
-
-Projected recursive evaluations retain the same actual-Hamiltonian manifold-invariance checks as ordinary CCE/ME-CCE. Conditioning cannot bypass `cce:population_transfer` rejection.
-
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
-
-- An empty cluster family retains the empty-cluster baseline: its conditioning cylinder fixes the entire bath to the reference assignment.
-
-- Constructs the union of product-state cylinders associated with retained superclusters, or uses explicitly supplied condition_sites.
-- Enumerates the declared product-state space within max_states and computes projected raw averages. Denominator subsets must reuse the numerator condition_sites.
-- Refuses closure beyond the enumeration budget rather than making an undeclared approximate random draw.
-
-- When a full-bath cluster is available, the public driver takes its raw conditional average directly (`raw_only=true`), including the empty-bath case. Singular auxiliary baselines do not mask an exact full-bath result; skipped lower-order prefixes are explicitly unavailable, and the final-order ledger retains the exact value with its validity/error metadata.
-
-- Projected raw diagnostics retain the largest available eigenproblem, orthogonality and unitarity residual over all constituent assignments, not only the first assignment. Each field is optional independently; driven records need not provide static-eigensystem diagnostics.
-
-## Inputs and outputs
-
-```matlab
-raw=cce_interlace(model,cluster,ensemble,schedule,parameters)
-```
-
-**Inputs**
-
-- `model`, `cluster`, `ensemble`, `schedule`, `parameters` — physical model, selected cluster, complete sampled ensemble, compiled sequence and interlaced settings.
-- `parameters.interlaced` — max_states, reference_state (ensemble spin_config index), optional condition_sites cell array; an optional evaluator function handle supports open-system/noise dispatch.
-
-**Outputs**
-
-- `raw` — conditional raw cluster observable with condition_sites and conditional-average diagnostics for consistent denominator reduction.
-
-Projected averages dispatch `cce`/`gcce` to the closed-system evaluator and `mecce`/`megcce` to the master-equation evaluator, including empty baselines, recursive subsets and the full-bath shortcut. Interlaced multiplicative reduction requires scalar signal, not additive noise correlations.
-
-## References
-
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_interlace.m)
-- [cce_states.m](cce_states.md)
-- [cce_reduce.m](cce_reduce.md)
-- [Method reference](https://doi.org/10.1103/PhysRevB.86.035452)
-
-The selected `reference_state` preserves its supplied observed density. Its bath IDs and pure product densities must agree with its ensemble basis assignment; an optional spin_config assignment must agree as well; inconsistent supplied bath densities are rejected before projected enumeration, rather than overwritten silently. Use explicit-product evaluation for mixed local densities.
-
-## Native context and closed-system experiments
-
-Optional sixth argument evaluator explicitly supplies the physical cluster evaluator. Every conditional subset and complete-bath recursion retains that handle and the parent conditioning cylinders. Raw value and irreducible factor remain separate fields; five-argument existing engine callers retain their prior evaluator selection.
-
-## Native dissipative, noise and ensemble contract
-
-Native interlacing enumerates physical assignments within an explicit state and memory budget. The conditioning union is inherited unchanged by all denominator subsets and the empty reference. Every raw calculation calls the supplied evaluator, including the full-bath path. Returned kinds distinguish irreducible factors from raw_full_bath records, preventing double reduction. The full-bath record is the exact averaged physical result, not a quotient.

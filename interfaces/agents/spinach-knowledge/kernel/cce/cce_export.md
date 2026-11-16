@@ -1,5 +1,13 @@
 # kernel/cce/cce_export.m
 
+## Native role and invocation
+
+Explicit result/model interchange utility, not an automatic clexpn output stage.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `cce_export(filename,model,result)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_export.m)
 
 ## Purpose

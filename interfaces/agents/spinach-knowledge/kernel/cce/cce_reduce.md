@@ -1,5 +1,13 @@
 # kernel/cce/cce_reduce.m
 
+## Native role and invocation
+
+Internal multiplicative, additive and observed-density reduction service. clexpn selects its algebra from the registered experiment contract.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `reduced=cce_reduce(raw,clusters,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_reduce.m)
 
 ## Purpose
@@ -8,11 +16,10 @@ Reduce raw cluster observables with conditioned multiplicative or additive recur
 
 ## Behaviour
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Accepts the empty-cluster baseline followed by one raw record per retained cluster; the integer-power and direct recursive forms use the same subset-closed family.
 - The multiplicative reducer accumulates log magnitudes and phases without replacing zero denominators by epsilon. Near-unresolved factors are masked or raise an error according to `zero_policy`.
-- Noise uses additive connected-cluster subtraction. A known complete-bath exact value is substituted by `cce`, not by this algebraic helper.
+- Noise uses additive connected-cluster subtraction with the reduction algebra selected by the native experiment contract.
 
 ## Inputs and outputs
 
@@ -34,7 +41,6 @@ reduced=cce_reduce(raw,clusters,parameters)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_reduce.m)
 - [cce_clusters.m](cce_clusters.md)
-- [cce.m](cce.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.78.085315)
 
 ## Native dissipative, noise and ensemble contract

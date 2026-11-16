@@ -1,5 +1,13 @@
 # kernel/cce/cce_project.m
 
+## Native role and invocation
+
+Expert conditional observed-manifold projection for compiled retained Hamiltonians. The native context requests projected generators through cce_generators.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `manifolds=cce_project(model,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_project.m)
 
 ## Purpose
@@ -8,7 +16,6 @@ Project an observed-spin system onto two explicit orthogonal states.
 
 ## Behaviour
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Computes manifold energies, projectors and spin expectations in observed physical-ID tensor order.
 - Optionally constructs second-order susceptibilities in the observed eigenbasis. The correction contracts ordered bath operators and vanishes only when the supplied problem makes it vanish.
@@ -32,5 +39,3 @@ manifolds=cce_project(model,parameters)
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_project.m)
-- [cce_prepare.m](cce_prepare.md)
-- [cce_cluster.m](cce_cluster.md)

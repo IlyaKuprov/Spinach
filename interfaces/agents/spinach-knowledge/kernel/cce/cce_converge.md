@@ -1,35 +1,15 @@
 # kernel/cce/cce_converge.m
 
+## Native applicability
+
+This retained expert convergence utility has no native `clexpn` invocation contract in the current implementation. Do not pass native experiment parameters to it or infer a registered experiment from its two-argument signature.
+
+For native simulations, call `clexpn(spin_system,pulse_sequence,parameters,assumptions)` explicitly for each refinement and compare numerical answers together with `diagnostics.valid` and `diagnostics.convergence`. The context's omitted-order policy is not an independent bath-radius, graph-threshold or sample-count convergence certificate.
+
+## Convergence meaning
+
+Refine cluster order, bath extent, graph cutoff, bath-state samples and time resolution independently while holding other physical choices fixed. Compare time grids only on declared common samples. Use explicit absolute/relative observable tolerances and a bounded evaluation budget. Several successive levels agreeing establishes the requested ladder criterion, not universal physical convergence. Bath-configuration convergence requires independently prepared physical realizations rather than a fabricated configuration generator.
+
+## Source
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_converge.m)
-
-## Purpose
-
-Run independent, explicit convergence ladders and report acceptance gates.
-
-## Behaviour
-
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
-
-- Varies one supported field at a time from the baseline; order, bath size, graph cutoff, sample count and time-grid refinement are separate tests. Every refinement is compared with the returned baseline, and all comparisons must pass; agreement of later ladder steps cannot certify an inaccurate baseline.
-- Applies user-declared observable tolerances and work cap. Time-grid comparisons require nested points; sample-count ladders require an independent-seed check.
-- Runs explicit held-out complete parameter checks when supplied; does not equate an order plateau with convergence in omitted physical dimensions.
-
-## Inputs and outputs
-
-```matlab
-result=cce_converge(spin_system,parameters)
-```
-
-**Inputs**
-
-- `spin_system`, `parameters` — physical model and ordinary CCE settings plus `convergence.ladders` (field and cell-row values), atol, rtol, max_work, and optional checks (cell of complete parameter structures).
-
-**Outputs**
-
-- `result` — baseline CCE result with convergence status, original input_parameters and convergence_report containing comparisons, work usage and acceptance metadata.
-
-## References
-
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_converge.m)
-- [cce.m](cce.md)
-- [cce_diagnostics.m](cce_diagnostics.md)

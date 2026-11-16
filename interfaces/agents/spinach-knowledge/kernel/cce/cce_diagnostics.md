@@ -1,5 +1,13 @@
 # kernel/cce/cce_diagnostics.m
 
+## Native role and invocation
+
+Internal validity and uncertainty diagnostics for completed cluster reduction. The native context calls this service on its result record.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `diagnostics=cce_diagnostics(model,raw,result,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_diagnostics.m)
 
 ## Purpose
@@ -8,7 +16,6 @@ Report validity, conditioning, sampling and observed-density diagnostics.
 
 ## Behaviour
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Constructs per-observable invalid reasons, valid-time masks/fraction and numerical budget checks from result values, masks and error bounds.
 - Reports cluster cost/order information and sample statistics when available; density outputs are checked for trace, Hermiticity and minimum eigenvalue.
@@ -35,5 +42,4 @@ diagnostics=cce_diagnostics(model,raw,result,parameters)
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_diagnostics.m)
-- [cce.m](cce.md)
 - [cce_reduce.m](cce_reduce.md)

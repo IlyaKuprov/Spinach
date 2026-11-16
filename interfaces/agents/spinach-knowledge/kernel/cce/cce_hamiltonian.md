@@ -1,5 +1,13 @@
 # kernel/cce/cce_hamiltonian.m
 
+## Native role and invocation
+
+Expert retained-Hilbert Hamiltonian assembly service. The native context generator path is cce_subsystem followed by cce_generators, which can call this helper for validated coherent Hilbert assembly; it is not an alternative public context.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `[H,meta]=cce_hamiltonian(model,sites,spin_config)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_hamiltonian.m)
 
 ## Purpose
@@ -20,7 +28,7 @@ Build one cluster Hamiltonian in observed-spin system-then-bath tensor order.
 
 **Inputs**
 
-- `model` — output of `cce_prepare`.
+- `model` — output of `cce_compile`.
 - `sites` — physical bath IDs; `[]` selects the observed baseline.
 - `spin_config` — scalar structure with optional backend override, exterior_ids and exterior_expectations (one real Ix/Iy/Iz row per exterior ID). Exterior fields use retained model pair interactions.
 
@@ -32,5 +40,4 @@ Build one cluster Hamiltonian in observed-spin system-then-bath tensor order.
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_hamiltonian.m)
-- [cce_prepare.m](cce_prepare.md)
 - [cce_states.m](cce_states.md)

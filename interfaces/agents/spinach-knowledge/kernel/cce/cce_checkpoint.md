@@ -1,5 +1,13 @@
 # kernel/cce/cce_checkpoint.m
 
+## Native role and invocation
+
+Internal checkpoint identity, atomic publication and raw-record storage service used by cce_schedule.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `state=cce_checkpoint(filename,action,state)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_checkpoint.m)
 
 ## Purpose
@@ -8,7 +16,7 @@ Read, atomically write or validate a versioned task checkpoint.
 
 ## Behaviour
 
-Checkpoint ownership belongs to `cce_schedule`, reached by the non-interlaced `cce` driver. Interlaced runs and direct cluster evaluators reject checkpoint options rather than silently ignoring them; adaptive convergence rejects a shared checkpoint. Empty or absent filenames are errors, not a request to disable checkpointing.
+Checkpoint ownership belongs to the native `cce_schedule` path used by `clexpn`. Individual experiment evaluators do not publish checkpoint files. Empty or absent checkpoint filenames are errors, not a request to disable checkpointing.
 
 - Checks schema version, full identity and task-ID compatibility, completion records and checksum.
 - Writes a closed temporary MAT file in the destination directory, then atomically renames it to the requested path.

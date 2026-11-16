@@ -1,5 +1,13 @@
 # kernel/cce/cce_controls.m
 
+## Native role and invocation
+
+Expert retained-space control compiler and propagator. Native experiments call this engine with prepared internal records; it is not a context or experiment entry point.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `segments=cce_controls(model,sites,spin_config,schedule,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_controls.m)
 
 ## Purpose
@@ -14,7 +22,6 @@ DEER frequency windows require axial canonical lab-frame Zeeman rows at every ca
 
 A finite `meanfield_radius` requires finite real observed and exterior coordinates; missing geometry raises `cce:coordinates` before distance filtering. The radius is nonnegative, and `Inf` retains the unbounded default without requiring coordinates. Included cluster sites need no coordinates for this cutoff, and an empty exterior requires no distance calculation.
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Ideal operator events use angle one when `angle` is omitted or empty, including alongside finite controls; axis events still require an explicit finite angle.
 
@@ -51,7 +58,5 @@ A single-site ideal operator pulse wholly outside the retained cluster is skippe
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_controls.m)
-- [cce_sequence.m](cce_sequence.md)
-- [cce_cluster.m](cce_cluster.md)
 
 Finite-control gCCE uses `spin_config.rho0` both for the propagated density and for normalized observable/signal references, including the observable error bound. Parameter-level `rho0` does not override a supplied spin_config.

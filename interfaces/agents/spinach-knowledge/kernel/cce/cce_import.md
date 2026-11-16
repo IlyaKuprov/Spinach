@@ -1,5 +1,13 @@
 # kernel/cce/cce_import.m
 
+## Native role and invocation
+
+Explicit versioned result, spin-table and Cartesian-tensor import utility. Imported tables are not automatically converted into a native experiment request.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `imported=cce_import(filename,format,units)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_import.m)
 
 ## Purpose
@@ -30,6 +38,5 @@ imported=cce_import(filename,format,units)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_import.m)
 - [cce_export.m](cce_export.md)
-- [cce_bath.m](cce_bath.md)
 
 Tagged JSON reconstructs empty cells and field-name lists before cell operations, including empty structures, integer arrays, multidimensional zero-sized arrays, and character shapes. MAT, JSON, and CSV-sidecar exports share exact type/shape round-trip tests. Unit fields must belong to the requested physical format; frame and cube density labels remain metadata.

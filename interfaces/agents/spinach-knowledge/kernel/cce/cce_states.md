@@ -1,5 +1,13 @@
 # kernel/cce/cce_states.m
 
+## Native role and invocation
+
+Expert bath product-state ensemble construction service using its own engine parameter record. Native clexpn constructs its ensemble through spin_ensemble; this helper is not called by cce_compile.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `ensemble=cce_states(model,parameters)`. Engine records are not public experiment parameter structures.
+
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_states.m)
 
 ## Purpose
@@ -10,7 +18,6 @@ Compile observed-spin density matrices and product-bath states with stable physi
 
 - `numerics.max_memory_bytes` is checked before allocating the sample-count-scaled configuration and assignment arrays. The bound includes local density matrices, expectations, weights, IDs and measured record metadata; exceeding it raises `cce_states:memory`.
 
-- Optional public fields are checked by `cce_validate`; unknown, reserved, and method-inapplicable requests are rejected rather than silently ignored.
 
 - Supports maximally mixed product states, explicit single-site density matrices, sampled product states, and interlaced sampled spin_configs.
 - Uses local Threefry streams with global state IDs as substreams; it does not change the global random stream.
@@ -35,5 +42,4 @@ ensemble=cce_states(model,parameters)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_states.m)
 - [cce_interlace.m](cce_interlace.md)
-- [cce_cluster.m](cce_cluster.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.79.115320)

@@ -1,5 +1,13 @@
 # cce_evolution — retained-space propagation
 
+## Native role and invocation
+
+Expert retained-space propagation kernel used by control/evaluation services. Its record contract is internal, not the clexpn public input structure.
+
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+
+Internal/expert signature: `answer=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)`. Engine records are not public experiment parameter structures.
+
 Syntax: answer=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output).
 
 L is a conventional H+1i*R+1i*K or the explicitly tagged projected structure from cce_generators. timestep is seconds, nsteps is a nonnegative integer. A coherent Hilbert state is a square density matrix; Liouville and projected bath-coherence states are column-major vectors. Non-Hermitian Hilbert generators and unsupported representation/output pairs are rejected.

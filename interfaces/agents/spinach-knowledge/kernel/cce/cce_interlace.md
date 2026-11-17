@@ -17,3 +17,7 @@ With `raw_only=true`, the service returns the conditional physical raw average i
 `clexpn` rejects interlaced `noise_correlation`: connected noise uses ordinary ensemble moment averaging. Checkpoint ownership remains with the native scheduler; the interlaced evaluator returns raw records rather than publishing checkpoint files itself. The registered evaluator, not a method-name dispatch or an inferred callback signature, determines physical propagation.
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_interlace.m)
+
+## Native reference validation
+
+Before enumerating a native conditional ensemble, the reference bath IDs and assignments must match the model. Every index must select a local basis vector and bath_rho must equal its projector within dimension^2*eps in Frobenius norm. Shape or density inconsistencies raise cce:spin_config with the same message as the legacy route. This check does not use the propagation error tolerance; mixed reference densities belong to explicit_product.

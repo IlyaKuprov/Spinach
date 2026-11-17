@@ -64,3 +64,7 @@ Native nested CCE controls produce deterministic configuration/state/cluster tas
 When the complete bath is retained in an interlaced expansion, only its physical raw average is evaluated. Lower-order records/prefixes are explicitly marked not evaluated, avoiding both singular denominator work and false convergence information.
 
 Generalized Zeeman-Hilbert hahn_echo raw-ledger budgeting includes retained observed density diagnostics (complex observed-dimension squared per time point and task). The Hahn registry contract version is 3, so checkpoints predating retained generalized propagation evidence are rejected rather than reusing incomplete records.
+
+## Native task ceiling
+
+The native scheduler accepts parameters.cce.parallel.max_tasks and limits batch_size to that value before estimating simultaneous workspace and executing tasks. All cluster/state records still run. Invalid values raise the same positive-integer requirement as the legacy scheduler.

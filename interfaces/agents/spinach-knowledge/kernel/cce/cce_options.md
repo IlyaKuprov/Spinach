@@ -49,3 +49,7 @@ non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
 are rejected. Connected ensemble and Fourier conventions remain explicit.
 
 parameters.drive is owned by finite_drive (also admitted during internal cce_compile validation); it is rejected for other experiments. The experiment validates every descriptor field.
+
+## Parallel task ceiling
+
+parameters.cce.parallel.max_tasks is an optional finite positive integer. It caps simultaneously scheduled batch tasks, not the total physical cluster/state task count. It combines with batch_size by taking their minimum; parallel.mode remains serial, clusters or states.

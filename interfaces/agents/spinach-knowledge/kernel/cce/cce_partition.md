@@ -2,11 +2,11 @@
 
 ## Native role and invocation
 
-Internal partition construction and hybrid-group metadata service used by cce_clusters.
+Internal partition construction and hybrid-group metadata service used by clexpn before cluster enumeration.
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `partition=cce_partition(model,graph,parameters)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `partition=cce_partition(model,graph,parameters)`. The native call takes the experiment parameters with partition controls under `parameters.cce`; the context supplies the physical model and registered pulse-sequence handle.
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_partition.m)
 
@@ -51,3 +51,7 @@ Adaptive pilot and held-out validation use the raw complete-patch record when th
 - [Method reference](https://doi.org/10.1103/PhysRevB.110.L220302)
 
 Unresolved (infinite-objective) reductions may take a deterministic capacity-limited pair merge even when the objective remains infinite. Each merge reduces the number of groups, and round/probe ceilings still apply. Such an intermediate is never accepted: the selected partition must pass both pilot and held-out patch checks, including the exact-patch bypass when a full patch becomes reachable.
+
+## Native adaptive partition contract
+
+The context passes the native parameters structure directly to cce_partition(model,graph,parameters). Controls live in parameters.cce.partition; pilot_configs and heldout_configs contain native bath-state records (bath_ids, bath_rho, assignment, configuration_id, state_id and weight). The context supplies model.pulse_sequence. Pilot and held-out patch calculations use that registered experiment evaluator and native reduction, preserving the declared time grid, finite controls, exterior state and observable. The existing bounded merge search, memory preflight, independent held-out validation and completion diagnostics are unchanged. No public signature changes.

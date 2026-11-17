@@ -20,3 +20,7 @@ Native noise descriptors carry physical bath-spin support without building a ful
 Use clexpn(spin_system,@finite_drive,parameters,assumptions) for a rectangular observed-spin drive followed by free evolution. parameters.drive supplies spins, axis, amplitude, detuning and duration; no public pulse-event array is required.
 
 Bath-pumped Hahn evaluation uses `clexpn(spin_system,@bath_pumped_hahn,parameters,assumptions)`. The five-argument experiment optionally returns `[E,aux]`; coherent projected propagation supplies spectral residuals, Hamiltonian round-off bounds and signal error estimates to the native reducer. The pump selects canonical axial Zeeman frequencies, with explicit Hz or rad/s units, an inclusive nonnegative halfwidth, a fraction in [0,1], logical allow_empty, and optional distinct physical bath sites or isotope-label cells. No-field product-density ensembles allow selected spins outside a retained cluster; static exterior mean-field pumping remains explicitly unsupported.
+
+## Native adaptive groups and ensemble contracts
+
+parameters.cce.partition.mode=adaptive is executed through the registered experiment, using explicitly supplied pilot_configs and heldout_configs. The frozen production partition and convergence diagnostics are returned in diagnostics.policy.partition. parameters.cce.parallel.max_tasks caps each scheduler batch. diagnostics.reduction.sampling_standard_error preserves raw full-bath Monte Carlo uncertainty under internal-first averaging; truncated internal-first and single-draw uncertainty are NaN.

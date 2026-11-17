@@ -318,6 +318,9 @@ if isfield(parameters,'noise')&&parameters.noise.connected
     end
 end
 
+% Retain unaveraged samples for the exact full-bath uncertainty
+sampling_error=[];
+
 % The internal-first estimator includes the observed-spin-only reference
 if strcmp(options.averaging,'internal_then_expansion')&&count>1
     records=raw{1};
@@ -330,6 +333,14 @@ if strcmp(options.averaging,'internal_then_expansion')&&count>1
                                       weights(n)*raw{n}(k).abs_error_bound;
             records(k).valid=records(k).valid&raw{n}(k).valid;
         end
+    end
+    sampling_error=NaN(size(records(1).value));
+    complete=find(arrayfun(@(item)isequal(sort(item.sites),...
+                                         sort(options.bath_spins)),clusters),1);
+    if ~isempty(complete)&&~(additive&&isfield(parameters,'noise')&&parameters.noise.connected)
+        values=[];
+        for n=1:count, values=cat(3,values,raw{n}(complete+1).value); end
+        sampling_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(count*(count-1)));
     end
     raw={records}; weights=1; count=1;
 end
@@ -398,11 +409,15 @@ if strcmp(options.numerics.zero_policy,'error')&&any(~reduced.valid,'all')
 end
 reduced.samples=parts; reduced.weights=weights;
 reduced.sampling_standard_error=zeros(size(reduced.value));
-if count>1&&all(abs(weights-1/count)<=eps)
+if strcmp(options.bath_state.mode,'sampled')
+    reduced.sampling_standard_error(:)=NaN;
+end
+if strcmp(options.bath_state.mode,'sampled')&&count>1&&all(abs(weights-1/count)<=eps)
     values=cellfun(@(part)part.value,parts,'UniformOutput',false);
     values=cat(3,values{:});
-    reduced.sampling_standard_error=std(values,0,3)/sqrt(count);
+    reduced.sampling_standard_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(count*(count-1)));
 end
+if ~isempty(sampling_error), reduced.sampling_standard_error=sampling_error; end
 end
 
 % Multiply each irreducible factor once, without feeding it into a raw reducer

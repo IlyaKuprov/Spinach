@@ -53,3 +53,7 @@ For a complete-bath exact reference, validity records finite propagated data ind
 When more than one native reduction is averaged, the final absolute bound also includes gamma(4*N)*sum(w_s*abs(value_s)), with gamma(q)=q*eps/(1-q*eps). This deterministic summation estimate is separate from sampling_standard_error and does not alter order-resolved estimates or the signal.
 
 For one deterministic bath state, a complete connected-noise cluster is a direct full-bath reference: its propagated error estimate and validity replace the redundantly recombined final-order estimate. Multi-state connected-noise estimators retain ensemble centering before reduction and their existing combination policy.
+
+## Native sampled uncertainty
+
+For sampled product states, uncertainty is separate from deterministic propagation error. After-expansion averaging uses sqrt(sum(abs(x_s-mean(x_s)).^2)/(N*(N-1))). Internal-first averaging uses the individual raw complete-bath responses in that same expression, not the already averaged response. A truncated internal-first estimator, a single sample, and internally averaged connected noise report NaN. Deterministic and interlaced ensembles retain zero sampling uncertainty. No legacy statistical interpretation is changed.

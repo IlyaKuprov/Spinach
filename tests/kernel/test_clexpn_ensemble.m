@@ -75,6 +75,68 @@ result=test_true(result,'Mask propagation',~masked.valid(2),'An invalid weighted
 raw=da.raw; raw{1}(2).abs_error_bound(:)=0.01;
 bounded=cce_reduce(raw,da.clusters,local);
 result=test_true(result,'Error propagation',any(~bounded.valid),'Reported uncertainty cannot be erased.');
+
+% Preserve the sampled full-bath standard error and unavailable estimates
+request=da.parameters; request.cce.order=2;
+request.cce.averaging='internal_then_expansion';
+[~,sampled]=clexpn(s,@free_evolution,request,'labframe');
+values=cellfun(@(raw)raw(end).value,sampled.raw,'UniformOutput',false);
+values=cat(3,values{:}); count=size(values,3);
+expected=sqrt(sum(abs(values-mean(values,3)).^2,3)/(count*(count-1)));
+result=test_close(result,'Internal full-bath standard error',...
+                  sampled.reduction.sampling_standard_error,expected,0,0,...
+                  'Use the individual exact sampled signals before internal averaging.');
+request.cce.order=1; [~,sampled]=clexpn(s,@free_evolution,request,'labframe');
+result=test_true(result,'Internal truncated uncertainty is unavailable',...
+                 all(isnan(sampled.reduction.sampling_standard_error),'all'),...
+                 'A nonlinear product of means has no per-sample estimator.');
+request.cce.bath_state.samples=1;
+[~,sampled]=clexpn(s,@free_evolution,request,'labframe');
+result=test_true(result,'Single draw uncertainty is unavailable',...
+                 all(isnan(sampled.reduction.sampling_standard_error),'all'),...
+                 'One random sample cannot estimate its variance.');
+
+% Limit each scheduled batch without changing the physical calculation
+request=da.parameters;
+request.cce.parallel=struct('mode','serial','batch_size',4,'max_tasks',1);
+limited=clexpn(s,@free_evolution,request,'labframe');
+result=test_close(result,'Parallel task ceiling preserves signals',limited,a,0,0,...
+                  'The task limit caps batches, not the cluster family.');
+
+% Reject an interlacing density inconsistent with its sampled basis state
+request=da.parameters; request.cce.interlaced=struct('max_states',4,'reference_state',1);
+model=cce_compile(s,request,'labframe'); model.clusters=da.clusters;
+ensemble=da.ensemble; ensemble.spin_config(1).bath_rho{1}=eye(2)/2;
+schedule=struct('pulse_sequence',@free_evolution,'contract',da.contract);
+refused=false;
+try
+    cce_interlace(model,da.clusters(1),ensemble,schedule,request,da.contract.evaluator);
+catch exception
+    refused=strcmp(exception.identifier,'cce:spin_config')&&...
+            strcmp(exception.message,['Interlaced reference bath_rho must agree with its basis '...
+                                      'assignment; use explicit_product for mixed states.']);
+end
+result=test_true(result,'Interlaced reference density consistency',refused,...
+                 'Conditional sampling must use the declared reference basis state.');
+
+% Adapt pilot groups through the native context, then validate held-out states
+inter.coupling.matrix{2,3}=0.7*eye(3); coupled=create(sys,inter);
+request=dp.parameters; exact=clexpn(coupled,@free_evolution,request,'labframe');
+request.cce.groups={2,3}; request.cce.order=1;
+pilot=dp.ensemble.spin_config; heldout=pilot; heldout.bath_rho{1}=diag([1 0]);
+request.cce.partition=struct('mode','adaptive','max_dimension',4,...
+                            'patches',{{[2 3]}},'patch_atol',1e-10,'patch_rtol',1e-10,...
+                            'pilot_configs',pilot,'heldout_configs',heldout,...
+                            'max_rounds',2,'max_probes',100);
+[adapted,adaptive]=clexpn(coupled,@free_evolution,request,'labframe');
+result=test_true(result,'Native adaptive partition is held-out validated',...
+                 adaptive.policy.partition.complete&&...
+                 isequal(adaptive.policy.partition.groups,{[2 3]})&&...
+                 ~isempty(adaptive.policy.partition.diagnostics.heldout_error),...
+                 'Only the frozen pilot-selected partition reaches held-out validation.');
+result=test_close(result,'Adaptive full-bath group preserves signal',adapted,exact,0,0,...
+                  'Adaptive grouping retains the same exact full-bath experiment.');
+
 end
 
 

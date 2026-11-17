@@ -82,3 +82,7 @@ Inspect numerical error, denominator conditioning, density validity and sampling
 ## Orientation composition
 
 `clexpn` accepts a fixed `parameters.orientation`. For orientation averaging, obtain a deferred task with `parameters.context.mode='defer'`, then pass that descriptor to `orientation_average` with the declared grid/rank and matching assumptions. Reduction occurs separately at each orientation before the orientation-weighted numerical answers are combined. Never average Hamiltonians or irreducible factors as a replacement for averaging completed experiment results. `powder` can accept the same registered deferred descriptor; its ordinary five-argument callback path is distinct. See [Contexts](contexts.md).
+
+## Native adaptive and sampling controls
+
+Use parameters.cce.partition for bounded adaptive partitions, with separate native pilot_configs and heldout_configs. clexpn supplies the registered experiment to each exact patch calculation and returns the frozen groups in diagnostics.policy.partition. parameters.cce.parallel.max_tasks caps batch concurrency, not the number of physical tasks. Internal-first sampled full-bath uncertainty is computed from individual unaveraged exact responses; truncated internal-first, connected-noise internal-first, and single-draw estimates are NaN. Interlacing rejects a reference density inconsistent with its declared local basis assignment using cce:spin_config and dimension^2*eps, independently of propagation tolerances.

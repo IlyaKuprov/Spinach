@@ -63,6 +63,7 @@ end
 
 % Compile immutable physical data, not a full-bath basis
 model=cce_compile(spin_system,parameters,assumptions);
+model.pulse_sequence=pulse_sequence;
 if isfield(model,'transition')
     policy.transition=model.transition; policy.transition_meta=model.transition_meta;
 end
@@ -94,11 +95,7 @@ for field={'groups','selection'}
 end
 graph=cce_graph(model,selection);
 if isfield(options,'partition')
-    if strcmp(options.partition.mode,'adaptive')
-        error('clexpn:staged','Adaptive partition probes require the convergence stage.');
-    end
-    selection.partition=options.partition;
-    partition=cce_partition(model,graph,selection);
+    partition=cce_partition(model,graph,parameters);
     selection.groups=partition.groups;
     if ~isempty(partition.groups), parameters.cce.groups=partition.groups; end
     model.parameters=parameters; model.groups=partition.groups; policy.partition=partition;

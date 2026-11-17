@@ -275,6 +275,14 @@ end
 if ~isscalar(batch_size)||~isfinite(batch_size)||batch_size<1||batch_size~=fix(batch_size)
     error('cce_schedule:batch','Batch size must be a finite positive integer.');
 end
+if isfield(options,'parallel')&&isfield(options.parallel,'max_tasks')
+    limit=options.parallel.max_tasks;
+    if ~isnumeric(limit)||~isreal(limit)||~isscalar(limit)||...
+       ~isfinite(limit)||limit<1||limit~=fix(limit)
+        error('parallel.max_tasks must be a positive integer.');
+    end
+    batch_size=min(batch_size,limit);
+end
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=prod(model.multiplicities(model.observed_ids))^2;

@@ -5,7 +5,8 @@
 %
 % Inputs:
 %   model, graph - canonical model and bath connectivity.
-%   parameters.partition - mode=user|coupling|spatial|adaptive and max_dimension
+%   parameters.cce.partition - native user/coupling/spatial/adaptive policy
+%   parameters.partition - internal legacy policy retained until cutover
 %   (maximum group Hilbert dimension). Spatial mode also requires
 %   group_count and max_rounds. Adaptive mode or optional adaptive=true requires patches,
 %   patch_atol, patch_rtol, pilot_configs, heldout_configs, max_rounds,
@@ -23,8 +24,22 @@
 
 function partition=cce_partition(model,graph,parameters)
 
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
+% Keep experiment parameters intact while resolving the partition controls
+native=isfield(parameters,'cce'); native_parameters=parameters;
+if native
+    options=parameters.cce;
+    parameters=struct('partition',options.partition,'graph',options.graph,...
+                      'order',options.order,'numerics',options.numerics,...
+                      'expansion',options.expansion,'method','gcce');
+    if isfield(options,'groups'), parameters.groups=options.groups; end
+    if strcmp(options.approximation,'projected'), parameters.method='cce'; end
+    if isfield(native_parameters,'noise')
+        parameters.method='noise'; parameters.noise=native_parameters.noise;
+        parameters.bath_state=options.bath_state;
+    end
+else
+    cce_validate(parameters);
+end
 
 % Validate declared bounds and canonicalise physical group membership
 grumble(model,graph,parameters);
@@ -116,6 +131,7 @@ end
 % Run optional fixed-pilot adaptation before freezing the production partition
 adaptive=strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive);
 if adaptive&&complete
+
     % Both cohorts remain resident throughout pilot selection and validation
     pilot=p.pilot_configs; heldout=p.heldout_configs;
     metadata=whos('pilot','heldout');
@@ -138,6 +154,7 @@ if adaptive&&complete
                 [value,candidate_errors,used,valid]=patches(candidate,p.pilot_configs,diagnostics.probes);
                 diagnostics.probes=used;
                 if ~valid, break; end
+
                 % Allow bounded progress through unresolved intermediate reductions
                 if value<best||(isinf(value)&&isinf(best)&&~accepted)
                     best=value; selected=candidate; accepted=true; selected_errors=candidate_errors;
@@ -177,10 +194,20 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
     if isfield(q,'checkpoint'), q=rmfield(q,'checkpoint'); end
     if strcmp(parameters.expansion,'disjoint'), q.order=1; end
     if strcmp(parameters.expansion,'disjoint_inter'), q.order=2; end
-    evaluator=@cce_cluster;
-    if ismember(q.method,{'mecce','megcce'}), evaluator=@cce_master; end
-    if strcmp(q.method,'noise'), evaluator=@cce_noise; end
-    schedule=cce_sequence(model,q);
+    if native
+        contract=cce_capabilities(model.pulse_sequence); evaluator=contract.evaluator;
+        schedule=struct('pulse_sequence',model.pulse_sequence,'contract',contract);
+        evaluation=native_parameters; evaluation.cce.groups=q.groups;
+        evaluation.cce.order=q.order; evaluation.cce.expansion=q.expansion;
+        if isfield(evaluation.cce,'checkpoint')
+            evaluation.cce=rmfield(evaluation.cce,'checkpoint');
+        end
+    else
+        evaluator=@cce_cluster;
+        if ismember(q.method,{'mecce','megcce'}), evaluator=@cce_master; end
+        if strcmp(q.method,'noise'), evaluator=@cce_noise; end
+        schedule=cce_sequence(model,q); evaluation=q;
+    end
 
     % Compare every declared patch with the downward-closed group expansion
     for patch=1:numel(p.patches)
@@ -203,12 +230,22 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         local_model=model; local_model.bath_ids=sites;
         local_graph=cce_graph(local_model,local); family=cce_clusters(local_model,local_graph,local);
         dc=prod(model.multiplicities(model.observed_ids)); components=1;
-        if strcmp(parameters.quantity,'density'), components=dc^2; end
-        if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
-            components=numel(parameters.coil);
+        if native
+            if isfield(native_parameters,'output')&&strcmp(native_parameters.output,'density')
+                components=dc^2;
+            elseif isfield(native_parameters,'coil')&&iscell(native_parameters.coil)
+                components=numel(native_parameters.coil);
+            end
+            times=native_parameters.times;
+        else
+            if strcmp(parameters.quantity,'density'), components=dc^2; end
+            if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
+                components=numel(parameters.coil);
+            end
+            times=schedule.times;
         end
         bytes=3*(numel(family)+2)*...
-              (numel(schedule.times)*(25*components+16*dc^2)+1024);
+              (numel(times)*(25*components+16*dc^2)+1024);
         if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
             error('cce_partition:memory',...
                   'Patch cluster records exceed numerics.max_memory_bytes.');
@@ -218,11 +255,12 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         for spin_config=1:numel(spin_configs)
             if used>=p.max_probes, valid=false; objective=inf; return; end
             used=used+1; state=spin_configs(spin_config);
-            baseline=evaluator(model,empty,state,schedule,q);
-            exact=evaluator(model,whole,state,schedule,q);
+            if native, state.weight=1; end
+            baseline=evaluator(model,empty,state,schedule,evaluation);
+            exact=evaluator(model,whole,state,schedule,evaluation);
             records=repmat(baseline,1,numel(family));
             for cluster_index=1:numel(family)
-                records(cluster_index)=evaluator(model,family(cluster_index),state,schedule,q);
+                records(cluster_index)=evaluator(model,family(cluster_index),state,schedule,evaluation);
             end
 
             % Score all times using exact complete patches without auxiliary denominators
@@ -231,7 +269,13 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             elseif isempty(sites)
                 reduced=baseline;
             else
-                reduced=cce_reduce([baseline records],family,local);
+                if native
+                    request=evaluation; request.cce.groups=local.groups;
+                    request.cce.bath_spins=sites;
+                    reduced=cce_reduce({[baseline records]},family,request);
+                else
+                    reduced=cce_reduce([baseline records],family,local);
+                end
             end
             difference=abs(reduced.value-exact.value);
             tolerance=p.patch_atol+p.patch_rtol*abs(exact.value);

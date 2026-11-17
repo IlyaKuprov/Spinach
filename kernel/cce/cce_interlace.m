@@ -257,7 +257,6 @@ raw.distribution_signature=struct('assignments',assignments,'weights',weights);
 
 end
 
-% Check all public inputs before enumerating any states
 % Average a raw cluster or recursively divide parent-conditioned subset records
 function raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
 spec=parameters.cce.interlaced;
@@ -266,6 +265,24 @@ if ~isfield(spec,'max_states')||~isscalar(spec.max_states)||~isfinite(spec.max_s
     error('cce_interlace:budget','An explicit positive integer state budget is required.');
 end
 reference=ensemble.spin_config(spec.reference_state);
+
+% Reject a density inconsistent with the sampled reference assignment
+if ~isequal(reference.bath_ids,model.bath_ids)||...
+   numel(reference.assignment)~=numel(model.bath_ids)
+    error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
+end
+for j=1:numel(model.bath_ids)
+    dimension=model.multiplicities(model.bath_ids(j)); index=reference.assignment(j);
+    if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
+        error('cce:spin_config','Interlaced reference assignments must select local basis states.');
+    end
+    vector=ensemble.bases{j}(:,index);
+    if ~isequal(size(reference.bath_rho{j}),[dimension dimension])||...
+       norm(reference.bath_rho{j}-vector*vector','fro')>dimension^2*eps
+        error('cce:spin_config',...
+              'Interlaced reference bath_rho must agree with its basis assignment; use explicit_product for mixed states.');
+    end
+end
 if isfield(spec,'condition_sites')
     cylinders=spec.condition_sites;
 else
@@ -276,6 +293,7 @@ else
     end
     if isempty(cylinders), cylinders={cluster.sites}; end
 end
+
 % Remove contained cylinders before charging the explicit enumeration budget
 keep=true(size(cylinders));
 for j=1:numel(cylinders)

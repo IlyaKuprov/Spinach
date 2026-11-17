@@ -2,7 +2,7 @@
 
 ## Native role and invocation
 
-Expert retained-space control compiler and propagator. Native experiments call this engine with prepared internal records; it is not a context or experiment entry point.
+Expert retained-space control compiler and propagator. It consumes prepared internal records and is not a context, an experiment entry point, or an alternative public event interface.
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
@@ -26,11 +26,11 @@ A finite `meanfield_radius` requires finite real observed and exterior coordinat
 - Ideal operator events use angle one when `angle` is omitted or empty, including alongside finite controls; axis events still require an explicit finite angle.
 
 - Signal is raw by default on every dispatch path; explicit `normalized=true` divides by the initial signal.
-- Signal detection and error bounds both use `parameters.coil`.
+- Observable detection and its error bounds use `parameters.coil`; selected-transition signal detection uses the ordered alpha/beta vectors.
 - DEER species filters use the prepared model’s canonical isotope metadata.
 
 - Expands named hahn/cpmg/xy4/xy8/udd ideal sequences and explicit piecewise-constant finite drives; amplitude and detuning are angular frequencies.
-- Finite drives and ideal bath/selective rotations require generalized CCE. Simultaneous finite drives are refused rather than implicitly combined.
+- Finite drives and ideal bath/selective rotations require generalized CCE. Simultaneous finite drives add.
 - Supplies piecewise segments with embedded cluster operators; exterior rotations update mean fields according to `meanfield=none|static`; static exterior ideal one-site rotations update the sampled field exactly.
 
 - The memory budget includes retained Hamiltonians, pulses and exterior expectations for every requested time and segment, before operator allocation; scheduler accounting includes each simultaneously active worker.
@@ -60,3 +60,5 @@ A single-site ideal operator pulse wholly outside the retained cluster is skippe
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_controls.m)
 
 Finite-control gCCE uses `spin_config.rho0` both for the propagated density and for normalized observable/signal references, including the observable error bound. Parameter-level `rho0` does not override a supplied spin_config.
+
+Density extraction and reference normalisation are file-local. They retain complex phase, time-by-channel output, and column-major density flattening; a scalar normalisation always uses the supplied initial observed density rather than the first sampled time. Local input checks retain spin-configuration vocabulary and finite-radius geometry validation.

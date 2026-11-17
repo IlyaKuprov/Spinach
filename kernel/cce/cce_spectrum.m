@@ -26,14 +26,11 @@
 %   spectrum - angular-frequency grid, transformed values and declared
 %   convention/quadrature metadata.
 %
-% See also cce_noise.
+% See also noise_correlation.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function spectrum=cce_spectrum(times,correlation,parameters)
-
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
 
 % Validate the transform convention, dimensional axes and quadrature
 grumble(times,correlation,parameters);
@@ -104,6 +101,11 @@ if ~isstruct(parameters)||~isfield(parameters,'spectrum')||...
     error('Explicit spectrum convention, sidedness, window, axes and weights are required.');
 end
 s=parameters.spectrum;
+known={'frequency_grid','convention','window','weights','sidedness',...
+       'time_domain','stationary','modulation'};
+if ~isscalar(s)||~isempty(setdiff(fieldnames(s),known))
+    error('cce:parameters','Unsupported spectrum option.');
+end
 if ~strcmp(s.convention,'exp(+i*omega*t)')||...
    ~ismember(s.sidedness,{'one-sided','two-sided'})||...
    ~ismember(s.window,{'none','hann'})||...
@@ -128,6 +130,7 @@ if strcmp(s.weights,'rectangle')&&...
     error('Rectangle quadrature requires a uniform time grid.');
 end
 if strcmp(s.sidedness,'one-sided')
+
     % Compare dimensionless residuals separately for each correlation column
     scale=max(abs(correlation),[],1); scale(scale==0)=1;
     scaled=correlation./scale;

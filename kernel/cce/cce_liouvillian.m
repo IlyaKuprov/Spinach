@@ -2,7 +2,7 @@
 %
 %           [G,meta]=cce_liouvillian(model,sites,spin_config,parameters)
 %
-% model is returned by cce_prepare; sites lists physical bath IDs. spin_config
+% model is returned by cce_compile; sites lists physical bath IDs. spin_config
 % accepts cce_hamiltonian fields. parameters.method is mecce or megcce;
 % parameters.jumps is a struct array with support (ordered physical IDs),
 % operator (dimensionless matrix in that tensor order), and rate (s^-1).
@@ -22,15 +22,12 @@
 %   blocks.
 %   meta - tensor order, dimensions, Hamiltonians and included jump records.
 %
-% See also cce_master, cce_hamiltonian.
+% See also cce_generators, cce_hamiltonian.
 % Reference: https://doi.org/10.1103/PhysRevLett.132.250401
 %
 % ilya.kuprov@weizmann.ac.il
 
 function [G,meta]=cce_liouvillian(model,sites,spin_config,parameters)
-
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
 
 % Validate dimensions, units and the explicit method
 grumble(model,sites,spin_config,parameters);

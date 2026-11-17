@@ -40,3 +40,5 @@ imported=cce_import(filename,format,units)
 - [cce_export.m](cce_export.md)
 
 Tagged JSON reconstructs empty cells and field-name lists before cell operations, including empty structures, integer arrays, multidimensional zero-sized arrays, and character shapes. MAT, JSON, and CSV-sidecar exports share exact type/shape round-trip tests. Unit fields must belong to the requested physical format; frame and cube density labels remain metadata.
+
+The retained service uses the native compilation/input boundary: physical models come from cce_compile, and generated baths enter canonical sys/inter through spin_bath.

@@ -24,7 +24,7 @@
 %   imported - recovered model/result or canonical spin/tensor/cube data with
 %   explicit metadata.
 %
-% See also cce_export, cce_bath.
+% See also cce_export, spin_bath.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -202,6 +202,7 @@ if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
    ~isstruct(units)||~isscalar(units)
     error('Invalid CCE import arguments.');
 end
+
 % Require unit fields to belong to the requested physical file format
 allowed={};
 if ismember(format,{'xyz','csv','cube'}), allowed={'length','rotation','frame'}; end

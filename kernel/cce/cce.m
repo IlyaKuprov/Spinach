@@ -106,6 +106,7 @@ if strcmp(parameters.bath_state.mode,'interlaced')
     end
     empty=struct('id',uint64(0),'sites',[]); ns=numel(ensemble.spin_configs);
     nt=numel(parameters.times); no=parameters.order+1;
+
     % Bound retained sample/order values, uncertainties and validity masks
     dc=prod(model.multiplicities(model.observed_ids));
     bytes=3*nt*ns*(25+25*no)+...
@@ -117,6 +118,7 @@ if strcmp(parameters.bath_state.mode,'interlaced')
     estimates=zeros(nt,ns); by_order=zeros(nt,1,no,ns);
     order_error=zeros(size(by_order)); order_valid=true(size(by_order));
     valid=true(size(estimates)); bounds=zeros(size(estimates));
+
     % Retained conditioning records scale with both samples and cluster count
     cylinders={clusters.sites};
     if isfield(parameters.interlaced,'condition_sites')
@@ -139,6 +141,7 @@ if strcmp(parameters.bath_state.mode,'interlaced')
     for s=1:ns
         conditioned=parameters; conditioned.interlaced.reference_state=s;
         if ~isempty(full_index)
+
             % Full-bath conditioning is an exact raw average without denominators
             conditioned.interlaced.raw_only=true;
             if full_index==0, cluster=empty; else, cluster=clusters(full_index); end
@@ -323,6 +326,478 @@ if isfield(parameters,'analysis'), result.analysis=cce_analyse(result,parameters
 % Honor explicit raw suppression after diagnostics and analysis consume it
 if isfield(parameters,'retain_raw')&&~parameters.retain_raw, result.raw={}; end
 
+end
+
+% Retained driver-local scheduling pending removal of this entry point
+function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
+
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
+% Validate immutable inputs and choose one outer parallel layer
+schedule_grumble(model,clusters,ensemble,schedule,parameters);
+
+% Default to the closed-system cluster evaluator
+if nargin<6, evaluator=@cce_cluster; end
+mode='serial'; batch_size=1; max_tasks=Inf; workers=1;
+if isfield(parameters,'parallel')
+    if isfield(parameters.parallel,'mode'), mode=parameters.parallel.mode; end
+    if isfield(parameters.parallel,'max_tasks'), max_tasks=parameters.parallel.max_tasks; end
+end
+if ~strcmp(mode,'serial')
+    if ~license('test','Distrib_Computing_Toolbox')
+        error('cce_schedule:toolbox','Parallel Computing Toolbox is unavailable.');
+    end
+    pool=gcp('nocreate');
+    if isempty(pool)||~isfield(model.spin_system.sys,'parallel')||...
+       pool.NumWorkers~=model.spin_system.sys.parallel{2}
+        error('cce_schedule:pool','Use create with explicit sys.parallel before scheduling.');
+    end
+    workers=pool.NumWorkers; batch_size=workers;
+end
+if isfield(parameters,'parallel')&&isfield(parameters.parallel,'batch_size')
+    batch_size=parameters.parallel.batch_size;
+end
+
+% Bound task count before allocating the ledger or any cluster operator
+ns=numel(ensemble.spin_configs); nc=numel(clusters)+1; count=ns*nc;
+if count>max_tasks, error('cce_schedule:tasks','Task count exceeds parallel.max_tasks.'); end
+nt=numel(schedule.times); dc=prod(model.multiplicities(model.observed_ids));
+components=1;
+if strcmp(parameters.quantity,'density'), components=dc^2; end
+if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
+    components=numel(parameters.coil);
+end
+metadata=whos('model','clusters','ensemble','schedule','parameters');
+resident=3*count*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
+
+% Include the retained first and second moments of sampled noise records
+if strcmp(parameters.method,'noise'), resident=resident+3*count*(32*nt+16); end
+peak=0;
+for k=0:numel(clusters)
+    sites=[];
+    if k>0, sites=clusters(k).sites; end
+
+    % Reserve unprojected Hamiltonians, spin operators and physical pulse matrices
+    db=prod(model.multiplicities(sites)); dimension=dc*db;
+    copies=12+3*(numel(model.observed_ids)+numel(sites))+2*numel(schedule.events);
+    if ~model.direct_supported||strcmp(model.backend,'stock')
+
+        % Include the spherical components retained by the stock construction route
+        ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
+        copies=copies+sum((2*(1:ranks)+1).^2);
+    end
+    workspace=16*copies*dimension^2;
+
+    % Add the projected Hilbert or Liouville propagation workspace separately
+    propagated=dimension;
+    if ismember(parameters.method,{'cce','mecce','noise'}), propagated=db; end
+    if ismember(parameters.method,{'mecce','megcce'})
+
+        % Retain manifold, spin and included jump operators in every completed record
+        ids=[model.observed_ids sites]; jumps=0; labels=0;
+        for j=1:numel(parameters.jumps)
+            if all(ismember(parameters.jumps(j).support,ids))
+                jumps=jumps+1; labels=labels+numel(parameters.jumps(j).support)+1;
+            end
+        end
+        retained=16*(3*numel(ids)*dimension^2+2*(1+jumps)*propagated^2)+...
+                 8*(2*numel(ids)+labels);
+        resident=resident+3*ns*retained; workspace=workspace+retained;
+        propagated=propagated^2;
+    end
+    workspace=workspace+16*(24+numel(schedule.events))*propagated^2;
+    if isfield(schedule,'controls')&&schedule.controls
+
+        % Reserve every retained segment on each simultaneously active worker
+        segments=nt*(2+2*numel(schedule.events));
+        workspace=workspace+segments*(48*dimension^2+24*numel(model.bath_ids)+8);
+    end
+    peak=max(peak,workspace);
+end
+if resident+min([workers batch_size count])*peak>parameters.numerics.max_memory_bytes
+    error('cce_schedule:memory','Raw ledger and simultaneous dense storage exceed memory budget.');
+end
+
+% Build stable task keys independently of input order and worker rank
+ids=zeros(count,3); input_index=zeros(count,2); position=0;
+for s=1:ns
+    for k=0:numel(clusters)
+        position=position+1; id=0;
+        if k>0, id=double(clusters(k).id); end
+        ids(position,:)=[ensemble.spin_configs(s).configuration_id ensemble.spin_configs(s).state_id id];
+        input_index(position,:)=[s k];
+    end
+end
+[ids,permutation]=sortrows(ids,[1 2 3]); input_index=input_index(permutation,:);
+if size(unique(ids,'rows'),1)~=count
+    error('cce_schedule:identity','Configuration, state and cluster IDs must be unique.');
+end
+
+% Exclude execution choices from physical restart identity
+physical=parameters;
+for field={'parallel','checkpoint','retain_raw','convergence'}
+    if isfield(physical,field{1}), physical=rmfield(physical,field{1}); end
+end
+
+% Hash every executable CCE source so stale code cannot reuse a checkpoint
+sources=dir(fullfile(fileparts(mfilename('fullpath')),'*.m'));
+code=cell(1,numel(sources));
+for k=1:numel(sources), code{k}=fileread(fullfile(sources(k).folder,sources(k).name)); end
+identity=struct('model',md5_hash({model.spin_system.comp,model.spin_system.inter,...
+                                model.spin_system.tols}),...
+                'parameters',md5_hash(physical),'clusters',md5_hash(clusters),...
+                'schedule',md5_hash(schedule),'samples',md5_hash(ensemble),...
+                'code',md5_hash(code));
+payload=struct('parameters',physical,'ensemble',ensemble,'clusters',clusters,'schedule',schedule);
+state=struct('version',1,'identity',identity,'payload',payload,'task_ids',ids,...
+             'completed',false(count,1),'records',{cell(count,1)});
+filename=''; resume=false;
+if isfield(parameters,'checkpoint')
+    if isfield(parameters.checkpoint,'file'), filename=parameters.checkpoint.file; end
+    if isfield(parameters.checkpoint,'resume'), resume=parameters.checkpoint.resume; end
+end
+if resume
+    state=cce_checkpoint(filename,'read',state);
+elseif ~isempty(filename)&&isfile(filename)
+    error('cce_schedule:exists','Checkpoint exists; explicitly request resume or use another filename.');
+end
+
+% Keep scheduler-owned checkpoint options out of direct evaluator calls
+if isfield(parameters,'checkpoint'), parameters=rmfield(parameters,'checkpoint'); end
+
+% Evaluate only missing tasks and persist each bounded completed batch
+missing=find(~state.completed);
+for first=1:batch_size:numel(missing)
+    indices=missing(first:min(first+batch_size-1,numel(missing)));
+    records=cell(numel(indices),1); selected=input_index(indices,:);
+    task_clusters=cell(numel(indices),1); task_configs=cell(numel(indices),1);
+    for j=1:numel(indices)
+        task_clusters{j}=struct('id',uint64(0),'sites',[]);
+        if selected(j,2)>0, task_clusters{j}=clusters(selected(j,2)); end
+        task_configs{j}=ensemble.spin_configs(selected(j,1));
+    end
+    if strcmp(mode,'serial')
+        for j=1:numel(indices)
+            records{j}=evaluator(model,task_clusters{j},task_configs{j},schedule,parameters);
+        end
+    else
+        parfor (j=1:numel(indices),workers)
+            records{j}=evaluator(model,task_clusters{j},task_configs{j},schedule,parameters); %#ok<PFBNS>
+        end
+    end
+    state.records(indices)=records; state.completed(indices)=true;
+    if ~isempty(filename), state=cce_checkpoint(filename,'write',state); end
+end
+
+% Restore spin_config/cluster input order for the client's fixed-order reduction
+raw=cell(1,ns);
+for s=1:ns
+    indices=find(input_index(:,1)==s);
+    [~,order]=sort(input_index(indices,2));
+    raw{s}=[state.records{indices(order)}];
+end
+
+end
+
+% Reject unsupported execution fields and malformed scheduling inputs
+function schedule_grumble(model,clusters,ensemble,schedule,parameters)
+if ~isstruct(model)||~all(isfield(model,{'spin_system','multiplicities','observed_ids'}))||...
+   ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
+   ~isstruct(ensemble)||~isfield(ensemble,'spin_configs')||isempty(ensemble.spin_configs)||...
+   ~isstruct(schedule)||~all(isfield(schedule,{'times','events'}))||...
+   ~isstruct(parameters)||~all(isfield(parameters,{'numerics','quantity','method'}))||...
+   ~isfield(parameters.numerics,'max_memory_bytes')||...
+   ~isscalar(parameters.numerics.max_memory_bytes)||...
+   ~isfinite(parameters.numerics.max_memory_bytes)||parameters.numerics.max_memory_bytes<=0
+    error('cce_schedule:input','Prepared model, clusters, spin_configs, schedule and memory budget required.');
+end
+if isfield(parameters,'parallel')
+    parallel=parameters.parallel;
+    if ~isstruct(parallel)||~isscalar(parallel)||...
+       ~all(ismember(fieldnames(parallel),{'mode','batch_size','max_tasks'}))
+        error('cce_schedule:input','Unknown parallel field.');
+    end
+    if isfield(parallel,'mode')&&~ismember(parallel.mode,{'serial','clusters','states'})
+        error('cce_schedule:input','parallel.mode must be serial, clusters or states.');
+    end
+    for field={'batch_size','max_tasks'}
+        if isfield(parallel,field{1})
+            value=parallel.(field{1});
+            if ~isnumeric(value)||~isscalar(value)||~isfinite(value)||value<1||value~=fix(value)
+                error('cce_schedule:input','Parallel caps must be finite positive integers.');
+            end
+        end
+    end
+end
+if isfield(parameters,'checkpoint')
+    checkpoint=parameters.checkpoint;
+    if ~isstruct(checkpoint)||~isscalar(checkpoint)||...
+       ~all(ismember(fieldnames(checkpoint),{'file','resume'}))||...
+       (isfield(checkpoint,'file')&&(~ischar(checkpoint.file)||...
+        (~isempty(checkpoint.file)&&~isrow(checkpoint.file))))||...
+       (isfield(checkpoint,'resume')&&(~islogical(checkpoint.resume)||~isscalar(checkpoint.resume)))
+        error('cce_schedule:input','Invalid checkpoint.file/resume.');
+    end
+    if isfield(checkpoint,'resume')&&checkpoint.resume&&...
+       (~isfield(checkpoint,'file')||isempty(checkpoint.file))
+        error('cce_schedule:input','Resume requires a checkpoint filename.');
+    end
+end
+end
+
+% Retained driver-local scheduling pending removal of this entry point
+function raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
+
+% Preserve an explicitly supplied experiment evaluator through every recursion
+if nargin<6
+    evaluator=@cce_cluster;
+    if ismember(parameters.method,{'mecce','megcce'}), evaluator=@cce_master; end
+end
+if ~isa(evaluator,'function_handle')
+    error('cce_interlace:evaluator','evaluator must be a function handle.');
+end
+
+% Reject unsupported optional inputs before selecting an execution path
+cce_validate(parameters);
+
+% Validate the explicit conditioning and local product distribution
+interlace_grumble(model,cluster,ensemble,parameters);
+
+% Locate included superclusters unless a shared denominator K was supplied
+spec=parameters.interlaced; reference=ensemble.spin_configs(spec.reference_state);
+if isfield(reference,'assignment')&&...
+   ~isequal(reference.assignment,ensemble.assignments(spec.reference_state,:))
+    error('cce:spin_config','Interlaced spin_config and ensemble reference assignments must agree.');
+end
+reference.assignment=ensemble.assignments(spec.reference_state,:);
+bases=cell(size(model.bath_ids)); probabilities=bases;
+for j=1:numel(model.bath_ids)
+    d=model.multiplicities(model.bath_ids(j));
+    if ischar(parameters.bath_state.basis), bases{j}=eye(d); else, bases{j}=parameters.bath_state.basis{j}; end
+    if ischar(parameters.bath_state.probabilities)
+        probabilities{j}=ones(d,1)/d;
+    else
+        probabilities{j}=parameters.bath_state.probabilities{j}(:);
+    end
+end
+
+% Validate the supplied reference before replacing any enumerated bath state
+cce_validate(parameters,model,cluster.sites,reference);
+if ~isequal(reference.bath_ids,model.bath_ids)||...
+   numel(reference.assignment)~=numel(model.bath_ids)
+    error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
+end
+
+% Require each reference density to represent its declared local assignment
+for j=1:numel(model.bath_ids)
+    dimension=model.multiplicities(model.bath_ids(j)); basis=bases{j};
+    index=reference.assignment(j);
+    if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
+        error('cce:spin_config','Interlaced reference assignments must select local basis states.');
+    end
+    vector=basis(:,index);
+    if ~isequal(size(reference.bath_rho{j}),[dimension dimension])||...
+       norm(reference.bath_rho{j}-vector*vector','fro')>dimension^2*eps
+        error('cce:spin_config',...
+              'Interlaced reference bath_rho must agree with its basis assignment; use explicit_product for mixed states.');
+    end
+end
+
+% Resolve the cylinder family only after the reference has been validated
+if isfield(spec,'condition_sites')
+    cylinders=spec.condition_sites;
+else
+    family=cce_clusters(model,cce_graph(model,parameters),parameters);
+
+    % Retain the reference-assignment baseline when no clusters were kept
+    if isempty(family)&&isempty(cluster.sites)
+        cylinders={[]};
+    else
+        cylinders={family(arrayfun(@(c) all(ismember(cluster.sites,c.sites)),family)).sites};
+    end
+end
+if isempty(cylinders), error('cce_interlace:empty','No conditioning supercluster.'); end
+
+% Bound cylinder masks, enumeration counts and index vectors before allocation
+bytes=3*8*numel(cylinders);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_interlace:memory',...
+          'Conditioning cylinder metadata exceed numerics.max_memory_bytes.');
+end
+
+% Remove contained cylinders without changing the conditioning union
+keep=true(size(cylinders));
+for j=1:numel(cylinders)
+    for k=1:numel(cylinders)
+        if j~=k&&all(ismember(cylinders{j},cylinders{k}))&&...
+           (numel(cylinders{j})<numel(cylinders{k})||j>k)
+            keep(j)=false; break;
+        end
+    end
+end
+cylinders=cylinders(keep);
+
+% Reject invalid cylinder IDs and bound enumeration before allocating it
+counts=zeros(size(cylinders)); dimensions=model.multiplicities(model.bath_ids);
+for k=1:numel(cylinders)
+    if ~isnumeric(cylinders{k})||~isreal(cylinders{k})||numel(unique(cylinders{k}))~=numel(cylinders{k})||...
+       any(~ismember(cylinders{k},model.bath_ids))||~all(ismember(cluster.sites,cylinders{k}))
+        error('cce_interlace:cylinder','Invalid conditioning supercluster.');
+    end
+    counts(k)=prod(dimensions(ismember(model.bath_ids,cylinders{k})));
+end
+if sum(counts)>spec.max_states
+    error('cce_interlace:budget','Cylinder enumeration exceeds interlaced.max_states.');
+end
+
+% Bound assignments, a cylinder block, sorting copies and index/weight vectors
+rows=sum(counts); columns=numel(model.bath_ids);
+bytes=8*rows*(4*columns+5);
+if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    error('cce_interlace:memory',...
+          'Conditioning assignments and sorting workspace exceed numerics.max_memory_bytes.');
+end
+
+% Enumerate each cylinder around the same global assignment
+assignments=zeros(rows,columns); cursor=0;
+for k=1:numel(cylinders)
+    positions=find(ismember(model.bath_ids,cylinders{k}));
+    block=repmat(reference.assignment,counts(k),1); radix=1;
+    for j=positions
+        block(:,j)=mod(floor((0:counts(k)-1)'/radix),dimensions(j))+1;
+        radix=radix*dimensions(j);
+    end
+    assignments(cursor+(1:counts(k)),:)=block; cursor=cursor+counts(k);
+end
+
+% Release the last cylinder before sorting the conditioning union
+clear block
+
+% Deduplicate overlapping cylinders before computing physical probabilities
+assignments=unique(assignments,'rows','sorted');
+logweights=zeros(size(assignments,1),1);
+for j=1:numel(model.bath_ids)
+    logweights=logweights+log(probabilities{j}(assignments(:,j)));
+end
+shift=max(logweights);
+if ~isfinite(shift), error('cce_interlace:zero_mass','Conditioning event has zero probability.'); end
+weights=exp(logweights-shift); logmass=shift+log(sum(weights));
+weights=weights/sum(weights); mass=exp(logmass);
+
+% Evaluate each distinct configuration once using the unchanged cluster engine
+raw=[];
+for k=1:numel(weights)
+    if weights(k)==0, continue; end
+    spin_config=reference; spin_config.assignment=assignments(k,:);
+    for j=1:numel(model.bath_ids)
+        vector=bases{j}(:,assignments(k,j));
+        spin_config.bath_rho{j}=vector*vector';
+        spin=pauli(dimensions(j)); x=spin.x; y=spin.y; z=spin.z; operators={x,y,z};
+        for a=1:3
+            spin_config.expectations(j,a)=real(trace(spin_config.bath_rho{j}*operators{a}));
+        end
+    end
+
+    % Preserve the physical evaluator in every recursive conditional average
+    item=evaluator(model,cluster,spin_config,schedule,parameters);
+    if isempty(raw)
+        raw=item; raw.value=zeros(size(item.value));
+        raw.abs_error_bound=zeros(size(item.abs_error_bound));
+        raw.density=zeros(size(item.density));
+    end
+    raw.value=raw.value+weights(k)*item.value;
+    raw.abs_error_bound=raw.abs_error_bound+weights(k)*item.abs_error_bound;
+    raw.density=raw.density+weights(k)*item.density;
+    raw.valid=raw.valid&item.valid;
+
+    % Preserve worst constituent residuals rather than only the first assignment
+    if isfield(item,'eigen_residual')
+        raw.eigen_residual=max(raw.eigen_residual,item.eigen_residual);
+    end
+    if isfield(item,'orthogonality_residual')
+        raw.orthogonality_residual=max(raw.orthogonality_residual,item.orthogonality_residual);
+    end
+    if isfield(item,'unitarity_residual')
+        raw.unitarity_residual=max(raw.unitarity_residual,item.unitarity_residual);
+    end
+end
+
+% Form the irreducible W12 factor using precisely the same conditioning event
+if (~isfield(spec,'raw_only')||~spec.raw_only)&&~isempty(cluster.sites)
+    family=cce_clusters(model,cce_graph(model,parameters),parameters);
+    subsets=family(arrayfun(@(entry) all(ismember(entry.sites,cluster.sites)),family));
+    bytes=8*rows*(columns+1)+3*25*numel(raw.value)*numel(subsets);
+    if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+        error('cce_interlace:memory',...
+              'Conditional subset factors exceed numerics.max_memory_bytes.');
+    end
+    factors=cell(1,numel(subsets)); errors=factors; masks=factors;
+    conditioned=parameters; conditioned.interlaced.condition_sites=cylinders;
+    conditioned.interlaced.raw_only=true;
+    empty=cce_interlace(model,struct('id',0,'sites',[]),ensemble,schedule,conditioned,evaluator);
+    for j=1:numel(subsets)
+        if isequal(subsets(j).sites,cluster.sites)
+            item=raw;
+        else
+            item=cce_interlace(model,subsets(j),ensemble,schedule,conditioned,evaluator);
+        end
+        denominator=empty.value; uncertainty=empty.abs_error_bound; valid=empty.valid;
+        for k=1:j-1
+            if all(ismember(subsets(k).sites,subsets(j).sites))
+                uncertainty=abs(denominator).*errors{k}+abs(factors{k}).*uncertainty+uncertainty.*errors{k};
+                denominator=denominator.*factors{k}; valid=valid&masks{k};
+            end
+        end
+        resolved=valid&item.valid&abs(denominator)>uncertainty+parameters.numerics.atol+...
+                 parameters.numerics.rtol*abs(denominator);
+        factors{j}=NaN(size(item.value)); errors{j}=Inf(size(item.value)); masks{j}=resolved;
+        factors{j}(resolved)=item.value(resolved)./denominator(resolved);
+        errors{j}(resolved)=(item.abs_error_bound(resolved)+...
+            abs(factors{j}(resolved)).*uncertainty(resolved))./...
+            (abs(denominator(resolved))-uncertainty(resolved));
+    end
+    target=find(arrayfun(@(entry) isequal(sort(entry.sites),sort(cluster.sites)),subsets));
+    if numel(target)~=1, error('cce_interlace:family','Requested cluster absent from included family.'); end
+    raw.factor=factors{target}; raw.factor_valid=masks{target}&isfinite(raw.factor);
+    raw.factor_abs_error_bound=errors{target};
+end
+
+% Return the exact conditioning signature for safe reuse by denominator subsets
+raw.condition_sites=cylinders; raw.assignments=assignments;
+raw.weights=weights; raw.condition_mass=mass; raw.log_condition_mass=logmass;
+raw.distribution_signature=struct('assignments',assignments,'weights',weights);
+
+end
+
+function interlace_grumble(model,cluster,ensemble,parameters)
+if ~isstruct(model)||~all(isfield(model,{'bath_ids','multiplicities'}))||...
+   ~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
+   ~isstruct(ensemble)||~all(isfield(ensemble,{'spin_configs','assignments'}))||...
+   ~isstruct(parameters)||~isfield(parameters,'interlaced')||...
+   ~isfield(parameters,'bath_state')||~all(isfield(parameters.bath_state,{'basis','probabilities'}))
+    error('cce_interlace:input','Canonical model, cluster, ensemble and interlaced options required.');
+end
+spec=parameters.interlaced;
+if ~isstruct(spec)||~all(isfield(spec,{'reference_state','max_states'}))||...
+   ~isscalar(spec.reference_state)||~isreal(spec.reference_state)||...
+   ~isfinite(spec.reference_state)||spec.reference_state<1||...
+   spec.reference_state~=fix(spec.reference_state)||spec.reference_state>numel(ensemble.spin_configs)||...
+   ~isscalar(spec.max_states)||~isreal(spec.max_states)||~isfinite(spec.max_states)||...
+   spec.max_states<1||spec.max_states~=fix(spec.max_states)
+    error('cce_interlace:options','Finite positive integer reference_state and max_states required.');
+end
+if isfield(spec,'raw_only')&&(~islogical(spec.raw_only)||~isscalar(spec.raw_only))
+    error('cce_interlace:options','raw_only must be logical.');
+end
+if isfield(spec,'condition_sites')&&~iscell(spec.condition_sites)
+    error('cce_interlace:options','condition_sites must be a cell array.');
+end
+assignment=ensemble.assignments(spec.reference_state,:);
+if numel(assignment)~=numel(model.bath_ids)||any(assignment<1)||...
+   any(assignment>model.multiplicities(model.bath_ids))||any(assignment~=fix(assignment))
+    error('cce_interlace:assignment','Interlacing requires a sampled product-state assignment.');
+end
 end
 
 % Validate explicit choices and refuse unavailable extensions

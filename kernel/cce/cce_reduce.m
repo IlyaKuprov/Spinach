@@ -21,7 +21,7 @@
 % Powers use deterministic compensated log-amplitude and phase sums;
 % exact zeros with strictly positive powers are valid if their supplied
 % uncertainty is zero and every denominator is resolved. Complete bath
-% exact-reference bypass belongs to cce.m, not this algebraic reducer.
+% exact-reference bypass belongs to the native ensemble reduction.
 %
 % Inputs:
 %   raw - records with cluster_id, time-by-observable value, logical valid,
@@ -41,7 +41,7 @@
 % and E_approx=E(empty)+sum(K(C)). Masks remain explicit;
 % unresolved denominators are never replaced by epsilon.
 %
-% See also cce_clusters, cce.
+% See also cce_clusters, clexpn.
 % Reference: https://doi.org/10.1103/PhysRevB.78.085315
 %
 % ilya.kuprov@weizmann.ac.il
@@ -52,9 +52,6 @@ function reduced=cce_reduce(raw,clusters,parameters)
 if isfield(parameters,'cce')
     reduced=native_reduce(raw,clusters,parameters); return
 end
-
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
 
 % Validate indexed raw records and the closed cluster family
 grumble(raw,clusters,parameters);

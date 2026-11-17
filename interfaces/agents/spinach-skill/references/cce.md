@@ -8,7 +8,7 @@ Use `clexpn` for observed-spin/bath dynamics represented by a hierarchy of retai
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,assumptions);
 ```
 
-`parameters.observed` is the ordered row of observed physical IDs; `parameters.times` is a nonempty, strictly increasing row of nonnegative total elapsed times in seconds. `assumptions` is an explicit stock assumption string, not an approximation inferred from isotope names. The context returns the numerical experiment answer first and validity, error, convergence and execution evidence second. Invalid values remain invalid; inspect `diagnostics.valid` and `diagnostics.invalid_reasons` before fitting or plotting an inferred decay.
+`parameters.observed` is the ordered row of observed physical IDs; `parameters.times` is a nonempty, strictly increasing row of nonnegative total elapsed times in seconds. `assumptions` is an explicit stock assumption string, not an approximation inferred from isotope names. The context returns the numerical experiment answer first and validity, error, convergence and execution evidence second. Invalid values remain invalid; inspect `diagnostics.reduction.valid` and `diagnostics.reduction.reason` before fitting or plotting an inferred decay.
 
 The registered five-argument experiments in `experiments/cce/` are:
 
@@ -33,8 +33,8 @@ Use `cce_transition(spin_system,parameters,assumptions)` to resolve an ordered p
 | Native field | Meaning |
 |---|---|
 | `cce.bath_spins` | Ordered physical bath IDs, disjoint from observed IDs; default is the complement |
-| `cce.order` | Maximum retained order; omission requests the context convergence policy, not an assertion of full-bath convergence |
-| `cce.expansion` | `standard`, `pcce` or `hybrid`; partitioned forms require groups or an explicit partition policy |
+| `cce.order` | Maximum retained order; omission uses the included-bath order; use the explicit convergence service for refinement |
+| `cce.expansion` | `standard`, `partition`, `disjoint` or `disjoint_inter`; partitioned forms require groups or an explicit partition policy |
 | `cce.graph` | `complete`, distance, coupling or explicit connectivity, with the corresponding radius/threshold/sparse logical adjacency |
 | `cce.bath_state` | Mixed or sampled product bath states; supplied samples/probabilities/seeds define the sampling problem |
 | `cce.meanfield`, `cce.meanfield_radius` | Exterior product-state field policy and optional distance cutoff |
@@ -42,7 +42,7 @@ Use `cce_transition(spin_system,parameters,assumptions)` to resolve an ordered p
 | `cce.backend` | `auto`, `direct` or `stock` retained-Hamiltonian construction within validated support |
 | `cce.numerics` | Absolute/relative accuracy and memory budget, precision and conditioning policy |
 | `cce.parallel`, `cce.checkpoint` | Scheduling and checkpoint controls |
-| `cce.convergence` | Context convergence controls; inspected through returned diagnostics |
+| `cce.convergence` | Independent refinement controls consumed by `cce_converge` |
 | `cce.basis` | Retained `zeeman-hilb` or `zeeman-liouv` basis declaration |
 
 `cce_options` validates the complete nested vocabulary. Unknown fields are errors. Algorithm controls belong under `parameters.cce`; physical input tensors belong in `sys`/`inter`; pulse, drive, preparation and detector choices belong to the experiment. The internal model and reducer records are not public parameter containers.
@@ -59,7 +59,7 @@ The family is downward closed: every proper subset needed by the recurrence is p
 
 Generalized observables and density matrices require entrywise handling with the declared observed dimension and detector. A non-informative density entry remains invalid rather than being replaced by a population from another cluster. Noise correlation uses additive inclusion-exclusion, never multiplicative coherence division. The requested reduction algebra comes from the registered experiment.
 
-For sampled bath states, one global product assignment is shared by every cluster of a sample. Perform cluster reduction for each assignment, then ensemble-average; averaging raw cluster signals before nonlinear reduction changes the approximation. Static exterior fields must use that same assignment. Interlaced sampling averages explicit neighbor configurations at the appropriate irreducible-cluster stage; it is an advanced engine operation, not a new public experiment handle.
+For sampled bath states, one global product assignment is shared by every cluster of a sample. Choose `cce.averaging=after_expansion` to reduce each assignment before averaging, or `internal_then_expansion` to average raw records, including the empty reference, before reduction. These estimators need not agree. Static exterior fields must use that same assignment. Interlaced sampling averages explicit neighbor configurations at the appropriate irreducible-cluster stage; it is an advanced engine operation, not a new public experiment handle.
 
 Partitioned CCE counts complete groups, not individual sites; subset closure must not split a group. Hybrid families combine group clusters with cross-group monomer clusters under the selected policy. Partition pilot scores are construction evidence, not a certificate of physical convergence. Refine graph thresholds, bath extent, cluster/group order and state samples independently.
 
@@ -77,7 +77,7 @@ Local dissipators are supplied as `parameters.bath_jumps`, with ordered physical
 
 Inspect numerical error, denominator conditioning, density validity and sampling error separately. A converged cluster order does not prove bath-radius, graph-cutoff, partition or sample-count convergence. For controlled comparisons, hold the bath realization, physical spin ordering, transition phase, pulse schedule and normalization fixed; compare complete-bath raw responses with an independently constructed small-system calculation.
 
-`cce_analyse` fits only an explicitly declared observable, envelope, model, interval and weighting. `cce_spectrum`, `cce_import` and `cce_export` are explicit analysis/interchange utilities, not implicit context stages. The standalone `cce_converge` helper has no native `clexpn` invocation contract in the current implementation; perform explicit native runs for independent refinement ladders instead.
+`cce_analyse` fits only an explicitly declared observable, envelope, model, interval and weighting. `cce_spectrum`, `cce_import` and `cce_export` are explicit analysis/interchange utilities, not implicit context stages. Call `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)` for independent native refinement ladders.
 
 ## Orientation composition
 
@@ -143,3 +143,5 @@ These ideal/mixed controls require generalized Hilbert dynamics, retain the full
 drift, and reject unsupported exterior dynamics. Single master echoes continue
 to use hahn_echo. Native control tests keep experiment-owned preparation and
 normalisation, independent dense references, and all physical assertions.
+
+Retained services validate their own consumed records; `cce_options` owns public input validation. `cce_schedule` and `cce_interlace` require the explicit registered evaluator and native parameters, with no method-name fallback. Internal graph, projection, state, control, and scalar-reduction records are numerical-engine inputs, not alternate public context parameters. Density extraction and reference normalisation within the internal control engine are file-local and preserve column-major ordering and complex detector phase.

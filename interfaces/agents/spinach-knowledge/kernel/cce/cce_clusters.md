@@ -44,3 +44,5 @@ clusters=cce_clusters(model,graph,parameters)
 - [cce_graph.m](cce_graph.md)
 - [cce_partition.m](cce_partition.md)
 - [cce_reduce.m](cce_reduce.md)
+
+Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.

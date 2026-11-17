@@ -49,3 +49,5 @@ Projected jumps must preserve both selected manifolds under the jump operator an
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_liouvillian.m)
 - [cce_hamiltonian.m](cce_hamiltonian.md)
 - [Method reference](https://doi.org/10.1103/PhysRevLett.132.250401)
+
+Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.

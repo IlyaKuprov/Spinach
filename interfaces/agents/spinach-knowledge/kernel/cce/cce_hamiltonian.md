@@ -41,3 +41,5 @@ Build one cluster Hamiltonian in observed-spin system-then-bath tensor order.
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_hamiltonian.m)
 - [cce_states.m](cce_states.md)
+
+The retained service uses the native compilation/input boundary: physical models come from cce_compile, and generated baths enter canonical sys/inter through spin_bath.

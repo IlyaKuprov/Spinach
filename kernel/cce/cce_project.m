@@ -25,14 +25,11 @@
 %   manifolds - alpha/beta state, projector, energy, expectations and
 %   susceptibility records, with observed-spin system operators and projection metadata.
 %
-% See also cce_prepare, cce_cluster.
+% See also cce_compile, cce_generators.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function manifolds=cce_project(model,parameters)
-
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
 
 % Validate explicit observed vectors and perturbation controls
 grumble(model,parameters);
@@ -98,7 +95,7 @@ end
 % Reject invalid state vectors and unresolved perturbation settings
 function grumble(model,parameters)
 if ~isstruct(model)||~all(isfield(model,{'observed_ids','multiplicities','source_hash'}))
-    error('model must be returned by cce_prepare.');
+    error('model must be returned by cce_compile.');
 end
 if ~isstruct(parameters)||~isfield(parameters,'transition')||...
    ~isstruct(parameters.transition)||~all(isfield(parameters.transition,{'alpha','beta'}))

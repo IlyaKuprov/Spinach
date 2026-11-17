@@ -35,8 +35,6 @@ if isfield(parameters,'cce')
         result.density=reshape(result.value.',dimension,dimension,numel(parameters.times));
     end
     parameters=struct('times',parameters.times,'numerics',parameters.cce.numerics);
-else
-    cce_validate(parameters);
 end
 
 % Check shapes before combining numerical validity and time coverage

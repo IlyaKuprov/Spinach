@@ -55,3 +55,5 @@ This table describes the retained graph engine input, not an additional public c
 | Field at the engine parameter root | Meaning |
 |---|---|
 | `bath_radius` | Maximum distance in Angstrom from an observed spin for retaining a bath site; default Inf. This is separate from the graph edge radius. |
+
+Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.

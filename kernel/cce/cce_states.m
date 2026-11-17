@@ -25,15 +25,12 @@
 %   mode, configuration ID and state IDs. Each spin_config carries the same
 %   exterior assignment for all its clusters.
 %
-% See also cce_interlace, cce_cluster.
+% See also cce_interlace, cce_subsystem.
 % Reference: https://doi.org/10.1103/PhysRevB.79.115320
 %
 % ilya.kuprov@weizmann.ac.il
 
 function ensemble=cce_states(model,parameters)
-
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
 
 % Validate explicit physical states and sampling controls
 grumble(model,parameters);
@@ -77,6 +74,7 @@ if ismember(mode,{'sampled','interlaced'}), ns=parameters.bath_state.samples; en
 if isfield(parameters.bath_state,'configuration_id')
     config_id=parameters.bath_state.configuration_id;
 end
+
 % Bound retained densities, assignments, expectations and record metadata
 prototype=struct('rho0',rho_obs,'bath_ids',ids,'bath_rho',{rhos},...
                  'expectations',zeros(nb,3),'state_id',0,...
@@ -146,16 +144,22 @@ if ~isstruct(model)||~all(isfield(model,{'observed_ids','bath_ids','multipliciti
    ~isfield(parameters,'bath_state')||~isfield(parameters.bath_state,'mode')
     error('Canonical model, rho_obs state and bath_state.mode are required.');
 end
-known={'mode','rho','probabilities','basis','samples','seed','configuration_id','temperature'};
+known={'mode','rho','probabilities','basis','samples','seed','configuration_id'};
 if ~isempty(setdiff(fieldnames(parameters.bath_state),known))
     error('Unknown bath_state field.');
-end
-if isfield(parameters.bath_state,'temperature')&&~isempty(parameters.bath_state.temperature)
-    error('cce_states:capability','Thermal preparation requires explicit local densities.');
 end
 mode=parameters.bath_state.mode;
 if ~ismember(mode,{'mixed_product','explicit_product','sampled','interlaced'})
     error('Unknown bath state mode.');
+end
+sampled=ismember(mode,{'sampled','interlaced'});
+for name={'basis','probabilities','samples','seed'}
+    if isfield(parameters.bath_state,name{1})&&~sampled
+        error('cce:capability','bath_state.%s requires sampled or interlaced mode.',name{1});
+    end
+end
+if isfield(parameters.bath_state,'rho')&&~strcmp(mode,'explicit_product')
+    error('cce:capability','bath_state.rho requires explicit_product mode.');
 end
 d=prod(model.multiplicities(model.observed_ids));
 if isfield(parameters,'rho0')

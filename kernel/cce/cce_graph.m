@@ -41,9 +41,6 @@
 
 function graph=cce_graph(model,parameters)
 
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
-
 % Validate inputs
 grumble(model,parameters);
 
@@ -226,6 +223,26 @@ if ~isstruct(parameters)||~isscalar(parameters)||~all(isfield(parameters,{'metho
     error('cce_graph:parameters','explicit method and graph mode are required.');
 end
 g=parameters.graph;
+known={'mode','score','radius','threshold','adjacency','scores',...
+       'mismatch','mismatch_scale','approximate'};
+if ~isempty(setdiff(fieldnames(g),known))
+    error('cce:parameters','Unsupported graph option.');
+end
+for item={'radius','distance';'threshold','coupling';'adjacency','explicit'}.'
+    if isfield(g,item{1})&&~strcmp(g.mode,item{2})
+        error('cce:capability','graph.%s requires graph.mode=%s.',item{1},item{2});
+    end
+end
+if isfield(g,'score')
+    for name={'mismatch','mismatch_scale'}
+        if isfield(g,name{1})&&~strcmp(g.score,'resonance')
+            error('cce:capability','graph.%s requires score=resonance.',name{1});
+        end
+    end
+    if isfield(g,'scores')&&~strcmp(g.score,'supplied')
+        error('cce:capability','graph.scores requires score=supplied.');
+    end
+end
 for field={'radius','threshold'}
     if (strcmp(g.mode,'distance')&&strcmp(field{1},'radius'))||...
        (strcmp(g.mode,'coupling')&&strcmp(field{1},'threshold'))

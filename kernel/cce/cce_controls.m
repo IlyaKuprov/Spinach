@@ -35,14 +35,12 @@
 %
 % Generalized state propagation and normalization use spin_config.rho0.
 %
-% See also cce_sequence, cce_cluster.
+% Internal engine records are not public experiment parameters.
+% See also finite_drive, hahn_echo, cce_observation.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function segments=cce_controls(model,sites,spin_config,schedule,parameters)
-
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters,model,sites,spin_config);
 
 % Validate the canonical metadata and requested controls
 grumble(model,sites,spin_config,parameters);
@@ -117,6 +115,7 @@ for k=1:numel(schedule.times)
     end
     segment_count=segment_count+numel(unique([0;t;starts(starts>0&starts<t);stops(stops>0&stops<t)]));
 end
+
 % Reserve sparse complex Hamiltonians, dense pulses and exterior expectations
 retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
 dc=prod(model.multiplicities(model.observed_ids)); components=1;
@@ -193,6 +192,7 @@ for t=1:numel(schedule.times)
                 if ~strcmp(event.type,'ideal'), continue; end
                 exterior=intersect(event.target,setdiff(spin_config.bath_ids,sites));
                 if isfield(event,'operator')&&~isempty(event.operator)
+
                     % Omit a one-site exterior pulse only when no exterior fields are used
                     if isscalar(event.target)&&~ismember(event.target,ids)&&...
                        strcmp(parameters.meanfield,'none')
@@ -251,7 +251,7 @@ if strcmp(parameters.method,'gcce')
     end
     observe=parameters; observe.rho0=spin_config.rho0;
     if ~isfield(observe,'normalized'), observe.normalized=false; end
-    value=cce_observe(density,observe);
+    value=observe_density(density,observe);
     scale=ones(1,size(value,2));
     if strcmp(parameters.quantity,'observable')
         operators=parameters.coil;
@@ -260,7 +260,7 @@ if strcmp(parameters.method,'gcce')
     end
     if observe.normalized
         plain=observe; plain.normalized=false;
-        scale=scale./abs(cce_observe(spin_config.rho0,plain));
+        scale=scale./abs(observe_density(spin_config.rho0,plain));
     end
     bounds=bounds.*scale;
     segments.raw=struct('cluster_id',uint64(0),'value',value,'valid',isfinite(value),...
@@ -324,6 +324,7 @@ if isfield(spec,'species')
 end
 frequencies=zeros(size(candidates));
 for k=1:numel(candidates)
+
     % Reject transverse canonical fields rather than silently secularizing them
     id=candidates(k); tensor=model.zeeman{id};
     if norm(tensor(3,1:2))>3*eps*norm(tensor(3,:))
@@ -390,6 +391,7 @@ for event=reshape(events,1,[])
             error('cce_controls:finite','Finite pulses require duration,axis,amplitude,detuning.');
         end
     else
+
         % Operator events default to angle one; axis events require an angle
         has_operator=isfield(event,'operator')&&~isempty(event.operator);
         has_angle=isfield(event,'angle')&&~isempty(event.angle);
@@ -413,6 +415,102 @@ for event=reshape(events,1,[])
 end
 end
 
+% Extract density components and retain the explicit reference normalisation
+function observed=observe_density(rho,parameters)
+
+% Validate the density stack and requested observable
+detection_grumble(rho,parameters);
+
+% Extract each time point in an explicitly documented element order
+d=size(rho,1); nt=size(rho,3);
+switch parameters.quantity
+    case 'density'
+        observed=reshape(rho,d*d,nt).';
+    case 'signal'
+        observed=complex(zeros(nt,1));
+        for k=1:nt
+            observed(k)=parameters.transition.alpha'*rho(:,:,k)*parameters.transition.beta;
+        end
+    case 'observable'
+        coils=parameters.coil;
+        if ~iscell(coils), coils={coils}; end
+        observed=complex(zeros(nt,numel(coils)));
+        for k=1:nt
+            for j=1:numel(coils)
+                observed(k,j)=trace(coils{j}'*rho(:,:,k));
+            end
+        end
+end
+
+% Normalize only against the explicitly supplied initial observed state
+if isfield(parameters,'normalized')&&parameters.normalized
+    if strcmp(parameters.quantity,'density')
+        error('cce_observe:normalization','A density matrix is not normalized elementwise.');
+    end
+    reference_parameters=parameters; reference_parameters.normalized=false;
+    reference=observe_density(parameters.rho0,reference_parameters);
+    bound=size(rho,1)^2*eps*max(1,norm(parameters.rho0,'fro'));
+
+    % Propagate density uncertainty in the units of each observable
+    if strcmp(parameters.quantity,'observable')
+        bound=bound*cellfun(@(op) norm(op,'fro'),coils(:).');
+    end
+    if any(abs(reference)<=bound)
+        error('cce_observe:initial_zero','Initial observable is unresolved or zero.');
+    end
+    observed=observed./reference;
+end
+
+end
+
+% Validate dimensions, finite values and observation definitions
+function detection_grumble(rho,parameters)
+if ~isnumeric(rho)||ndims(rho)>3||size(rho,1)~=size(rho,2)||...
+   isempty(rho)||any(~isfinite(rho),'all')
+    error('rho must be a finite square matrix or stack.');
+end
+if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'quantity')||...
+   ~ismember(parameters.quantity,{'density','signal','observable'})
+    error('quantity must be density, signal, or observable.');
+end
+if strcmp(parameters.quantity,'signal')
+    if ~isfield(parameters,'transition')||...
+       ~all(isfield(parameters.transition,{'alpha','beta'}))
+        error('Signal detection requires parameters.transition.alpha and parameters.transition.beta.');
+    end
+    for name={'alpha','beta'}
+        state=parameters.transition.(name{1});
+        if ~isnumeric(state)||~isequal(size(state),[size(rho,1) 1])||...
+           any(~isfinite(state))||abs(norm(state)-1)>size(rho,1)*eps
+            error('Observed-spin observation states must be normalized columns.');
+        end
+    end
+    if abs(parameters.transition.alpha'*parameters.transition.beta)>size(rho,1)*eps
+        error('Observed-spin observation states must be orthogonal.');
+    end
+end
+if strcmp(parameters.quantity,'observable')
+    if ~isfield(parameters,'coil'), error('coil must be supplied.'); end
+    coils=parameters.coil;
+    if ~iscell(coils), coils={coils}; end
+    if isempty(coils), error('coils must be nonempty.'); end
+    for k=1:numel(coils)
+        if ~isnumeric(coils{k})||~isequal(size(coils{k}),size(rho,[1 2]))||...
+           any(~isfinite(coils{k}),'all')
+            error('Each receiver coil must match the observed-spin dimension.');
+        end
+    end
+end
+if isfield(parameters,'normalized')
+    if ~islogical(parameters.normalized)||~isscalar(parameters.normalized)
+        error('normalized must be a logical scalar.');
+    end
+    if parameters.normalized&&~isfield(parameters,'rho0')
+        error('Normalization requires rho0.');
+    end
+end
+end
+
 % Check canonical metadata and physical site IDs
 function grumble(model,sites,spin_config,parameters)
 if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'observed_ids','bath_ids','multiplicities'}))||...
@@ -425,6 +523,32 @@ if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'observed_ids','bath_
 end
 if ~isempty(spin_config)&&(~isstruct(spin_config)||~all(isfield(spin_config,{'bath_ids','bath_rho','expectations'})))
     error('cce_controls:spin_config','A canonical spin-configuration structure is required.');
+end
+if isfield(parameters,'initial_rho')
+    error('cce:spin_config','Use spin_config.rho0 for the observed density.');
+end
+if ~isempty(spin_config)
+    known={'rho0','bath_ids','bath_rho','expectations','state_id',...
+           'configuration_id','weight','assignment','id'};
+    if ~isscalar(spin_config)||~isempty(setdiff(fieldnames(spin_config),known))
+        error('cce:spin_config','Unsupported spin-configuration field.');
+    end
+end
+if isfield(parameters,'meanfield_radius')
+    radius=parameters.meanfield_radius;
+    if ~isnumeric(radius)||~isreal(radius)||~isscalar(radius)||isnan(radius)||radius<0
+        error('cce:parameters','meanfield_radius must be a nonnegative real scalar.');
+    end
+    if ~isempty(spin_config)&&isfinite(radius)
+        exterior=setdiff(spin_config.bath_ids,sites);
+        if ~isempty(exterior)&&(~isfield(model,'coordinates_A')||...
+           ~isnumeric(model.coordinates_A)||~isreal(model.coordinates_A)||...
+           size(model.coordinates_A,2)~=3||...
+           size(model.coordinates_A,1)<max([model.observed_ids exterior])||...
+           any(~isfinite(model.coordinates_A([model.observed_ids exterior],:)),'all'))
+            error('cce:coordinates','Finite observed and exterior coordinates are required.');
+        end
+    end
 end
 end
 

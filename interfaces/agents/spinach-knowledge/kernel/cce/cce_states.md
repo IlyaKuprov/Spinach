@@ -32,7 +32,7 @@ ensemble=cce_states(model,parameters)
 **Inputs**
 
 - `model` — prepared physical model.
-- `parameters.bath_state` — `mode=mixed_product|explicit_product|sampled|interlaced`; explicit mode uses `rho` cells in bath-ID order. Sampled/interlaced modes require basis/probabilities (cells or the character `uniform`), positive integer `samples`, and explicit `seed`. `observed` supplies the observed-spin system state/projectors.
+- `parameters.bath_state` — `mode=mixed_product|explicit_product|sampled|interlaced`; explicit mode uses `rho` cells in bath-ID order. Sampled/interlaced modes require basis/probabilities (cells or the character `uniform`), positive integer `samples`, and explicit `seed`. `rho0` supplies the observed-spin density; otherwise an explicit ordered `transition.alpha`/`beta` pair supplies the projected preparation.
 
 **Outputs**
 
@@ -43,3 +43,5 @@ ensemble=cce_states(model,parameters)
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_states.m)
 - [cce_interlace.m](cce_interlace.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.79.115320)
+
+Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.

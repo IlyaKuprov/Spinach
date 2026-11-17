@@ -32,8 +32,8 @@ partition=cce_partition(model,graph,parameters)
 **Inputs**
 
 - `model`, `graph` — canonical model and bath connectivity.
-- `parameters.partition` — `mode=user|coupling|spatial|adaptive` and `max_dimension` (group Hilbert-dimension ceiling). Spatial grouping also requires `group_count` and `max_rounds`. Adaptive mode or optional `adaptive=true` requires `patches`, `patch_atol`, `patch_rtol`, `pilot_configs`, `heldout_configs`, `max_rounds`, and `max_probes`.
-- `parameters.groups`, `parameters.expansion`, and `parameters.order` — explicit groups and expansion-order semantics are top-level parameters, not partition fields.
+- `parameters.cce.partition` — `mode=user|coupling|spatial|adaptive` and `max_dimension` (group Hilbert-dimension ceiling). Spatial grouping also requires `group_count` and `max_rounds`. Adaptive mode or optional `adaptive=true` requires `patches`, `patch_atol`, `patch_rtol`, `pilot_configs`, `heldout_configs`, `max_rounds`, and `max_probes`.
+- `parameters.cce.groups`, `parameters.cce.expansion`, and `parameters.cce.order` — explicit groups and expansion-order semantics are CCE options, not partition fields.
 
 **Outputs**
 
@@ -57,3 +57,5 @@ Unresolved (infinite-objective) reductions may take a deterministic capacity-lim
 The context passes the native parameters structure directly to cce_partition(model,graph,parameters). Controls live in parameters.cce.partition; pilot_configs and heldout_configs contain native bath-state records (bath_ids, bath_rho, assignment, configuration_id, state_id and weight). The context supplies model.pulse_sequence. Pilot and held-out patch calculations use that registered experiment evaluator and native reduction, preserving the declared time grid, finite controls, exterior state and observable. The existing bounded merge search, memory preflight, independent held-out validation and completion diagnostics are unchanged. No public signature changes.
 
 Native adaptive patch selection removes the experiment-owned propagator preference only from its internal graph and cluster-selection request. The native evaluator still receives the original numerical preference, so an explicit stock master-equation propagator is used unchanged for pilot, held-out, and production dynamics.
+
+Only the native experiment parameter contract is accepted. Exact-patch evaluation always obtains its callback from the registered pulse sequence; no method-name dispatch or event-schedule compiler is used.

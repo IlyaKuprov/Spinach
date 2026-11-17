@@ -42,3 +42,5 @@ spectrum=cce_spectrum(times,correlation,parameters)
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_spectrum.m)
+
+Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.

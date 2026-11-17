@@ -2,7 +2,7 @@
 %
 %                [H,meta]=cce_hamiltonian(model,sites,spin_config)
 %
-% model is returned by cce_prepare; sites are physical bath spin IDs.
+% model is returned by cce_compile; sites are physical bath spin IDs.
 % Ordering is model.observed_ids followed by sites, in the supplied order.
 % spin_config is a scalar struct with optional backend (auto/direct/stock),
 % exterior_ids and exterior_expectations (one real [Ix Iy Iz] row per ID).
@@ -10,7 +10,7 @@
 % meta reports IDs, dimensions, operators, backend and roundoff residuals.
 %
 % Inputs:
-%   model - output of cce_prepare.
+%   model - output of cce_compile.
 %   sites - physical bath IDs; [] selects the observed baseline.
 %   spin_config - scalar structure with optional backend override, exterior_ids
 %   and exterior_expectations (one real Ix/Iy/Iz row per exterior ID).
@@ -21,7 +21,7 @@
 %   meta - physical tensor order, dimensions, local operators and backend
 %   metadata.
 %
-% See also cce_prepare, cce_states.
+% See also cce_compile, cce_states.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -205,7 +205,7 @@ end
 function grumble(model,sites,spin_config)
 if ~isstruct(model)||~all(isfield(model,{'source_hash','observed_ids',...
    'bath_ids','multiplicities','retained','spin_system','numerics','backend'}))
-    error('model must be returned by cce_prepare.');
+    error('model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
    any(~isfinite(sites))||any(sites~=fix(sites))||...

@@ -11,7 +11,7 @@
 % batch_size defaults to the worker count. numerics.max_memory_bytes
 % bounds resident raw data plus simultaneous per-worker dense storage.
 % checkpoint.file/resume enable per-batch atomic restart. No GPU path.
-% Native requests place these controls under parameters.cce; max_tasks caps
+% All requests place these controls under parameters.cce; max_tasks caps
 % native batch concurrency. Their memory preflight includes retained master
 % generators and full physical construction before projection.
 %
@@ -26,238 +26,16 @@
 %   raw - cell per input spin_config, each containing the baseline record then
 %   cluster records in input order.
 %
-% See also cce_checkpoint, cce_cluster.
+% See also cce_checkpoint, cce_capabilities, clexpn.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 
-% Native contexts supply an explicit evaluator and nested algorithm controls
-if isfield(parameters,'cce')
-    raw=native_schedule(model,clusters,ensemble,schedule,parameters,evaluator);
-    return
-end
+% Validate the registered experiment and resolved native scheduling inputs
+grumble(model,clusters,ensemble,schedule,parameters,evaluator);
 
-% Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
-
-% Validate immutable inputs and choose one outer parallel layer
-grumble(model,clusters,ensemble,schedule,parameters);
-
-% Default to the closed-system cluster evaluator
-if nargin<6, evaluator=@cce_cluster; end
-mode='serial'; batch_size=1; max_tasks=Inf; workers=1;
-if isfield(parameters,'parallel')
-    if isfield(parameters.parallel,'mode'), mode=parameters.parallel.mode; end
-    if isfield(parameters.parallel,'max_tasks'), max_tasks=parameters.parallel.max_tasks; end
-end
-if ~strcmp(mode,'serial')
-    if ~license('test','Distrib_Computing_Toolbox')
-        error('cce_schedule:toolbox','Parallel Computing Toolbox is unavailable.');
-    end
-    pool=gcp('nocreate');
-    if isempty(pool)||~isfield(model.spin_system.sys,'parallel')||...
-       pool.NumWorkers~=model.spin_system.sys.parallel{2}
-        error('cce_schedule:pool','Use create with explicit sys.parallel before scheduling.');
-    end
-    workers=pool.NumWorkers; batch_size=workers;
-end
-if isfield(parameters,'parallel')&&isfield(parameters.parallel,'batch_size')
-    batch_size=parameters.parallel.batch_size;
-end
-
-% Bound task count before allocating the ledger or any cluster operator
-ns=numel(ensemble.spin_configs); nc=numel(clusters)+1; count=ns*nc;
-if count>max_tasks, error('cce_schedule:tasks','Task count exceeds parallel.max_tasks.'); end
-nt=numel(schedule.times); dc=prod(model.multiplicities(model.observed_ids));
-components=1;
-if strcmp(parameters.quantity,'density'), components=dc^2; end
-if strcmp(parameters.quantity,'observable')&&iscell(parameters.coil)
-    components=numel(parameters.coil);
-end
-metadata=whos('model','clusters','ensemble','schedule','parameters');
-resident=3*count*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
-
-% Include the retained first and second moments of sampled noise records
-if strcmp(parameters.method,'noise'), resident=resident+3*count*(32*nt+16); end
-peak=0;
-for k=0:numel(clusters)
-    sites=[];
-    if k>0, sites=clusters(k).sites; end
-
-    % Reserve unprojected Hamiltonians, spin operators and physical pulse matrices
-    db=prod(model.multiplicities(sites)); dimension=dc*db;
-    copies=12+3*(numel(model.observed_ids)+numel(sites))+2*numel(schedule.events);
-    if ~model.direct_supported||strcmp(model.backend,'stock')
-
-        % Include the spherical components retained by the stock construction route
-        ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
-        copies=copies+sum((2*(1:ranks)+1).^2);
-    end
-    workspace=16*copies*dimension^2;
-
-    % Add the projected Hilbert or Liouville propagation workspace separately
-    propagated=dimension;
-    if ismember(parameters.method,{'cce','mecce','noise'}), propagated=db; end
-    if ismember(parameters.method,{'mecce','megcce'})
-
-        % Retain manifold, spin and included jump operators in every completed record
-        ids=[model.observed_ids sites]; jumps=0; labels=0;
-        for j=1:numel(parameters.jumps)
-            if all(ismember(parameters.jumps(j).support,ids))
-                jumps=jumps+1; labels=labels+numel(parameters.jumps(j).support)+1;
-            end
-        end
-        retained=16*(3*numel(ids)*dimension^2+2*(1+jumps)*propagated^2)+...
-                 8*(2*numel(ids)+labels);
-        resident=resident+3*ns*retained; workspace=workspace+retained;
-        propagated=propagated^2;
-    end
-    workspace=workspace+16*(24+numel(schedule.events))*propagated^2;
-    if isfield(schedule,'controls')&&schedule.controls
-
-        % Reserve every retained segment on each simultaneously active worker
-        segments=nt*(2+2*numel(schedule.events));
-        workspace=workspace+segments*(48*dimension^2+24*numel(model.bath_ids)+8);
-    end
-    peak=max(peak,workspace);
-end
-if resident+min([workers batch_size count])*peak>parameters.numerics.max_memory_bytes
-    error('cce_schedule:memory','Raw ledger and simultaneous dense storage exceed memory budget.');
-end
-
-% Build stable task keys independently of input order and worker rank
-ids=zeros(count,3); input_index=zeros(count,2); position=0;
-for s=1:ns
-    for k=0:numel(clusters)
-        position=position+1; id=0;
-        if k>0, id=double(clusters(k).id); end
-        ids(position,:)=[ensemble.spin_configs(s).configuration_id ensemble.spin_configs(s).state_id id];
-        input_index(position,:)=[s k];
-    end
-end
-[ids,permutation]=sortrows(ids,[1 2 3]); input_index=input_index(permutation,:);
-if size(unique(ids,'rows'),1)~=count
-    error('cce_schedule:identity','Configuration, state and cluster IDs must be unique.');
-end
-
-% Exclude execution choices from physical restart identity
-physical=parameters;
-for field={'parallel','checkpoint','retain_raw','convergence'}
-    if isfield(physical,field{1}), physical=rmfield(physical,field{1}); end
-end
-
-% Hash every executable CCE source so stale code cannot reuse a checkpoint
-sources=dir(fullfile(fileparts(mfilename('fullpath')),'*.m'));
-code=cell(1,numel(sources));
-for k=1:numel(sources), code{k}=fileread(fullfile(sources(k).folder,sources(k).name)); end
-identity=struct('model',md5_hash({model.spin_system.comp,model.spin_system.inter,...
-                                model.spin_system.tols}),...
-                'parameters',md5_hash(physical),'clusters',md5_hash(clusters),...
-                'schedule',md5_hash(schedule),'samples',md5_hash(ensemble),...
-                'code',md5_hash(code));
-payload=struct('parameters',physical,'ensemble',ensemble,'clusters',clusters,'schedule',schedule);
-state=struct('version',1,'identity',identity,'payload',payload,'task_ids',ids,...
-             'completed',false(count,1),'records',{cell(count,1)});
-filename=''; resume=false;
-if isfield(parameters,'checkpoint')
-    if isfield(parameters.checkpoint,'file'), filename=parameters.checkpoint.file; end
-    if isfield(parameters.checkpoint,'resume'), resume=parameters.checkpoint.resume; end
-end
-if resume
-    state=cce_checkpoint(filename,'read',state);
-elseif ~isempty(filename)&&isfile(filename)
-    error('cce_schedule:exists','Checkpoint exists; explicitly request resume or use another filename.');
-end
-
-% Keep scheduler-owned checkpoint options out of direct evaluator calls
-if isfield(parameters,'checkpoint'), parameters=rmfield(parameters,'checkpoint'); end
-
-% Evaluate only missing tasks and persist each bounded completed batch
-missing=find(~state.completed);
-for first=1:batch_size:numel(missing)
-    indices=missing(first:min(first+batch_size-1,numel(missing)));
-    records=cell(numel(indices),1); selected=input_index(indices,:);
-    task_clusters=cell(numel(indices),1); task_configs=cell(numel(indices),1);
-    for j=1:numel(indices)
-        task_clusters{j}=struct('id',uint64(0),'sites',[]);
-        if selected(j,2)>0, task_clusters{j}=clusters(selected(j,2)); end
-        task_configs{j}=ensemble.spin_configs(selected(j,1));
-    end
-    if strcmp(mode,'serial')
-        for j=1:numel(indices)
-            records{j}=evaluator(model,task_clusters{j},task_configs{j},schedule,parameters);
-        end
-    else
-        parfor (j=1:numel(indices),workers)
-            records{j}=evaluator(model,task_clusters{j},task_configs{j},schedule,parameters); %#ok<PFBNS>
-        end
-    end
-    state.records(indices)=records; state.completed(indices)=true;
-    if ~isempty(filename), state=cce_checkpoint(filename,'write',state); end
-end
-
-% Restore spin_config/cluster input order for the client's fixed-order reduction
-raw=cell(1,ns);
-for s=1:ns
-    indices=find(input_index(:,1)==s);
-    [~,order]=sort(input_index(indices,2));
-    raw{s}=[state.records{indices(order)}];
-end
-
-end
-
-% Reject unsupported execution fields and malformed scheduling inputs
-function grumble(model,clusters,ensemble,schedule,parameters)
-if ~isstruct(model)||~all(isfield(model,{'spin_system','multiplicities','observed_ids'}))||...
-   ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
-   ~isstruct(ensemble)||~isfield(ensemble,'spin_configs')||isempty(ensemble.spin_configs)||...
-   ~isstruct(schedule)||~all(isfield(schedule,{'times','events'}))||...
-   ~isstruct(parameters)||~all(isfield(parameters,{'numerics','quantity','method'}))||...
-   ~isfield(parameters.numerics,'max_memory_bytes')||...
-   ~isscalar(parameters.numerics.max_memory_bytes)||...
-   ~isfinite(parameters.numerics.max_memory_bytes)||parameters.numerics.max_memory_bytes<=0
-    error('cce_schedule:input','Prepared model, clusters, spin_configs, schedule and memory budget required.');
-end
-if isfield(parameters,'parallel')
-    parallel=parameters.parallel;
-    if ~isstruct(parallel)||~isscalar(parallel)||...
-       ~all(ismember(fieldnames(parallel),{'mode','batch_size','max_tasks'}))
-        error('cce_schedule:input','Unknown parallel field.');
-    end
-    if isfield(parallel,'mode')&&~ismember(parallel.mode,{'serial','clusters','states'})
-        error('cce_schedule:input','parallel.mode must be serial, clusters or states.');
-    end
-    for field={'batch_size','max_tasks'}
-        if isfield(parallel,field{1})
-            value=parallel.(field{1});
-            if ~isnumeric(value)||~isscalar(value)||~isfinite(value)||value<1||value~=fix(value)
-                error('cce_schedule:input','Parallel caps must be finite positive integers.');
-            end
-        end
-    end
-end
-if isfield(parameters,'checkpoint')
-    checkpoint=parameters.checkpoint;
-    if ~isstruct(checkpoint)||~isscalar(checkpoint)||...
-       ~all(ismember(fieldnames(checkpoint),{'file','resume'}))||...
-       (isfield(checkpoint,'file')&&(~ischar(checkpoint.file)||...
-        (~isempty(checkpoint.file)&&~isrow(checkpoint.file))))||...
-       (isfield(checkpoint,'resume')&&(~islogical(checkpoint.resume)||~isscalar(checkpoint.resume)))
-        error('cce_schedule:input','Invalid checkpoint.file/resume.');
-    end
-    if isfield(checkpoint,'resume')&&checkpoint.resume&&...
-       (~isfield(checkpoint,'file')||isempty(checkpoint.file))
-        error('cce_schedule:input','Resume requires a checkpoint filename.');
-    end
-end
-end
-
-% Evaluate native tasks with deterministic assembly, parallel batches and checkpoints
-function raw=native_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
-if ~isa(evaluator,'function_handle')
-    error('cce_schedule:evaluator','Native scheduling requires a registered evaluator.');
-end
+% Build deterministic tasks from resolved native controls
 options=parameters.cce; ns=numel(ensemble.spin_config); nc=numel(clusters)+1;
 mode='serial'; workers=1; batch_size=1;
 if isfield(options,'parallel'), mode=options.parallel.mode; end
@@ -457,6 +235,18 @@ if strcmp(parameters.cce.bath_state.mode,'interlaced')
     end
 else
     raw=evaluator(model,cluster,ensemble.spin_config(index(1)),schedule,parameters);
+end
+end
+
+% Validate producer-owned records and the required explicit callback
+function grumble(model,clusters,ensemble,schedule,parameters,evaluator)
+if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'spin_system','multiplicities','observed_ids'}))||...
+   ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
+   ~isstruct(ensemble)||~isfield(ensemble,'spin_config')||isempty(ensemble.spin_config)||...
+   ~isstruct(schedule)||~all(isfield(schedule,{'pulse_sequence','contract'}))||...
+   ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
+   ~isa(evaluator,'function_handle')
+    error('cce_schedule:input','Native model, ensemble, schedule, parameters and evaluator are required.');
 end
 end
 

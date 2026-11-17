@@ -56,3 +56,5 @@ Explicit `analysis` and `spectrum` requests now run `cce_analyse` and `cce_spect
 Initial states are specified by `rho0` and `bath_state`; the unused `initial_rho` alias is rejected. Explicit evaluator spin_configs, including adaptive pilot and held-out samples, determine generalized evolution and normalization independently of these driver defaults.
 
 Receiver detection uses the Spinach convention trace(coil'*rho). The initial observed-spin density is parameters.rho0; transition contains only alpha and beta. result.response is the generic alias of result.value, including density and noise outputs.
+
+Scheduling and conditional averaging used by this retiring driver are file-local. The retained public scheduler/interlacing services accept only the native experiment contract.

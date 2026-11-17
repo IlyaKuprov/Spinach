@@ -45,7 +45,7 @@ Checks resident-memory refusal for 200 observable columns on both gCCE and gener
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
-The concurrency fixture closes its own one-worker pool before create requests two workers, and asserts the resulting live worker count. create deliberately reuses an existing pool. ME memory checks use cce_master with explicit empty jumps; the observable-memory test uses jumps rather than the ignored lindblad alias.
+The concurrency fixture closes its own one-worker pool before create requests two workers, and asserts the resulting live worker count. create deliberately reuses an existing pool. ME memory checks use the registered native evaluator with an explicit Liouville representation; the observable-memory test supplies physical bath_jumps.
 
 ## Native scheduling and resource validation
 

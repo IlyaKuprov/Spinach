@@ -42,3 +42,5 @@ result=test_cce_interlacing()
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
 Reference-spin_config tests preserve a non-default observed density and reject a bath density inconsistent with the reference basis assignment, before enumeration can overwrite it.
+
+Native calls use clexpn with free_evolution or hahn_echo and the registered evaluator for direct conditional averages. Observed preparation belongs to experiment rho0, while sampled bath configurations own bath_rho and assignment. All original physical checks remain: conditioning unions and weights, memory refusal, reference consistency, worst residuals, shared denominators, full-bath bypass, Lindblad damping, driven responses, and convergence diagnostics. The former wrapper-schema check now checks numeric time-by-channel answers and separate diagnostic fields. The sampled-state memory check uses order zero so graph workspace does not pre-empt the intended configuration-count check.

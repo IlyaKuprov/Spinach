@@ -68,3 +68,5 @@ Generalized Zeeman-Hilbert hahn_echo raw-ledger budgeting includes retained obse
 ## Native task ceiling
 
 The native scheduler accepts parameters.cce.parallel.max_tasks and limits batch_size to that value before estimating simultaneous workspace and executing tasks. All cluster/state records still run. Invalid values raise the same positive-integer requirement as the legacy scheduler.
+
+For a native interlaced full-bath calculation, non-evaluated task placeholders are omitted from the returned raw ledger before concatenation. The exact full-bath record therefore retains the experiment's actual diagnostic schema, including driven and master-equation records; no placeholder is counted as a propagated cluster. Task ordering and checkpoint entries remain unchanged.

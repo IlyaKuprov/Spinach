@@ -367,6 +367,9 @@ for n=1:ns
     for k=1:nc
         position=find(indices(:,1)==n&indices(:,2)==k,1); records{k}=state.records{position};
     end
+    if strcmp(options.bath_state.mode,'interlaced')
+        records=records(~cellfun(@(item)strcmp(item.kind,'not_evaluated'),records));
+    end
     raw{n}=[records{:}];
 end
 end

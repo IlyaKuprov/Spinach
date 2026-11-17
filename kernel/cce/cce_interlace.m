@@ -24,6 +24,11 @@
 %   raw - conditional raw cluster observable with condition_sites and
 %   conditional-average diagnostics for consistent denominator reduction.
 %
+% Native controls are nested in parameters.cce. Native raw values stay
+% conditional averages; factor fields hold the separately reduced quotient.
+% Assignment probabilities use shifted logarithmic products, and numerical
+% residuals retain the worst constituent solve. raw_only leaves factors empty.
+%
 % See also cce_states, cce_reduce.
 % Reference: https://doi.org/10.1103/PhysRevB.86.035452
 %
@@ -308,8 +313,12 @@ cylinders=cylinders(keep);
 nb=numel(model.bath_ids); dimensions=model.multiplicities(model.bath_ids);
 counts=cellfun(@(sites)prod(dimensions(ismember(model.bath_ids,sites))),cylinders);
 count=sum(counts);
-if count>spec.max_states||8*count*max(1,nb)>parameters.cce.numerics.max_memory_bytes
-    error('cce_interlace:budget','Native conditioning enumeration exceeds its explicit budget.');
+if count>spec.max_states
+    error('cce_interlace:budget','Cylinder enumeration exceeds interlaced.max_states.');
+end
+bytes=8*count*(4*nb+5);
+if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
+    error('cce_interlace:memory','Conditioning assignments and sorting workspace exceed the memory budget.');
 end
 assignments=zeros(count,nb); position=0;
 for k=1:numel(cylinders)
@@ -321,14 +330,15 @@ for k=1:numel(cylinders)
         end
     end
 end
-assignments=unique(assignments,'rows'); count=size(assignments,1); weights=zeros(count,1);
-for n=1:count
-    weight=1;
-    for j=1:nb, weight=weight*ensemble.probabilities{j}(assignments(n,j)); end
-    weights(n)=weight;
+assignments=unique(assignments,'rows','sorted'); count=size(assignments,1);
+logweights=zeros(count,1);
+for j=1:nb
+    logweights=logweights+log(ensemble.probabilities{j}(assignments(:,j)));
 end
-if sum(weights)==0, error('cce_interlace:weight','Conditioning event has zero probability.'); end
-weights=weights/sum(weights); retained=find(weights>0);
+shift=max(logweights);
+if ~isfinite(shift), error('cce_interlace:zero_mass','Conditioning event has zero probability.'); end
+weights=exp(logweights-shift); logmass=shift+log(sum(weights));
+weights=weights/sum(weights); mass=exp(logmass); retained=find(weights>0);
 for n=reshape(retained,1,[])
     configuration=reference; configuration.assignment=assignments(n,:);
     for j=1:nb
@@ -341,8 +351,15 @@ for n=reshape(retained,1,[])
     raw.value=raw.value+weights(n)*item.value;
     raw.abs_error_bound=raw.abs_error_bound+weights(n)*item.abs_error_bound;
     raw.valid=raw.valid&item.valid;
+    for field={'eigen_residual','orthogonality_residual','unitarity_residual'}
+        if isfield(item,field{1}), raw.(field{1})=max(raw.(field{1}),item.(field{1})); end
+    end
 end
 raw.condition_sites=cylinders; raw.assignment_count=numel(retained);
+raw.assignments=assignments; raw.weights=weights;
+raw.condition_mass=mass; raw.log_condition_mass=logmass;
+raw.distribution_signature=struct('assignments',assignments,'weights',weights);
+raw.factor=[]; raw.factor_valid=[]; raw.factor_abs_error_bound=[];
 raw.reference=raw.value; raw.reference_error=raw.abs_error_bound;
 raw.full_bath=isequal(sort(cluster.sites),sort(model.bath_ids));
 if isfield(spec,'raw_only')&&spec.raw_only, return; end
@@ -373,14 +390,20 @@ if ~isempty(cluster.sites)&&~raw.full_bath
                               denominator_error.*factor.abs_error_bound;
             denominator=denominator.*factor.value; valid=valid&factor.valid;
         end
-        safe=abs(denominator)>denominator_error;
-        item.abs_error_bound=(item.abs_error_bound+abs(item.value./denominator).*...
-                              denominator_error)./(abs(denominator)-denominator_error);
-        item.value=item.value./denominator; item.valid=valid&safe&isfinite(item.value);
-        item.value(~item.valid)=NaN; item.abs_error_bound(~item.valid)=Inf;
+        resolved=valid&abs(denominator)>denominator_error+parameters.cce.numerics.atol+...
+                 parameters.cce.numerics.rtol*abs(denominator);
+        value=NaN(size(item.value)); uncertainty=Inf(size(item.value));
+        value(resolved)=item.value(resolved)./denominator(resolved);
+        uncertainty(resolved)=(item.abs_error_bound(resolved)+...
+            abs(value(resolved)).*denominator_error(resolved))./...
+            (abs(denominator(resolved))-denominator_error(resolved));
+        item.value=value; item.abs_error_bound=uncertainty;
+        item.valid=resolved&isfinite(value);
         records{k+1}=item;
     end
-    position=find([family.id]==cluster.id,1); raw=records{position+1};
+    position=find([family.id]==cluster.id,1); factor=records{position+1};
+    raw.factor=factor.value; raw.factor_valid=factor.valid;
+    raw.factor_abs_error_bound=factor.abs_error_bound;
     raw.reference=factors; raw.reference_error=errors;
 end
 raw.kind='irreducible';

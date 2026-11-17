@@ -421,6 +421,14 @@ if strcmp(options.bath_state.mode,'sampled')&&count>1&&all(abs(weights-1/count)<
     values=cat(3,values{:});
     reduced.sampling_standard_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(count*(count-1)));
 end
+if strcmp(options.bath_state.mode,'interlaced')
+    reduced.sampling_standard_error(:)=NaN;
+    if count>1
+        values=cellfun(@(part)part.value,parts,'UniformOutput',false);
+        reduced.sampling_standard_error=std(cat(3,values{:}),0,3)/sqrt(count);
+    end
+    if any([raw{1}.full_bath]), reduced.sampling_standard_error(:)=0; end
+end
 if ~isempty(sampling_error), reduced.sampling_standard_error=sampling_error; end
 end
 
@@ -433,24 +441,24 @@ if ~isempty(complete)
 end
 reduced=cce_reduce(baseline,clusters([]),empty);
 orders=0:selection.order; shape=[size(raw(1).value) numel(orders)];
-reduced.by_order=complex(zeros(shape)); reduced.by_order_error=zeros(shape);
-reduced.by_order_valid=false(shape);
+reduced.by_order=complex(NaN(shape)); reduced.by_order_error=Inf(shape);
+reduced.by_order_valid=false(shape); reduced.orders=orders;
+if ~isempty(complete)
+    reduced.by_order(:,:,end)=baseline.value;
+    reduced.by_order_error(:,:,end)=baseline.abs_error_bound;
+    reduced.by_order_valid(:,:,end)=baseline.valid; return
+end
+value=baseline.value; bound=baseline.abs_error_bound; valid=baseline.valid;
 for order=orders
-    value=raw(1).value; bound=raw(1).abs_error_bound; valid=raw(1).valid;
-    for k=find([clusters.order]<=order)
-        factor=raw(k+1); bound=abs(value).*factor.abs_error_bound+...
-                             abs(factor.value).*bound+bound.*factor.abs_error_bound;
-        value=value.*factor.value; valid=valid&factor.valid;
-    end
-    full=find([raw.full_bath],1);
-    if ~isempty(full)&&full>1&&clusters(full-1).order<=order
-        value=raw(full).value; bound=raw(full).abs_error_bound; valid=raw(full).valid;
+    for k=find([clusters.order]==order)
+        factor=raw(k+1); bound=abs(value).*factor.factor_abs_error_bound+...
+                             abs(factor.factor).*bound+bound.*factor.factor_abs_error_bound;
+        value=value.*factor.factor; valid=valid&factor.factor_valid;
     end
     reduced.by_order(:,:,order+1)=value; reduced.by_order_error(:,:,order+1)=bound;
     reduced.by_order_valid(:,:,order+1)=valid;
 end
 reduced.value=value; reduced.abs_error_bound=bound; reduced.valid=valid;
-reduced.orders=orders;
 end
 
 % Validate raw gather indexing, scalar budgets and the subset order

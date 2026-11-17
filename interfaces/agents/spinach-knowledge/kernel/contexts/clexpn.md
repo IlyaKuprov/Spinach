@@ -30,3 +30,5 @@ For projected evolution, `parameters.cce.second_order` is included in graph cons
 The experiment owns cce.numerics.propagator; graph and cluster-selection calls receive numerical selection controls without that propagation-only field. The resolved public parameters retain the requested propagation policy.
 
 Before propagation, the resolved representation validates the numerical preference: eig for Hilbert dynamics, stock for Liouville dynamics, with expm additionally available for generalized Hahn echo. Unknown or incompatible preferences are rejected rather than discarded.
+
+The disjoint and disjoint_inter expansion families fix the retained physical-group order at one and two, respectively, independently of a supplied generic order. This resolution precedes cluster enumeration and reduction: disjoint_inter must retain inter-group pairs even when the caller supplied order one. The resolved order is visible in diagnostics.parameters.cce.order.

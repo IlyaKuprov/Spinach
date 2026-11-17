@@ -31,6 +31,9 @@ if native
     parameters=struct('partition',options.partition,'graph',options.graph,...
                       'order',options.order,'numerics',options.numerics,...
                       'expansion',options.expansion,'method','gcce');
+    if isfield(parameters.numerics,'propagator')
+        parameters.numerics=rmfield(parameters.numerics,'propagator');
+    end
     if isfield(options,'groups'), parameters.groups=options.groups; end
     if strcmp(options.approximation,'projected'), parameters.method='cce'; end
     if isfield(native_parameters,'noise')

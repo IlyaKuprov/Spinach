@@ -63,3 +63,5 @@ result=test_cce_partition()
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
 The `Unresolved density intermediate gcce` and `Unresolved density intermediate megcce` checks require two bounded merges from three singleton groups to an exact, pilot- and held-out-validated density patch. The matching `Unresolved density round ceiling` checks require the first, still unresolved intermediate to remain incomplete.
+
+The registered test uses native clexpn Hahn and free-evolution calls, numeric answers, and separate diagnostics. Direct partition probes use resolved native options and the registered experiment callback, with native pilot and held-out configurations. All dense Kronecker references, physical grouping assertions, memory and iteration ceilings, and unresolved-density checks remain. Empty baths use order zero without an empty explicit groups field; their sole observed-spin reference is unchanged. Explicit stock propagation is retained for the final master-equation density checks.

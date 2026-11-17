@@ -55,3 +55,5 @@ Unresolved (infinite-objective) reductions may take a deterministic capacity-lim
 ## Native adaptive partition contract
 
 The context passes the native parameters structure directly to cce_partition(model,graph,parameters). Controls live in parameters.cce.partition; pilot_configs and heldout_configs contain native bath-state records (bath_ids, bath_rho, assignment, configuration_id, state_id and weight). The context supplies model.pulse_sequence. Pilot and held-out patch calculations use that registered experiment evaluator and native reduction, preserving the declared time grid, finite controls, exterior state and observable. The existing bounded merge search, memory preflight, independent held-out validation and completion diagnostics are unchanged. No public signature changes.
+
+Native adaptive patch selection removes the experiment-owned propagator preference only from its internal graph and cluster-selection request. The native evaluator still receives the original numerical preference, so an explicit stock master-equation propagator is used unchanged for pilot, held-out, and production dynamics.

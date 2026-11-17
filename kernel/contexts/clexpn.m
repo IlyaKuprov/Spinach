@@ -95,6 +95,10 @@ if isempty(parameters.cce.order)
     policy.defaults{end+1}='parameters.cce.order';
 end
 
+% Disjoint families retain single groups or all inter-group pairs
+if strcmp(parameters.cce.expansion,'disjoint'), parameters.cce.order=1; end
+if strcmp(parameters.cce.expansion,'disjoint_inter'), parameters.cce.order=2; end
+
 % Build the physical connectivity and downward-closed cluster family
 options=parameters.cce;
 selection=struct('graph',options.graph,'order',options.order,'numerics',options.numerics);

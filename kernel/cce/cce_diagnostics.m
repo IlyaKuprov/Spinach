@@ -19,14 +19,25 @@
 %   diagnostics - numerical/conditioning, cluster, sample and density
 %   diagnostic fields.
 %
-% See also cce, cce_reduce.
+% Native parameters.cce supplies numerical policy; parameters.output=
+% density identifies a time-by-vectorised-density reduction value.
+%
+% See also clexpn, cce_reduce.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function diagnostics=cce_diagnostics(model,raw,result,parameters)
 
 % Reject unsupported optional inputs before selecting an execution path
-cce_validate(parameters);
+if isfield(parameters,'cce')
+    if isfield(parameters,'output')&&strcmp(parameters.output,'density')
+        dimension=prod(model.multiplicities(model.observed_ids));
+        result.density=reshape(result.value.',dimension,dimension,numel(parameters.times));
+    end
+    parameters=struct('times',parameters.times,'numerics',parameters.cce.numerics);
+else
+    cce_validate(parameters);
+end
 
 % Check shapes before combining numerical validity and time coverage
 grumble(model,raw,result,parameters);

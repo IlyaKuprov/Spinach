@@ -43,4 +43,4 @@ result=test_cce_diagnostics()
 
 ## Native contract
 
-Native migration is blocked by missing result diagnostics. `clexpn` exposes raw records, reduction, policy, ensemble, and identifiers, but not the coverage/error-budget acceptance report or reduced-density physicality checks exercised here. The test remains unchanged, including unmodified nonphysical densities, minimum eigenvalues, trace/Hermiticity residuals, and sampling-prefix assertions.
+The test calls `clexpn` for native numeric density, signal, and noise answers, and audits its raw and reduction records with `cce_diagnostics`. Standard and partitioned projected/generalised Hilbert/Liouville calculations retain the same diagnostic schema. Negative populations, trace/Hermiticity violations, incomplete time coverage, nonfinite bounds, exceeded numerical budgets, and sampled order-prefix means are checked without modifying the audited matrices. Native density rows are column-vectorised observed-spin density matrices.

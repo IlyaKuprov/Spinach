@@ -2,7 +2,7 @@
 
 ## Native role and invocation
 
-Internal validity and uncertainty diagnostics for completed cluster reduction. The native context calls this service on its result record.
+Internal validity and uncertainty diagnostics for completed cluster reduction. Call this expert service on the native context’s raw and reduction records.
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
@@ -43,3 +43,5 @@ diagnostics=cce_diagnostics(model,raw,result,parameters)
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_diagnostics.m)
 - [cce_reduce.m](cce_reduce.md)
+
+Native requests pass the resolved `parameters` with `parameters.cce.numerics`. When `parameters.output` is `density`, the reduction’s time-by-vectorised-density values are inspected as square observed-spin density matrices using the compiled model dimensions. The routine never repairs these arrays; all coverage, error-budget, trace, Hermiticity, and minimum-eigenvalue decisions retain their original arithmetic.

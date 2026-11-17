@@ -53,7 +53,7 @@ if ~isempty(cache)&&isequaln(cache.signature,signature)
 end
 
 % Count resident jump operators before Hamiltonian or dissipator allocation
-if ~isempty(jumps)
+if ~isempty(jumps)||(projected&&strcmp(cluster_system.formalism,'zeeman-liouv'))
     if projected, n=db; else, n=d; end
     included=0;
     for k=1:numel(jumps)
@@ -94,7 +94,7 @@ if projected
              'dissipator',[],'swap_matrix',[]);
     H.hamiltonian_abs_error_bound=meta.roundoff_bound;
     H.hamiltonian_norm=norm(ham,'fro');
-    if ~isempty(jumps)
+    if ~isempty(jumps)||strcmp(cluster_system.formalism,'zeeman-liouv')
         H.dissipator=dissipator(cluster_system,jumps,va,vb);
         H.swap_matrix=commutation(db);
     end

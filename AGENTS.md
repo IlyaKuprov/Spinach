@@ -154,6 +154,8 @@ The common shape is **physical specification → basis and numerical options →
 
 - Use `%%` only when a long example genuinely has separate major demonstrations. Ordinary operation blocks use `%`, without banners or numbered workflow narration.
 
+- Use the appropriate number of decimal places for each physical parameter.
+
 #### 4. Use the familiar Spinach data flow
 
 - Keep the conventional structure names: `sys`, `inter`, `bas`, `spin_system`, `parameters`, and, for optimal control, `control`.
@@ -165,6 +167,8 @@ The common shape is **physical specification → basis and numerical options →
 - Normally keep `create()` followed by `basis()` together under `% Spinach housekeeping`. Where necessary, perform spin selection or other system changes between them, and caption those operations explicitly.
 
 - Construct states and operators after the required basis is available. Make assumptions explicit where the example constructs Hamiltonians directly.
+
+- Instead of Matlab plot decoration functions (xlabel, title, legend, etc.) use Spinach plot decoration commands from `kernel/plotting` directory.
 
 - For standard experiments, call the appropriate context with an existing sequence handle, such as `liquid(spin_system,@acquire,parameters,'nmr')`. Direct Hamiltonian construction and propagation are appropriate when those operations are themselves the demonstration.
 

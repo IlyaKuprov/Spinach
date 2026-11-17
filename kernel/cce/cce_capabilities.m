@@ -15,7 +15,7 @@ function contract=cce_capabilities(pulse_sequence)
 
 % Require an actual registered function handle
 grumble(pulse_sequence);
-registered={@free_evolution,@finite_drive,@hahn_echo,@cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
+registered={@free_evolution,@finite_drive,@refocusing_train,@hahn_echo,@cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
 if ~any(cellfun(@(sequence)isequal(sequence,pulse_sequence),registered))
     error('cce_capabilities:unregistered','Experiment is not registered for clexpn.');
 end
@@ -28,19 +28,22 @@ contract.reduction='multiplicative'; contract.density_reduction=false;
 contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
 if isequal(pulse_sequence,@hahn_echo)||isequal(pulse_sequence,@free_evolution)||...
-   isequal(pulse_sequence,@finite_drive), contract.version=3; end
+   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train), contract.version=3; end
 if isequal(pulse_sequence,@hahn_echo), contract.version=6; end
 if isequal(pulse_sequence,@bath_pumped_hahn), contract.version=3; end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
 end
-if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
+if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.density_reduction=true; contract.outputs{end+1}='density';
 end
-if isequal(pulse_sequence,@finite_drive)
+if isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)
     contract.projected=false;
+end
+if isequal(pulse_sequence,@refocusing_train)
+    contract.formalisms={'zeeman-hilb'};
 end
 if isequal(pulse_sequence,@noise_correlation)
     contract.projected=false; contract.dissipative=true;
@@ -51,6 +54,9 @@ end
 
 % Reject checkpoints predating retained master-generator evidence
 contract.version=contract.version+1;
+if isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@free_evolution)
+    contract.version=contract.version+1;
+end
 
 end
 
@@ -99,7 +105,7 @@ if isstruct(H)&&~parameters.cce.second_order.enabled&&...
 end
 pulse_sequence=schedule.pulse_sequence;
 if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)||...
-   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@hahn_echo)||...
+   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)||isequal(pulse_sequence,@hahn_echo)||...
    isequal(pulse_sequence,@bath_pumped_hahn)
     [answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
 else

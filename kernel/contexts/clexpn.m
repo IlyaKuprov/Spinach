@@ -25,6 +25,9 @@ function [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assum
 grumble(spin_system,pulse_sequence,parameters,assumptions);
 started=tic; contract=cce_capabilities(pulse_sequence);
 [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions);
+if strcmp(parameters.cce.approximation,'projected')&&~contract.projected
+    error('clexpn:projection','This experiment requires generalized evolution.');
+end
 if (isfield(parameters,'noise')||isfield(parameters,'spectrum'))&&...
    ~isequal(pulse_sequence,@noise_correlation)
     error('clexpn:noise','Noise and spectrum parameters belong to the noise_correlation experiment.');

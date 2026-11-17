@@ -2,12 +2,21 @@
 
 Syntax: `[answer,aux]=finite_drive(spin_system,parameters,H,R,K)`.
 
-A native five-argument rectangular-drive experiment for clexpn. The scalar
-parameters.drive descriptor contains spins (unique physical observed-spin IDs),
-axis (x/y/z or a real unit three-vector), amplitude and detuning (real finite
-rad/s scalars), and duration (positive finite seconds). All five fields are
-required; unknown fields and a competing sequence array are rejected. The drive
-starts at zero. Observation times are zero or at least the drive duration.
+A native five-argument finite-drive experiment for clexpn. The scalar
+parameters.drive descriptor requires spins (observed physical IDs), axis (x/y/z or a
+real unit three-vector), amplitude and detuning in rad/s, and positive duration
+in seconds. Equal-length amplitude/duration rows specify piecewise-constant
+waveform slices. Optional time is a scalar start (default zero), or a matching
+row of explicit slice starts. Without explicit starts, slices are consecutive.
+Nonzero observations follow completion of the last finite slice. Drift remains active throughout.
+
+Optional refocusing is a cell row of ideal-pulse descriptors: spins, either
+an integrated Hermitian operator or axis and angle, and either time (seconds)
+or fraction of the observation time. Coincident pulses keep declaration order.
+This mixed ideal/finite path requires generalized Hilbert dynamics. Pure finite
+drives retain the existing generalized master-equation path. A one-site exterior
+pulse is inactive without mean fields; finite exterior excitation with static
+mean fields and arbitrary exterior operator rotations are refused.
 
 Preparation, detection, normalization, density layout and dissipative generators
 follow free_evolution. Projected generators are unsupported. Retained bath drift

@@ -1,0 +1,11 @@
+# cce_pulse_events
+
+Internal syntax: events=cce_pulse_events(parameters).
+
+Compiles finite_drive and refocusing_train physical declarations into an internal
+ordered event array. Drive units are rad/s and seconds; row amplitudes and
+matching durations describe waveform slices, optionally with explicit starts.
+Ideal declarations use integrated generators or Cartesian angle/axis pairs.
+XY8 phases and Uhrig fractions are generated here, never inferred from an
+experiment's function-name string. Raw public event input is refused. This
+service compiles declarations but does not construct a spin Hamiltonian.

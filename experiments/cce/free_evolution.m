@@ -12,11 +12,12 @@
 % Finite Hilbert controls use segmentwise expm and preserve the original
 % 16*d^3*eps*sum(1+abs(dt)*norm(H,2)) arithmetic bound, including the initial
 % zero-duration interval.
-% sequence is an optional finite-event array: target physical IDs, axis
+% sequence is an internal experiment-compiled event array: physical IDs, axis
 % (x/y/z or a unit vector), amplitude and detuning in rad/s, duration in
 % seconds, placement (absolute/fraction) and at (seconds/fraction). Drift
 % and relaxation remain active during each drive. Overlapping drives add.
-% Drives on exterior bath spins and projected dynamics are not supported.
+% Ideal and static-exterior Hilbert segments use cce_segments; pure finite
+% drives retain their streamed propagation. Projected drives are unsupported.
 % H,R,K are conventional angular-frequency generators or explicitly tagged
 % projected branches from cce_generators. No pulse or receiver is implicit.
 %
@@ -58,12 +59,31 @@ else
 end
 
 % Compile experiment-owned finite drives once for this retained subsystem
-[events,starts,drives]=finite_controls(spin_system,parameters,H);
+events=struct([]); segments=struct(); segmented=false;
+if isfield(parameters,'sequence')&&~isempty(parameters.sequence)
+    events=parameters.sequence;
+    if any(strcmp({events.type},'ideal'))&&~isfield(parameters,'refocusing')&&~isfield(parameters,'train')
+        error('free_evolution:sequence','Named experiments own ideal refocusing pulses.');
+    end
+    if isstruct(H), error('free_evolution:projection','Finite controls require generalized dynamics.'); end
+    segmented=strcmp(spin_system.formalism,'zeeman-hilb')&&...
+              (any(strcmp({events.type},'ideal'))||strcmp(parameters.cce.meanfield,'static')||...
+               any(~ismember([events.target],spin_system.physical_ids)));
+    if segmented
+        segments=cce_segments(spin_system,parameters,H,events);
+    else
+        [events,starts,drives]=finite_controls(spin_system,parameters,H);
+    end
+end
 
 % Reuse the coherent spectrum and retain its measured numerical diagnostics
 aux=struct();
 controlled=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
-if controlled, aux.abs_error_bound=zeros(size(answer)); end
+if controlled
+    aux.abs_error_bound=zeros(size(answer));
+    if segmented, aux.segments=segments; end
+    aux.density=complex(zeros(spin_system.observed_dimension,spin_system.observed_dimension,numel(parameters.times)));
+end
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
 projected_me=isstruct(H)&&strcmp(spin_system.formalism,'zeeman-liouv');
 liouville=isempty(events)&&(projected_me||(~isstruct(H)&&...
@@ -145,8 +165,19 @@ for n=1:numel(parameters.times)
     elseif isempty(events)
         rho=cce_evolution(spin_system,generator,[],rho0,parameters.times(n),1,'final');
     else
-        [rho,bound]=driven_evolution(spin_system,generator,rho0,parameters.times(n),...
-                             events,starts(:,n),drives);
+        if segmented
+            rho=rho0; scale=0;
+            for k=1:numel(segments.durations{n})
+                ham=segments.hamiltonians{n}{k}; dt=segments.durations{n}(k);
+                pulse_prop=segments.pulses{n}{k}*expm(-1i*dt*ham);
+                rho=pulse_prop*rho*pulse_prop';
+                scale=scale+1+abs(dt)*norm(full(ham),2);
+            end
+            bound=16*spin_system.dimension^3*eps*scale;
+        else
+            [rho,bound]=driven_evolution(spin_system,generator,rho0,parameters.times(n),...
+                                        events,starts(:,n),drives);
+        end
         if controlled
             if density
                 aux.abs_error_bound(n,:)=bound;
@@ -162,6 +193,7 @@ for n=1:numel(parameters.times)
         blocks=reshape(full(rho),[db dc db dc]);
         blocks=reshape(permute(blocks,[1 3 2 4]),[db*db dc*dc]);
         observed=reshape(sum(blocks(1:db+1:db*db,:),1),[dc dc]);
+        if controlled, aux.density(:,:,n)=observed; end
         if density
             answer(n,:)=observed(:).';
         else
@@ -259,7 +291,8 @@ boundaries=unique([0;total;starts(starts>0&starts<total);stops(stops>0&stops<tot
 if coherent, boundaries=[0;boundaries]; end
 for k=1:numel(boundaries)-1
     left=boundaries(k); right=boundaries(k+1); generator=L;
-    active=find(starts<right&stops>left);
+    midpoint=(left+right)/2;
+    active=find(starts<=midpoint&stops>midpoint&right~=left);
     for n=reshape(active,1,[]), generator=generator+drives{n}; end
     if coherent
         propagator=eye(size(generator))*expm(-1i*(right-left)*generator);

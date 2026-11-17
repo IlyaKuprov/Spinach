@@ -61,3 +61,5 @@ The optional pump.boundary selects an open or closed physical frequency interval
 ## Checkpoint request ownership
 
 A supplied cce.checkpoint requires a nonempty character filename; resume, if supplied, is a scalar logical. Interlaced bath-state requests and independent convergence controls cannot share a checkpoint ledger and are rejected before physical compilation. Adaptive partition pilot and held-out evaluations remain separate from the production scheduler checkpoint.
+
+drive belongs to finite_drive. A refocusing cell row may accompany finite_drive or define refocusing_train; the single scalar hahn_echo descriptor is unchanged. train belongs to refocusing_train. Detailed waveform, pulse, and train validation remains experiment-owned.

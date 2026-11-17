@@ -49,4 +49,14 @@ result=test_cce_controls()
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
-A supplied observed density and polarized bath state are checked against an independent dense finite-pulse propagator, including normalization by the spin_config initial observable. The driven dispatch rejects unsupported spin_config reference overrides.
+A supplied observed density and polarized bath state are checked against an independent dense finite-pulse propagator, including normalization by the experiment-owned initial observable. The native subsystem rejects unsupported bath-configuration reference overrides.
+
+The registered identifier is unchanged. All original physical checks run through
+clexpn, finite_drive, hahn_echo, refocusing_train, or native compiled subsystem
+services. Former omitted/empty operator-angle spellings are tested as equivalent
+integrated-generator and Cartesian declarations; a physical angle is never
+implicitly applied twice. Raw signal checks explicitly request normalized=false.
+Named Hahn direct-segment arithmetic is selected with cce.numerics.propagator=expm.
+The test retains dense detuned-drive, ideal-width, midpoint-waveform, tensor-order,
+spin-one/selective-pulse, exterior-field, memory, and scale-invariant Hermiticity
+assertions, without calling the retired public control/evaluator interface.

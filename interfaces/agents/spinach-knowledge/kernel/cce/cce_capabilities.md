@@ -6,7 +6,8 @@
 |---|---|---|---|
 | `free_evolution` | Generalized or projected | Yes | Multiplicative signal/observable; generalized observed density |
 | `hahn_echo` | Generalized or projected | Yes | Multiplicative signal/observable; generalized observed density |
-| `finite_drive` | Generalized only | Yes | Multiplicative signal/observable; observed density |
+| `finite_drive` | Generalised only; mixed ideal/finite controls require Hilbert space | Pure finite drives only | Multiplicative signal/observable; observed density |
+| `refocusing_train` | Generalised Hilbert only | No | Multiplicative signal/observable; observed density |
 | `cpmg_echo` | Generalized or projected | No | Multiplicative signal/observable |
 | `bath_pumped_hahn` | Generalized or projected | No | Multiplicative signal/observable |
 | `cce_eseem` | Generalized or projected | No | Multiplicative signal/observable |
@@ -22,14 +23,16 @@ For multiplicative experiments the raw record carries signal, observed-density a
 
 The noise evaluator is bound to noise_correlation, even when called directly without noise parameters. A foreign schedule or an explicitly different output is rejected with clexpn:noise before subsystem construction. Its contract version is distinct from the general dynamics evaluator.
 
-Free evolution and its finite-drive delegate use capability version 3: checkpoints from the earlier master-propagation arithmetic are not accepted as current raw records. The public experiment signatures are unchanged.
+Free evolution and its finite-drive delegate reject checkpoints from preceding master-propagation and controlled-density schemas. The public experiment signatures are unchanged.
 
-Direct registered evaluation checks retained time-history memory before constructing a subsystem or generator, including density components and retained density pages. Hahn capability version 4 covers native stock master-equation pulse propagation and generalized selective refocusing.
+Direct registered evaluation checks retained time-history memory before constructing a subsystem or generator, including density components and retained density pages. Hahn registration covers native stock master-equation pulse propagation and generalized selective refocusing.
 
-Hahn capability version 5 covers absolute refocusing time and manifold-preserving projected pulse descriptors. Raw records retain the experiment-owned pulse_time and pulse_applied arrays, independently of the observed numeric response.
+Hahn registration covers absolute refocusing time and manifold-preserving projected pulse descriptors. Raw records retain the experiment-owned pulse_time and pulse_applied arrays, independently of the observed numeric response.
 
-The registered native evaluator rejects projected propagation when the actual retained Hamiltonian leaks out of either selected observed manifold, unless the explicitly requested second-order treatment applies. The criterion is dimension*eps*norm(H,fro), matching the original propagation check; direct generator inspection still exposes the measured leakage. Hahn capability version 6 covers Cartesian exterior-field updates, and bath-pumped Hahn version 3 covers the strict frequency window.
+The registered native evaluator rejects projected propagation when the actual retained Hamiltonian leaks out of either selected observed manifold, unless the explicitly requested second-order treatment applies. The criterion is dimension*eps*norm(H,fro), matching the original propagation check; direct generator inspection still exposes the measured leakage. Hahn registration covers Cartesian exterior-field updates, and bath-pumped Hahn covers the strict frequency window.
 
 Direct registered experiment callbacks reject cce.checkpoint before constructing a subsystem. The scheduler removes its owned checkpoint request before callback invocation; this applies equally to free evolution, finite drive, master-equation propagation, and fluctuation correlations.
 
-Master-equation raw tasks retain the native generator evidence returned by cce_generators, including physical spin and Lindblad operators. The experiment capability versions advance for this raw-record schema, preventing a checkpoint without those records from being resumed as the current schema. Free/finite evolution and noise use version 4, Hahn uses version 6, and the remaining registered experiments use version 3.
+Master-equation raw tasks retain the native generator evidence returned by cce_generators, including physical spin and Lindblad operators. The experiment capability versions advance for this raw-record schema, preventing a checkpoint without those records from being resumed as the current schema. Capability versions are implementation-owned schema identifiers, not a user-selected physical approximation.
+
+refocusing_train is an explicitly registered generalized Hilbert experiment with density/observable/signal reduction. Finite-drive and free-evolution checkpoint versions distinguish retained controlled-density evidence. The registered handles, not name heuristics, select evaluation.

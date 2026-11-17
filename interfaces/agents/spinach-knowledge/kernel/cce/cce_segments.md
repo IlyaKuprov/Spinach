@@ -1,0 +1,17 @@
+# cce_segments
+
+Internal syntax: segments=cce_segments(system,parameters,drift,events).
+
+Compiles experiment-owned events for one native retained subsystem. Physical
+spin order, pulse support order, and simultaneous-event order are retained.
+Intervals split at pulse starts/stops and observation endpoints, including the
+initial zero-duration interval. Returned durations, Hamiltonians, pulse matrices,
+and post-pulse exterior expectations expose the actual numerical calculation.
+
+The segment engine reuses generator-supplied Cartesian spin operators. Finite
+pulses add to the full drift. Static exterior Cartesian rotations update the
+same bath product densities and subsequent fields through cce_subsystem and
+cce_generators; finite exterior excitation or explicit exterior operator pulses
+are refused. Integrated generators must be Hermitian relative to their own norm.
+Retained segment arrays and propagation workspaces are counted before allocation.
+No legacy model/parameter translation or propagation-result wrapper is provided.

@@ -105,7 +105,7 @@ Noise inputs belong exclusively to noise_correlation, including direct evaluator
 
 Connected sampled noise retains M_s-mu_s*mean(nu)-mean(mu)*(nu_s-mean(nu)) before reduction. These centred contributions determine after-expansion sampling uncertainty; internal-first connected uncertainty remains unavailable (NaN). Complete-bath values and propagation bounds use the exact raw reference after centring. Free-evolution master dynamics uses stock exponential action with dense generator arithmetic, including projected coherence blocks, and reports its dimension/norm-based floating-point estimate. The registered rates and noise tests use native clexpn and service contracts throughout.
 
-The free_evolution and finite_drive capability version is 3; regenerate older raw checkpoints rather than reusing their propagation/error arithmetic.
+Capability versions distinguish propagation and retained-control-density schemas; regenerate checkpoints from preceding contracts rather than reusing their raw records.
 
 Receiver matrices supplied as a cell vector retain linear channel order for either row or column storage; output references and uncertainty factors are rows. Generalized Hilbert Hahn calculations may explicitly select cce.numerics.propagator='expm' for direct segment evolution and its segment arithmetic estimate. The default spectral Hahn path remains available; propagation-only policy is not a graph or reduction constraint.
 
@@ -130,3 +130,16 @@ For checkpointed native experiments, place file and optional logical resume unde
 For native parallel work, choose the pool through sys.parallel before create. cce.parallel.max_tasks limits the concurrent batch, not the number of physical cluster/configuration records. The memory preflight includes unprojected observed-plus-bath construction, simultaneous Hilbert/Liouville workspaces, all detector columns, and the master-generator arrays retained by completed tasks. Increasing worker count can therefore require a larger budget even when every individual cluster fits; no silent task dropping or model truncation occurs.
 
 A native model's source_hash represents physical/numerical inputs, not execution choices. Changing checkpoint/resume, parallel batching, raw-retention preference, or convergence orchestration does not change this fingerprint; changes to tensors, tolerances, bath states, or experiment parameters do. This also keeps retained generator provenance identical across a partial restart.
+
+For a piecewise finite pulse use finite_drive with drive.spins, axis, row amplitude
+(rad/s), matching positive duration (s), and scalar detuning (rad/s). Optional
+time supplies a scalar start or matching explicit slice starts; otherwise slices
+start consecutively at zero. Nonzero observations follow the last finite slice. Add ideal pulses
+with a refocusing cell row: spins, integrated Hermitian operator or axis/angle,
+and absolute time or fraction. Do not supply raw event arrays. Pure ideal trains
+use refocusing_train with that cell row, or train.name=xy8/udd, count, axis, and
+spins. XY8 phases remain literal; neither train is silently treated as CPMG.
+These ideal/mixed controls require generalized Hilbert dynamics, retain the full
+drift, and reject unsupported exterior dynamics. Single master echoes continue
+to use hahn_echo. Native control tests keep experiment-owned preparation and
+normalisation, independent dense references, and all physical assertions.

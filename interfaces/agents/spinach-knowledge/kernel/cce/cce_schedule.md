@@ -84,3 +84,5 @@ Master-equation raw records retain manifold Hamiltonians, physical spin operator
 Dissipative noise also reserves full retained Liouville construction before the experiment restricts the generator to the bath. A small final bath block cannot conceal the larger temporary full-system matrices.
 
 Skipped lower-order master records in the full-bath interlacing shortcut carry an empty generator field, not fabricated operators. This keeps the raw-record schema consistent with the evaluated full-bath record while their not-evaluated masks remain false. Explicit projected jumps also select master storage accounting when the requested subsystem retains a Hilbert representation.
+
+Native finite_drive and refocusing_train preflight counts every retained time-by-segment Hamiltonian, pulse, and exterior expectation before dispatch. This is added to the existing simultaneous-workspace requirement without changing physical task enumeration or batch semantics.

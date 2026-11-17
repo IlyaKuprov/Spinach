@@ -300,6 +300,21 @@ master=strcmp(model.formalism,'zeeman-liouv')||...
        (isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps));
 if noise, resident=resident+3*ns*nc*(32*nt+16); end
 
+% Count retained experiment-owned control intervals before dispatch
+segment_count=0;
+if isequal(schedule.pulse_sequence,@finite_drive)||isequal(schedule.pulse_sequence,@refocusing_train)
+    events=cce_pulse_events(parameters);
+    for time=parameters.times
+        starts=[events.at].'; stops=starts;
+        for j=1:numel(events)
+            if strcmp(events(j).placement,'fraction'), starts(j)=starts(j)*time; end
+            stops(j)=starts(j);
+            if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
+        end
+        segment_count=segment_count+numel(unique([0;time;starts(starts>0&starts<time);stops(stops>0&stops<time)]));
+    end
+end
+
 % Reserve full physical construction and every simultaneous propagation workspace
 peak=0;
 for k=0:numel(clusters)
@@ -330,7 +345,7 @@ for k=0:numel(clusters)
         resident=resident+3*ns*retained; workspace=workspace+retained;
         propagated=propagated^2;
     end
-    workspace=workspace+16*24*propagated^2;
+    workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
     peak=max(peak,workspace);
 end
 if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_bytes

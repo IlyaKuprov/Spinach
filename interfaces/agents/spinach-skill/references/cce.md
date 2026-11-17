@@ -96,3 +96,9 @@ Nonprojected free evolution takes the partial trace before applying observed-spi
 Projected second-order graph controls are forwarded from `parameters.cce.second_order`; an observed-mediated pair is retained unless the graph is explicitly approximate. Sampling and projected-pair regression tests use native numeric answers and separate diagnostics, with unchanged registered IDs.
 
 For Liouville free evolution, exactly diagonal generators use sparse stock-step action; non-diagonal generators preserve their established storage and arithmetic. This representation choice uses `isdiag`, not a numerical threshold.
+
+### Native jump and noise validation
+
+Zero-rate bath_jumps records contribute nothing and are skipped before projected manifold and support checks. Active split supports require a common retained group; active exterior jumps cannot drive a frozen mean field. Projected jumps must preserve both selected manifolds and the loss-operator subspaces, with scale-relative leakage checks. Generalised Liouville evolution permits observed-spin jumps.
+
+Noise inputs belong exclusively to noise_correlation, including direct evaluator requests. Explicit noise matrices use the relative Hermiticity criterion 100*eps*norm(B,'fro'), without an absolute unit-scale floor. Both noise moments and first moments remain available for ensemble connected subtraction.

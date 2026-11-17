@@ -36,6 +36,6 @@ result=test_mecce_rates()
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_mecce_rates.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-## Native contract
+## Contract boundaries
 
-Native migration is blocked by the zero-rate limit of a manifold-changing jump. With `bath_jumps.rate=0`, the native projected generator still rejects the jump with `cce:capability` (manifold preservation), while this test requires exact agreement with the absent-jump model. The test is retained unchanged; damping, dephasing, scaled leakage, weak-rate, exterior, and nonnormal-loss assertions are not removed.
+Projected zero-rate jumps contribute no dissipator and do not require manifold closure; active jumps retain both jump-operator and loss-operator closure requirements. Active exterior jumps cannot drive a frozen field. The regression preserves all physical rate, reference, and rejection assertions.

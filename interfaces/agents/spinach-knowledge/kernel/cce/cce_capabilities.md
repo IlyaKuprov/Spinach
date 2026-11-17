@@ -10,12 +10,14 @@
 | `cpmg_echo` | Generalized or projected | No | Multiplicative signal/observable |
 | `bath_pumped_hahn` | Generalized or projected | No | Multiplicative signal/observable |
 | `cce_eseem` | Generalized or projected | No | Multiplicative signal/observable |
-| `noise_correlation` | Generalized only | No | Additive correlation |
+| `noise_correlation` | Generalized only | Bath-only jumps | Additive correlation |
 
 Registered representations are `zeeman-hilb` and `zeeman-liouv`, subject to each experiment and generator restriction. `cce_generators` requires retained Liouville space for native generalized jumps and separately constructs conditional projected dissipative generators.
 
 The registry returns the experiment handle, evaluator, supported formalisms, projection/dissipation flags, reduction algebra, density-reduction flag, outputs and contract version. The evaluator constructs the retained subsystem and generators and calls the five-argument experiment. It produces internal raw records for `cce_schedule` and `cce_reduce`; these records are not the public first output of `clexpn`.
 
-For multiplicative experiments the raw record carries signal, observed-density and detector data where applicable, absolute error bounds, validity and propagation diagnostics. Hahn records include the actual physical retained IDs and raw response evidence. Noise records use `correlation`, `mean_left`, `mean_right`, `mean_error_left`, `mean_error_right`, `valid` and `error_bound` for additive ensemble reduction.
+For multiplicative experiments the raw record carries signal, observed-density and detector data where applicable, absolute error bounds, validity and propagation diagnostics. Hahn records include the actual physical retained IDs and raw response evidence. Noise records retain value, moment, mean_time, mean_zero, valid, and abs_error_bound for additive ensemble reduction.
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_capabilities.m)
+
+The noise evaluator is bound to noise_correlation, even when called directly without noise parameters. A foreign schedule or an explicitly different output is rejected with clexpn:noise before subsystem construction. Its contract version is distinct from the general dynamics evaluator.

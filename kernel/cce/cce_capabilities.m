@@ -40,8 +40,21 @@ end
 if isequal(pulse_sequence,@noise_correlation)
     contract.projected=false; contract.dissipative=true;
     contract.reduction='additive'; contract.outputs={'correlation'};
+    contract.evaluator=@evaluate_noise; contract.version=3;
     contract.auxiliary={'moment','mean_time','mean_zero','valid','abs_error_bound'};
 end
+
+end
+
+% Evaluate a noise request only through its registered experiment contract
+function raw=evaluate_noise(model,cluster,configuration,schedule,parameters)
+
+% Preserve the noise experiment and output ownership at the direct entry point
+if ~isequal(schedule.pulse_sequence,@noise_correlation)||...
+   (isfield(parameters,'output')&&~strcmp(parameters.output,'correlation'))
+    error('clexpn:noise','Noise evaluation requires noise_correlation and its correlation output.');
+end
+raw=evaluate(model,cluster,configuration,schedule,parameters);
 
 end
 

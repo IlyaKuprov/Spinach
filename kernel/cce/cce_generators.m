@@ -11,6 +11,8 @@
 % Its swapped branch is swap_matrix*conj(dissipator)*swap_matrix'.
 % parameters.bath_jumps uses support, operator and rate; supported spin
 % descriptors are L+, L-, Lx, Ly and Lz, or explicit ordered matrices.
+% Zero-rate jumps are omitted before closure checks; active split supports
+% and exterior jumps driving a frozen mean field are refused.
 % Projected H has kind='cce_projected', left/right Hamiltonians and a
 % dissipator acting on column-vectorised bath coherence. R and K are []:
 % the tagged object, not numeric addition, goes to cce_evolution. Swap
@@ -287,7 +289,17 @@ for k=1:numel(jumps)
 
     % A supported jump is included only when its entire support is retained
     jump=jumps(k);
-    if ~all(ismember(jump.support,ids)), continue; end
+    if jump.rate==0, continue; end
+    included=ismember(jump.support,ids);
+    if ~any(included)
+        if any(ismember(jump.support,system.configuration.exterior_ids))
+            error('cce:exteriorJump','An active exterior jump cannot drive a frozen mean field.');
+        end
+        continue
+    end
+    if ~all(included)
+        error('cce:jumpSupport','A correlated jump crosses this cluster; group its support.');
+    end
     if ischar(jump.operator)
         labels={'L+','L-','Lx','Ly','Lz'}; fields={'p','m','x','y','z'};
         field=fields{strcmp(jump.operator,labels)};

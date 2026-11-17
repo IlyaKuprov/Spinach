@@ -88,6 +88,40 @@ result=test_close(result,'Symmetrized real correlation',imag(sym),zeros(size(sym
 result=test_true(result,'Ordering metadata',isfield(dc.raw{1},'mean_time')&&...
                  isfield(dc.raw{1},'mean_zero'),'First moments survive scheduling.');
 
+% Direct noise evaluation enforces experiment ownership before construction
+foreign=dc.parameters; foreign.rho0=ones(2)/2;
+model=cce_compile(s,foreign,'labframe'); model.formalism='zeeman-liouv';
+contract=cce_capabilities(@noise_correlation);
+schedule=struct('pulse_sequence',@free_evolution,'contract',cce_capabilities(@free_evolution));
+cluster=struct('id',uint64(1),'sites',2); rejected=false;
+try
+    contract.evaluator(model,cluster,dc.ensemble.spin_config(1),schedule,foreign);
+catch exception
+    rejected=strcmp(exception.identifier,'clexpn:noise');
+end
+result=test_true(result,'Direct noise foreign experiment refused',rejected,...
+                 'Noise inputs cannot be routed through a foreign experiment evaluator.');
+
+% The evaluator remains noise-owned even without a noise parameter field
+foreign=rmfield(foreign,'noise'); foreign.output='signal'; rejected=false;
+try
+    contract.evaluator(model,cluster,dc.ensemble.spin_config(1),schedule,foreign);
+catch exception
+    rejected=strcmp(exception.identifier,'clexpn:noise');
+end
+result=test_true(result,'Noise evaluator identity retained',rejected,...
+                 'Removing property parameters does not turn the noise evaluator into another experiment.');
+
+% Hermiticity is relative to operator units rather than an absolute floor
+scaled=p; scaled.noise.terms.operator=1e-20*[0 1;0 0]; rejected=false;
+try
+    clexpn(s,@noise_correlation,scaled,'labframe');
+catch exception
+    rejected=contains(lower(exception.message),'hermitian');
+end
+result=test_true(result,'Scaled non-Hermitian noise refused',rejected,...
+                 'Rescaling an operator cannot hide its non-Hermitian part.');
+
 % Observable cross terms close disconnected sparse-graph supports
 sys.isotopes={'E','1H','1H'}; inter.zeeman.scalar={0,0,0}; inter.coupling.matrix=cell(3);
 three=create(sys,inter); sparse=p; sparse.cce.order=2;

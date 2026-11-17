@@ -20,3 +20,5 @@ non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
 are rejected. Connected ensemble and Fourier conventions are unchanged.
 
 With no bath dissipator, noise_correlation evaluates the explicitly ordered or symmetrized correlation in Hilbert space using the Hermitian bath eigensystem. It transports the existing unitary round-off estimate. Dissipative noise retains Liouville propagation. Optional parameters.spectrum is evaluated after the completed native ensemble and returned in diagnostics.spectrum, not per cluster.
+
+Explicit operator Hermiticity is checked relative to its own Frobenius norm: norm(B-B','fro') must not exceed 100*eps*norm(B,'fro'). There is no absolute unit-scale floor; rescaling a non-Hermitian operator cannot make it acceptable.

@@ -39,6 +39,6 @@ Public optional-field contracts are explicit in reused fixtures: irrelevant meth
 
 Direct noise spin_configs with nontracial bath states are checked against dense ordered and symmetrized connected correlations; the initial moments come from the supplied bath state.
 
-## Native contract
+## Contract boundaries
 
-Native migration is blocked by the internal connected-covariance uncertainty contract. The existing assertion requires `sampling_standard_error` to be NaN for `internal_then_expansion`; the native reduction returns a finite value and the migrated assertion fails. The original test remains unchanged, preserving all ordered, symmetrized, sampled, supplied-state, disconnected, and allocation assertions.
+The regression preserves ordered, symmetrised, sampled, supplied-state, disconnected, and allocation checks, including unavailable internal connected-covariance uncertainty. Foreign-method direct evaluation and scaled non-Hermitian operators remain explicit refusal cases.

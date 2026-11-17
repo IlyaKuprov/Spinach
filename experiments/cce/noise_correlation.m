@@ -145,7 +145,7 @@ if isfield(noise,'terms')
         d=prod(system.model.multiplicities(term.support));
         if ~all(ismember(term.support,system.model.bath_ids))||...
            ~isequal(size(term.operator),[d d])||any(~isfinite(term.operator),'all')||...
-           norm(term.operator-term.operator','fro')>d*eps*max(1,norm(term.operator,'fro'))
+           norm(term.operator-term.operator','fro')>100*eps*norm(term.operator,'fro')
             error('noise_correlation:operator','Fluctuation operators must be Hermitian and supported on bath spins.');
         end
     end

@@ -56,6 +56,36 @@ rho=clexpn(s,@free_evolution,relax,'labframe');
 result=test_close(result,'Observed relaxation population',rho(:,4),0.5*exp(-0.4*p.times(:)),...
                   1e-12,1e-12,'Observed-spin relaxation is not silently discarded.');
 
+% Zero-rate manifold-changing jumps vanish before projected closure checks
+zero=relax; zero.cce.approximation='projected'; zero.output='signal';
+zero.bath_jumps=struct('support',1,'operator',[0 1;0 0],'rate',0);
+zero_model=cce_compile(s,zero,'labframe');
+[zero_system,~]=cce_subsystem(zero_model,[],struct(),[]);
+zero_parameters=zero_model.parameters;
+[with_zero,~,~]=cce_generators(zero_system,zero_parameters,[]);
+zero_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
+[without_jump,~,~]=cce_generators(zero_system,zero_parameters,[]);
+zero_generator=-1i*(with_zero.left-with_zero.right)+with_zero.dissipator;
+no_generator=-1i*(without_jump.left-without_jump.right);
+result=test_close(result,'Zero-rate projected jump omitted',zero_generator,no_generator,0,0,...
+                  'A zero coefficient contributes neither dissipation nor manifold leakage.');
+
+% Active exterior jumps cannot supply a frozen mean field
+exterior=zero; exterior.cce.bath_spins=2; exterior.cce.order=1;
+exterior.cce.meanfield='static'; exterior.bath_jumps.support=2;
+exterior.bath_jumps.rate=1; exterior_model=cce_compile(s,exterior,'labframe');
+configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},...
+                     'exterior_ids',2,'exterior_expectations',[0 0 0.5]);
+[exterior_system,~]=cce_subsystem(exterior_model,[],configuration,[]);
+rejected=false;
+try
+    cce_generators(exterior_system,exterior_model.parameters,[]);
+catch exception
+    rejected=strcmp(exception.identifier,'cce:exteriorJump');
+end
+result=test_true(result,'Active exterior jump refused',rejected,...
+                 'An evolving exterior population cannot silently become a static field.');
+
 % Instrument the supplied evaluator on recursive and complete-bath paths
 model=cce_compile(s,df.parameters,'labframe'); model.formalism='zeeman-liouv';
 model.clusters=df.clusters; calls=[]; events={}; local=df.parameters;

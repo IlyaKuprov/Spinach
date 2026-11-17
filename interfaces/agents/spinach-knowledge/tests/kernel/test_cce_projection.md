@@ -42,3 +42,5 @@ result=test_cce_projection()
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Checks second-order mediated coupling-graph dynamics against independently constructed dense projected Hamiltonians, and verifies that omitting induced edges requires the explicit graph approximation flag.
+
+The mediated-pair and explicit graph-approximation cases use `clexpn(system,@free_evolution,parameters,'labframe')`. The pair uses the explicit ordered magnetic quantum numbers `[0.5 -0.5]`, which select the same two Zeeman basis columns as the direct projection checks. Physical observed IDs and transition selectors are experiment parameters; second-order, graph, bath, order, and numerical controls belong to `parameters.cce`. The native `cce_compile` service supplies both physical models used by direct internal `cce_project` checks. The internal projection control structure is distinct from the context parameters; it preserves explicit-state, gap, overlap, and double-counting rejection assertions.

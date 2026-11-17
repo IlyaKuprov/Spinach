@@ -90,6 +90,7 @@ if isequal(pulse_sequence,@noise_correlation)
     selection.method='noise'; selection.noise=parameters.noise;
     selection.bath_state=options.bath_state;
 end
+if strcmp(options.approximation,'projected'), selection.second_order=options.second_order; end
 for field={'groups','selection'}
     if isfield(options,field{1}), selection.(field{1})=options.(field{1}); end
 end

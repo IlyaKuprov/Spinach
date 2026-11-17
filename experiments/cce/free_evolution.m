@@ -122,7 +122,9 @@ for n=1:numel(parameters.times)
            strcmp(parameters.cce.numerics.propagator,'stock')
             rho=propagator(engine,generator,parameters.times(n))*rho0;
         else
-            rho=step(engine,generator,rho0,parameters.times(n));
+            action=generator;
+            if isdiag(action), action=sparse(action); end
+            rho=step(engine,action,rho0,parameters.times(n));
         end
     elseif isempty(events)
         rho=cce_evolution(spin_system,generator,[],rho0,parameters.times(n),1,'final');

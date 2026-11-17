@@ -1,5 +1,5 @@
 % Hamiltonian operator or superoperator and its rotational decomposi-
-% tion. Descriptor and operator generation are parallelised. Syntax:
+% tion. Large operator construction tasks are parallelised. Syntax:
 %
 %             [I,Q]=hamiltonian(spin_system,operator_type)
 %
@@ -28,6 +28,10 @@
 % Note: the code has a few rather eccentric blocks that bring the
 %       memory footprint to the absolute minimum and work around
 %       the sparse matrix addition efficiency problem.
+%
+% Note: exact Hilbert spaces with product dimension at or below
+%       tols.small_matrix construct their component operators on the
+%       caller, without worker dispatch.
 %
 % Note: bosonic mode terms declared in inter.modes are added to the
 %       invariant part I at their input orientation; the Q part and
@@ -662,8 +666,15 @@ parfor_ss.sys=spin_system.sys; parfor_ss.tols=spin_system.tols;
 parfor_ss.bas=spin_system.bas; parfor_ss.comp=spin_system.comp;
 parfor_ss.chem.parts=spin_system.chem.parts;
 
+% Keep small exact Hilbert spaces on the caller using the existing size policy
+nworkers=Inf;
+if strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
+   prod(spin_system.comp.mults)<=spin_system.tols.small_matrix
+    nworkers=0;
+end
+
 % Parfor timing
-if ~isworkernode
+if ~isworkernode&&(nworkers>0)
     D=parallel.pool.DataQueue;
     afterEach(D,@(~)parfor_progr);
     terms_done=0; last_toc=0;
@@ -682,19 +693,20 @@ function parfor_progr()
     end
 end
 
+% Extract sliced specifications without constructing a table for every operator
+left_ops=descr.opL; right_ops=descr.opS;
+left_spins=descr.nL; right_spins=descr.nS;
+
 % Build component operators in XYZ form
 report(spin_system,'building individual operators...');
-parfor n=1:nterms
-    
-    % Get descriptor line
-    descr_line=descr(n,:);
-    
+parfor (n=1:nterms,nworkers)
+
     % Compute operator from specification
-    if descr_line.nS==0
-        oper{n}=operator(parfor_ss,descr_line.opL,{descr_line.nL},operator_type,'xyz');
+    if right_spins(n)==0
+        oper{n}=operator(parfor_ss,left_ops(n),{left_spins(n)},operator_type,'xyz');
     else
-        oper{n}=operator(parfor_ss,[descr_line.opL,descr_line.opS],...
-                                   {descr_line.nL ,descr_line.nS },operator_type,'xyz');
+        oper{n}=operator(parfor_ss,[left_ops(n),right_ops(n)],...
+                                   {left_spins(n),right_spins(n)},operator_type,'xyz');
     end
 
     % Report progress
@@ -1456,7 +1468,6 @@ if (~isfield(spin_system.inter.coupling,'strength'))||...
    (~isfield(spin_system.inter.zeeman,'strength'))     
     error('assumption information is missing, run assume() before calling this function.');
 end
-% Catch operator type errors
 if (~ischar(operator_type))||...
    (~ismember(operator_type,{'left','right','comm','acomm'}))
     error('incorrect operator type specification.');
@@ -1482,4 +1493,5 @@ end
 % 
 % Yours sincerely,
 % Ilya Kuprov.
+
 

@@ -24,6 +24,10 @@
 % replaces the default observed pi pulse; omitted bath sites are inactive
 % only without a static exterior field. Joint observed/bath pulses are refused.
 % Projected pulses must preserve or interchange the selected manifolds.
+% Alternatively, refocusing.axis and angle specify a physical Cartesian
+% rotation. A one-site exterior Cartesian pulse updates its product density
+% and subsequent static mean field; generalized Hilbert propagation then uses
+% direct segment exponentials. Exterior explicit operator pulses remain refused.
 % aux.pulse_time and aux.pulse_applied record sample-specific control timing.
 % Optional aux contains spectral/error diagnostics for coherent projected echoes.
 %
@@ -61,12 +65,40 @@ if ~isfield(model,'transition')
 end
 a=model.transition.alpha; b=model.transition.beta;
 rotation=expm(-1i*pi*kron((a*b'+b*a')/2,eye(db)));
-positions=parameters.times/2;
+positions=parameters.times/2; H_after=H;
 if isfield(parameters,'refocusing')
     pulse=parameters.refocusing;
     if isfield(pulse,'fraction'), positions=pulse.fraction*parameters.times;
     else, positions=repmat(pulse.time,size(parameters.times)); end
-    if isequal(pulse.spins,model.observed_ids)
+    if isfield(pulse,'axis')
+        if strcmp(parameters.cce.meanfield,'static')&&any(ismember(pulse.spins,model.bath_ids))
+            parameters.cce.numerics.propagator='expm';
+        end
+        axis=pulse.axis; if ischar(axis), axis=double('xyz'==axis); end
+        generator=zeros(dc*db); local=spin_system; local.formalism='zeeman-hilb';
+        for id=intersect(pulse.spins,spin_system.physical_ids,'stable')
+            for k=1:3
+                labels={'Lx','Ly','Lz'};
+                generator=generator+pulse.angle*axis(k)*cce_operator(local,labels{k},id);
+            end
+        end
+        exterior=setdiff(pulse.spins,spin_system.physical_ids);
+        if ~isempty(exterior)&&strcmp(parameters.cce.meanfield,'static')
+            if projected||~strcmp(spin_system.formalism,'zeeman-hilb')
+                error('hahn_echo:exterior','Exterior rotations require generalized Hilbert dynamics.');
+            end
+            configuration=spin_system.configuration;
+            configuration=rmfield(configuration,{'expectations','exterior_ids','exterior_expectations'});
+            for id=exterior
+                index=find(configuration.bath_ids==id,1); operators=pauli(model.multiplicities(id));
+                rotation=expm(-1i*pulse.angle*(axis(1)*operators.x+axis(2)*operators.y+axis(3)*operators.z));
+                configuration.bath_rho{index}=rotation*configuration.bath_rho{index}*rotation';
+            end
+            [after,~]=cce_subsystem(model,spin_system.sites,configuration,[]);
+            [H_after,~,~]=cce_generators(after,parameters,[]);
+            parameters.cce.numerics.propagator='expm';
+        end
+    elseif isequal(pulse.spins,model.observed_ids)
         generator=kron(pulse.operator,eye(db));
     else
         position=find(spin_system.physical_ids==pulse.spins,1);
@@ -103,7 +135,7 @@ fractions=0.5;
 if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
    ~any(R(:))&&~any(K(:))&&~isfield(parameters,'pump')&&...
    isfield(parameters,'cce_aux')
-    [E,aux]=generalized_echo(spin_system,parameters,H,rho0,coil,meta,rotation,positions,density);
+    [E,aux]=generalized_echo(spin_system,parameters,H,H_after,rho0,coil,meta,rotation,positions,density);
     aux.pulse_time=positions; aux.pulse_applied=parameters.times>0&positions<=parameters.times; return
 end
 
@@ -175,9 +207,10 @@ end
 if isfield(parameters,'refocusing')
     pulse=parameters.refocusing;
     if ~isstruct(pulse)||~isscalar(pulse)||...
-       ~all(isfield(pulse,{'spins','operator'}))||...
+       ~isfield(pulse,'spins')||...
+       ~xor(isfield(pulse,'operator'),all(isfield(pulse,{'axis','angle'})))||...
        ~xor(isfield(pulse,'fraction'),isfield(pulse,'time'))||...
-       ~isempty(setdiff(fieldnames(pulse),{'spins','operator','fraction','time'}))
+       ~isempty(setdiff(fieldnames(pulse),{'spins','operator','axis','angle','fraction','time'}))
         error('hahn_echo:refocusing','Supply spins, operator, and either fraction or time for one ideal refocusing pulse.');
     end
     ids=pulse.spins;
@@ -187,10 +220,19 @@ if isfield(parameters,'refocusing')
         error('hahn_echo:operator_target','An operator pulse addresses the whole observed system or one physical site.');
     end
     d=prod(spin_system.model.multiplicities(ids));
-    if ~isnumeric(pulse.operator)||~isequal(size(pulse.operator),[d d])||...
+    if isfield(pulse,'operator')&&(~isnumeric(pulse.operator)||~isequal(size(pulse.operator),[d d])||...
        any(~isfinite(pulse.operator),'all')||...
-       norm(pulse.operator-pulse.operator','fro')>d*eps*max(1,norm(pulse.operator,'fro'))
+       norm(pulse.operator-pulse.operator','fro')>d*eps*max(1,norm(pulse.operator,'fro')))
         error('hahn_echo:refocusing','The integrated generator must be Hermitian.');
+    end
+    if isfield(pulse,'axis')
+        axis=pulse.axis;
+        if ischar(axis)&&ismember(axis,{'x','y','z'}), axis=double('xyz'==axis); end
+        if ~isnumeric(axis)||~isreal(axis)||~isequal(size(axis),[1 3])||...
+           any(~isfinite(axis))||abs(norm(axis)-1)>3*eps||...
+           ~isnumeric(pulse.angle)||~isreal(pulse.angle)||~isscalar(pulse.angle)||~isfinite(pulse.angle)
+            error('hahn_echo:refocusing','Supply a unit Cartesian axis and finite real rotation angle.');
+        end
     end
     if isfield(pulse,'fraction'), position=pulse.fraction; upper=1;
     else, position=pulse.time; upper=Inf; end
@@ -277,7 +319,7 @@ aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
 end
 
 % Propagate a generalized Hahn echo with retained observed density and bounds
-function [answer,aux]=generalized_echo(system,parameters,H,rho0,coil,meta,pulse,positions,density)
+function [answer,aux]=generalized_echo(system,parameters,H,H_after,rho0,coil,meta,pulse,positions,density)
 
 % Select direct segments or reuse one Hermitian eigensystem
 direct=isfield(parameters.cce.numerics,'propagator')&&...
@@ -310,9 +352,10 @@ for n=1:count
         for k=1:numel(durations)
             rotation=eye(size(H));
             if k==2&&positions(n)<=time, rotation=pulse; end
-            propagator=rotation*expm(-1i*durations(k)*H);
+            segment=H; if k==3, segment=H_after; end
+            propagator=rotation*expm(-1i*durations(k)*segment);
             rho=propagator*rho*propagator';
-            scale=scale+1+abs(durations(k))*norm(full(H),2);
+            scale=scale+1+abs(durations(k))*norm(full(segment),2);
         end
     else
         if time>0

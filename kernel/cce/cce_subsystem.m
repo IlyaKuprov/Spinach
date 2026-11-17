@@ -15,6 +15,9 @@
 % cluster_system carries observed-first IDs, mappings, multiplicities, isotope
 % labels, local Pauli matrices, local bath densities and exterior mean fields.
 % formalism is zeeman-hilb or zeeman-liouv; Hilbert dimensions are always explicit.
+% A finite cce.meanfield_radius requires observed and exterior coordinates;
+% exterior sites within that Angstrom distance of any observed spin contribute.
+% Included sites need no geometry for this state-dependent radius selection.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -107,6 +110,20 @@ cluster_system.configuration.expectations=expectations;
 cluster_system.configuration.exterior_ids=[];
 cluster_system.configuration.exterior_expectations=zeros(0,3);
 if strcmp(model.parameters.cce.meanfield,'static')
+    if isfield(model.parameters.cce,'meanfield_radius')&&...
+       isfinite(model.parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
+        coordinates=model.coordinates_A([model.observed_ids exterior_ids],:);
+        if any(~isfinite(coordinates),'all')
+            error('cce:coordinates','cce.meanfield_radius requires finite observed and exterior coordinates.');
+        end
+        distance=inf(1,numel(exterior_ids));
+        for id=model.observed_ids
+            delta=model.coordinates_A(exterior_ids,:)-model.coordinates_A(id,:);
+            distance=min(distance,sqrt(sum(delta.^2,2)).');
+        end
+        keep=distance<=model.parameters.cce.meanfield_radius;
+        exterior_ids=exterior_ids(keep); exterior_expectations=exterior_expectations(keep,:);
+    end
     cluster_system.configuration.exterior_ids=exterior_ids;
     cluster_system.configuration.exterior_expectations=exterior_expectations;
 end

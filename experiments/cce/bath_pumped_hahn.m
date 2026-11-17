@@ -18,7 +18,11 @@
 % Exterior selected spins are omitted when cce.meanfield is none: each
 % retained cluster evolves its marginal bath state. Static conditioned
 % exterior spins cannot be pumped without time-dependent mean fields.
-% aux contains spectral/error diagnostics for coherent projected echoes.
+% pump.boundary may be open (strict, legacy physical window) or closed
+% (inclusive, the native default). A zero-width open window selects nothing.
+% aux.selected_sites records the full physical selection before cluster pruning;
+% aux.boundary_rule records the interval convention. Spectral/error diagnostics
+% are also retained for coherent projected echoes.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -55,7 +59,12 @@ for k=1:numel(ids)
     frequencies(k)=tensor(3,3);
 end
 factor=1; if strcmp(spec.units,'Hz'), factor=2*pi; end
-ids=ids(abs(frequencies-factor*spec.center)<=factor*spec.halfwidth);
+distance=abs(frequencies-factor*spec.center); width=factor*spec.halfwidth;
+if isfield(spec,'boundary')&&strcmp(spec.boundary,'open')
+    ids=ids(distance<width); rule='strict_abs_less_than';
+else
+    ids=ids(distance<=width); rule='abs_less_than_or_equal';
+end
 if isempty(ids)&&~spec.allow_empty
     error('bath_pumped_hahn:empty','Pump window selected no bath spins.');
 end
@@ -63,13 +72,16 @@ if isfield(parameters.cce,'meanfield')&&strcmp(parameters.cce.meanfield,'static'
    ~all(ismember(ids,spin_system.sites))
     error('bath_pumped_hahn:exterior','Pumping static exterior mean fields requires time-dependent conditioning.');
 end
+aux.selected_sites=ids; aux.boundary_rule=rule;
 ids=intersect(ids,spin_system.sites,'stable');
 [fractions,order]=sort([0.5 spec.fraction]); pulse_kind=[1 2]; pulse_kind=pulse_kind(order);
 
 % Retain ordered branch propagators and their numerical error diagnostics
 if projected&&isempty(H.dissipator)&&...
    ~isfield(parameters,'rho0')&&~isfield(parameters,'preparation')&&~isfield(parameters,'coil')
+    selected=aux.selected_sites;
     [E,aux]=projected_echo(spin_system,parameters,H,ids,fractions,pulse_kind,reference,meta);
+    aux.selected_sites=selected; aux.boundary_rule=rule;
     return
 end
 
@@ -144,6 +156,9 @@ if ~isfield(parameters,'pump')||~isstruct(parameters.pump)||...
     error('bath_pumped_hahn:pump','Supply a complete physical pump selector.');
 end
 spec=parameters.pump;
+if isfield(spec,'boundary')&&(~ischar(spec.boundary)||~ismember(spec.boundary,{'open','closed'}))
+    error('bath_pumped_hahn:pump','The pump boundary must be open or closed.');
+end
 if ~isscalar(spec)||~isnumeric(spec.center)||~isreal(spec.center)||...
    ~isscalar(spec.center)||~isfinite(spec.center)||...
    ~isnumeric(spec.halfwidth)||~isreal(spec.halfwidth)||...

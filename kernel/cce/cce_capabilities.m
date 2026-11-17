@@ -27,7 +27,8 @@ contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
 if isequal(pulse_sequence,@hahn_echo)||isequal(pulse_sequence,@free_evolution)||...
    isequal(pulse_sequence,@finite_drive), contract.version=3; end
-if isequal(pulse_sequence,@hahn_echo), contract.version=5; end
+if isequal(pulse_sequence,@hahn_echo), contract.version=6; end
+if isequal(pulse_sequence,@bath_pumped_hahn), contract.version=3; end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
@@ -82,6 +83,10 @@ physical=configuration;
 if isfield(physical,'assignment'), physical=rmfield(physical,'assignment'); end
 [spin_system,~]=cce_subsystem(model,cluster.sites,physical,[]);
 [H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
+if isstruct(H)&&~parameters.cce.second_order.enabled&&...
+   parameters.cce_aux.projection_leakage>spin_system.dimension*eps*H.hamiltonian_norm
+    error('cce:population_transfer','Projected states must be invariant under the cluster Hamiltonian.');
+end
 pulse_sequence=schedule.pulse_sequence;
 if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)||...
    isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@hahn_echo)||...

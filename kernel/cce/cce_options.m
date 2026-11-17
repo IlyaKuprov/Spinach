@@ -255,6 +255,7 @@ if isfield(p,'pump')
         error('cce_options:pump','Pump species must be an explicit cell row of isotope names.');
     end
     choice(p.pump.units,{'Hz','rad/s'},'pump.units');
+    if isfield(p.pump,'boundary'), choice(p.pump.boundary,{'open','closed'},'pump.boundary'); end
     if ~isnumeric(p.pump.center)||~isreal(p.pump.center)||~isscalar(p.pump.center)||~isfinite(p.pump.center)
         error('cce_options:pump','Pump center must be finite in the explicitly declared frequency units.');
     end
@@ -370,7 +371,7 @@ if isfield(p,'transition')
     end
 end
 if isfield(p,'pump')
-    fields(p.pump,{'sites','species','center','halfwidth','units','fraction','allow_empty'},'pump');
+    fields(p.pump,{'sites','species','center','halfwidth','units','fraction','allow_empty','boundary'},'pump');
 end
 if isfield(p,'sequence')
     if ~isstruct(p.sequence)||~isrow(p.sequence)

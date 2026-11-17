@@ -53,3 +53,5 @@ parameters.drive is owned by finite_drive (also admitted during internal cce_com
 ## Parallel task ceiling
 
 parameters.cce.parallel.max_tasks is an optional finite positive integer. It caps simultaneously scheduled batch tasks, not the total physical cluster/state task count. It combines with batch_size by taking their minimum; parallel.mode remains serial, clusters or states.
+
+The refocusing descriptor belongs to hahn_echo and its direct compiler/generator validation. Its physical matrix, support, and placement are checked by the experiment. Passing it to free_evolution is rejected rather than silently ignored.

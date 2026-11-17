@@ -23,3 +23,5 @@ For multiplicative experiments the raw record carries signal, observed-density a
 The noise evaluator is bound to noise_correlation, even when called directly without noise parameters. A foreign schedule or an explicitly different output is rejected with clexpn:noise before subsystem construction. Its contract version is distinct from the general dynamics evaluator.
 
 Free evolution and its finite-drive delegate use capability version 3: checkpoints from the earlier master-propagation arithmetic are not accepted as current raw records. The public experiment signatures are unchanged.
+
+Direct registered evaluation checks retained time-history memory before constructing a subsystem or generator, including density components and retained density pages. Hahn capability version 4 covers native stock master-equation pulse propagation and generalized selective refocusing.

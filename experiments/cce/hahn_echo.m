@@ -18,6 +18,10 @@
 % cce.numerics.propagator='expm' selects direct segment exponentials for
 % generalized Hilbert evolution, retaining the segment arithmetic bound.
 % The default reuses a Hermitian eigensystem across the time grid.
+% Optional refocusing is a scalar descriptor with spins, operator (a
+% Hermitian integrated rotation generator), and fraction in [0,1]. It
+% replaces the default observed pi pulse; omitted bath sites are inactive
+% only without a static exterior field. Joint observed/bath pulses are refused.
 % Optional aux contains spectral/error diagnostics for coherent projected echoes.
 %
 % Generalized unitary Zeeman-Hilbert echoes retain observed density matrices,
@@ -40,7 +44,9 @@ end
 if ~iscell(coil), coil={coil}; end
 projected=isstruct(H); E=complex(zeros(numel(parameters.times),numel(reference)));
 aux=struct();
-if projected&&~density&&isempty(H.dissipator)&&~isfield(parameters,'pump')&&...
+if projected&&~density&&isempty(H.dissipator)&&...
+   ~strcmp(spin_system.formalism,'zeeman-liouv')&&~isfield(parameters,'pump')&&...
+   ~isfield(parameters,'refocusing')&&...
    all(isfield(H,{'hamiltonian_abs_error_bound','hamiltonian_norm'}))
     [E,aux]=projected_echo(spin_system,parameters,H,reference,meta); return
 end
@@ -57,16 +63,40 @@ if ~isfield(model,'transition')
     error('hahn_echo:transition','An explicit transition is required for ideal refocusing.');
 end
 a=model.transition.alpha; b=model.transition.beta;
-rotation=eye(dc)-a*a'-b*b'-1i*(a*b'+b*a');
-rotation=kron(rotation,eye(db));
-fractions=0.5;
+rotation=expm(-1i*pi*kron((a*b'+b*a')/2,eye(db)));
+fraction=0.5;
+if isfield(parameters,'refocusing')
+    pulse=parameters.refocusing; fraction=pulse.fraction;
+    if isequal(pulse.spins,model.observed_ids)
+        generator=kron(pulse.operator,eye(db));
+    else
+        position=find(spin_system.physical_ids==pulse.spins,1);
+        if isempty(position)
+            if strcmp(parameters.cce.meanfield,'static')
+                error('hahn_echo:exterior','Exterior pulses require time-dependent mean fields.');
+            end
+            generator=zeros(dc*db);
+        else
+            dims=spin_system.multiplicities;
+            generator=kron(eye(prod(dims(1:position-1))),...
+                           kron(pulse.operator,eye(prod(dims(position+1:end)))));
+        end
+    end
+    rotation=expm(-1i*generator);
+end
+
+% Keep ideal master-equation propagation on the native stock action path
+if strcmp(spin_system.formalism,'zeeman-liouv')
+    [E,aux]=master_echo(spin_system,parameters,H,R,K,rho0,coil,meta,rotation,fraction,density);
+    return
+end
+fractions=fraction;
 
 % Reuse one Hermitian spectrum and retain its forward-error diagnostics
 if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
    ~any(R(:))&&~any(K(:))&&~isfield(parameters,'pump')&&...
    isfield(parameters,'cce_aux')
-    rotation=expm(-1i*pi*kron((a*b'+b*a')/2,eye(db)));
-    [E,aux]=generalized_echo(spin_system,parameters,H,rho0,coil,meta,rotation,density);
+    [E,aux]=generalized_echo(spin_system,parameters,H,rho0,coil,meta,rotation,fraction,density);
     return
 end
 
@@ -135,6 +165,31 @@ end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('hahn_echo:generators','Supply conventional or tagged projected generators.');
 end
+if isfield(parameters,'refocusing')
+    if isstruct(H)
+        error('hahn_echo:refocusing','Selective refocusing requires generalized dynamics.');
+    end
+    pulse=parameters.refocusing;
+    if ~isstruct(pulse)||~isscalar(pulse)||...
+       ~all(isfield(pulse,{'spins','operator','fraction'}))||...
+       ~isempty(setdiff(fieldnames(pulse),{'spins','operator','fraction'}))
+        error('hahn_echo:refocusing','Supply spins, operator, and fraction for one ideal refocusing pulse.');
+    end
+    ids=pulse.spins;
+    if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
+       any(~ismember(ids,spin_system.model.physical_ids))||numel(unique(ids))~=numel(ids)||...
+       ~(isscalar(ids)||isequal(ids,spin_system.model.observed_ids))
+        error('hahn_echo:operator_target','An operator pulse addresses the whole observed system or one physical site.');
+    end
+    d=prod(spin_system.model.multiplicities(ids));
+    if ~isnumeric(pulse.operator)||~isequal(size(pulse.operator),[d d])||...
+       any(~isfinite(pulse.operator),'all')||...
+       norm(pulse.operator-pulse.operator','fro')>d*eps*max(1,norm(pulse.operator,'fro'))||...
+       ~isnumeric(pulse.fraction)||~isreal(pulse.fraction)||~isscalar(pulse.fraction)||...
+       ~isfinite(pulse.fraction)||pulse.fraction<0||pulse.fraction>1
+        error('hahn_echo:refocusing','The integrated generator must be Hermitian and the fraction in [0,1].');
+    end
+end
 if isfield(parameters.cce.numerics,'propagator')&&...
    strcmp(parameters.cce.numerics.propagator,'expm')&&...
    (isstruct(H)||~strcmp(spin_system.formalism,'zeeman-hilb')||...
@@ -199,7 +254,7 @@ aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
 end
 
 % Propagate a generalized Hahn echo with retained observed density and bounds
-function [answer,aux]=generalized_echo(system,parameters,H,rho0,coil,meta,pulse,density)
+function [answer,aux]=generalized_echo(system,parameters,H,rho0,coil,meta,pulse,fraction,density)
 
 % Select direct segments or reuse one Hermitian eigensystem
 direct=isfield(parameters.cce.numerics,'propagator')&&...
@@ -227,7 +282,7 @@ for n=1:count
     time=parameters.times(n); propagator=eye(size(H));
     if direct
         rho=rho0; durations=0; scale=0;
-        if time>0, durations=[0 time/2 time/2]; end
+        if time>0, durations=[0 fraction*time (1-fraction)*time]; end
         for k=1:numel(durations)
             rotation=eye(size(H)); if k==2, rotation=pulse; end
             propagator=rotation*expm(-1i*durations(k)*H);
@@ -236,8 +291,9 @@ for n=1:count
         end
     else
         if time>0
-            free=(vectors.*exp(-1i*energies*(time/2)).')*vectors';
+            free=(vectors.*exp(-1i*energies*(fraction*time)).')*vectors';
             propagator=free*propagator; propagator=pulse*propagator;
+            free=(vectors.*exp(-1i*energies*(time-fraction*time)).')*vectors';
             propagator=free*propagator;
         end
         rho=propagator*rho0*propagator';
@@ -281,6 +337,107 @@ if ~direct
     aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
     aux.backend=parameters.cce_aux.backend;
 end
+
+end
+
+% Propagate an ideal pulse between native master-equation intervals
+function [answer,aux]=master_echo(system,p,H,R,K,rho0,coils,meta,pulse,fraction,density)
+
+% Preserve column-major density ordering and the Spinach generator sign
+dc=system.observed_dimension; db=system.bath_dimension; projected=isstruct(H);
+if projected
+    G=-1i*(kron(eye(db),H.left)-kron(H.right.',eye(db)));
+    if ~isempty(H.dissipator), G=G+H.dissipator; end
+    flip=reshape(1:db^2,db,db).'; flip=flip(:); alternate=conj(G(flip,flip));
+    a=kron(system.model.transition.alpha,eye(db)); b=kron(system.model.transition.beta,eye(db));
+    aa=a'*pulse*a; ab=a'*pulse*b; ba=b'*pulse*a; bb=b'*pulse*b;
+    tolerance=100*eps*system.dimension;
+    if norm(ab,'fro')+norm(ba,'fro')<tolerance
+        pair={aa,bb}; swapped=false;
+    elseif norm(aa,'fro')+norm(bb,'fro')<tolerance
+        pair={ba,ab}; swapped=true;
+    else
+        error('hahn_echo:manifolds','The pulse must preserve or interchange the selected spin manifolds.');
+    end
+    if norm(pair{1}'*pair{1}-eye(db),'fro')+...
+       norm(pair{2}'*pair{2}-eye(db),'fro')>tolerance
+        error('hahn_echo:manifolds','The pulse must not leak outside the selected spin manifolds.');
+    end
+    rho0=1;
+    for state=system.bath_rho, rho0=kron(rho0,state{1}); end
+    rho0=rho0(:); answer=complex(zeros(numel(p.times),1));
+else
+    G=-1i*H+R+K;
+    if ~isfield(p,'bath_jumps')||isempty(p.bath_jumps), G=sparse(G); end
+    answer=complex(zeros(numel(p.times),numel(meta.normalization_divisor)));
+    if density, answer=complex(zeros(numel(p.times),dc^2)); end
+end
+engine=system.model.spin_system; engine.bas.formalism='sphten-liouv'; engine.tols.prop_chop=0;
+aux.density=complex(zeros(dc,dc,numel(p.times)));
+if projected, aux.density=[]; end
+
+% Use the same stock exponential action on both sides of the ideal rotation
+for n=1:numel(p.times)
+    time=p.times(n); vector=rho0; generator=G; previous=0;
+    if time>0
+        previous=fraction*time;
+        if isfield(p.cce.numerics,'propagator')&&strcmp(p.cce.numerics.propagator,'stock')
+            vector=propagator(engine,1i*G,previous)*vector;
+        else
+            vector=step(engine,1i*G,vector,previous);
+        end
+        if projected
+            rho=reshape(vector,db,db); rho=pair{1}*rho*pair{2}';
+            if swapped, generator=alternate; end
+        else
+            rho=reshape(vector,dc*db,dc*db); rho=pulse*rho*pulse';
+        end
+        vector=rho(:);
+    end
+    if isfield(p.cce.numerics,'propagator')&&strcmp(p.cce.numerics.propagator,'stock')
+        vector=propagator(engine,1i*generator,time-previous)*vector;
+    else
+        vector=step(engine,1i*generator,vector,time-previous);
+    end
+    if projected
+        answer(n)=trace(reshape(vector,db,db));
+        if ~meta.normalized, answer(n)=answer(n)*meta.initial_signal; end
+    else
+        rho=reshape(vector,dc*db,dc*db); observed=complex(zeros(dc));
+        for a=1:dc
+            for b=1:dc
+                observed(a,b)=trace(rho((a-1)*db+(1:db),(b-1)*db+(1:db)));
+            end
+        end
+        aux.density(:,:,n)=observed;
+        if density
+            answer(n,:)=observed(:).';
+        elseif ~isfield(p,'coil')&&~isfield(p,'detection')
+            answer(n)=exp(-1i*meta.receiver_phase)*(meta.transition.alpha'*observed*...
+                      meta.transition.beta)/meta.normalization_divisor;
+        else
+            for k=1:numel(coils)
+                detector=reshape(coils{k},dc*db,dc*db); detector=detector(1:db:end,1:db:end);
+                answer(n,k)=trace(detector'*observed)/meta.normalization_divisor(k);
+            end
+        end
+    end
+end
+
+% Retain the master-equation arithmetic estimate, not a physical truncation bound
+scale=ones(1,size(answer,2));
+if ~projected&&~density
+    if isfield(p,'coil')
+        for k=1:numel(coils)
+            detector=reshape(coils{k},dc*db,dc*db); scale(k)=norm(detector(1:db:end,1:db:end),2);
+        end
+    end
+    scale=scale./abs(meta.normalization_divisor);
+elseif projected&&~meta.normalized
+    scale=abs(meta.initial_signal);
+end
+aux.abs_error_bound=(64*eps*size(G,1)*(1+norm(G,1)*p.times(:)))*scale;
+aux.error_bound_kind='floating_point_estimate';
 
 end
 

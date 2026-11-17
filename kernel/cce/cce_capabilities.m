@@ -27,6 +27,7 @@ contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
 if isequal(pulse_sequence,@hahn_echo)||isequal(pulse_sequence,@free_evolution)||...
    isequal(pulse_sequence,@finite_drive), contract.version=3; end
+if isequal(pulse_sequence,@hahn_echo), contract.version=4; end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
@@ -61,6 +62,17 @@ end
 
 % Evaluate one native subsystem through the ordinary pulse-sequence signature
 function raw=evaluate(model,cluster,configuration,schedule,parameters)
+
+% Bound retained time records before allocating subsystem or propagation arrays
+dc=prod(model.multiplicities(model.observed_ids)); components=1;
+if isfield(parameters,'output')&&strcmp(parameters.output,'density'), components=dc^2; end
+if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&iscell(parameters.coil)
+    components=numel(parameters.coil);
+end
+bytes=3*numel(parameters.times)*(25*components+16*dc^2);
+if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
+    error('clexpn:memory','Retained time records exceed cce.numerics.max_memory_bytes.');
+end
 
 % Build only the retained subsystem and its representation-compatible generators
 if isequal(schedule.pulse_sequence,@noise_correlation)

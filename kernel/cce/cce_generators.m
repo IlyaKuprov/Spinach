@@ -52,6 +52,16 @@ if ~isempty(cache)&&isequaln(cache.signature,signature)
     cache.hits=cache.hits+1; return
 end
 
+% Count resident jump operators before Hamiltonian or dissipator allocation
+if ~isempty(jumps)
+    if projected, n=db; else, n=d; end
+    included=0;
+    for k=1:numel(jumps)
+        if all(ismember(jumps(k).support,ids)), included=included+1; end
+    end
+    memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*n^4+2*included*d^2));
+end
+
 % Preserve the canonical direct and independent stock construction paths
 [ham,meta]=matrix(cluster_system,parameters);
 parameters.cce_aux=meta;
@@ -85,7 +95,7 @@ if projected
     H.hamiltonian_abs_error_bound=meta.roundoff_bound;
     H.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)
-        H.dissipator=dissipator(cluster_system,jumps,va,vb,parameters);
+        H.dissipator=dissipator(cluster_system,jumps,va,vb);
         H.swap_matrix=commutation(db);
     end
     R=[]; K=[];
@@ -94,7 +104,7 @@ elseif strcmp(cluster_system.formalism,'zeeman-liouv')
     % Column-major vectorisation fixes the transposes and the relaxation sign
     memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*d^4));
     H=kron(eye(d),ham)-kron(ham.',eye(d));
-    R=dissipator(cluster_system,jumps,[],[],parameters); K=zeros(size(H));
+    R=dissipator(cluster_system,jumps,[],[]); K=zeros(size(H));
 else
     H=ham; R=zeros(size(H)); K=zeros(size(H));
 end
@@ -274,16 +284,11 @@ end
 % Validate structure, IDs, and explicitly supplied exterior expectations
 
 % Assemble loss and jump terms for conventional or conditional density blocks
-function R=dissipator(system,jumps,va,vb,parameters)
+function R=dissipator(system,jumps,va,vb)
 
-% Count resident operator and superoperator storage before allocating it
+% Select the density dimension after the caller's allocation preflight
 ids=system.physical_ids; d=system.dimension; projected=~isempty(va);
 if projected, n=system.bath_dimension; else, n=d; end
-included=0;
-for k=1:numel(jumps)
-    if all(ismember(jumps(k).support,ids)), included=included+1; end
-end
-memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*n^4+2*included*d^2));
 R=zeros(n^2);
 for k=1:numel(jumps)
 

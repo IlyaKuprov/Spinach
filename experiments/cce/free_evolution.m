@@ -41,10 +41,10 @@ end
 selected=~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&isfield(meta,'transition');
 
 % Preserve the projected spectral action for a selected-transition FID
-if isstruct(H)&&isempty(H.dissipator)&&...
+if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-liouv')&&...
    ~(isfield(parameters,'output')&&strcmp(parameters.output,'density'))&&(~isfield(parameters,'sequence')||isempty(parameters.sequence))&&...
-   ~isfield(parameters,'rho0')&&~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&...
-   ~isfield(parameters,'preparation')&&~isfield(parameters,'bath_operator')
+   ~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&...
+   ~isfield(parameters,'bath_operator')
     [answer,aux]=projected_fid(spin_system,parameters,H,reference,meta); return
 end
 if ~iscell(coil), detectors={coil}; else, detectors=coil; end
@@ -65,12 +65,13 @@ aux=struct();
 controlled=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
 if controlled, aux.abs_error_bound=zeros(size(answer)); end
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
-projected_me=isstruct(H)&&~isempty(H.dissipator);
+projected_me=isstruct(H)&&strcmp(spin_system.formalism,'zeeman-liouv');
 liouville=isempty(events)&&(projected_me||(~isstruct(H)&&...
           strcmp(spin_system.formalism,'zeeman-liouv')));
 if projected_me
     db=spin_system.bath_dimension;
-    generator=kron(eye(db),H.left)-kron(H.right.',eye(db))+1i*H.dissipator;
+    generator=kron(eye(db),H.left)-kron(H.right.',eye(db));
+    if ~isempty(H.dissipator), generator=generator+1i*H.dissipator; end
     if meta.normalized
         rho0=rho0/meta.initial_signal; reference=1;
     end
@@ -136,7 +137,7 @@ for n=1:numel(parameters.times)
             rho=propagator(engine,generator,parameters.times(n))*rho0;
         else
             action=generator;
-            if isdiag(action)&&(~isfield(parameters,'bath_jumps')||isempty(parameters.bath_jumps))
+            if ~projected_me&&(~isfield(parameters,'bath_jumps')||isempty(parameters.bath_jumps))
                 action=sparse(action);
             end
             rho=step(engine,action,rho0,parameters.times(n));
@@ -178,8 +179,7 @@ for n=1:numel(parameters.times)
         end
     else
         for k=1:numel(detectors)
-            if isvector(rho), value=detectors{k}'*rho;
-            else, value=trace(detectors{k}'*rho); end
+            value=conj(detectors{k}(1))*trace(reshape(rho,spin_system.bath_dimension,[]));
             if meta.normalized, value=value/reference(k); end
             answer(n,k)=value;
         end

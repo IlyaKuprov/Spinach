@@ -327,12 +327,16 @@ end
 
 % Validate ownership, required controls and the complete nested vocabulary
 function grumble(system,p,experiment,assumptions)
+if isfield(p,'refocusing')&&~isequal(experiment,@hahn_echo)&&...
+   ~isequal(experiment,@cce_compile)&&~isequal(experiment,@cce_generators)
+    error('cce_options:refocusing','The refocusing descriptor belongs to hahn_echo.');
+end
 if isfield(p,'drive')&&~isequal(experiment,@finite_drive)&&~isequal(experiment,@cce_compile)
     error('cce_options:drive','The drive descriptor belongs to finite_drive.');
 end
 fields(p,{'observed','transition','spins','times','nloops','preparation','rho0',...
           'drive','coil','output','normalized','orientation','cce','sequence','pump',...
-          'bath_jumps','noise','spectrum'},'parameters');
+          'bath_jumps','noise','spectrum','refocusing'},'parameters');
 if ~isa(experiment,'function_handle')
     error('cce_options:experiment','pulse_sequence must be a function handle.');
 end

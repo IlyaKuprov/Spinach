@@ -1,10 +1,12 @@
 # kernel/cce/cce_converge.m
 
-## Native applicability
+## Native convergence contract
 
-This retained expert convergence utility has no native `clexpn` invocation contract in the current implementation. Do not pass native experiment parameters to it or infer a registered experiment from its two-argument signature.
+Use `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)`. The experiment and assumptions are explicit, exactly as in clexpn; the primary result is the unchanged numeric baseline, never a wrapper or a silently substituted refined result.
 
-For native simulations, call `clexpn(spin_system,pulse_sequence,parameters,assumptions)` explicitly for each refinement and compare numerical answers together with `diagnostics.valid` and `diagnostics.convergence`. The context's omitted-order policy is not an independent bath-radius, graph-threshold or sample-count convergence certificate.
+Declare independent ladders in parameters.cce.convergence using native paths cce.order, cce.bath_spins, cce.graph.threshold, cce.graph.radius, cce.bath_state.samples, or times. Every ladder starts at the supplied baseline. Every refinement is compared with that baseline, including its numerical masks and error bounds. Orders above the finite bath size evaluate the same full-bath family. Time ladders retain every preceding time exactly; interpolation is not used.
+
+Supply atol, rtol, and max_work. Sampling ladders require a held-out bath-state seed in checks; nested cce overrides replace only the specified algorithm controls. Shared checkpoints are rejected before any evaluation. The second output contains convergence (converged, limit_reached, or not_converged), the original input_parameters, and convergence_report with comparisons, work, coverage, and budgets. The diagnostic reduction and ensemble remain those of the unchanged baseline.
 
 ## Convergence meaning
 
@@ -13,3 +15,5 @@ Refine cluster order, bath extent, graph cutoff, bath-state samples and time res
 ## Source
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_converge.m)
+
+Order-ladder entries must be numeric, real, finite nonnegative integer scalars. They are validated before finite-bath saturation, which must not turn NaN, infinity, fractional values, or text into a valid order.

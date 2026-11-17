@@ -42,4 +42,6 @@ result=test_cce_convergence()
 
 ## Native contract
 
-Native migration is blocked by the convergence service interface. `cce_converge` still has the two-argument legacy signature and calls `cce`; no registered-experiment native signature is implemented. Its independent ladders, work cap, held-out sampling, graph, mesh, and invalid-numerics assertions remain unchanged.
+Native convergence uses an explicit registered experiment and assumptions in `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)`. Its independent native-path ladders preserve the original baseline, work cap, held-out seed requirement, shared-time coverage, and numerical validity. Agreement between later refinements never certifies an inaccurate baseline.
+
+Four native-boundary checks reject NaN, infinity, fractional values, and text in an order ladder before any baseline evaluation. The original finite-bath order-three refinement remains accepted.

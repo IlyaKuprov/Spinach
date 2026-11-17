@@ -59,7 +59,10 @@ p.cce.averaging='internal_then_expansion';
 % Check unitary and master-equation paths against the exact signal
 for method={'gcce','megcce'}
     p.cce.approximation='generalized';
-    if strcmp(method{1},'megcce'), p.bath_jumps=struct([]); end
+    p.cce.basis=struct('formalism','zeeman-hilb','approximation','none');
+    if strcmp(method{1},'megcce')
+        p.bath_jumps=struct([]); p.cce.basis.formalism='zeeman-liouv';
+    end
     for mode={'mixed_product','sampled'}
         p.cce.bath_state=struct('mode',mode{1});
         if strcmp(mode{1},'sampled')

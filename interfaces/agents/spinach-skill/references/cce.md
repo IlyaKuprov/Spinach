@@ -86,3 +86,9 @@ Inspect numerical error, denominator conditioning, density validity and sampling
 ## Native adaptive and sampling controls
 
 Use parameters.cce.partition for bounded adaptive partitions, with separate native pilot_configs and heldout_configs. clexpn supplies the registered experiment to each exact patch calculation and returns the frozen groups in diagnostics.policy.partition. parameters.cce.parallel.max_tasks caps batch concurrency, not the number of physical tasks. Internal-first sampled full-bath uncertainty is computed from individual unaveraged exact responses; truncated internal-first, connected-noise internal-first, and single-draw estimates are NaN. Interlacing rejects a reference density inconsistent with its declared local basis assignment using cce:spin_config and dimension^2*eps, independently of propagation tolerances.
+
+## Selected-transition numerical conventions
+
+Default projected free evolution uses the two conditional bath eigensystems, preserves the branch-product order and treats zero elapsed time exactly. Its residual-derived propagation bounds use the bath dimension. Default generalized Hahn detection evaluates `alpha'*rho_observed*beta`; the preparation reference uses that same bilinear ordering and the declared receiver phase. Explicit coils and detection descriptors retain their Hilbert–Schmidt traces and operator norms. Do not replace one arithmetic ordering with an algebraically equivalent one when bitwise regression identity is required.
+
+Nonprojected free evolution takes the partial trace before applying observed-spin detectors. Liouville signal, observable and density outputs retain the same propagation action and arithmetic-error estimate, with detector and normalization scaling where appropriate. Select `cce.basis.formalism='zeeman-liouv'` explicitly when testing a zero-rate master-equation limit: an empty jump list alone does not select that representation.

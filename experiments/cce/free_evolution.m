@@ -35,6 +35,15 @@ if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     if ~isfield(parameters,'coil'), parameters.coil=eye(spin_system.observed_dimension); end
 end
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
+selected=~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&isfield(meta,'transition');
+
+% Preserve the projected spectral action for a selected-transition FID
+if isstruct(H)&&isempty(H.dissipator)&&...
+   ~(isfield(parameters,'output')&&strcmp(parameters.output,'density'))&&(~isfield(parameters,'sequence')||isempty(parameters.sequence))&&...
+   ~isfield(parameters,'rho0')&&~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&...
+   ~isfield(parameters,'preparation')&&~isfield(parameters,'bath_operator')
+    [answer,aux]=projected_fid(spin_system,parameters,H,reference,meta); return
+end
 if isstruct(H), generator=H; else, generator=H+1i*R+1i*K; end
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
 if density
@@ -52,7 +61,7 @@ aux=struct();
 controlled=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
 if controlled, aux.abs_error_bound=zeros(size(answer)); end
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
-liouville=density&&isempty(events)&&~isstruct(H)&&...
+liouville=isempty(events)&&~isstruct(H)&&...
           strcmp(spin_system.formalism,'zeeman-liouv');
 
 % Preserve the stock density action and its arithmetic estimate
@@ -60,6 +69,17 @@ if liouville
     engine=spin_system.model.spin_system; engine.bas.formalism='sphten-liouv';
     engine.tols.prop_chop=0;
     scale=ones(1,size(answer,2));
+    if ~density
+        if ~selected
+            if ~iscell(coil), detectors={coil}; else, detectors=coil; end
+            db=spin_system.bath_dimension; dc=spin_system.observed_dimension;
+            for k=1:numel(detectors)
+                detector=reshape(detectors{k},dc*db,dc*db);
+                scale(k)=norm(detector(1:db:end,1:db:end),2);
+            end
+        end
+        if meta.normalized, scale=scale./abs(reference); end
+    end
     argument=norm(-1i*generator,1)*parameters.times(:);
     aux.abs_error_bound=(64*eps*size(generator,1)*(1+argument))*scale;
     aux.error_bound_kind='floating_point_estimate';
@@ -119,15 +139,27 @@ for n=1:numel(parameters.times)
             end
         end
     end
-    if density
+    if density||~isstruct(H)
         dc=spin_system.observed_dimension; db=spin_system.bath_dimension;
-        rho=reshape(rho,dc*db,dc*db); observed=zeros(dc);
-        for a=1:dc
-            for b=1:dc
-                observed(a,b)=trace(rho((a-1)*db+(1:db),(b-1)*db+(1:db)));
+        blocks=reshape(full(rho),[db dc db dc]);
+        blocks=reshape(permute(blocks,[1 3 2 4]),[db*db dc*dc]);
+        observed=reshape(sum(blocks(1:db+1:db*db,:),1),[dc dc]);
+        if density
+            answer(n,:)=observed(:).';
+        else
+            if ~iscell(coil), detectors={coil}; else, detectors=coil; end
+            for k=1:numel(detectors)
+                if selected
+                    value=exp(-1i*meta.receiver_phase)*(meta.transition.alpha'*observed*meta.transition.beta);
+                else
+                    detector=reshape(detectors{k},dc*db,dc*db);
+                    detector=detector(1:db:end,1:db:end);
+                    value=trace(detector'*observed);
+                end
+                if meta.normalized, value=value/reference(k); end
+                answer(n,k)=value;
             end
         end
-        answer(n,:)=observed(:).';
     else
         if ~iscell(coil), detectors={coil}; else, detectors=coil; end
         for k=1:numel(detectors)
@@ -223,6 +255,42 @@ for k=1:numel(boundaries)-1
     end
 end
 bound=16*system.dimension^3*eps*scale;
+end
+
+% Propagate both conditional branches with their measured spectral residuals
+function [answer,aux]=projected_fid(system,parameters,H,reference,meta)
+
+% Diagonalize each bath Hamiltonian once in its original numerical convention
+[va,ea]=eig(full((H.left+H.left')/2),'vector');
+[vb,eb]=eig(full((H.right+H.right')/2),'vector');
+ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
+oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
+residual=max(ra,rb); orthogonality=max(oa,ob);
+rho=1;
+for k=1:numel(system.bath_rho), rho=kron(rho,system.bath_rho{k}); end
+answer=complex(zeros(numel(parameters.times),1)); bounds=zeros(size(answer));
+
+% Keep the branch multiplication order and forward bound of the reference
+for n=1:numel(parameters.times)
+    time=parameters.times(n);
+    ua=eye(system.bath_dimension); ub=ua;
+    if time~=0
+        ua=((va.*exp(-1i*time*ea).')*va')*ua;
+        ub=((vb.*exp(-1i*time*eb).')*vb')*ub;
+    end
+    answer(n)=trace(ua*rho*ub');
+    operations=12*system.bath_dimension^3; gamma=operations*eps/(1-operations*eps);
+    bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+4*orthogonality+...
+              gamma*(1+time*H.hamiltonian_norm);
+end
+if ~meta.normalized
+    answer=answer*reference; bounds=bounds*abs(reference);
+end
+aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
+           'orthogonality_residual',orthogonality,...
+           'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
+           'backend',parameters.cce_aux.backend);
+
 end
 
 % Validate the experiment-owned time axis and retained subsystem

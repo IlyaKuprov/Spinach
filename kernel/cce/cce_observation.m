@@ -78,6 +78,9 @@ if isempty(detectors)||~isrow(detectors)||~all(cellfun(@(x)isnumeric(x)&&...
 end
 for k=1:numel(detectors), detectors{k}=exp(1i*phase)*detectors{k}; end
 reference=cellfun(@(x)trace(x'*observed),detectors);
+if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
+    reference=exp(-1i*phase)*(model.transition.alpha'*observed*model.transition.beta);
+end
 if normalized&&any(abs(reference)<=cellfun(@(x)dc*eps*norm(x,'fro')*...
                                                   norm(observed,'fro'),detectors))
     error('cce_observation:reference','Cannot normalize by a vanishing detected reference.');

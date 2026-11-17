@@ -2,7 +2,7 @@
 
 Syntax: `answer=free_evolution(spin_system,parameters,H,R,K)`
 
-Experiment owns validation, preparation and detection through cce_observation. times gives total elapsed sequence duration in seconds. Normalized signal defaults to true and uses the actual detected preparation reference. Explicit rho0/coil or preparation descriptors override the transition preparation. No controls. Direct density output is time-by-column-vectorised observed density; density context reduction is not yet available.
+Experiment owns validation, preparation and detection through cce_observation. times gives total elapsed sequence duration in seconds. Normalized signal defaults to true and uses the actual detected preparation reference. Explicit rho0/coil or preparation descriptors override the transition preparation. No controls. Direct density output is time-by-column-vectorised observed density; the context uses its native density-reduction contract.
 
 GKSL relaxation follows `L=H+1i*R+1i*K`. Projected propagation acts on an alpha/beta coherence block, not a physical density. Generalized density output is column-vectorised and reduced elementwise, including the empty reference; positivity is not guaranteed at truncated order.
 
@@ -18,3 +18,7 @@ The optional second output in `[answer,aux]=free_evolution(spin_system,parameter
 For density output without finite events, the zeeman-liouv path uses the stock step exponential action (or stock propagator when explicitly selected), with prop_chop=0. Its auxiliary absolute error estimate is 64*eps*dimension*(1+norm(generator,1)*time) per density element. This preserves the established master-equation numerical path and its diagnostics. Coherent Hilbert, projected, controlled, and signal-only paths retain their existing contracts.
 
 Controlled Hilbert evolution uses segmentwise matrix exponentials in the original multiplication order, including the initial zero-duration interval. Its existing arithmetic estimate is 16*d^3*eps times the sum of 1+abs(dt)*norm(H,2) over segments; density entries inherit that estimate. The named finite_drive experiment compiles its declarative rectangular drive through this path.
+
+For an uncontrolled, nondissipative projected transition with default preparation and detection, the experiment diagonalizes each conditional bath Hamiltonian once. It propagates the two branches in their original product order and returns `trace(rho_bath)` exactly at zero elapsed time. The auxiliary eigenvalue residuals, orthogonality residuals and forward bounds use the retained bath dimension. Explicit preparation/detection overrides and controlled or dissipative propagation retain their general paths.
+
+Nonprojected propagation is reduced to the observed-spin density before detection, preserving the partial-trace and detector multiplication order. The Liouville-space action and its floating-point error estimate apply to signal and observable outputs as well as density output. Observable bounds use the observed detector norm and the actual normalization reference.

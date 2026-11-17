@@ -206,6 +206,7 @@ aux.density=complex(zeros(dc,dc,count)); bounds=zeros(size(answer));
 operations=20*size(H,1)^3; gamma=operations*eps/(1-operations*eps);
 hnorm=norm(H,'fro'); hbound=parameters.cce_aux.roundoff_bound;
 detector_norms=cellfun(@(x)norm(x,2),detectors);
+if ~isfield(parameters,'coil')&&~isfield(parameters,'detection'), detector_norms=1; end
 divisors=meta.normalization_divisor;
 
 % Compose both free intervals and the physical pi rotation in time order
@@ -224,8 +225,11 @@ for n=1:count
     if density
         answer(n,:)=observed(:).';
     else
-        for k=1:numel(meta.normalization_divisor)
-            answer(n,k)=trace(detectors{k}'*observed)/divisors(k);
+        if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
+            answer(n)=exp(-1i*meta.receiver_phase)*(meta.transition.alpha'*...
+                      observed*meta.transition.beta)/divisors;
+        else
+            for k=1:numel(detectors), answer(n,k)=trace(detectors{k}'*observed)/divisors(k); end
         end
     end
 

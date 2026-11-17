@@ -27,7 +27,7 @@ contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
 if isequal(pulse_sequence,@hahn_echo)||isequal(pulse_sequence,@free_evolution)||...
    isequal(pulse_sequence,@finite_drive), contract.version=3; end
-if isequal(pulse_sequence,@hahn_echo), contract.version=4; end
+if isequal(pulse_sequence,@hahn_echo), contract.version=5; end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
@@ -102,6 +102,11 @@ if exist('aux','var')&&isfield(aux,'eigen_residual')
     raw.eigen_residual=aux.eigen_residual;
     raw.orthogonality_residual=aux.orthogonality_residual;
     raw.hamiltonian_bound=aux.hamiltonian_bound; raw.backend=aux.backend;
+end
+
+% Retain the experiment-owned inclusion decision for each observation time
+if exist('aux','var')&&isfield(aux,'pulse_time')
+    raw.pulse_time=aux.pulse_time; raw.pulse_applied=aux.pulse_applied;
 end
 
 % Retain generalized echo density and numerical propagation diagnostics

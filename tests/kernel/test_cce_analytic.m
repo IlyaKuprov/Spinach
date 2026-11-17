@@ -23,7 +23,7 @@ spin_system.inter.coupling.matrix{1,2}(3,3)=longitudinal;
 p=parameters(); p.times=linspace(0,0.012,81);
 
 % Compare the complex projected FID against independent two-by-two expm
-fid=cce(spin_system,p); z=diag([1 -1])/2; x=[0 1;1 0]/2;
+fid=clexpn(spin_system,@free_evolution,p,'labframe'); z=diag([1 -1])/2; x=[0 1;1 0]/2;
 ha=omega*z+(longitudinal*z+transverse*x)/2;
 hb=omega*z-(longitudinal*z+transverse*x)/2;
 reference=zeros(numel(p.times),1);
@@ -31,48 +31,76 @@ for k=1:numel(p.times)
     t=p.times(k);
     reference(k)=exp(-1i*phase*t)*trace(expm(-1i*ha*t)*expm(1i*hb*t))/2;
 end
-result=test_close(result,'complex FID',fid.value,reference,1e-11,1e-11,'Independent analytic or dense reference.');
+result=test_close(result,'complex FID',fid,reference,1e-11,1e-11,'Independent analytic or dense reference.');
 
 % Evaluate the exact single-spin Hahn formula for two non-collinear fields
-p.sequence=struct('type','ideal','target',1,'placement','fraction','at',0.5,...
-                  'axis','x','angle',pi);
-echo=cce(spin_system,p); a=[transverse/2 0 omega+longitudinal/2];
+echo=clexpn(spin_system,@hahn_echo,p,'labframe'); a=[transverse/2 0 omega+longitudinal/2];
 b=[-transverse/2 0 omega-longitudinal/2];
 modulation=norm(cross(a,b))^2/(norm(a)^2*norm(b)^2);
 reference=1-2*modulation*sin(norm(a)*p.times(:)/4).^2.*sin(norm(b)*p.times(:)/4).^2;
-result=test_close(result,'one-spin Hahn formula',echo.value,reference,1e-11,1e-11,'Independent analytic or dense reference.');
-result=test_true(result,'zero time is unity',echo.value(1)==1,'Independent analytic or dense reference.');
+result=test_close(result,'one-spin Hahn formula',echo,reference,1e-11,1e-11,'Independent analytic or dense reference.');
+result=test_true(result,'zero time is unity',echo(1)==1,'Independent analytic or dense reference.');
 
 % Include absolute-time pulses only in samples that reach their timestamp
-q=p; q.times=[0 0.0005 0.001 0.0015]; q.sequence=struct('type','ideal',...
-    'target',1,'placement','absolute','at',0.001,'axis','x','angle',pi);
-model=cce_prepare(spin_system,q); schedule=cce_sequence(model,q);
+q=p; q.times=[0 0.0005 0.001 0.0015];
+q.refocusing=struct('spins',1,'operator',pi*x,'time',0.001);
+[absolute,diagnostics]=clexpn(spin_system,@hahn_echo,q,'labframe');
+schedule=diagnostics.raw{1}(end);
 result=test_true(result,'Absolute event inclusion per sample',...
-                 isempty(schedule.order{1})&&isempty(schedule.order{2})&&...
-                 isequal(schedule.order{3},1)&&isequal(schedule.order{4},1),...
+                 isequal(schedule.pulse_applied,[false false true true]),...
                  'Zero and shorter samples omit the pulse; equality and later samples include it.');
-absolute=cce(spin_system,q); values=zeros(numel(q.times),1);
+values=zeros(numel(q.times),1);
 for k=1:numel(q.times)
     t=q.times(k); a=min(t,0.001); b=max(0,t-0.001);
     ua=expm(-1i*hb*b)*expm(-1i*ha*a);
     ub=expm(-1i*ha*b)*expm(-1i*hb*a);
     values(k)=exp(-1i*phase*(a-b))*trace(ua*ub')/2;
 end
-result=test_close(result,'Absolute pulse dense manifold reference',absolute.value,values,...
+result=test_close(result,'Absolute pulse dense manifold reference',absolute,values,...
                   2e-12,2e-12,'Each requested duration uses only pulses at or before its endpoint.');
-fprintf('Absolute pulse dense discrepancy %.3g.\n',max(abs(absolute.value-values)));
+fprintf('Absolute pulse dense discrepancy %.3g.\n',max(abs(absolute-values)));
 
 % Verify isolated-centre phase appears once in an empty bath
-p.bath_spins=[]; p.order=0; p.sequence=[];
-empty=cce(spin_system,p);
-result=test_close(result,'empty bath phase',empty.value,exp(-1i*phase*p.times(:)),1e-11,1e-11,'Independent analytic or dense reference.');
+p.cce.bath_spins=[]; p.cce.order=0;
+empty=clexpn(spin_system,@free_evolution,p,'labframe');
+result=test_close(result,'empty bath phase',empty,exp(-1i*phase*p.times(:)),1e-11,1e-11,'Independent analytic or dense reference.');
 
 % Verify a disconnected unpolarized bath changes no observed dynamics
-p.bath_spins=2; p.order=1; spin_system.inter.coupling.matrix{1,2}=zeros(3);
-uncoupled=cce(spin_system,p);
-result=test_close(result,'uncoupled bath',uncoupled.value,empty.value,1e-11,1e-11,'Independent analytic or dense reference.');
-metrics.fid_error=max(abs(fid.value-reference_fid(ha,hb,phase,p.times)));
-metrics.hahn_error=max(abs(echo.value-reference));
+p.cce.bath_spins=2; p.cce.order=1; spin_system.inter.coupling.matrix{1,2}=zeros(3);
+uncoupled=clexpn(spin_system,@free_evolution,p,'labframe');
+result=test_close(result,'uncoupled bath',uncoupled,empty,1e-11,1e-11,'Independent analytic or dense reference.');
+metrics.fid_error=max(abs(fid-reference_fid(ha,hb,phase,p.times)));
+metrics.hahn_error=max(abs(echo-reference));
+
+% Check the same absolute boundary in both generalized propagation paths
+probe_system=spin_system; probe_system.inter.zeeman.matrix{1}(3,3)=phase;
+probe_system.inter.coupling.matrix{1,2}=zeros(3);
+probe_system.inter.coupling.matrix{1,2}(1,3)=transverse;
+probe_system.inter.coupling.matrix{1,2}(3,3)=longitudinal;
+probe=q; probe.output='density'; probe.rho0=ones(2)/2;
+probe.cce.approximation='generalized'; probe.cce.basis.formalism='zeeman-hilb';
+full_hamiltonian=phase*kron(z,eye(2))+kron(eye(2),omega*z)+...
+                 kron(z,longitudinal*z+transverse*x);
+initial=kron(probe.rho0,eye(2)/2); pulse=kron(expm(-1i*pi*x),eye(2));
+expected_density=complex(zeros(numel(probe.times),4));
+for index=1:numel(probe.times)
+    time=probe.times(index); before=min(time,probe.refocusing.time);
+    propagator=expm(-1i*before*full_hamiltonian);
+    if time>0&&time>=probe.refocusing.time, propagator=pulse*propagator; end
+    propagator=expm(-1i*(time-before)*full_hamiltonian)*propagator;
+    rho=propagator*initial*propagator'; observed=complex(zeros(2));
+    for row=1:2
+        for col=1:2, observed(row,col)=trace(rho((row-1)*2+(1:2),(col-1)*2+(1:2))); end
+    end
+    expected_density(index,:)=observed(:).';
+end
+for propagation={'eig','expm'}
+    probe.cce.numerics.propagator=propagation{1};
+    observed_density=clexpn(probe_system,@hahn_echo,probe,'labframe');
+    result=test_close(result,['Absolute generalized ' propagation{1}],observed_density,...
+                      expected_density,2e-12,2e-12,...
+                      'Both propagators omit a later pulse and include the endpoint pulse.');
+end
 
 % Report the measured metrics
 disp(metrics);
@@ -81,12 +109,12 @@ end
 
 % Supply all physics choices explicitly
 function p=parameters()
-p.observed_spins=1; p.bath_spins=2; p.method='cce'; p.expansion='standard';
-p.quantity='signal'; p.order=1; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
-p.assumptions='labframe'; p.orientation=[0 0 0]; p.interaction_cutoff=Inf;
-p.graph=struct('mode','complete','score','coupling_norm');
-p.bath_state=struct('mode','mixed_product'); p.meanfield='none'; p.sequence=[];
-p.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+p.observed=1; p.cce.bath_spins=2; p.cce.approximation='projected'; p.cce.expansion='standard';
+p.output='signal'; p.cce.order=1; p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
+p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
+p.cce.graph=struct('mode','complete','score','coupling_norm');
+p.cce.bath_state=struct('mode','mixed_product'); p.cce.meanfield='none';
+p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 end
 
 % Independently evaluate the analytic manifold trace for metric reporting

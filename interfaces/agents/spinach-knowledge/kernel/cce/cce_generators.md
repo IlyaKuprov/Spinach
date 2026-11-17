@@ -29,3 +29,7 @@ Zero-rate records are omitted before support and manifold-closure checks. An act
 Resident jump and superoperator storage is checked before Hamiltonian construction and projected-manifold closure. An insufficient allocation budget is therefore rejected before building matrices or examining leakage, on both projected and generalized direct-service paths. The existing storage formula and physical jump algebra are unchanged.
 
 A projected `zeeman-liouv` request retains an explicit bath-space zero dissipator when no Lindblad operators are supplied. The representation, rather than the presence of nonzero relaxation, selects the master-equation propagation contract; the same zero-rate limit therefore retains its propagation error estimate.
+
+## Retained master-generator evidence
+
+For a master-equation representation, cce_aux.generator records the physical ordering and dimensions, projected/full-space status, left/right Hamiltonians, included Lindblad-operator pairs and rates, and Hamiltonian construction diagnostics. The registered evaluator retains this evidence with each completed raw task. It describes column-vectorised propagation with exp(-1i*L*t); no generator, jump rate, or density normalization is changed. The scheduler accounts for the cumulative operator storage.

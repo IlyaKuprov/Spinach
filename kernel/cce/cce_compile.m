@@ -147,7 +147,7 @@ end
 % Exclude execution-only options from the physical model fingerprint
 physical=parameters;
 for name={'parallel','checkpoint','retain_raw','convergence'}
-    if isfield(physical,name{1}), physical=rmfield(physical,name{1}); end
+    if isfield(physical.cce,name{1}), physical.cce=rmfield(physical.cce,name{1}); end
 end
 model.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,...
                             physical,assumptions,formalism});

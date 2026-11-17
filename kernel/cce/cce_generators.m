@@ -20,6 +20,8 @@
 % a refocusing pulse. These tags are never stock pulse-sequence inputs.
 % parameters.cce_backend selects auto/direct/stock. The returned
 % parameters.cce_aux contains ordering, Hamiltonian and rounding metadata.
+% Master-equation cce_aux.generator retains the physical Hamiltonians,
+% spin operators, and included jump pairs for completed raw-task evidence.
 % cache is [] or the separate exact generator cache returned here.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -95,7 +97,7 @@ if projected
     H.hamiltonian_abs_error_bound=meta.roundoff_bound;
     H.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)||strcmp(cluster_system.formalism,'zeeman-liouv')
-        H.dissipator=dissipator(cluster_system,jumps,va,vb);
+        [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb);
         H.swap_matrix=commutation(db);
     end
     R=[]; K=[];
@@ -104,9 +106,20 @@ elseif strcmp(cluster_system.formalism,'zeeman-liouv')
     % Column-major vectorisation fixes the transposes and the relaxation sign
     memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*d^4));
     H=kron(eye(d),ham)-kron(ham.',eye(d));
-    R=dissipator(cluster_system,jumps,[],[]); K=zeros(size(H));
+    [R,jump_records]=dissipator(cluster_system,jumps,[],[]); K=zeros(size(H));
 else
     H=ham; R=zeros(size(H)); K=zeros(size(H));
+end
+
+% Retain the physical master-generator evidence with its completed raw task
+if exist('jump_records','var')
+    ha=ham; hb=ham;
+    if projected, ha=H.left; hb=H.right; end
+    parameters.cce_aux.generator=struct('physical_ids',ids,'dimension',d,...
+        'bath_dimension',db,'observed_dimension',cluster_system.observed_dimension,...
+        'projected',projected,'h_alpha',ha,'h_beta',hb,'jumps',jump_records,...
+        'vectorization','column','evolution','exp(-1i*L*t)',...
+        'rate_units','s^-1','hamiltonian',meta);
 end
 
 % Cache only exact native inputs and the corresponding sequence auxiliaries
@@ -284,12 +297,12 @@ end
 % Validate structure, IDs, and explicitly supplied exterior expectations
 
 % Assemble loss and jump terms for conventional or conditional density blocks
-function R=dissipator(system,jumps,va,vb)
+function [R,records]=dissipator(system,jumps,va,vb)
 
 % Select the density dimension after the caller's allocation preflight
 ids=system.physical_ids; d=system.dimension; projected=~isempty(va);
 if projected, n=system.bath_dimension; else, n=d; end
-R=zeros(n^2);
+R=zeros(n^2); records=struct('support',{},'rate',{},'left',{},'right',{});
 for k=1:numel(jumps)
 
     % A supported jump is included only when its entire support is retained
@@ -326,6 +339,8 @@ for k=1:numel(jumps)
     end
     R=R+jump.rate*(kron(conj(right),left)-...
         0.5*kron(eye(n),left'*left)-0.5*kron((right'*right).',eye(n)));
+    records(end+1)=struct('support',jump.support,'rate',jump.rate,...
+                          'left',left,'right',right); %#ok<AGROW>
 end
 
 end

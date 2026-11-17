@@ -6,6 +6,8 @@
 % contract declares generator representations, reduction algebra and the
 % evaluator used by the context. Unregistered handles are rejected before
 % any basis or generator is constructed; names are not matched heuristically.
+% Master-equation task records retain generator evidence; capability versions
+% distinguish that raw-record schema when validating a checkpoint.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -46,6 +48,9 @@ if isequal(pulse_sequence,@noise_correlation)
     contract.evaluator=@evaluate_noise; contract.version=3;
     contract.auxiliary={'moment','mean_time','mean_zero','valid','abs_error_bound'};
 end
+
+% Reject checkpoints predating retained master-generator evidence
+contract.version=contract.version+1;
 
 end
 
@@ -105,6 +110,7 @@ end
 raw.cluster_id=cluster.id; raw.value=answer;
 raw.abs_error_bound=zeros(size(answer)); raw.valid=isfinite(answer);
 raw.weight=configuration.weight;
+if isfield(parameters.cce_aux,'generator'), raw.generator=parameters.cce_aux.generator; end
 if exist('aux','var')&&isfield(aux,'abs_error_bound')
     raw.abs_error_bound=aux.abs_error_bound;
 end

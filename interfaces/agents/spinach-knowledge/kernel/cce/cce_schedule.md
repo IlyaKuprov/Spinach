@@ -74,3 +74,13 @@ For a native interlaced full-bath calculation, non-evaluated task placeholders a
 ## Execution-neutral native restart
 
 Native checkpoint identity excludes checkpoint, parallel, and retain_raw controls from both the experiment parameters and the compiled model parameter copy. Changing serial/parallel scheduling or batch size therefore preserves the physical restart identity. Physical tensors, Spinach tolerances, experiment/version, time mesh, sampled configurations, and cluster family remain checked. Only the scheduler consumes cce.checkpoint; it removes that field before invoking a registered experiment callback.
+
+## Concurrent native storage preflight
+
+Before task evaluation, the native scheduler counts the actual model/ensemble/schedule/parameter metadata, time-by-channel raw records, observed-density storage, and noise moments. It separately reserves unprojected physical Hamiltonian/spin-operator construction and the propagation workspace for each simultaneously active worker, bounded by worker count, batch_size, max_tasks, and the number of physical tasks. A projected bath propagator does not eliminate the full observed-plus-bath construction cost.
+
+Master-equation raw records retain manifold Hamiltonians, physical spin operators, and included Lindblad-operator pairs. Their storage accumulates across completed configurations and clusters and is included in resident memory as well as active construction. A budget may admit serial evaluation while rejecting a two-worker batch; the scheduler rejects rather than silently reducing the physical model or dropping tasks.
+
+Dissipative noise also reserves full retained Liouville construction before the experiment restricts the generator to the bath. A small final bath block cannot conceal the larger temporary full-system matrices.
+
+Skipped lower-order master records in the full-bath interlacing shortcut carry an empty generator field, not fabricated operators. This keeps the raw-record schema consistent with the evaluated full-bath record while their not-evaluated masks remain false. Explicit projected jumps also select master storage accounting when the requested subsystem retains a Hilbert representation.

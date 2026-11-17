@@ -11,6 +11,9 @@
 % batch_size defaults to the worker count. numerics.max_memory_bytes
 % bounds resident raw data plus simultaneous per-worker dense storage.
 % checkpoint.file/resume enable per-batch atomic restart. No GPU path.
+% Native requests place these controls under parameters.cce; max_tasks caps
+% native batch concurrency. Their memory preflight includes retained master
+% generators and full physical construction before projection.
 %
 % Inputs:
 %   model, clusters, ensemble, schedule, parameters, evaluator - prepared
@@ -256,7 +259,7 @@ if ~isa(evaluator,'function_handle')
     error('cce_schedule:evaluator','Native scheduling requires a registered evaluator.');
 end
 options=parameters.cce; ns=numel(ensemble.spin_config); nc=numel(clusters)+1;
-mode='serial'; workers=0; batch_size=1;
+mode='serial'; workers=1; batch_size=1;
 if isfield(options,'parallel'), mode=options.parallel.mode; end
 if ~ismember(mode,{'serial','clusters','states'})
     error('cce_schedule:parallel','Choose serial, clusters or states parallelism.');
@@ -289,16 +292,49 @@ if isfield(parameters,'output')&&strcmp(parameters.output,'density')
 elseif isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
-bytes=ns*nc*(1024+numel(parameters.times)*(25*components+48));
+nt=numel(parameters.times); dc=prod(model.multiplicities(model.observed_ids));
+metadata=whos('model','clusters','ensemble','schedule','parameters');
+resident=3*ns*nc*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
+noise=isequal(schedule.pulse_sequence,@noise_correlation);
+master=strcmp(model.formalism,'zeeman-liouv')||...
+       (isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps));
+if noise, resident=resident+3*ns*nc*(32*nt+16); end
 
-% Retained generalized Hahn density diagnostics also occupy the raw ledger
-if isequal(schedule.pulse_sequence,@hahn_echo)&&...
-   strcmp(options.approximation,'generalized')&&strcmp(model.formalism,'zeeman-hilb')
-    bytes=bytes+ns*nc*16*numel(parameters.times)*...
-                prod(model.multiplicities(model.observed_ids))^2;
+% Reserve full physical construction and every simultaneous propagation workspace
+peak=0;
+for k=0:numel(clusters)
+    sites=[]; if k>0, sites=clusters(k).sites; end
+    ids=[model.observed_ids sites]; db=prod(model.multiplicities(sites)); dimension=dc*db;
+    copies=12+3*numel(ids);
+    if ~model.direct_supported||strcmp(model.backend,'stock')
+        ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
+        copies=copies+sum((2*(1:ranks)+1).^2);
+    end
+    workspace=16*copies*dimension^2; propagated=dimension;
+    if (strcmp(options.approximation,'projected')&&~noise)||(noise&&~master)
+        propagated=db;
+    end
+    if master
+
+        % Count manifold, spin, and included jump arrays retained by every task
+        jumps=0; labels=0;
+        if isfield(parameters,'bath_jumps')
+            for jump=parameters.bath_jumps
+                if all(ismember(jump.support,ids))
+                    jumps=jumps+1; labels=labels+numel(jump.support)+1;
+                end
+            end
+        end
+        retained=16*(3*numel(ids)*dimension^2+2*(1+jumps)*propagated^2)+...
+                 8*(2*numel(ids)+labels);
+        resident=resident+3*ns*retained; workspace=workspace+retained;
+        propagated=propagated^2;
+    end
+    workspace=workspace+16*24*propagated^2;
+    peak=max(peak,workspace);
 end
-if bytes>options.numerics.max_memory_bytes
-    error('cce_schedule:memory','The task ledger exceeds the declared memory budget.');
+if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_bytes
+    error('cce_schedule:memory','Raw ledger and simultaneous dense storage exceed memory budget.');
 end
 model.clusters=clusters;
 if strcmp(options.bath_state.mode,'interlaced')&&...
@@ -397,6 +433,10 @@ if strcmp(parameters.cce.bath_state.mode,'interlaced')
                    'weight',ensemble.spin_config(index(1)).weight,...
                    'condition_sites',{{}},'assignment_count',0,'reference',[],...
                    'reference_error',[],'full_bath',false,'kind','not_evaluated');
+        if strcmp(model.formalism,'zeeman-liouv')||...
+           (isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps))
+            raw.generator=[];
+        end
     else
         raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator);
     end

@@ -4,7 +4,7 @@
 %   [rho0,coil,reference,meta]=cce_observation(cluster_system,parameters)
 %
 % Explicit rho0 is an observed-spin density matrix; coil is an observed
-% detector matrix or cell row. Otherwise preparation is 'transition' (the
+% detector matrix or cell vector. Otherwise preparation is 'transition' (the
 % equal alpha/beta superposition) or a structure with states and spins for
 % cce_state; 'transverse' prepares (identity+2*Lx)/2 for one spin one-half.
 % detection is 'transition' (alpha*beta') or a structure with
@@ -72,17 +72,17 @@ else
     error('cce_observation:detection','Declare a detector or select an observed transition.');
 end
 if ~iscell(detectors), detectors={detectors}; end
-if isempty(detectors)||~isrow(detectors)||~all(cellfun(@(x)isnumeric(x)&&...
+if isempty(detectors)||~isvector(detectors)||~all(cellfun(@(x)isnumeric(x)&&...
         isequal(size(x),[dc dc])&&all(isfinite(x),'all'),detectors))
     error('cce_observation:detection','Every detector must be a finite observed-spin matrix.');
 end
 for k=1:numel(detectors), detectors{k}=exp(1i*phase)*detectors{k}; end
-reference=cellfun(@(x)trace(x'*observed),detectors);
+reference=cellfun(@(x)trace(x'*observed),detectors(:).');
 if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
     reference=exp(-1i*phase)*(model.transition.alpha'*observed*model.transition.beta);
 end
 if normalized&&any(abs(reference)<=cellfun(@(x)dc*eps*norm(x,'fro')*...
-                                                  norm(observed,'fro'),detectors))
+                                                  norm(observed,'fro'),detectors(:).'))
     error('cce_observation:reference','Cannot normalize by a vanishing detected reference.');
 end
 

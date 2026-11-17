@@ -47,6 +47,7 @@ if isstruct(H)&&isempty(H.dissipator)&&...
    ~isfield(parameters,'preparation')&&~isfield(parameters,'bath_operator')
     [answer,aux]=projected_fid(spin_system,parameters,H,reference,meta); return
 end
+if ~iscell(coil), detectors={coil}; else, detectors=coil; end
 if isstruct(H), generator=H; else, generator=H+1i*R+1i*K; end
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
 if density
@@ -85,7 +86,6 @@ if liouville
         if ~meta.normalized, scale=scale*abs(meta.initial_signal); end
     elseif ~density
         if ~selected
-            if ~iscell(coil), detectors={coil}; else, detectors=coil; end
             db=spin_system.bath_dimension; dc=spin_system.observed_dimension;
             for k=1:numel(detectors)
                 detector=reshape(detectors{k},dc*db,dc*db);
@@ -115,7 +115,6 @@ if coherent
     if density
         scale=ones(1,spin_system.observed_dimension^2);
     else
-        if ~iscell(coil), detectors={coil}; else, detectors=coil; end
         scale=cellfun(@(op)norm(op,2),detectors(:).');
         if meta.normalized, scale=scale./abs(reference); end
     end
@@ -151,7 +150,7 @@ for n=1:numel(parameters.times)
             if density
                 aux.abs_error_bound(n,:)=bound;
             else
-                norms=cellfun(@(detector)norm(full(detector),2),detectors);
+                norms=cellfun(@(detector)norm(full(detector),2),detectors(:).');
                 if meta.normalized, norms=norms./abs(reference); end
                 aux.abs_error_bound(n,:)=bound*norms;
             end
@@ -165,7 +164,6 @@ for n=1:numel(parameters.times)
         if density
             answer(n,:)=observed(:).';
         else
-            if ~iscell(coil), detectors={coil}; else, detectors=coil; end
             for k=1:numel(detectors)
                 if selected
                     value=exp(-1i*meta.receiver_phase)*(meta.transition.alpha'*observed*meta.transition.beta);
@@ -179,7 +177,6 @@ for n=1:numel(parameters.times)
             end
         end
     else
-        if ~iscell(coil), detectors={coil}; else, detectors=coil; end
         for k=1:numel(detectors)
             if isvector(rho), value=detectors{k}'*rho;
             else, value=trace(detectors{k}'*rho); end

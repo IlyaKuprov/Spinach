@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Four bath spins, complex pure/mixed states and physical Hahn pulses.
+Four bath spins, complex pure/mixed states, and physical Hahn pulses, tested through native clexpn calls and independent dense Kronecker/expm references.
 
 ## Behaviour
 
@@ -33,4 +33,8 @@ result=test_gcce_exact()
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_gcce_exact.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+Native preparation and observation are tested with independent receiver scales from 1e-20 to 1e20, true zero-reference rejection, and both row and column detector cells. The same 64 row/column comparisons cover free, directly exponentiated Hahn, finite-drive, master-equation, and raw interlaced evaluations; physical inputs and assertion tolerances are fixed.
+
+The y-phase Hahn rotation is specified by explicit transition columns alpha=[1;0], beta=[0;1i], with the physical initial density supplied separately. Direct raw interlacing uses the registered callback and a context-generated ensemble, not a legacy evaluator. The context call used solely to obtain that ensemble has order zero; the subsequent raw calculation uses the requested physical cluster.
+
+Native-only regressions reject unknown or Hilbert-only preferences on master-equation requests, and reject direct-segment Hahn propagation for projected or Liouville representations.

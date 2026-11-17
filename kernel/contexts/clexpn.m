@@ -76,6 +76,20 @@ if ~ismember(model.formalism,contract.formalisms)
     error('clexpn:formalism','The experiment does not support the requested representation.');
 end
 
+% Validate propagation choices here rather than in graph or reduction services
+if isfield(numerics,'propagator')
+    supported={'eig'};
+    if strcmp(model.formalism,'zeeman-liouv')
+        supported={'stock'};
+    elseif isequal(pulse_sequence,@hahn_echo)&&strcmp(parameters.cce.approximation,'generalized')
+        supported={'eig','expm'};
+    end
+    if ~ischar(numerics.propagator)||~isrow(numerics.propagator)||...
+       ~ismember(numerics.propagator,supported)
+        error('clexpn:propagator','Propagation preference is incompatible with this experiment and representation.');
+    end
+end
+
 if isempty(parameters.cce.order)
     parameters.cce.order=numel(model.bath_ids);
     policy.defaults{end+1}='parameters.cce.order';
@@ -84,6 +98,9 @@ end
 % Build the physical connectivity and downward-closed cluster family
 options=parameters.cce;
 selection=struct('graph',options.graph,'order',options.order,'numerics',options.numerics);
+if isfield(selection.numerics,'propagator')
+    selection.numerics=rmfield(selection.numerics,'propagator');
+end
 selection.method='gcce'; selection.expansion=options.expansion;
 if strcmp(options.approximation,'projected'), selection.method='cce'; end
 if isequal(pulse_sequence,@noise_correlation)

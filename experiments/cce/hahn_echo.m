@@ -15,6 +15,9 @@
 % output=density returns column-vectorised generalized observed density.
 % It requires a physical initial density and does not normalize a receiver.
 %
+% cce.numerics.propagator='expm' selects direct segment exponentials for
+% generalized Hilbert evolution, retaining the segment arithmetic bound.
+% The default reuses a Hermitian eigensystem across the time grid.
 % Optional aux contains spectral/error diagnostics for coherent projected echoes.
 %
 % Generalized unitary Zeeman-Hilbert echoes retain observed density matrices,
@@ -132,6 +135,12 @@ end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('hahn_echo:generators','Supply conventional or tagged projected generators.');
 end
+if isfield(parameters.cce.numerics,'propagator')&&...
+   strcmp(parameters.cce.numerics.propagator,'expm')&&...
+   (isstruct(H)||~strcmp(spin_system.formalism,'zeeman-hilb')||...
+    any(R(:))||any(K(:))||isfield(parameters,'pump'))
+    error('hahn_echo:propagator','Direct segment exponentials require closed generalized Hilbert dynamics.');
+end
 
 end
 
@@ -192,10 +201,14 @@ end
 % Propagate a generalized Hahn echo with retained observed density and bounds
 function [answer,aux]=generalized_echo(system,parameters,H,rho0,coil,meta,pulse,density)
 
-% Diagonalize the complete retained-cluster Hamiltonian once
-H=(H+H')/2; [vectors,energies]=eig(full(H),'vector'); energies=real(energies);
-residual=norm(H*vectors-vectors.*energies.','fro');
-orthogonality=norm(vectors'*vectors-eye(size(H)),'fro');
+% Select direct segments or reuse one Hermitian eigensystem
+direct=isfield(parameters.cce.numerics,'propagator')&&...
+       strcmp(parameters.cce.numerics.propagator,'expm');
+if ~direct
+    H=(H+H')/2; [vectors,energies]=eig(full(H),'vector'); energies=real(energies);
+    residual=norm(H*vectors-vectors.*energies.','fro');
+    orthogonality=norm(vectors'*vectors-eye(size(H)),'fro');
+end
 dc=system.observed_dimension; db=system.bath_dimension; count=numel(parameters.times);
 detectors=cellfun(@(x)x(1:db:end,1:db:end),coil,'UniformOutput',false);
 answer=complex(zeros(count,numel(meta.normalization_divisor)));
@@ -212,12 +225,24 @@ divisors=meta.normalization_divisor;
 % Compose both free intervals and the physical pi rotation in time order
 for n=1:count
     time=parameters.times(n); propagator=eye(size(H));
-    if time>0
-        free=(vectors.*exp(-1i*energies*(time/2)).')*vectors';
-        propagator=free*propagator; propagator=pulse*propagator;
-        propagator=free*propagator;
+    if direct
+        rho=rho0; durations=0; scale=0;
+        if time>0, durations=[0 time/2 time/2]; end
+        for k=1:numel(durations)
+            rotation=eye(size(H)); if k==2, rotation=pulse; end
+            propagator=rotation*expm(-1i*durations(k)*H);
+            rho=propagator*rho*propagator';
+            scale=scale+1+abs(durations(k))*norm(full(H),2);
+        end
+    else
+        if time>0
+            free=(vectors.*exp(-1i*energies*(time/2)).')*vectors';
+            propagator=free*propagator; propagator=pulse*propagator;
+            propagator=free*propagator;
+        end
+        rho=propagator*rho0*propagator';
     end
-    rho=propagator*rho0*propagator'; observed=complex(zeros(dc));
+    observed=complex(zeros(dc));
     for k=1:db
         indices=k:db:dc*db; observed=observed+rho(indices,indices);
     end
@@ -234,8 +259,12 @@ for n=1:count
     end
 
     % Bound spectral residuals, tensor assembly and floating-point products
-    bound=2*time*(residual+hbound)+...
-          8*orthogonality+gamma*(1+time*hnorm);
+    if direct
+        bound=16*size(H,1)^3*eps*scale;
+    else
+        bound=2*time*(residual+hbound)+...
+              8*orthogonality+gamma*(1+time*hnorm);
+    end
     if density
         bounds(n,:)=bound;
     else
@@ -246,10 +275,12 @@ for n=1:count
 end
 
 % Keep generator and propagation evidence alongside the natural response
-aux.abs_error_bound=bounds; aux.eigen_residual=residual;
-aux.orthogonality_residual=orthogonality;
-aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
-aux.backend=parameters.cce_aux.backend;
+aux.abs_error_bound=bounds;
+if ~direct
+    aux.eigen_residual=residual; aux.orthogonality_residual=orthogonality;
+    aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
+    aux.backend=parameters.cce_aux.backend;
+end
 
 end
 

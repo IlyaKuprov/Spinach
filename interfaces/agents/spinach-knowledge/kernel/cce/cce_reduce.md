@@ -57,3 +57,5 @@ For one deterministic bath state, a complete connected-noise cluster is a direct
 ## Native sampled uncertainty
 
 For sampled product states, uncertainty is separate from deterministic propagation error. After-expansion averaging uses sqrt(sum(abs(x_s-mean(x_s)).^2)/(N*(N-1))). Internal-first averaging uses the individual raw complete-bath responses in that same expression, not the already averaged response. A truncated internal-first estimator, a single sample, and internally averaged connected noise report NaN. Deterministic and interlaced ensembles retain zero sampling uncertainty. No legacy statistical interpretation is changed.
+
+Native reduction does not forward the experiment-owned cce.numerics.propagator into the internal scalar-reduction validator. Propagation preferences cannot change the reduction algebra or its numerical budget.

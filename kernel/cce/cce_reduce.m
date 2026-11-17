@@ -300,6 +300,9 @@ end
 selection=struct('method','gcce','order',options.order,...
                  'reducer',options.reducer,'numerics',options.numerics,'expansion',options.expansion);
 selection.numerics.zero_policy='mask';
+if isfield(selection.numerics,'propagator')
+    selection.numerics=rmfield(selection.numerics,'propagator');
+end
 additive=isfield(parameters,'noise');
 if additive, selection.method='noise'; end
 

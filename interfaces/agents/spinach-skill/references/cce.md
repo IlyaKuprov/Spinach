@@ -102,3 +102,7 @@ For Liouville free evolution, exactly diagonal generators use sparse stock-step 
 Zero-rate bath_jumps records contribute nothing and are skipped before projected manifold and support checks. Active split supports require a common retained group; active exterior jumps cannot drive a frozen mean field. Projected jumps must preserve both selected manifolds and the loss-operator subspaces, with scale-relative leakage checks. Generalised Liouville evolution permits observed-spin jumps.
 
 Noise inputs belong exclusively to noise_correlation, including direct evaluator requests. Explicit noise matrices use the relative Hermiticity criterion 100*eps*norm(B,'fro'), without an absolute unit-scale floor. Both noise moments and first moments remain available for ensemble connected subtraction.
+
+Connected sampled noise retains M_s-mu_s*mean(nu)-mean(mu)*(nu_s-mean(nu)) before reduction. These centred contributions determine after-expansion sampling uncertainty; internal-first connected uncertainty remains unavailable (NaN). Complete-bath values and propagation bounds use the exact raw reference after centring. Free-evolution master dynamics uses stock exponential action with dense generator arithmetic, including projected coherence blocks, and reports its dimension/norm-based floating-point estimate. The registered rates and noise tests use native clexpn and service contracts throughout.
+
+The free_evolution and finite_drive capability version is 3; regenerate older raw checkpoints rather than reusing their propagation/error arithmetic.

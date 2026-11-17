@@ -312,7 +312,8 @@ if isfield(parameters,'noise')&&parameters.noise.connected
             mean_zero=mean_zero+weights(n)*raw{n}(k).mean_zero;
         end
         for n=1:count
-            raw{n}(k).value=raw{n}(k).moment-mean_time*mean_zero;
+            raw{n}(k).value=raw{n}(k).moment-raw{n}(k).mean_time*mean_zero-...
+                            mean_time*(raw{n}(k).mean_zero-mean_zero);
             raw{n}(k).valid=raw{n}(k).valid&isfinite(mean_time)&isfinite(mean_zero);
         end
     end
@@ -358,7 +359,7 @@ else
     for n=1:count
         parts{n}=cce_reduce(raw{n},clusters,selection);
         complete=find(arrayfun(@(item)isequal(sort(item.sites),sort(options.bath_spins)),clusters),1);
-        if ~isempty(complete)&&~(count>1&&isfield(parameters,'noise')&&parameters.noise.connected)
+        if ~isempty(complete)
             exact=raw{n}(complete+1); parts{n}.value=exact.value;
             parts{n}.valid=exact.valid; parts{n}.abs_error_bound=exact.abs_error_bound;
             parts{n}.by_order(:,:,end)=exact.value;
@@ -393,7 +394,7 @@ end
 % A finite exact reference remains valid even above the requested error budget
 reduced.valid=reduced.valid&isfinite(reduced.value);
 complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(options.bath_spins)),clusters));
-if ~complete||(count>1&&isfield(parameters,'noise')&&parameters.noise.connected)
+if ~complete
     reduced.valid=reduced.valid&reduced.abs_error_bound<=options.numerics.atol+...
                               options.numerics.rtol*abs(reduced.value);
 end

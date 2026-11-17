@@ -36,6 +36,6 @@ result=test_mecce_rates()
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_mecce_rates.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-## Contract boundaries
+## Native contract
 
-Projected zero-rate jumps contribute no dissipator and do not require manifold closure; active jumps retain both jump-operator and loss-operator closure requirements. Active exterior jumps cannot drive a frozen field. The regression preserves all physical rate, reference, and rejection assertions.
+The registered test calls clexpn with free_evolution and native compile/subsystem/generator services. Natural density answers are time-by-column-vectorised observed matrices. It preserves amplitude damping, longitudinal dephasing, weak-rate propagation and error coverage, reciprocal operator/rate scaling, negative-rate refusal, exact zero-rate equivalence, active exterior-jump refusal, the population-product counterexample, nonnormal loss leakage, and independent three-level master-equation references. Zero-rate projected jumps disappear before manifold checks. The weak-rate stock-propagation assertion uses the native expert services with its original cleanup thresholds.

@@ -20,7 +20,10 @@
 % H,R,K are conventional angular-frequency generators or explicitly tagged
 % projected branches from cce_generators. No pulse or receiver is implicit.
 %
-% GKSL relaxation uses L=H+1i*R+1i*K. Projected propagation carries a
+% GKSL relaxation uses stock exponential action and its floating-point
+% estimate 64*eps*n*(1+norm(L,1)*time), scaled by the detector/reference.
+% Master-equation generators retain dense arithmetic. L=H+1i*R+1i*K.
+% Projected propagation carries a
 % coherence block, not a physical density; density requires generalized CCE.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -61,15 +64,26 @@ aux=struct();
 controlled=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
 if controlled, aux.abs_error_bound=zeros(size(answer)); end
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
-liouville=isempty(events)&&~isstruct(H)&&...
-          strcmp(spin_system.formalism,'zeeman-liouv');
+projected_me=isstruct(H)&&~isempty(H.dissipator);
+liouville=isempty(events)&&(projected_me||(~isstruct(H)&&...
+          strcmp(spin_system.formalism,'zeeman-liouv')));
+if projected_me
+    db=spin_system.bath_dimension;
+    generator=kron(eye(db),H.left)-kron(H.right.',eye(db))+1i*H.dissipator;
+    if meta.normalized
+        rho0=rho0/meta.initial_signal; reference=1;
+    end
+end
 
 % Preserve the stock density action and its arithmetic estimate
 if liouville
     engine=spin_system.model.spin_system; engine.bas.formalism='sphten-liouv';
     engine.tols.prop_chop=0;
     scale=ones(1,size(answer,2));
-    if ~density
+    if projected_me
+        scale=norm(reshape(full(coil),spin_system.bath_dimension,[]),2);
+        if ~meta.normalized, scale=scale*abs(meta.initial_signal); end
+    elseif ~density
         if ~selected
             if ~iscell(coil), detectors={coil}; else, detectors=coil; end
             db=spin_system.bath_dimension; dc=spin_system.observed_dimension;
@@ -123,7 +137,9 @@ for n=1:numel(parameters.times)
             rho=propagator(engine,generator,parameters.times(n))*rho0;
         else
             action=generator;
-            if isdiag(action), action=sparse(action); end
+            if isdiag(action)&&(~isfield(parameters,'bath_jumps')||isempty(parameters.bath_jumps))
+                action=sparse(action);
+            end
             rho=step(engine,action,rho0,parameters.times(n));
         end
     elseif isempty(events)

@@ -39,6 +39,6 @@ Public optional-field contracts are explicit in reused fixtures: irrelevant meth
 
 Direct noise spin_configs with nontracial bath states are checked against dense ordered and symmetrized connected correlations; the initial moments come from the supplied bath state.
 
-## Contract boundaries
+## Native contract
 
-The regression preserves ordered, symmetrised, sampled, supplied-state, disconnected, and allocation checks, including unavailable internal connected-covariance uncertainty. Foreign-method direct evaluation and scaled non-Hermitian operators remain explicit refusal cases.
+The registered test calls clexpn with noise_correlation, retaining both ensemble averaging orders, supplied nontracial bath states, ordered and symmetrised dense references, disconnected cross terms, finite-mixture covariance, allocation preflight, and unavailable internal connected-covariance uncertainty. Direct registered evaluator calls reject foreign experiment requests. The exact scaled operator 1e-20*[0 1;0 0] remains a non-Hermitian rejection case. Numeric correlation arrays and separate diagnostics replace wrapped results without changing physical assertions.

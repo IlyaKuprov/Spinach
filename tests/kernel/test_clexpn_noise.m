@@ -19,6 +19,13 @@ reference=0.25-mean(means)^2;
 result=test_close(result,'Unequal conditional means',a,reference*ones(3,1),1e-12,1e-12,...
                   'Subtract ensemble first moments, not conditional covariances.');
 result=test_true(result,'Nonzero ensemble variance',reference>0,'A mixture of eigenstates fluctuates.');
+
+% Sampling uncertainty uses centred contributions of the empirical covariance
+centred=0.25-means*mean(means)-mean(means)*(means-mean(means));
+standard_error=sqrt(sum(abs(centred-mean(centred)).^2)/(16*15));
+result=test_close(result,'Connected covariance sampling uncertainty',...
+                  d.reduction.sampling_standard_error,standard_error*ones(3,1),0,0,...
+                  'Sample contributions retain fluctuations of both first moments.');
 p.cce.averaging='internal_then_expansion'; b=clexpn(s,@noise_correlation,p,'labframe');
 result=test_close(result,'Additive averaging order',a,b,1e-12,1e-12,'Connected ensemble reduction is linear.');
 p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])}});

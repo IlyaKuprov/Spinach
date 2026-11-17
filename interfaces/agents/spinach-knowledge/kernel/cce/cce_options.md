@@ -57,3 +57,7 @@ parameters.cce.parallel.max_tasks is an optional finite positive integer. It cap
 The refocusing descriptor belongs to hahn_echo and its direct compiler/generator validation. Its physical matrix, support, and placement are checked by the experiment. Passing it to free_evolution is rejected rather than silently ignored.
 
 The optional pump.boundary selects an open or closed physical frequency interval; only those two values are accepted. The native closed default is unchanged, while explicit open preserves the original strict CCE window and excludes an exact-boundary resonance.
+
+## Checkpoint request ownership
+
+A supplied cce.checkpoint requires a nonempty character filename; resume, if supplied, is a scalar logical. Interlaced bath-state requests and independent convergence controls cannot share a checkpoint ledger and are rejected before physical compilation. Adaptive partition pilot and held-out evaluations remain separate from the production scheduler checkpoint.

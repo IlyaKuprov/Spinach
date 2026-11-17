@@ -47,6 +47,9 @@ end
 
 % Native contexts carry nested algorithm controls and an explicit evaluator
 if isfield(parameters,'cce')
+    if isfield(parameters.cce,'checkpoint')
+        error('cce_options:checkpoint','Interlaced evaluations cannot own a checkpoint ledger.');
+    end
     raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator); return
 end
 

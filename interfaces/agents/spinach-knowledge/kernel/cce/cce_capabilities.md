@@ -29,3 +29,5 @@ Direct registered evaluation checks retained time-history memory before construc
 Hahn capability version 5 covers absolute refocusing time and manifold-preserving projected pulse descriptors. Raw records retain the experiment-owned pulse_time and pulse_applied arrays, independently of the observed numeric response.
 
 The registered native evaluator rejects projected propagation when the actual retained Hamiltonian leaks out of either selected observed manifold, unless the explicitly requested second-order treatment applies. The criterion is dimension*eps*norm(H,fro), matching the original propagation check; direct generator inspection still exposes the measured leakage. Hahn capability version 6 covers Cartesian exterior-field updates, and bath-pumped Hahn version 3 covers the strict frequency window.
+
+Direct registered experiment callbacks reject cce.checkpoint before constructing a subsystem. The scheduler removes its owned checkpoint request before callback invocation; this applies equally to free evolution, finite drive, master-equation propagation, and fluctuation correlations.

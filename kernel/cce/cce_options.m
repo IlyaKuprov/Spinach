@@ -92,6 +92,17 @@ end
 % Validate resolved cluster controls and physical states
 function validate_options(system,p)
 c=p.cce; ids=p.observed; bath=c.bath_spins; nspins=system.comp.nspins;
+if isfield(c,'checkpoint')
+    if ~isfield(c.checkpoint,'file')||~ischar(c.checkpoint.file)||...
+       ~isrow(c.checkpoint.file)||isempty(c.checkpoint.file)||...
+       (isfield(c.checkpoint,'resume')&&...
+        (~islogical(c.checkpoint.resume)||~isscalar(c.checkpoint.resume)))
+        error('cce_options:checkpoint','Checkpoint requests require a nonempty filename and logical resume flag.');
+    end
+    if strcmp(c.bath_state.mode,'interlaced')||isfield(c,'convergence')
+        error('cce_options:checkpoint','Interlacing and independent convergence runs cannot share a checkpoint ledger.');
+    end
+end
 spin_ids(bath,nspins,'parameters.cce.bath_spins',true);
 if ~isempty(intersect(ids,bath))
     error('cce_options:ownership','Observed and bath spin IDs must be disjoint.');

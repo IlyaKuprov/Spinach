@@ -310,11 +310,13 @@ end
 payload=struct('model',model,'clusters',clusters,'ensemble',ensemble,...
                'parameters',parameters,'experiment',func2str(schedule.pulse_sequence),...
                'contract_version',schedule.contract.version);
-if isfield(payload.parameters.cce,'checkpoint')
-    payload.parameters.cce=rmfield(payload.parameters.cce,'checkpoint');
-end
-if isfield(payload.model.parameters.cce,'checkpoint')
-    payload.model.parameters.cce=rmfield(payload.model.parameters.cce,'checkpoint');
+for field={'checkpoint','parallel','retain_raw'}
+    if isfield(payload.parameters.cce,field{1})
+        payload.parameters.cce=rmfield(payload.parameters.cce,field{1});
+    end
+    if isfield(payload.model.parameters.cce,field{1})
+        payload.model.parameters.cce=rmfield(payload.model.parameters.cce,field{1});
+    end
 end
 
 % The model is hashed from its full physical content, not its derived cache key
@@ -344,6 +346,11 @@ if isfield(options,'checkpoint')
     elseif isfile(filename)
         error('cce_schedule:exists','Explicitly resume an existing checkpoint or choose another filename.');
     end
+end
+
+% Keep checkpoint ownership in the scheduler, not its experiment callback
+if isfield(parameters.cce,'checkpoint')
+    parameters.cce=rmfield(parameters.cce,'checkpoint');
 end
 pending=find(~state.completed);
 for first=1:batch_size:numel(pending)

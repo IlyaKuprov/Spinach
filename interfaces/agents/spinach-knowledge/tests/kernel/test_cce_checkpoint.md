@@ -44,3 +44,7 @@ result=test_cce_checkpoint()
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_checkpoint.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+## Native experiment coverage
+
+The registered test enters through clexpn with free_evolution, finite_drive, and noise_correlation. It preserves interrupted raw/reduced replay, adaptive-partition pilot ownership, tensor/tolerance/seed/time identities, checksum and completed-record integrity, actual filesystem save failure, execution-neutral restart, and fresh-versus-cold physical-model checks. Projected/generalized Hilbert and master-equation requests are explicit native approximation and representation choices. Direct callbacks and interlacing refuse checkpoint ownership; an independent convergence request cannot share a ledger.

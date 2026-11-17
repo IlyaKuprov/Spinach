@@ -64,6 +64,11 @@ end
 % Evaluate one native subsystem through the ordinary pulse-sequence signature
 function raw=evaluate(model,cluster,configuration,schedule,parameters)
 
+% Only the scheduler may consume checkpoint requests
+if isfield(parameters.cce,'checkpoint')
+    error('cce_options:checkpoint','Direct experiment evaluators cannot own a checkpoint ledger.');
+end
+
 % Bound retained time records before allocating subsystem or propagation arrays
 dc=prod(model.multiplicities(model.observed_ids)); components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density'), components=dc^2; end

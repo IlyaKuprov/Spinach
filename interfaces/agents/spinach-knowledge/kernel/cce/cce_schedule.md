@@ -70,3 +70,7 @@ Generalized Zeeman-Hilbert hahn_echo raw-ledger budgeting includes retained obse
 The native scheduler accepts parameters.cce.parallel.max_tasks and limits batch_size to that value before estimating simultaneous workspace and executing tasks. All cluster/state records still run. Invalid values raise the same positive-integer requirement as the legacy scheduler.
 
 For a native interlaced full-bath calculation, non-evaluated task placeholders are omitted from the returned raw ledger before concatenation. The exact full-bath record therefore retains the experiment's actual diagnostic schema, including driven and master-equation records; no placeholder is counted as a propagated cluster. Task ordering and checkpoint entries remain unchanged.
+
+## Execution-neutral native restart
+
+Native checkpoint identity excludes checkpoint, parallel, and retain_raw controls from both the experiment parameters and the compiled model parameter copy. Changing serial/parallel scheduling or batch size therefore preserves the physical restart identity. Physical tensors, Spinach tolerances, experiment/version, time mesh, sampled configurations, and cluster family remain checked. Only the scheduler consumes cce.checkpoint; it removes that field before invoking a registered experiment callback.

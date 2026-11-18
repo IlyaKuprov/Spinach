@@ -198,3 +198,5 @@ Observation owns preparation/detection descriptors, physical-ID ordering, receiv
 Use clexpn for the native context and experiments/cce for free_evolution, hahn_echo, cpmg_echo, bath_pumped_hahn, cce_eseem, finite_drive, refocusing_train, and noise_correlation. The context returns a natural numeric array; diagnostics are optional second output. Read references/cce.md for supported representations and experiments.
 
 For cluster-expansion input fixtures and deferred orientation composition, follow [Cluster correlation expansions](references/cce.md): cce_fixture supplies pinned physical data, while context_task and orientation_average compose native clexpn dynamics without a full-bath basis.
+
+The clexpn native boundary rejects parameters.sequence, including empty arrays. Use finite_drive, refocusing_train, or a named echo experiment with native physical descriptors; free_evolution is uncontrolled.

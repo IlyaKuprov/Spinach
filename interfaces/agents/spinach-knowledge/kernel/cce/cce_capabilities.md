@@ -23,7 +23,7 @@ For multiplicative experiments the raw record carries signal, observed-density a
 
 The noise evaluator is bound to noise_correlation, even when called directly without noise parameters. A foreign schedule or an explicitly different output is rejected with clexpn:noise before subsystem construction. Its contract version is distinct from the general dynamics evaluator.
 
-Free evolution and its finite-drive delegate reject checkpoints from preceding master-propagation and controlled-density schemas. The public experiment signatures are unchanged.
+Free evolution, finite drive, and refocusing trains reject checkpoints predating the native-only control boundary, as well as the preceding master-propagation and controlled-density schemas. The public experiment signatures are unchanged.
 
 Direct registered evaluation checks retained time-history memory before constructing a subsystem or generator, including density components and retained density pages. Hahn registration covers native stock master-equation pulse propagation and generalized selective refocusing.
 

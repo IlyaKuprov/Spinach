@@ -16,3 +16,5 @@ update static product-state mean fields; correlated exterior pulses are refused.
 Auxiliary outputs retain density, arithmetic bounds, and compiled segments.
 Projected and master-equation trains are not registered by this experiment;
 use the already-supported hahn_echo for a single admissible master echo.
+
+Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.

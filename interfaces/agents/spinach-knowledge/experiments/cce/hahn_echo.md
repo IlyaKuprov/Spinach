@@ -33,3 +33,5 @@ The refocusing descriptor also accepts an absolute time in seconds instead of fr
 Independent full-density exponentials also check absolute refocusing before, at, and after its timestamp for both eig and expm generalized propagation. The direct interval path applies its rotation only when that sample includes the pulse.
 
 Refocusing may alternatively specify axis and angle for a Cartesian physical-spin rotation instead of an integrated operator. A one-site exterior Cartesian rotation updates its product density and the subsequent static mean field in generalized Hilbert dynamics; direct segment exponentials preserve interval timing and arithmetic bounds. Exterior explicit-operator pulses remain rejected, so arbitrary correlated exterior operations are not approximated by frozen fields. Capability version 6 identifies this extension.
+
+Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.

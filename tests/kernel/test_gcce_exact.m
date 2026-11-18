@@ -143,8 +143,8 @@ q.output='observable'; q.rho0=diag([1 0]);
 q.coil={eye(2),2*eye(2)}; q.cce.bath_state=struct('mode','mixed_product');
 q.bath_jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7);
 accepted=true; value_error=0; bound_error=0; cases=0;
-finite=struct('type','finite','target',1,'placement','absolute','at',0.05,...
-              'duration',0.05,'axis','x','amplitude',2,'detuning',0);
+finite=struct('spins',1,'time',0.05,'duration',0.05,...
+              'axis','x','amplitude',2,'detuning',0);
 for method={'gcce','megcce'}
     q.cce.basis=struct('formalism','zeeman-hilb');
     if strcmp(method{1},'gcce'), q.bath_jumps=struct([]);
@@ -152,17 +152,17 @@ for method={'gcce','megcce'}
         q.bath_jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7);
         q.cce.basis.formalism='zeeman-liouv';
     end
-    for sequence={[],struct('name','hahn','count',1,'axis','x','target',1),finite}
-        if strcmp(method{1},'megcce')&&~isempty(sequence{1}), continue; end
-        pulse_sequence=@free_evolution;
+    for sequence={@free_evolution,@hahn_echo,@finite_drive}
+        pulse_sequence=sequence{1};
+        if strcmp(method{1},'megcce')&&~isequal(pulse_sequence,@free_evolution), continue; end
         if isfield(q.cce.numerics,'propagator')
             q.cce.numerics=rmfield(q.cce.numerics,'propagator');
         end
-        if isfield(q,'sequence'), q=rmfield(q,'sequence'); end
-        if isstruct(sequence{1})&&isfield(sequence{1},'name')
-            pulse_sequence=@hahn_echo; q.cce.numerics.propagator='expm';
-        elseif ~isempty(sequence{1})
-            q.sequence=sequence{1};
+        if isfield(q,'drive'), q=rmfield(q,'drive'); end
+        if isequal(pulse_sequence,@hahn_echo)
+            q.cce.numerics.propagator='expm';
+        elseif isequal(pulse_sequence,@finite_drive)
+            q.drive=finite;
         end
         for mode={'mixed_product','interlaced'}
             q.cce.bath_state=struct('mode',mode{1});

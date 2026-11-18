@@ -33,3 +33,5 @@ A projected `zeeman-liouv` request retains an explicit bath-space zero dissipato
 ## Retained master-generator evidence
 
 For a master-equation representation, cce_aux.generator records the physical ordering and dimensions, projected/full-space status, left/right Hamiltonians, included Lindblad-operator pairs and rates, and Hamiltonian construction diagnostics. The registered evaluator retains this evidence with each completed raw task. It describes column-vectorised propagation with exp(-1i*L*t); no generator, jump rate, or density normalization is changed. The scheduler accounts for the cumulative operator storage.
+
+Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.

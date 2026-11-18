@@ -34,3 +34,5 @@ Before propagation, the resolved representation validates the numerical preferen
 The disjoint and disjoint_inter expansion families fix the retained physical-group order at one and two, respectively, independently of a supplied generic order. This resolution precedes cluster enumeration and reduction: disjoint_inter must retain inter-group pairs even when the caller supplied order one. The resolved order is visible in diagnostics.parameters.cce.order.
 
 A projected request is rejected before subsystem construction when its registered experiment does not support projected generators. Finite_drive and refocusing_train therefore cannot silently discard driven observed-spin population transfer.
+
+The native input boundary rejects parameters.sequence, including empty arrays. Finite, fractional, overlapping, and partially observed controls belong to finite_drive; ideal trains belong to refocusing_train. No raw-event parameter adapter is provided.

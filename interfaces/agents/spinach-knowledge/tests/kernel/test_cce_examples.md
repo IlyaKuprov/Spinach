@@ -53,3 +53,5 @@ The migrated cce_deer_bandwidth example returns [answer,diagnostics]. Its indepe
 ## Native molecular powder
 
 cce_molecular_powder returns numeric answer and separate native diagnostics. Its independent full-bath reference assembles rotated physical tensors with Cartesian spin matrices, the stock ordered-pair tensor convention and expm, then averages completed Hahn echoes. Tests cover agreement, the analytic unit initial signal, the final expansion order and orientation-resolved numerical bounds. There is no legacy entry-point call in any examples/cce file.
+
+Finite-control invocations use finite_drive with native physical descriptors, not a raw sequence field. Independent references retain their physical inputs and assertions; unused raw-event declarations are not part of the reference construction.

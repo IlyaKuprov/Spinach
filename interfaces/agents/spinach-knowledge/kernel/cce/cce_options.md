@@ -64,4 +64,4 @@ A supplied cce.checkpoint requires a nonempty character filename; resume, if sup
 
 drive belongs to finite_drive. A refocusing cell row may accompany finite_drive or define refocusing_train; the single scalar hahn_echo descriptor is unchanged. train belongs to refocusing_train. Detailed waveform, pulse, and train validation remains experiment-owned.
 
-The removed raw-event interface is not a supported alternative to the native descriptors. The current validator nevertheless admits sequence records for free_evolution; callers must not rely on that residual acceptance. Registered native experiment tests still exercise this route, so removing it requires preserving those physical checks through a supported interface or direct internal-service tests.
+Caller-supplied sequence fields are rejected before compilation, including empty event arrays. Use finite_drive, refocusing_train, hahn_echo, or another registered experiment with its native physical controls. Native finite-drive descriptors remain valid during generator-side validation of simultaneous GKSL relaxation.

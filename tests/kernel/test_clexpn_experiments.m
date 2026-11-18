@@ -84,24 +84,24 @@ inter.zeeman.matrix={zeros(3),zeros(3)}; inter.coupling.matrix=cell(2);
 system=create(sys,inter); p=struct(); p.observed=1; p.times=[0 0.2];
 p.transition=struct('spins',1,'ms',[0.5 -0.5]); p.output='density';
 p.cce=struct('approximation','generalized','order',1,'graph',struct('mode','complete'));
-p.sequence=struct('type','finite','target',1,'axis','z',...
-    'placement','absolute','at',0,'duration',0.2,'amplitude',7);
-actual=clexpn(system,@free_evolution,p,'labframe');
+p.drive=struct('spins',1,'axis','z','time',0,...
+               'duration',0.2,'amplitude',7,'detuning',0);
+actual=clexpn(system,@finite_drive,p,'labframe');
 rho=[1 1;1 1]/2; U=expm(-1i*7*diag([0.5 -0.5])*0.2); expected=U*rho*U';
 result=test_close(result,'Finite-drive acceptance probe',actual(2,:),expected(:).',...
-                  2e-14,0,'The supplied finite event rotates the observed density.');
-p.preparation='transverse'; named=clexpn(system,@free_evolution,p,'labframe');
+                  2e-14,0,'The native finite drive rotates the observed density.');
+p.preparation='transverse'; named=clexpn(system,@finite_drive,p,'labframe');
 result=test_close(result,'Transverse preparation',named,actual,2e-14,0,...
                   'The named positive preparation matches the transition superposition.');
 p.cce.basis.formalism='zeeman-liouv';
-liouville=clexpn(system,@free_evolution,p,'labframe');
+liouville=clexpn(system,@finite_drive,p,'labframe');
 result=test_close(result,'Finite-drive Liouville representation',liouville,actual,...
                   2e-14,0,'The Hamiltonian commutator gives the same observed density.');
 p.cce=rmfield(p.cce,'basis'); p.times=[0 0.05 0.2 0.4];
-p.sequence.duration=0.1; p.sequence.at=0.05; p.sequence.detuning=2;
-p.sequence(2)=p.sequence(1); p.sequence(2).at=0.1;
-p.sequence(2).axis='x'; p.sequence(2).amplitude=3;
-actual=clexpn(system,@free_evolution,p,'labframe'); expected=zeros(size(actual));
+p.drive.duration=0.1; p.drive.time=0.05; p.drive.detuning=2;
+p.drive(2)=p.drive(1); p.drive(2).time=0.1;
+p.drive(2).axis='x'; p.drive(2).amplitude=3;
+actual=clexpn(system,@finite_drive,p,'labframe'); expected=zeros(size(actual));
 Sz=diag([0.5 -0.5]); Sx=[0 1;1 0]/2;
 for n=1:numel(p.times)
     t=p.times(n); state=rho; cuts=unique([0 t min([0.05 0.1 0.15 0.2],t)]);
@@ -115,9 +115,9 @@ for n=1:numel(p.times)
 end
 result=test_close(result,'Overlapping finite intervals',actual,expected,3e-14,0,...
                   'Start/stop boundaries, detuning and partial intervals match dense expm.');
-p.sequence=p.sequence(1); p.sequence.axis=[0 0 1];
-p.sequence.placement='fraction'; p.sequence.at=0.5;
-actual=clexpn(system,@free_evolution,p,'labframe');
+p.drive=p.drive(1); p.drive.axis=[0 0 1];
+p.drive=rmfield(p.drive,'time'); p.drive.fraction=0.5;
+actual=clexpn(system,@finite_drive,p,'labframe');
 for n=1:numel(p.times)
     U=expm(-1i*9*Sz*min(0.1,p.times(n)/2)); state=U*rho*U';
     expected(n,:)=state(:).';
@@ -127,9 +127,10 @@ result=test_close(result,'Fractional finite-drive placement',actual,expected,3e-
 
 % Noncommuting drift remains active throughout a finite control interval
 inter.coupling.matrix{1,2}=diag([1 2 3]); system=create(sys,inter);
-p.sequence.at=0; p.sequence.duration=0.1; p.sequence.axis='x';
-p.sequence.placement='absolute'; p.preparation='transverse';
-actual=clexpn(system,@free_evolution,p,'labframe');
+p.drive=rmfield(p.drive,'fraction');
+p.drive.time=0; p.drive.duration=0.1; p.drive.axis='x';
+p.preparation='transverse';
+actual=clexpn(system,@finite_drive,p,'labframe');
 Sy=[0 -1i;1i 0]/2;
 drift=2*pi*(kron(Sx,Sx)+2*kron(Sy,Sy)+3*kron(Sz,Sz));
 drive=kron(7*Sx+2*Sz,eye(2));
@@ -146,7 +147,7 @@ result=test_close(result,'Finite-drive coupled drift',actual,expected,6e-14,0,..
                   'Dense full-bath propagation includes noncommuting dipolar drift.');
 
 % Named finite drives compile the same control without a public event array
-q=rmfield(p,'sequence');
+q=rmfield(p,'drive');
 q.drive=struct('spins',1,'axis','x','amplitude',7,'detuning',2,'duration',0.1);
 selected=p.times==0|p.times>=q.drive.duration; q.times=p.times(selected);
 named=clexpn(system,@finite_drive,q,'labframe');
@@ -165,15 +166,15 @@ for n=1:numel(invalid)
     result=test_true(result,['Named finite-drive validation ' field{1}],rejected,...
                       'Every declarative drive field is validated.');
 end
-bad=q; bad.times=[0 0.02]; rejected=false;
-try
-    clexpn(system,@finite_drive,bad,'labframe');
-catch
-    rejected=true;
+bad=q; bad.times=[0 0.02]; partial=clexpn(system,@finite_drive,bad,'labframe');
+U=expm(-1i*(drift+drive)*0.02); state=U*kron(rho,eye(2)/2)*U'; observed=zeros(2);
+for a=1:2
+    for b=1:2, observed(a,b)=trace(state((a-1)*2+(1:2),(b-1)*2+(1:2))); end
 end
-result=test_true(result,'Named finite-drive observation time',rejected,...
-                  'An observation cannot precede completion of the finite pulse.');
-bad=q; bad.sequence=p.sequence; rejected=false;
+result=test_close(result,'Named finite-drive observation time',partial(2,:),observed(:).',...
+                  6e-14,0,'An observation during a drive retains simultaneous coupled evolution.');
+bad=q; bad.sequence=struct('type','finite','target',1,'axis','x',...
+    'placement','absolute','at',0,'duration',0.1,'amplitude',7,'detuning',2); rejected=false;
 try
     clexpn(system,@finite_drive,bad,'labframe');
 catch
@@ -182,11 +183,23 @@ end
 result=test_true(result,'Named finite-drive event ownership',rejected,...
                   'A competing event array is rejected.');
 
+% Mixed finite and ideal controls retain their explicit representation limit
+bad=q; bad.cce.basis.formalism='zeeman-liouv';
+bad.refocusing={struct('spins',1,'axis','x','angle',pi,'fraction',0.5)};
+rejected=false;
+try
+    clexpn(system,@finite_drive,bad,'labframe');
+catch exception
+    rejected=strcmp(exception.identifier,'cce_acquire:controls');
+end
+result=test_true(result,'Mixed Liouville controls rejected',rejected,...
+                 'Ideal refocusing mixed with finite drives requires generalized Hilbert dynamics.');
+
 % Relaxation remains simultaneous with a finite observed drive
 inter.coupling.matrix=cell(2); system=create(sys,inter);
 p.cce.basis.formalism='zeeman-liouv';
 p.bath_jumps=struct('support',1,'operator','Lz','rate',2);
-actual=clexpn(system,@free_evolution,p,'labframe');
+actual=clexpn(system,@finite_drive,p,'labframe');
 J=sqrt(2)*Sz; loss=J'*J;
 D=kron(conj(J),J)-(kron(eye(2),loss)+kron(loss.',eye(2)))/2;
 A=-1i*(kron(eye(2),7*Sx+2*Sz)-kron((7*Sx+2*Sz).',eye(2)))+D;
@@ -198,21 +211,24 @@ result=test_close(result,'Finite-drive GKSL evolution',actual,expected,6e-14,0,.
                   'The dissipator remains active during and after the drive.');
 p=rmfield(p,'bath_jumps'); p.cce=rmfield(p.cce,'basis');
 
-p.sequence.type='ideal';
-failed=false;
-try
-    clexpn(system,@free_evolution,p,'labframe');
-catch err
-    failed=strcmp(err.identifier,'free_evolution:sequence');
+% Raw finite, ideal, and empty event arrays are all removed inputs
+for events={struct('type','finite'),struct('type','ideal'),struct([]),[]}
+    rejected=p; rejected=rmfield(rejected,'drive'); rejected.sequence=events{1};
+    failed=false;
+    try
+        clexpn(system,@free_evolution,rejected,'labframe');
+    catch err
+        failed=strcmp(err.identifier,'cce_options:sequence');
+    end
+    result=test_true(result,'Free evolution rejects raw events',failed,...
+                     'Use finite_drive, refocusing_train, or a named echo experiment.');
 end
-result=test_true(result,'Free evolution rejects ideal events',failed,...
-                 'Named echo experiments own ideal refocusing pulses.');
-p.sequence.type='finite'; p.cce.approximation='projected'; p.output='signal';
+p.cce.approximation='projected'; p.output='signal';
 failed=false;
 try
-    clexpn(system,@free_evolution,p,'labframe');
+    clexpn(system,@finite_drive,p,'labframe');
 catch err
-    failed=strcmp(err.identifier,'free_evolution:projection');
+    failed=strcmp(err.identifier,'clexpn:projection');
 end
 result=test_true(result,'Projected finite drives rejected',failed,...
                  'A finite observed drive requires generalized propagation.');

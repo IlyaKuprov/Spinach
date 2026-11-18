@@ -3,14 +3,16 @@
 %
 %     [answer,aux]=finite_drive(spin_system,parameters,H,R,K)
 %
-% parameters.times gives increasing elapsed seconds, zero or after the last
-% finite slice ends. parameters.drive is a scalar structure with fields:
+% parameters.times gives increasing elapsed seconds, including during a drive.
+% parameters.drive is a nonempty structure row, each element with fields:
 %   spins     - unique physical observed-spin identifiers
 %   axis      - 'x', 'y', 'z', or a real unit three-vector
 %   amplitude - real finite amplitude row in rad/s
 %   detuning  - real finite longitudinal offset in rad/s
 %   duration  - matching positive duration row in seconds
 % Optional time specifies the start in seconds; otherwise the start is zero.
+% Alternatively fraction specifies one start as a fraction of each elapsed
+% time, for a single finite pulse whose duration remains in seconds.
 % Equal-length amplitude/duration rows specify consecutive waveform slices.
 % A matching time row gives explicit starts, including overlapping slices.
 % Optional refocusing is a cell row of ideal-pulse descriptors (spins,
@@ -25,15 +27,9 @@ function [answer,aux]=finite_drive(spin_system,parameters,H,R,K)
 
 % Validate the declarative drive before compiling its finite event
 grumble(spin_system,parameters,H,R,K);
-parameters.sequence=cce_pulse_events(parameters);
-finite=strcmp({parameters.sequence.type},'finite');
-stops=[parameters.sequence(finite).at]+[parameters.sequence(finite).duration];
-if any(parameters.times>0&parameters.times<max(stops))
-    error('finite_drive:times','Nonzero observations must follow completion of the finite drive.');
-end
 
 % Reuse the experiment-level finite-control propagation contract
-[answer,aux]=free_evolution(spin_system,parameters,H,R,K);
+[answer,aux]=cce_acquire(spin_system,parameters,H,R,K);
 
 end
 
@@ -43,11 +39,12 @@ if ~isstruct(spin_system)||~isfield(spin_system,'model')||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'drive')
     error('finite_drive:input','Supply a retained subsystem and drive parameters.');
 end
-if isfield(parameters,'sequence')&&~isempty(parameters.sequence)
-    error('finite_drive:sequence','Pulse events belong to the finite_drive experiment.');
+cce_pulse_events(parameters);
+if isfield(parameters,'sequence')
+    error('finite_drive:sequence','Use finite_drive native drive descriptors, not parameters.sequence.');
 end
-if isfield(parameters.drive,'spins')
-    ids=parameters.drive.spins;
+for k=1:numel(parameters.drive)
+    ids=parameters.drive(k).spins;
     if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
        numel(unique(ids))~=numel(ids)||any(~ismember(ids,spin_system.model.observed_ids))
         error('finite_drive:spins','Finite drives address unique observed-spin identifiers.');

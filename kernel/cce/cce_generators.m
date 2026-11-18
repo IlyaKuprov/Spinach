@@ -455,6 +455,9 @@ end
 
 % Enforce the native ownership and representation contract
 function grumble(system,parameters,cache)
+if isfield(parameters,'sequence')
+    error('cce_generators:sequence','Use finite_drive, refocusing_train, or hahn_echo, not parameters.sequence.');
+end
 if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
    ~strcmp(system.kind,'cce_subsystem')||~isstruct(parameters)||~isscalar(parameters)||...
    ~isfield(parameters,'cce')||~all(isfield(parameters.cce,{'approximation','numerics','second_order'}))

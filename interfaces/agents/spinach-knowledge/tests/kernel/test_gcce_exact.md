@@ -38,3 +38,5 @@ Native preparation and observation are tested with independent receiver scales f
 The y-phase Hahn rotation is specified by explicit transition columns alpha=[1;0], beta=[0;1i], with the physical initial density supplied separately. Direct raw interlacing uses the registered callback and a context-generated ensemble, not a legacy evaluator. The context call used solely to obtain that ensemble has order zero; the subsequent raw calculation uses the requested physical cluster.
 
 Native-only regressions reject unknown or Hilbert-only preferences on master-equation requests, and reject direct-segment Hahn propagation for projected or Liouville representations.
+
+Finite-control invocations use finite_drive with native physical descriptors, not a raw sequence field. Independent references retain their physical inputs and assertions; unused raw-event declarations are not part of the reference construction.

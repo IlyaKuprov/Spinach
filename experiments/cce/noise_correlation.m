@@ -125,6 +125,9 @@ end
 
 % Reject unspecified connected conventions and non-Hermitian observables
 function grumble(system,p,H,R,K)
+if isfield(p,'sequence')
+    error('noise_correlation:sequence','Use finite_drive, refocusing_train, or hahn_echo for controls.');
+end
 if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')||...
    ~isnumeric(H)||~isnumeric(R)||~isnumeric(K)||~isfield(p,'noise')||...
    ~all(isfield(p.noise,{'ordering','connected','manifold'}))||...

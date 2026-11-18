@@ -130,6 +130,9 @@ end
 
 % Reject ambiguous preparation, detection and receiver conventions
 function grumble(system,parameters)
+if isfield(parameters,'sequence')
+    error('cce_observation:sequence','Use finite_drive, refocusing_train, or hahn_echo, not parameters.sequence.');
+end
 if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')
     error('cce_observation:input','A native retained subsystem and parameters are required.');

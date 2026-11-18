@@ -21,3 +21,5 @@ The named preparation `transverse` is available for exactly one observed spin on
 The default transition reference is evaluated in the bilinear order `exp(-1i*receiver_phase)*(alpha'*rho_observed*beta)`. This preserves the numerical convention of the selected-transition signal. Explicit coils or detection descriptors instead use `trace(coil'*rho_observed)`. The two forms represent the same detection convention but need not have identical floating-point rounding.
 
 Receiver cells may be row or column vectors. Linear cell order defines output-channel order; references and normalisation divisors are always rows. Each normalisation decision uses only that detector's own scale.
+
+Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.

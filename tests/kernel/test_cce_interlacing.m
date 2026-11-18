@@ -296,12 +296,12 @@ inter.coupling.matrix{1,3}=diag([1 3 4])/(2*pi); spin_system=create(sys,inter);
 q=p; q.cce.approximation='generalized'; q.normalized=false; q.cce.bath_spins=[2 3]; q.cce.meanfield='none';
 q.cce.bath_state.probabilities='uniform'; q.times=[0 0.2 0.5];
 q.cce.interlaced=struct('max_states',4); driven_ok=true; driven_error=0;
-finite=struct('type','finite','target',1,'placement','absolute','at',0.05,...
-              'duration',0.05,'axis','x','amplitude',2,'detuning',0);
-for sequence={@hahn_echo,@free_evolution}
+finite=struct('spins',1,'time',0.05,'duration',0.05,...
+              'axis','x','amplitude',2,'detuning',0);
+for sequence={@hahn_echo,@finite_drive}
     pulse_sequence=sequence{1};
-    if isequal(pulse_sequence,@free_evolution)
-        q.sequence=finite;
+    if isequal(pulse_sequence,@finite_drive)
+        q.drive=finite;
         q.cce.numerics=rmfield(q.cce.numerics,'propagator');
     else
         q.cce.numerics.propagator='expm';

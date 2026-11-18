@@ -28,6 +28,9 @@ end
 
 % Validate the supported context and its unevaluated call arguments
 function grumble(context,pulse_sequence,parameters,assumptions)
+if isfield(parameters,'sequence')
+    error('context_task:sequence','Use finite_drive, refocusing_train, or hahn_echo, not parameters.sequence.');
+end
 if ~isa(context,'function_handle')||~isequal(context,@clexpn)
     error('context_task:context','Only the generator-owning clexpn context is supported.');
 end

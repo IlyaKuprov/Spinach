@@ -76,8 +76,8 @@ if ~isstruct(spin_system)||~isfield(spin_system,'kind')||...
    any(~isfinite(parameters.times))||any(parameters.times<0)||any(diff(parameters.times)<0)
     error('cpmg_echo:input','A native retained subsystem and increasing nonnegative times are required.');
 end
-if isfield(parameters,'sequence')&&~isempty(parameters.sequence)
-    error('cpmg_echo:sequence','This named experiment defines its own controls.');
+if isfield(parameters,'sequence')
+    error('cpmg_echo:sequence','Use finite_drive, refocusing_train, or this named experiment, not parameters.sequence.');
 end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     error('cpmg_echo:density','This experiment returns detected signal or observables.');

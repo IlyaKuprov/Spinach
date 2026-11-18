@@ -137,7 +137,7 @@ A native model's source_hash represents physical/numerical inputs, not execution
 For a piecewise finite pulse use finite_drive with drive.spins, axis, row amplitude
 (rad/s), matching positive duration (s), and scalar detuning (rad/s). Optional
 time supplies a scalar start or matching explicit slice starts; otherwise slices
-start consecutively at zero. Nonzero observations follow the last finite slice. Add ideal pulses
+start consecutively at zero. Observations may occur during a finite pulse. Add ideal pulses
 with a refocusing cell row: spins, integrated Hermitian operator or axis/angle,
 and absolute time or fraction. Do not supply raw event arrays. Pure ideal trains
 use refocusing_train with that cell row, or train.name=xy8/udd, count, axis, and
@@ -159,6 +159,8 @@ Use [sys,inter,fixture]=cce_fixture('nv_four_c13','6f7282b6') for the fixed four
 
 The old observed_spins spelling is removed; use observed. Old top-level order, graph, bath_state, partition, interlaced, numerical, scheduling, and reduction controls belong under cce, while assumptions is the fourth context argument. method and quantity wrappers are replaced by the experiment capability and output; hamiltonian_backend becomes cce.backend, deer becomes pump with explicit frequency units and boundary, and jumps becomes bath_jumps. Supplied clusters and cluster_cap overrides are removed: the context owns the family, and the numerical policy owns its memory budget. Reserved controls, sampling, run, diagnostics, initial_rho, bath_state.temperature, and numerics.full_bath are not supported public inputs.
 
-Raw sequence/name/event-array forms are removed from the supported public contract. Use the registered experiment and its drive, refocusing, train, nloops, or pump controls instead. The current free_evolution route still accepts caller-supplied finite event records, and test_clexpn_experiments asserts that acceptance; this is a remaining public-boundary migration gap, not a compatibility promise. Internal event records and retained numerical engines must not be advertised as an alternate context API.
+Raw sequence/name/event-array forms are rejected at runtime, including empty arrays. Use the registered experiment and its drive, refocusing, train, nloops, or pump controls instead. All finite-drive physics checks use native descriptors: independent-axis overlapping drives, fractional starts, partial observations, coupled drift, and simultaneous GKSL relaxation. Internal events are compiled inside cce_acquire from validated native declarations; no raw parameter field or alternate context API remains.
 
 Use cce_analyse with an explicit record containing times, value, and valid and separate analysis options; that small data record is not a returned legacy simulation wrapper. Use cce_export(filename,model,payload) with an explicitly packed answer/diagnostics payload. Both utilities remain explicit post-processing choices.
+
+finite_drive accepts a nonempty structure row of independent drives. Each has observed spins, axis, amplitude/duration rows, detuning, and optional absolute time; a single finite pulse may instead specify a start fraction in [0,1]. Durations remain seconds, and overlapping contributions add while the full drift and supported dissipation remain active.

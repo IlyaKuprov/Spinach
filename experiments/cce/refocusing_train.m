@@ -17,8 +17,7 @@ function [answer,aux]=refocusing_train(spin_system,parameters,H,R,K)
 
 % Compile experiment-owned ideal timings and propagate the retained subsystem
 grumble(spin_system,parameters,H,R,K);
-parameters.sequence=cce_pulse_events(parameters);
-[answer,aux]=free_evolution(spin_system,parameters,H,R,K);
+[answer,aux]=cce_acquire(spin_system,parameters,H,R,K);
 
 end
 
@@ -28,6 +27,9 @@ if ~isstruct(spin_system)||~isfield(spin_system,'formalism')||...
    ~strcmp(spin_system.formalism,'zeeman-hilb')||~isnumeric(H)||...
    ~isnumeric(R)||~isnumeric(K)||any(R(:))||any(K(:))
     error('refocusing_train:generators','Ideal trains require generalized closed Hilbert dynamics.');
+end
+if isfield(parameters,'sequence')
+    error('refocusing_train:sequence','Use refocusing_train native descriptors, not parameters.sequence.');
 end
 if ~isstruct(parameters)||~isscalar(parameters)||...
    ~xor(isfield(parameters,'refocusing'),isfield(parameters,'train'))||isfield(parameters,'drive')

@@ -28,7 +28,7 @@ contract.reduction='multiplicative'; contract.density_reduction=false;
 contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
 if isequal(pulse_sequence,@hahn_echo)||isequal(pulse_sequence,@free_evolution)||...
-   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train), contract.version=3; end
+   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train), contract.version=4; end
 if isequal(pulse_sequence,@hahn_echo), contract.version=6; end
 if isequal(pulse_sequence,@bath_pumped_hahn), contract.version=3; end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...

@@ -180,6 +180,9 @@ end
 
 % Validate experiment-compiled events before allocating retained matrices
 function grumble(system,parameters,drift,events)
+if isfield(parameters,'sequence')
+    error('cce_segments:sequence','Use finite_drive or refocusing_train native controls, not parameters.sequence.');
+end
 if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')||...
    ~isstruct(parameters)||~isfield(parameters,'times')||~isnumeric(drift)
     error('cce_segments:input','Supply a native subsystem, parameters, and numeric drift.');

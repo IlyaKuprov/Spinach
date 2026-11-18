@@ -993,9 +993,7 @@ parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
 parameters.times=linspace(0,8*pi/abs(omega),101);
-parameters.sequence=struct('type','ideal','target',1,...
-                           'operator',pi*[0 1 0;1 0 0;0 0 0]/2,...
-                           'angle',1,'placement','fraction','at',0.5);
+
 parameters.bath_state=struct('mode','mixed_product');
 parameters.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^28);
 
@@ -1069,9 +1067,7 @@ parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
 parameters.times=1e-3*[0 0.012500000000000001 0.025000000000000001 0.037500000000000006 0.050000000000000003 0.0625 0.075000000000000011 0.087500000000000008 0.10000000000000001 0.1125 0.125 0.13750000000000001 0.15000000000000002 0.16250000000000001 0.17500000000000002 0.1875 0.20000000000000001 0.21250000000000002 0.22500000000000001 0.23750000000000002 0.25 0.26250000000000001 0.27500000000000002 0.28750000000000003 0.30000000000000004 0.3125 0.32500000000000001 0.33750000000000002 0.35000000000000003 0.36250000000000004 0.375 0.38750000000000001 0.40000000000000002 0.41250000000000003 0.42500000000000004 0.4375 0.45000000000000001 0.46250000000000002 0.47500000000000003 0.48750000000000004 0.5];
 a=parameters.transition.alpha; b=parameters.transition.beta;
-parameters.sequence=struct('type','ideal','target',1,'operator',...
-                           pi*(a*b'+b*a')/2,'angle',1,...
-                           'placement','fraction','at',0.5);
+
 parameters.bath_state=struct('mode','mixed_product');
 parameters.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
 
@@ -1133,8 +1129,7 @@ parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
 parameters.times=linspace(0,200e-6,41);
-parameters.sequence=struct('type','ideal','target',1,'axis','x',...
-                           'angle',pi,'placement','fraction','at',0.5);
+
 parameters.bath_state=struct('mode','mixed_product');
 parameters.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
 
@@ -1271,8 +1266,7 @@ parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
 parameters.times=linspace(0,200e-6,41);
-parameters.sequence=struct('type','ideal','target',1,'axis','x',...
-                           'angle',pi,'placement','fraction','at',0.5);
+
 parameters.bath_state=struct('mode','mixed_product');
 parameters.numerics=struct('atol',1e-5,'rtol',1e-5,'max_memory_bytes',2^28);
 
@@ -1415,7 +1409,7 @@ v=[1;0;0;1]/sqrt(2); parameters.rho0=v*v';
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete');
-parameters.times=linspace(0,200e-6,31); parameters.sequence=struct([]);
+parameters.times=linspace(0,200e-6,31);
 parameters.bath_state=struct('mode','mixed_product');
 parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
@@ -1529,7 +1523,7 @@ v=[1;1]/sqrt(2); parameters.rho0=v*v';
 parameters.assumptions='labframe'; parameters.orientation=[0 0 0];
 parameters.interaction_cutoff=Inf; parameters.meanfield='none';
 parameters.graph=struct('mode','complete'); parameters.times=linspace(0,200e-6,31);
-parameters.sequence=struct([]); parameters.bath_state=struct('mode','mixed_product');
+parameters.bath_state=struct('mode','mixed_product');
 parameters.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 jump=[0 1;0 0]; rate=3000;
 parameters.jumps=struct('support',2,'operator',jump,'rate',rate);

@@ -339,6 +339,9 @@ end
 
 % Validate ownership, required controls and the complete nested vocabulary
 function grumble(system,p,experiment,assumptions)
+if isfield(p,'sequence')
+    error('cce_options:sequence','Use finite_drive, refocusing_train, or hahn_echo, not parameters.sequence.');
+end
 if isfield(p,'refocusing')&&~isequal(experiment,@hahn_echo)&&~isequal(experiment,@finite_drive)&&~isequal(experiment,@refocusing_train)&&...
    ~isequal(experiment,@cce_compile)&&~isequal(experiment,@cce_generators)
     error('cce_options:refocusing','The refocusing descriptor belongs to hahn_echo.');
@@ -346,11 +349,12 @@ end
 if isfield(p,'train')&&~isequal(experiment,@refocusing_train)&&~isequal(experiment,@cce_compile)
     error('cce_options:train','Named trains belong to refocusing_train.');
 end
-if isfield(p,'drive')&&~isequal(experiment,@finite_drive)&&~isequal(experiment,@cce_compile)
+if isfield(p,'drive')&&~isequal(experiment,@finite_drive)&&...
+   ~isequal(experiment,@cce_compile)&&~isequal(experiment,@cce_generators)
     error('cce_options:drive','The drive descriptor belongs to finite_drive.');
 end
 fields(p,{'observed','transition','spins','times','nloops','preparation','rho0',...
-          'drive','coil','output','normalized','orientation','cce','sequence','pump',...
+          'drive','coil','output','normalized','orientation','cce','pump',...
           'bath_jumps','noise','spectrum','refocusing','train'},'parameters');
 if ~isa(experiment,'function_handle')
     error('cce_options:experiment','pulse_sequence must be a function handle.');
@@ -386,15 +390,6 @@ if isfield(p,'transition')
 end
 if isfield(p,'pump')
     fields(p.pump,{'sites','species','center','halfwidth','units','fraction','allow_empty','boundary'},'pump');
-end
-if isfield(p,'sequence')
-    if ~isstruct(p.sequence)||~isrow(p.sequence)
-        error('cce_options:sequence','Explicit events must be a structure row.');
-    end
-    for k=1:numel(p.sequence)
-        fields(p.sequence(k),{'type','target','placement','at','axis','angle','operator',...
-                              'duration','amplitude','detuning','segments'},'sequence');
-    end
 end
 if isfield(p,'noise')
     fields(p.noise,{'terms','descriptors','connected','ordering','manifold'},'noise');

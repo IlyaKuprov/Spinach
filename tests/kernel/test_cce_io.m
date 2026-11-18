@@ -1,6 +1,10 @@
-% Versioned complex result round trips and explicit physical input units.
+% Versioned complex result round trips and explicit physical input units. Syntax:
 %
-%                         result=test_cce_io()
+%                    result=test_cce_io()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -159,6 +163,7 @@ end
 
 end
 
+% Write and close a temporary fixture file
 function put(file,content)
 
 % Write a bounded test input and close it immediately

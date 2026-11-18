@@ -1,5 +1,10 @@
-% Finite controls, named timestamps and exterior-field regression tests.
-% Syntax: result=test_cce_controls()
+% Finite controls, named timestamps, and exterior-field regression tests. Syntax:
+%
+%                    result=test_cce_controls()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -17,13 +22,13 @@ initial=kron(p.rho0,spin_config.bath_rho{1}); rho=U*initial*U'; expected=partial
 error=norm(s_aux.density(:,:,end)-expected,'fro');
 result=test_close(result,'Finite detuned drive matches independent dense expm',s_aux.density(:,:,end),expected,1e-12,0,'Finite detuned drive matches independent dense expm');
 
-% Normalize driven observables against the supplied observed spin configuration
+% Normalise driven observables against the supplied observed spin configuration
 q=p; q.output='observable'; q.coil=diag([1 2]); q.normalized=true;
 supplied_config=ensemble.spin_configs(1); supplied_config.rho0=diag([0.25 0.75]);
 supplied_config.bath_rho={diag([0 1])}; supplied_config.expectations=[0 0 -0.5];
 q.rho0=supplied_config.rho0; supplied_config=rmfield(supplied_config,'rho0');
 driven=controlled(model,2,supplied_config,q,@finite_drive);
-H_obs=H+7*kron(x,eye(2))+3*kron(z,eye(2)); U=expm(-1i*H_obs*0.1);
+h_observed=H+7*kron(x,eye(2))+3*kron(z,eye(2)); U=expm(-1i*h_observed*0.1);
 rho=partial(U*kron(q.rho0,supplied_config.bath_rho{1})*U');
 config_expected=[1;trace(q.coil*rho)/trace(q.coil*q.rho0)];
 result=test_close(result,'Finite controls supplied spin_config reference',driven,config_expected,...
@@ -79,7 +84,7 @@ for method={'gcce','megcce'}
                       'Cartesian and integrated native declarations agree.');
 end
 
-% Preserve normalized observable units through each generalized driver
+% Preserve normalised observable units through each generalised driver
 for method={'gcce','megcce'}
     for driven=[false true]
         if driven&&strcmp(method{1},'megcce'), continue; end
@@ -102,12 +107,12 @@ for driven=[false true]
     else, sequence=@hahn_echo; q=rmfield(q,'drive'); q.refocusing=ideal; end
     accepted=false; pulse_error=Inf;
     try
-        [operator_result,operator_diagnostics]=clexpn(model.spin_system,sequence,q,'labframe');
+        [operator_result,operator_details]=clexpn(model.spin_system,sequence,q,'labframe');
         pulse=struct('spins',2,'time',0.05,'axis','x','angle',pi);
         if driven, q.refocusing={pulse}; else, q.refocusing=pulse; end
         axis_result=clexpn(model.spin_system,sequence,q,'labframe');
         pulse_error=norm(operator_result(:)-axis_result(:));
-        accepted=all(operator_diagnostics.reduction.valid,'all');
+        accepted=all(operator_details.reduction.valid,'all');
     catch exception
         fprintf('DISJOINT_PULSE driven=%d error=%s\n',driven,exception.identifier);
     end
@@ -129,10 +134,10 @@ end
 result=test_true(result,'Exterior operator static-field rejection',rejected,...
                  'The no-mean-field skip must not discard a pulse that changes exterior expectations.');
 
-% Require no-op control dispatch to preserve explicit and default normalization
+% Require no-op control dispatch to preserve explicit and default normalisation
 q=rmfield(p,'drive'); q.output='signal'; q.rho0=ones(2)/2; ss=model.spin_system;
-for normalized=[false true]
-    q.normalized=normalized; plain=clexpn(ss,@free_evolution,q,'labframe');
+for normalised=[false true]
+    q.normalized=normalised; plain=clexpn(ss,@free_evolution,q,'labframe');
     q.drive=struct('spins',1,'duration',0.01,'axis','x','amplitude',0,'detuning',0);
     driven=clexpn(ss,@finite_drive,q,'labframe');
     result=test_close(result,'Control dispatch preserves signal normalization',...
@@ -182,14 +187,19 @@ p=rmfield(p,'drive'); p.refocusing={ideal};
 p=rmfield(p,'refocusing');
 for k=1:3
     width=10^(-k-2); p.drive=struct('spins',1,'time',0.05-width/2,...
-        'duration',width,'axis','x','amplitude',pi/width,'detuning',0);
+                                    'duration',width,'axis','x','amplitude',pi/width,'detuning',0);
     [~,s_aux]=controlled(model,2,spin_config,p,@finite_drive);
     errors(k)=norm(s_aux.density(:,:,end)-reference_aux.density(:,:,end),'fro');
 end
 result=test_true(result,'Finite pulse approaches ideal rotation',all(diff(errors)<0)&&errors(end)<2e-5,'Finite pulse approaches ideal rotation');
 
 % Compare midpoint piecewise envelopes against a much finer independent product
-mesh=[8 16 32]; waveform_errors=zeros(size(mesh)); reference=waveform(H,spin_config,p.rho0,1024);
+mesh=[8 16 32]; waveform_errors=zeros(size(mesh)); mesh_count=1024;
+
+% Accumulate midpoint propagators before tracing out the bath
+spin=pauli(2); x=spin.x; U=eye(4); dt=0.1/mesh_count;
+for j=1:mesh_count, U=expm(-1i*dt*(H+10*sin(pi*(j-0.5)/mesh_count)*kron(x,eye(2))))*U; end
+reference=partial(U*kron(p.rho0,spin_config.bath_rho{1})*U');
 for k=1:numel(mesh)
     n=mesh(k); dt=0.1/n;
     p.drive=struct('spins',1,'time',(0:n-1)*dt,'duration',dt*ones(1,n),...
@@ -235,8 +245,8 @@ p=rmfield(p,'train'); p.cce.meanfield='static'; p.refocusing={ideal}; p.refocusi
 [~,s_aux]=controlled(model,[],spin_config,p,@refocusing_train);
 field=s_aux.segments.exterior_expectations{end};
 result=test_close(result,'Exterior ideal pulse flips the sampled field',field{2}(1,3),-spin_config.expectations(1,3),1e-14,0,'Exterior ideal pulse flips the sampled field');
-Hbefore=s_aux.segments.hamiltonians{end}{2}; Hafter=s_aux.segments.hamiltonians{end}{3};
-result=test_true(result,'Exterior pulse changes subsequent Hamiltonian',norm(Hbefore-Hafter,'fro')>1,'Exterior pulse changes subsequent Hamiltonian');
+h_before=s_aux.segments.hamiltonians{end}{2}; h_after=s_aux.segments.hamiltonians{end}{3};
+result=test_true(result,'Exterior pulse changes subsequent Hamiltonian',norm(h_before-h_after,'fro')>1,'Exterior pulse changes subsequent Hamiltonian');
 p=rmfield(p,'refocusing'); p.drive=struct('spins',2,'duration',0.1,'axis','x','amplitude',7,'detuning',0);
 refused=false;
 try
@@ -277,8 +287,8 @@ result=test_close(result,'Physical spin-one pi pulse',physical_aux.density(:,:,e
 result=test_close(result,'Selective two-level pi pulse',selective_aux.density(:,:,end),diag([0 1 0]),...
                   1e-12,0,'The declared two-level pulse maps m=+1 to m=0');
 result=test_true(result,'Physical and selective pulses differ',...
-    norm(physical_aux.density(:,:,end)-selective_aux.density(:,:,end),'fro')>1,...
-    'A spin-one Cartesian rotation must not silently become a two-level pulse');
+                 norm(physical_aux.density(:,:,end)-selective_aux.density(:,:,end),'fro')>1,...
+                 'A spin-one Cartesian rotation must not silently become a two-level pulse');
 
 % Apply the declared integrated generator on the static native path
 sys=struct(); sys.magnet=0; sys.isotopes={'E'}; sys.output='hush';
@@ -341,21 +351,19 @@ end
 
 % Trace the independent bath index in the dense Kronecker reference
 function rho=partial(full)
+
+% Sum the bath diagonal blocks
 rho=zeros(2);
 for a=1:2
     for b=1:2, rho(a,b)=trace(full((a-1)*2+(1:2),(b-1)*2+(1:2))); end
 end
-end
 
-% Independently propagate a sampled sinusoidal drive with a fine mesh
-function rho=waveform(H,spin_config,rho0,n)
-spin=pauli(2); x=spin.x; U=eye(4); dt=0.1/n;
-for j=1:n, U=expm(-1i*dt*(H+10*sin(pi*(j-0.5)/n)*kron(x,eye(2))))*U; end
-rho=partial(U*kron(rho0,spin_config.bath_rho{1})*U');
 end
 
 % Build a small noncommuting observed-spin-bath model in angular-frequency units
 function [model,p,ensemble]=fixture()
+
+% Compile the explicit two-spin model and its product state
 sys.isotopes={'1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
 inter.coupling.matrix=cell(2); inter.coupling.matrix{1,2}=diag([2 3 5])/(2*pi);
 spin_system=create(sys,inter); p.observed=1; p.cce.bath_spins=2;
@@ -369,15 +377,19 @@ p.drive=struct('spins',1,'duration',0.1,'axis','x','amplitude',7,'detuning',3);
 p=cce_options(spin_system,p,@finite_drive,'labframe'); model=cce_compile(spin_system,p,'labframe');
 configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},'state_id',1,'configuration_id',1,'weight',1);
 local=cce_subsystem(model,2,configuration,[]); ensemble.spin_configs=rmfield(local.configuration,{'exterior_ids','exterior_expectations'});
+
 end
 
 % Evaluate native experiments directly on an explicitly conditioned subsystem
 function [answer,aux]=controlled(model,sites,configuration,p,experiment)
+
+% Construct the conditioned subsystem and execute its native experiment
 p=cce_options(model.spin_system,p,experiment,'labframe');
 model=cce_compile(model.spin_system,p,'labframe');
 local=cce_subsystem(model,sites,configuration,[]);
 [H,R,K,p]=cce_generators(local,p,[]);
 [answer,aux]=experiment(local,p,H,R,K);
+
 end
 
 

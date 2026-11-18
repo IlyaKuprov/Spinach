@@ -1,10 +1,10 @@
-% Physical partitions against an independent dense Kronecker/expm oracle.
-% Syntax:
+% Physical partitions against an independent dense Kronecker/expm oracle. Syntax:
 %
-%                         result=test_cce_partition()
+%                    result=test_cce_partition()
 %
 % Outputs:
-%     result - standard Spinach regression-test result structure
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -13,7 +13,32 @@ function result=test_cce_partition()
 % Initialise the regression record and a noncommuting three-spin bath
 result=new_test_result('kernel/cce_partition','CCE physical partitions',...
                        'Dense exact unions, pair factors and bounded adaptation.');
-[spin_system,inter]=fixture(); parameters=choices();
+
+% Specify noncommuting observed-conditioned tensors in cycles per second
+sys.isotopes={'E','13C','13C','13C'}; sys.magnet=0;
+sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
+inter.zeeman.matrix={zeros(3),diag([0 0 120]),diag([0 0 180]),diag([0 0 270])};
+inter.zeeman.units='Hz'; inter.coordinates={[0 0 0],[1 0 0],[2 0 0],[4 0 0]};
+inter.coupling.matrix=cell(4);
+inter.coupling.matrix{1,2}=[0 0 90;0 0 0;0 0 230];
+inter.coupling.matrix{1,3}=[0 0 70;0 0 0;0 0 180];
+inter.coupling.matrix{1,4}=[0 0 50;0 0 0;0 0 110];
+inter.coupling.matrix{2,3}=30*eye(3); inter.coupling.matrix{3,4}=20*eye(3);
+spin_system=create(sys,inter);
+
+% Supply explicit laboratory angular-frequency tensors without field scaling
+spin_system.inter.magnet=0; spin_system.inter.coordinates=inter.coordinates;
+spin_system.inter.zeeman.matrix=cellfun(@(x)2*pi*x,inter.zeeman.matrix,'UniformOutput',false);
+spin_system.inter.coupling.matrix=cell(4);
+for j=1:4
+    for k=1:4
+        if ~isempty(inter.coupling.matrix{j,k})
+            spin_system.inter.coupling.matrix{j,k}=2*pi*inter.coupling.matrix{j,k};
+        end
+    end
+end
+
+parameters=choices();
 [parameters,~]=cce_options(spin_system,parameters,@hahn_echo,'labframe');
 exact=dense_echo(inter,2:4,parameters.times);
 ordinary=clexpn(spin_system,@hahn_echo,parameters,'labframe');
@@ -59,8 +84,8 @@ pair_product=dense_echo(inter,[2 3],parameters.times).*...
              dense_echo(inter,[2 4],parameters.times).*...
              dense_echo(inter,[3 4],parameters.times)./...
              (dense_echo(inter,2,parameters.times).*...
-              dense_echo(inter,3,parameters.times).*...
-              dense_echo(inter,4,parameters.times));
+ dense_echo(inter,3,parameters.times).*...
+ dense_echo(inter,4,parameters.times));
 result=test_close(result,'Three-group pair-factor identity',...
                   inter_result,pair_product,2e-12,2e-12,...
                   'Each pair contributes F_AB*F0/(F_A*F_B).');
@@ -179,44 +204,92 @@ parameters.cce.groups={2:4};
 % Reject malformed groups and nonfinite or fractional declared bounds
 parameters.cce.partition.adaptive=false; parameters.cce.partition.max_probes=100;
 invalid=parameters; invalid.cce.groups={[2 3],[3 4]};
+refused=false;
+try
+    cce_partition(model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Overlapping groups rejected',...
-                 rejected(@()cce_partition(model,graph,invalid)),...
+                 refused,...
                  'Every physical bath ID occurs exactly once.');
 invalid=parameters; invalid.cce.groups={[2 3]};
+refused=false;
+try
+    cce_partition(model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Missing physical IDs rejected',...
-                 rejected(@()cce_partition(model,graph,invalid)),...
+                 refused,...
                  'A partition covers the complete selected bath.');
 invalid=parameters; invalid.cce.partition.max_dimension=NaN;
+refused=false;
+try
+    cce_partition(model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Nonfinite capacity rejected',...
-                 rejected(@()cce_partition(model,graph,invalid)),...
+                 refused,...
                  'Declared Hilbert capacities are finite positive integers.');
 invalid=parameters; invalid.cce.partition.adaptive=true;
 invalid.cce.partition.max_probes=1.5;
+refused=false;
+try
+    cce_partition(model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Fractional probe ceiling rejected',...
-                 rejected(@()cce_partition(model,graph,invalid)),...
+                 refused,...
                  'Probe ceilings count whole exact evaluations.');
 
 % Validate adaptive coordinates, spin_config sets, and tolerances before any probe
 invalid=parameters; invalid.cce.partition.adaptive=true;
 invalid.cce.partition.patch_atol=NaN;
+refused=false;
+try
+    cce_partition(model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Nonfinite patch tolerance rejected',...
-                 rejected(@()cce_partition(model,graph,invalid)),...
+                 refused,...
                  'NaN tolerances cannot certify a patch.');
 invalid=parameters; invalid.cce.partition.adaptive=true;
 invalid.cce.partition.heldout_configs=[];
+refused=false;
+try
+    cce_partition(model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Empty held-out spin_configs rejected',...
-                 rejected(@()cce_partition(model,graph,invalid)),...
+                 refused,...
                  'Held-out validation is mandatory for adaptation.');
 invalid=parameters; invalid.cce.groups={};
 invalid.cce.partition=struct('mode','spatial','max_dimension',4,...
                              'group_count',2,'max_rounds',1.5);
+refused=false;
+try
+    cce_partition(model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Fractional spatial ceiling rejected',...
-                 rejected(@()cce_partition(model,graph,invalid)),...
+                 refused,...
                  'Spatial iteration budgets are whole counts.');
 invalid.cce.partition.max_rounds=2; bad_model=model;
 bad_model.coordinates_A(2,1)=NaN;
+refused=false;
+try
+    cce_partition(bad_model,graph,invalid);
+catch
+    refused=true;
+end
 result=test_true(result,'Missing spatial coordinate rejected',...
-                 rejected(@()cce_partition(bad_model,graph,invalid)),...
+                 refused,...
                  'Spatial grouping requires finite Cartesian coordinates.');
 
 % Keep the empty-bath limit valid for every nonstandard factor family
@@ -254,7 +327,7 @@ for method={'gcce','megcce'}
                      'An unresolved intermediate may advance but cannot be accepted.');
 end
 
-% Keep the group partition compatible with generalized observed-density dynamics
+% Keep the group partition compatible with generalised observed-density dynamics
 general=choices(); general.cce.approximation='generalized'; general.output='density';
 general.rho0=ones(2)/2;
 general.cce.expansion='partition'; general.cce.order=1; general.cce.groups={2:4};
@@ -323,34 +396,7 @@ fprintf('PARTITION_HELDOUT pilot_error=%.3e heldout_error=%.3e tolerance=%.3e\n'
 
 end
 
-function [spin_system,inter]=fixture()
-
-% Specify noncommuting observed-conditioned tensors in cycles per second
-sys.isotopes={'E','13C','13C','13C'}; sys.magnet=0;
-sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
-inter.zeeman.matrix={zeros(3),diag([0 0 120]),diag([0 0 180]),diag([0 0 270])};
-inter.zeeman.units='Hz'; inter.coordinates={[0 0 0],[1 0 0],[2 0 0],[4 0 0]};
-inter.coupling.matrix=cell(4);
-inter.coupling.matrix{1,2}=[0 0 90;0 0 0;0 0 230];
-inter.coupling.matrix{1,3}=[0 0 70;0 0 0;0 0 180];
-inter.coupling.matrix{1,4}=[0 0 50;0 0 0;0 0 110];
-inter.coupling.matrix{2,3}=30*eye(3); inter.coupling.matrix{3,4}=20*eye(3);
-spin_system=create(sys,inter);
-
-% Supply explicit laboratory angular-frequency tensors without field scaling
-spin_system.inter.magnet=0; spin_system.inter.coordinates=inter.coordinates;
-spin_system.inter.zeeman.matrix=cellfun(@(x)2*pi*x,inter.zeeman.matrix,'UniformOutput',false);
-spin_system.inter.coupling.matrix=cell(4);
-for j=1:4
-    for k=1:4
-        if ~isempty(inter.coupling.matrix{j,k})
-            spin_system.inter.coupling.matrix{j,k}=2*pi*inter.coupling.matrix{j,k};
-        end
-    end
-end
-
-end
-
+% Specify the physical and numerical test parameters
 function parameters=choices()
 
 % Declare physical, state, sequence, and numerical choices explicitly
@@ -369,6 +415,7 @@ parameters.cce.averaging='after_expansion';
 
 end
 
+% Evaluate an independent dense Hahn-echo reference
 function value=dense_echo(inter,sites,times)
 
 % Assemble independent Cartesian spin-half operators in full cluster Hilbert space
@@ -396,24 +443,12 @@ for n=1:count
     end
 end
 
-% Propagate a observed superposition and maximally mixed bath through a Hahn echo
+% Propagate an observed superposition and maximally mixed bath through a Hahn echo
 db=dim/2; density=kron(ones(2)/2,eye(db)/db);
 pulse=expm(-1i*pi*ops{1,1}); value=zeros(numel(times),1);
 for k=1:numel(times)
     free=expm(-1i*hamiltonian*times(k)/2); propagator=free*pulse*free;
     final=propagator*density*propagator'; value(k)=2*trace(final(1:db,db+1:end));
-end
-
-end
-
-function outcome=rejected(operation)
-
-% Accept only a genuinely thrown validation error
-outcome=false;
-try
-    operation();
-catch
-    outcome=true;
 end
 
 end

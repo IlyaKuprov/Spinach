@@ -1,5 +1,10 @@
-% Declared-window envelope fitting and invalid-data diagnostics.
-% Syntax: result=test_cce_analysis()
+% Declared-window envelope fitting and invalid-data diagnostics. Syntax:
+%
+%                    result=test_cce_analysis()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 

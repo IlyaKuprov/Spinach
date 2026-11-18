@@ -3,7 +3,8 @@
 %                    result=test_cce_clusters()
 %
 % Outputs:
-%    result - Spinach regression result and explanatory checks
+%
+%     result - scalar regression result and explanatory checks
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -50,7 +51,7 @@ counts=0; max_error=0;
 for n=0:7
     for topology=1:5
 
-        % Construct path, cycle, complete, empty and deterministic dense graphs
+        % Construct path, cycle, complete, empty, and deterministic dense graphs
         adjacency=false(n);
         for a=1:n
             for b=a+1:n
@@ -101,6 +102,7 @@ for n=0:7
             end
 
         end
+
     end
 end
 result=test_true(result,'Brute-force families through seven vertices',counts==180,...
@@ -169,7 +171,7 @@ for topology=1:3
                      'chain, triangle and disconnected pair-plus-singleton coefficients are exact');
 end
 
-% Check cap selection, mandatory closure and physical composite dimensions
+% Check cap selection, mandatory closure, and physical composite dimensions
 model=struct('physical_ids',[10 20 30 40 50],'observed_ids',10,'bath_ids',[20 30 40 50],...
              'multiplicities',[3 2 3 2 2],'coordinates_A',zeros(5,3),...
              'pairs',struct('ids',{},'tensor',{}));
@@ -234,7 +236,7 @@ model=struct('physical_ids',1:5,'observed_ids',1,'bath_ids',2:5,...
              'pairs',struct('ids',{},'tensor',{}));
 parameters=struct('method','cce','order',2,'expansion','standard',...
                   'cluster_cap',[0 1],'graph',struct('mode','complete',...
-                  'score','supplied','scores',[0 1 1 1;1 0 7 1;1 7 0 1;1 1 1 0]));
+                                                     'score','supplied','scores',[0 1 1 1;1 0 7 1;1 7 0 1;1 1 1 0]));
 graph=cce_graph(model,parameters); capped=cce_clusters(model,graph,parameters);
 result=test_true(result,'Deterministic score cap',isequal(capped(end).groups,[2 3])&&...
                  isequal(capped(1).cap_overrun,[2 0]),...
@@ -255,7 +257,7 @@ result=test_true(result,'One-group exact physical cost',isscalar(grouped)&&...
 
 % One hundred sparse bath vertices do not trigger a global powerset
 large=100; model=struct('physical_ids',1:large+1,'observed_ids',1,...
-                       'bath_ids',2:large+1,'multiplicities',2*ones(1,large+1));
+                        'bath_ids',2:large+1,'multiplicities',2*ones(1,large+1));
 graph=struct('bath_ids',2:large+1,'adjacency',sparse(false(large)),...
              'scores',sparse(large,large));
 parameters=struct('order',1,'expansion','standard','cluster_cap',1);

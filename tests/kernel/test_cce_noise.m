@@ -1,4 +1,10 @@
-% Additive noise expansion against dense quantum and classical references.
+% Additive noise expansion against dense quantum and classical references. Syntax:
+%
+%                    result=test_cce_noise()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -58,24 +64,24 @@ for ordering={'ordered','symmetrized'}
     q.noise.ordering=ordering{1}; q.noise.connected=true;
     raw=contract.evaluator(model,cluster,spin_config,schedule,q); supplied_reference=zeros(numel(p.times),1);
     for k=1:numel(p.times)
-        U=expm(-1i*H*p.times(k)); Bt=U'*B*U;
-        greater=trace(Bt*B*rho); lesser=trace(B*Bt*rho);
+        U=expm(-1i*H*p.times(k)); b_time=U'*B*U;
+        greater=trace(b_time*B*rho); lesser=trace(B*b_time*rho);
         if strcmp(ordering{1},'ordered'), moment=greater;
         else, moment=(greater+lesser)/2; end
-        supplied_reference(k)=moment-trace(Bt*rho)*trace(B*rho);
+        supplied_reference(k)=moment-trace(b_time*rho)*trace(B*rho);
     end
     result=test_close(result,['Noise supplied spin_config ' ordering{1}],raw.value,supplied_reference,...
                       2e-12,2e-12,'Noise uses the spin_config bath state and its connected reference moments.');
 end
 
-% Check factorization into independent connected single-spin correlations
+% Check factorisation into independent connected single-spin correlations
 s.inter.coupling.matrix{2,3}=zeros(3); p.cce.order=1; first=clexpn(s,@noise_correlation,p,'labframe');
 p.cce.order=2; second=clexpn(s,@noise_correlation,p,'labframe');
 reference=cos(1.3*p.times(:))/4+1;
 result=test_close(result,'C7 numerical check',first,reference,1e-12,1e-12,'Disconnected independent sum.');
 result=test_close(result,'C7 numerical check',second,first,1e-12,1e-12,'Disconnected pair cumulant vanishes.');
 
-% Exercise unequal-time quantum ordering in a polarized bath
+% Exercise unequal-time quantum ordering in a polarised bath
 p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2]),eye(2)/2}});
 p.noise.terms=struct('support',2,'operator',x); ordered=clexpn(s,@noise_correlation,p,'labframe');
 reference=(cos(1.3*p.times(:))+0.6i*sin(1.3*p.times(:)))/4;
@@ -90,7 +96,7 @@ result=test_close(result,'C7 numerical check',classical,repmat(0.16,numel(p.time
 
 % Retain classical ensemble variance in a sampled connected correlation
 q=p; q.cce.bath_state=struct('mode','sampled','samples',64,'seed',31,...
-                       'basis','uniform','probabilities','uniform');
+                             'basis','uniform','probabilities','uniform');
 q.rho0=eye(2)/2;
 [~,diagnostics]=clexpn(s,@noise_correlation,q,'labframe'); ensemble=diagnostics.ensemble;
 assignments=vertcat(ensemble.spin_config.assignment); means=1.5-assignments(:,1); expected=0.25-(ensemble.weights(:).'*means)^2;
@@ -106,7 +112,7 @@ for mode={'after_expansion','internal_then_expansion'}
                       'The mixed-state covariance includes the variance of sampled projected means.');
 end
 
-% Compare time-dependent ordered and symmetrized covariances with a dense mixture
+% Compare time-dependent ordered and symmetrised covariances with a dense mixture
 s.inter.zeeman.matrix{2}=zeros(3); s.inter.zeeman.matrix{2}(3,1)=1.3;
 rho=diag([mean(assignments(:,1)==1) mean(assignments(:,1)==2)]);
 for ordering={'ordered','symmetrized'}
@@ -175,9 +181,9 @@ H=1.3*kron(x,eye(2))+0.7*kron(eye(2),x);
 B=kron(z,eye(2))+kron(eye(2),z); rho=kron(diag([1 0]),diag([1 0]));
 reference=zeros(numel(p.times),1); connected=reference;
 for k=1:numel(p.times)
-    U=expm(-1i*H*p.times(k)); Bt=U'*B*U;
-    reference(k)=trace(Bt*B*rho);
-    connected(k)=reference(k)-trace(Bt*rho)*trace(B*rho);
+    U=expm(-1i*H*p.times(k)); b_time=U'*B*U;
+    reference(k)=trace(b_time*B*rho);
+    connected(k)=reference(k)-trace(b_time*rho)*trace(B*rho);
 end
 for ordering={'ordered','symmetrized'}
     p.noise.ordering=ordering{1}; p.noise.connected=false;
@@ -192,7 +198,7 @@ end
 
 % Preserve cross-site covariance of the actual finite sampled mixture
 p.cce.bath_state=struct('mode','sampled','samples',16,'seed',31,...
-                       'basis','uniform','probabilities','uniform');
+                        'basis','uniform','probabilities','uniform');
 p.noise.connected=true; p.rho0=eye(2)/2;
 [~,diagnostics]=clexpn(s,@noise_correlation,p,'labframe'); ensemble=diagnostics.ensemble;
 assignments=vertcat(ensemble.spin_config.assignment);
@@ -202,8 +208,8 @@ for k=1:size(assignments,1)
     rho(index,index)=rho(index,index)+ensemble.weights(k);
 end
 for k=1:numel(p.times)
-    U=expm(-1i*H*p.times(k)); Bt=U'*B*U;
-    reference(k)=trace(Bt*B*rho)-trace(Bt*rho)*trace(B*rho);
+    U=expm(-1i*H*p.times(k)); b_time=U'*B*U;
+    reference(k)=trace(b_time*B*rho)-trace(b_time*rho)*trace(B*rho);
 end
 for averaging={'after_expansion','internal_then_expansion'}
     p.cce.averaging=averaging{1}; actual=clexpn(s,@noise_correlation,p,'labframe');

@@ -1,6 +1,10 @@
 % Tests observed expectations and virtual-level corrections. Syntax:
 %
-%                        result=test_cce_projection()
+%                    result=test_cce_projection()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -10,7 +14,7 @@ function result=test_cce_projection()
 result=new_test_result('kernel/cce_projection','CCE observed projection',...
                        'Check explicit states, projected fields and resolved virtual levels.');
 
-% Create a observed spin-half with an exactly known longitudinal gap
+% Create an observed spin-half with an exactly known longitudinal gap
 sys.isotopes={'1H','13C'}; sys.magnet=0; sys.output='hush';
 system=create(sys,struct()); gap=1000; coupling=4;
 system.inter.zeeman.matrix{1}=gap*eye(3);
@@ -26,7 +30,7 @@ result=test_close(result,'alpha expectation',...
 result=test_close(result,'beta expectation',...
                   manifolds.beta.expectations,[0 0 -1/2],0,0,'Spin-half down state has negative one-half Sz.');
 result=test_true(result,'second order off by default',...
-                  ~manifolds.second_order_enabled&&norm(manifolds.alpha.susceptibility,'fro')==0,'No implicit perturbative correction.');
+                 ~manifolds.second_order_enabled&&norm(manifolds.alpha.susceptibility,'fro')==0,'No implicit perturbative correction.');
 
 % Compare manifold Hamiltonians against explicit full-Hilbert projections
 [H,meta]=cce_hamiltonian(model,2,struct());
@@ -35,10 +39,10 @@ for name={'alpha','beta'}
     projected=embedding'*H*embedding;
     reference=manifold.energy*eye(2)+coupling*manifold.expectations(1)*[0 1;1 0]/2;
     result=test_close(result,[name{1} ' projected projection'],...
-                  projected,reference,meta.roundoff_bound,0,'Independent dense product-space projection.');
+                      projected,reference,meta.roundoff_bound,0,'Independent dense product-space projection.');
 end
 
-% Enable a observed-gap expansion and compare against the exact coupled spectrum
+% Enable an observed-gap expansion and compare against the exact coupled spectrum
 projection.second_order=struct('enabled',true,'gap_tolerance',1,'overlap_tolerance',1e-12);
 manifolds=cce_project(model,projection);
 result=test_close(result,'virtual coefficient',...
@@ -48,7 +52,7 @@ exact=sort(eig(full(H))); approximate=gap/2+correction;
 error_value=abs(approximate-exact(end));
 bound=coupling^4/(256*gap^3);
 result=test_true(result,'second-order spectrum',...
-                  error_value<=bound+eps(gap),'Exact square-root spectrum bounds omitted fourth order.');
+                 error_value<=bound+eps(gap),'Exact square-root spectrum bounds omitted fourth order.');
 fprintf('CCE projection: exact spectral error=%g, fourth-order bound=%g\n',error_value,bound);
 
 % Reject a near-degenerate virtual denominator before any division
@@ -59,7 +63,7 @@ catch
     rejected=true;
 end
 result=test_true(result,'near-degenerate denominator rejected',...
-                  rejected,'An explicit gap guard prevents unresolved perturbation theory.');
+                 rejected,'An explicit gap guard prevents unresolved perturbation theory.');
 
 % Reject non-eigenstate projectors and gCCE double counting
 projection.second_order.gap_tolerance=1;
@@ -71,7 +75,7 @@ catch
     rejected=true;
 end
 result=test_true(result,'overlap guard',...
-                  rejected,'Explicit superposition is not silently reselected.');
+                 rejected,'Explicit superposition is not silently reselected.');
 projection.transition.alpha=[1;0]; projection.transition.beta=[0;1]; projection.method='gcce';
 rejected=false;
 try
@@ -80,7 +84,7 @@ catch
     rejected=true;
 end
 result=test_true(result,'gCCE correction rejected',...
-                  rejected,'Full observed dynamics already contains virtual transitions.');
+                 rejected,'Full observed dynamics already contains virtual transitions.');
 
 % Verify multi-centre product ordering and a complex orthogonal selected two-level transition basis
 projection=rmfield(projection,'second_order');

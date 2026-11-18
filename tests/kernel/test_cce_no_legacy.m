@@ -1,5 +1,10 @@
-% Absence of the retired CCE interface and its executable callers.
-% Syntax: result=test_cce_no_legacy()
+% Absence of the retired CCE interface and its executable callers. Syntax:
+%
+%                    result=test_cce_no_legacy()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % Checks the active path and Git-tracked MATLAB sources below the repository
 % containing this test. Comments and quoted text are stripped before the

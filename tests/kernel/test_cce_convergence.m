@@ -1,4 +1,10 @@
-% Explicit independent convergence ladder and cap acceptance test.
+% Explicit independent convergence ladder and cap acceptance test. Syntax:
+%
+%                    result=test_cce_convergence()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -25,7 +31,7 @@ p.cce=struct('bath_spins',[2 3],'approximation','projected','expansion','standar
                                  'samples',4,'seed',193),...
              'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^26));
 
-% Compare product-factorized Ising order one against the exact order two
+% Compare product-factorised Ising order one against the exact order two
 p.cce.bath_state=struct('mode','mixed_product'); p.cce.order=1;
 order=struct('field','cce.order','values',{{1,2}});
 time=struct('field','times','values',{{p.times,[0 0.001 0.002 0.004]}});
@@ -89,7 +95,7 @@ result=test_true(result,'invalid coverage cannot converge',~strcmp(invalid_detai
 request=converged_details.input_parameters; request.cce=rmfield(request.cce,'convergence');
 request.normalized=true; request.times=[0 0.001 0.01];
 request.cce.bath_state=struct('mode','sampled','samples',4,'seed',193,...
-                                'basis','uniform','probabilities','uniform');
+                              'basis','uniform','probabilities','uniform');
 [~,available]=clexpn(spin_system,@free_evolution,request,'labframe');
 request.cce.numerics.atol=mean(available.reduction.abs_error_bound([1 end]));
 request.cce.numerics.rtol=0;

@@ -1,9 +1,10 @@
-% Controlled CCE zeros, uncertainty, cancellation and phase tests. Syntax:
+% Controlled CCE zeros, uncertainty, cancellation, and phase tests. Syntax:
 %
 %                    result=test_cce_conditioning()
 %
 % Outputs:
-%    result - regression result with exact mask and reason checks
+%
+%     result - scalar regression result with exact mask and reason checks
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -25,7 +26,7 @@ for k=1:numel(clusters)
     raw(k+1).cluster_id=clusters(k).id;
 end
 
-% Plant a baseline zero, unresolved denominator, uncertain zero and exact zero
+% Plant a baseline zero, unresolved denominator, uncertain zero, and exact zero
 raw(1).value(2)=0;
 raw(3).value(3)=1e-10; raw(3).abs_error_bound(3)=1e-9;
 raw(5).value(4)=0; raw(5).abs_error_bound(4)=1e-9;

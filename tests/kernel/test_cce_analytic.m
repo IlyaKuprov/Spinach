@@ -1,6 +1,10 @@
-% Analytic projected CCE limits, Hahn modulation and complex FID. Syntax:
+% Analytic projected CCE limits, Hahn modulation, and complex FID. Syntax:
 %
-%                         result=test_cce_analytic()
+%                    result=test_cce_analytic()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -20,7 +24,15 @@ spin_system.inter.zeeman.matrix{1}(3,3)=phase;
 spin_system.inter.zeeman.matrix{2}(3,3)=omega;
 spin_system.inter.coupling.matrix{1,2}(1,3)=transverse;
 spin_system.inter.coupling.matrix{1,2}(3,3)=longitudinal;
-p=parameters(); p.times=linspace(0,0.012,81);
+
+% Declare the observed transition and bath policy
+p.observed=1; p.cce.bath_spins=2; p.cce.approximation='projected'; p.cce.expansion='standard';
+p.output='signal'; p.cce.order=1; p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
+p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
+p.cce.graph=struct('mode','complete','score','coupling_norm');
+p.cce.bath_state=struct('mode','mixed_product'); p.cce.meanfield='none';
+p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+p.times=linspace(0,0.012,81);
 
 % Compare the complex projected FID against independent two-by-two expm
 fid=clexpn(spin_system,@free_evolution,p,'labframe'); z=diag([1 -1])/2; x=[0 1;1 0]/2;
@@ -66,14 +78,20 @@ p.cce.bath_spins=[]; p.cce.order=0;
 empty=clexpn(spin_system,@free_evolution,p,'labframe');
 result=test_close(result,'empty bath phase',empty,exp(-1i*phase*p.times(:)),1e-11,1e-11,'Independent analytic or dense reference.');
 
-% Verify a disconnected unpolarized bath changes no observed dynamics
+% Verify a disconnected unpolarised bath changes no observed dynamics
 p.cce.bath_spins=2; p.cce.order=1; spin_system.inter.coupling.matrix{1,2}=zeros(3);
 uncoupled=clexpn(spin_system,@free_evolution,p,'labframe');
 result=test_close(result,'uncoupled bath',uncoupled,empty,1e-11,1e-11,'Independent analytic or dense reference.');
-metrics.fid_error=max(abs(fid-reference_fid(ha,hb,phase,p.times)));
+
+% Evaluate the conditional bath trace at every requested time
+values=zeros(numel(p.times),1);
+for k=1:numel(p.times)
+    values(k)=exp(-1i*phase*p.times(k))*trace(expm(-1i*ha*p.times(k))*expm(1i*hb*p.times(k)))/2;
+end
+metrics.fid_error=max(abs(fid-values));
 metrics.hahn_error=max(abs(echo-reference));
 
-% Check the same absolute boundary in both generalized propagation paths
+% Check the same absolute boundary in both generalised propagation paths
 probe_system=spin_system; probe_system.inter.zeeman.matrix{1}(3,3)=phase;
 probe_system.inter.coupling.matrix{1,2}=zeros(3);
 probe_system.inter.coupling.matrix{1,2}(1,3)=transverse;
@@ -111,24 +129,6 @@ result=test_close(result,'Projected absolute full-density receiver',absolute,...
 % Report the measured metrics
 disp(metrics);
 
-end
-
-% Supply all physics choices explicitly
-function p=parameters()
-p.observed=1; p.cce.bath_spins=2; p.cce.approximation='projected'; p.cce.expansion='standard';
-p.output='signal'; p.cce.order=1; p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
-p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
-p.cce.bath_state=struct('mode','mixed_product'); p.cce.meanfield='none';
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
-end
-
-% Independently evaluate the analytic manifold trace for metric reporting
-function values=reference_fid(ha,hb,phase,times)
-values=zeros(numel(times),1);
-for k=1:numel(times)
-    values(k)=exp(-1i*phase*times(k))*trace(expm(-1i*ha*times(k))*expm(1i*hb*times(k)))/2;
-end
 end
 
 

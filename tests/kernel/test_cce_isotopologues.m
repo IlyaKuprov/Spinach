@@ -1,6 +1,10 @@
-% Finite and sampled H/D isotopologue probability tests.
+% Finite and sampled H/D isotopologue probability tests. Syntax:
 %
-%                         result=test_cce_isotopologues()
+%                    result=test_cce_isotopologues()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -51,7 +55,7 @@ end
 result=test_close(result,'Weighted species-specific exact FIDs',weighted,analytic,1e-12,1e-12,...
                   'Rebuild physical spin dimensions and average independently propagated configurations.');
 
-% Preserve declared joint probabilities rather than factorizing them
+% Preserve declared joint probabilities rather than factorising them
 joint=rmfield(s,{'species','occupancy','isotopologues'});
 joint.configurations=struct('isotopes',{{'1H','1H'},{'2H','2H'}},'weight',{0.25,0.75});
 [~,~,bath]=spin_bath(struct('magnet',0),struct(),joint);

@@ -1,4 +1,10 @@
-% Deterministic serial/parallel scheduling and resource acceptance test.
+% Deterministic serial/parallel scheduling and resource acceptance test. Syntax:
+%
+%                    result=test_cce_parallel()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -73,7 +79,7 @@ try
     clexpn(spin_system,@free_evolution,p,'labframe');
 catch exception
     refused=ismember(exception.identifier,{'cce_states:memory','cce_clusters:memory',...
-                                          'cce_schedule:memory','clexpn:memory'});
+                                           'cce_schedule:memory','clexpn:memory'});
 end
 result=test_true(result,'memory cap',refused,...
                  'Configuration and cluster metadata are bounded before scheduler working matrices.');
@@ -148,7 +154,7 @@ for method={'cce','mecce','noise'}
         large=rmfield(large,'bath_jumps'); large.cce.approximation='generalized';
         pulse_sequence=@noise_correlation;
         large.noise=struct('terms',struct('support',7,'operator',diag([1 -1])/2),...
-                          'ordering','ordered','connected',false,'manifold','bath_only');
+                           'ordering','ordered','connected',false,'manifold','bath_only');
     end
     large_schedule=struct('pulse_sequence',pulse_sequence,'contract',cce_capabilities(pulse_sequence));
     evaluator=large_schedule.contract.evaluator; large_model.parameters=large;
@@ -164,6 +170,7 @@ for method={'cce','mecce','noise'}
         empty_cache=16*(3*6*64^2+2); full_cache=16*(3*7*128^2+2*2^2);
         resident=resident+3*(empty_cache+full_cache);
         full_workspace=full_workspace+full_cache;
+
     end
     large.cce.numerics.max_memory_bytes=resident+1.5*full_workspace; refused=false;
     try
@@ -184,6 +191,7 @@ for method={'cce','mecce','noise'}
     large.cce.parallel.mode='clusters';
     fprintf('CCE full-observed-spin system %s budget %.0f one workspace %.0f refused %d.\n',...
             method{1},large.cce.numerics.max_memory_bytes,full_workspace,refused);
+
 end
 
 % Noise still constructs a full retained Liouville generator before bath restriction
@@ -241,20 +249,20 @@ for method={'gcce','megcce'}
             method{1},refused,4*25*numel(q.times)*numel(q.coil),q.cce.numerics.max_memory_bytes);
 end
 
-% Retained ME manifold, spin and jump operators accumulate across sampled tasks
+% Retained ME manifold, spin, and jump operators accumulate across sampled tasks
 for method={'mecce','megcce'}
     retained.observed=1; retained.times=[0 1e-3]; retained.orientation=[0 0 0];
     retained.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
     retained.cce=struct('bath_spins',2,'order',1,'approximation','projected',...
-        'expansion','standard','interaction_cutoff',Inf,...
-        'graph',struct('mode','complete','score','coupling_norm'),...
-        'meanfield','none','averaging','after_expansion',...
-        'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
-                            'samples',40,'seed',31),...
-        'numerics',struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e8,...
-                          'zero_policy','mask'),...
-        'parallel',struct('mode','serial','max_tasks',80),...
-        'basis',struct('formalism','zeeman-liouv'));
+                        'expansion','standard','interaction_cutoff',Inf,...
+                        'graph',struct('mode','complete','score','coupling_norm'),...
+                        'meanfield','none','averaging','after_expansion',...
+                        'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
+                                            'samples',40,'seed',31),...
+                        'numerics',struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e8,...
+                                          'zero_policy','mask'),...
+                        'parallel',struct('mode','serial','max_tasks',80),...
+                        'basis',struct('formalism','zeeman-liouv'));
     retained.bath_jumps=repmat(struct('support',2,'operator',[0 1;0 0],'rate',2),1,8);
     if strcmp(method{1},'megcce')
         retained.cce.approximation='generalized'; retained.output='density'; retained.rho0=ones(2)/2;

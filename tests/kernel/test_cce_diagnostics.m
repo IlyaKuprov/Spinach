@@ -1,4 +1,10 @@
-% Coverage and unmodified density physicality diagnostics acceptance test.
+% Coverage and unmodified density physicality diagnostics acceptance test. Syntax:
+%
+%                    result=test_cce_diagnostics()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -40,7 +46,7 @@ result=test_true(result,'physical density accepted',physical_checks.acceptable&&
                  physical_checks.physicality_checked,...
                  'Complete exact density is normalized, Hermitian and positive.');
 
-% Audit common result fields across standard, partition, ME and noise manifolds
+% Audit common result fields across standard, partition, ME, and noise manifolds
 for method={'cce','gcce','mecce','megcce','noise'}
     q=p; q.output='signal'; q.normalized=ismember(method{1},{'cce','mecce'}); sequence=@free_evolution;
     q.cce.approximation='projected'; q.cce.basis.formalism='zeeman-hilb';
@@ -74,7 +80,7 @@ end
 
 % Retain all sampled prefix means rather than the first sampled trajectory
 q=p; q.cce.bath_state=struct('mode','sampled','basis','uniform',...
-                        'probabilities','uniform','samples',4,'seed',193);
+                             'probabilities','uniform','samples',4,'seed',193);
 [sampled,sampled_info]=clexpn(spin_system,@free_evolution,q,'labframe');
 prefixes=zeros(size(sampled_info.reduction.by_order));
 for k=1:numel(sampled_info.raw)

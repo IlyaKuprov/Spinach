@@ -1,12 +1,16 @@
-% Deterministic lattice, occupancy, geometry and frame tests.
+% Deterministic lattice, occupancy, geometry, and frame tests. Syntax:
 %
-%                         result=test_cce_bath()
+%                    result=test_cce_bath()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_cce_bath()
 
-% Initialize standard harness fields only
+% Initialise standard harness fields only
 result=new_test_result('kernel/cce_bath','CCE bath construction',...
                        'Nonorthogonal cells, occupancy, density and covariance.');
 
@@ -104,7 +108,7 @@ catch
 end
 result=test_true(result,'Duplicate physical sites are refused',rejected,'Duplicate physical sites are refused');
 
-% Check explicit physical grouping and isotope row normalization
+% Check explicit physical grouping and isotope row normalisation
 q=struct('mode','explicit','isotopes',{{'1H','13C'}},'magnetic',1,...
          'coordinates_A',[0 0 0;1 0 0],'groups',{{1,2}});
 [sys,inter,b]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
@@ -135,8 +139,8 @@ q.rotation=R; q.translation_A=[3 4 5];
 [rsys,rinter]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic')); sys.output='hush'; rsys.output='hush';
 sys.parallel={'local',1}; rsys.parallel={'local',1};
 plain=create(sys,inter); rotated=create(rsys,rinter);
-T=plain.inter.coupling.matrix{1,2}; Tr=rotated.inter.coupling.matrix{1,2};
-result=test_close(result,'Native dipolar transform covariance',Tr,R*T*R.',...
+T=plain.inter.coupling.matrix{1,2}; rotated_tensor=rotated.inter.coupling.matrix{1,2};
+result=test_close(result,'Native dipolar transform covariance',rotated_tensor,R*T*R.',...
                   100*eps*norm(T,'fro'),100*eps,'Rigid translations leave dipoles invariant.');
 
 % Reject invalid original site labels rather than silently dropping them

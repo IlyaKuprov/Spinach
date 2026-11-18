@@ -1,4 +1,10 @@
-% Atomic checkpoint identity, interruption and corruption acceptance test.
+% Atomic checkpoint identity, interruption, and corruption acceptance test. Syntax:
+%
+%                    result=test_cce_checkpoint()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -57,9 +63,9 @@ pilot=p; pilot.cce=rmfield(pilot.cce,'checkpoint'); pilot.cce.order=0;
 [~,pilot_data]=clexpn(spin_system,@free_evolution,pilot,'labframe');
 adaptive_states=pilot_data.ensemble;
 adaptive.cce.partition=struct('mode','adaptive','max_dimension',4,...
-    'patch_atol',1e-10,...
-    'patch_rtol',1e-10,'max_rounds',2,'max_probes',100,'patches',{{[2 3]}},...
-    'pilot_configs',adaptive_states.spin_config,'heldout_configs',adaptive_states.spin_config);
+                              'patch_atol',1e-10,...
+                              'patch_rtol',1e-10,'max_rounds',2,'max_probes',100,'patches',{{[2 3]}},...
+                              'pilot_configs',adaptive_states.spin_config,'heldout_configs',adaptive_states.spin_config);
 reference=clexpn(spin_system,@free_evolution,adaptive,'labframe'); accepted=false; discrepancy=Inf;
 adaptive.cce.checkpoint=struct('file',fullfile(folder,'adaptive-partition.mat'),'resume',false);
 try
@@ -94,7 +100,7 @@ result=test_true(result,'Interaction cutoff changes propagation',tolerance_diffe
                  'The fixture must independently demonstrate that the changed tolerance affects results.');
 fprintf('checkpoint tolerance observable difference %.12g\n',tolerance_difference);
 
-% Refuse changed times, physical tensors, seed and cluster identity
+% Refuse changed times, physical tensors, seed, and cluster identity
 changed=p; changed.times=[0 0.002 0.004]; refused=false;
 try
     clexpn(spin_system,@free_evolution,changed,'labframe'); catch exception, refused=strcmp(exception.identifier,'cce_checkpoint:identity'); end
@@ -243,7 +249,7 @@ end
 
 % Keep adaptive convergence explicitly incompatible with a shared checkpoint
 adaptive=p; adaptive.cce.convergence=struct('ladders',struct('field','order','values',{{1 2}}),...
-                                       'atol',1e-8,'rtol',1e-6,'max_work',3);
+                                            'atol',1e-8,'rtol',1e-6,'max_work',3);
 refused=false;
 try
     clexpn(spin_system,@free_evolution,adaptive,'labframe');

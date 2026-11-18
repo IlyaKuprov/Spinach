@@ -1,6 +1,10 @@
-% Validate externally supplied reduced Lunghi two-proton fixtures.
+% Validate externally supplied reduced Lunghi two-proton fixtures. Syntax:
 %
 %                    result=test_cce_lunghi_fixtures()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % Set SPINACH_CCE_LUNGHI_FIXTURES to inputs and CSVs, and
 % SPINACH_CCE_LUNGHI_STATES to phase-preserving *_states.json files and
@@ -22,10 +26,10 @@ end
 errors=zeros(1,2); cases={'VOTPP','Cumnt'};
 for case_id=1:2
 
-    % Read explicit positions, anisotropic gyros and frequency tensors
+    % Read explicit positions, anisotropic gyros, and frequency tensors
     name=cases{case_id}; input=jsondecode(fileread(fullfile(folder,[name '_input.json'])));
     expected=readmatrix(fullfile(folder,[name '_gcce2.csv']));
-    dims=2*input.center.s(:).'+1; observed_dimension=prod(dims);
+    dims=2*input.center.s(:).'+1; observed_dim=prod(dims);
     if dims(1)==8, isotope='51V'; else, isotope='63Cu'; end
     sys.isotopes={isotope,'E','1H','1H'}; sys.magnet=0;
     sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
@@ -63,7 +67,7 @@ for case_id=1:2
     p.cce.graph=struct('mode','complete','score','coupling_norm'); p.cce.meanfield='none';
     p.cce.bath_state.mode='mixed_product'; p.times=input.compute.times_ms(:).'*1e-3;
     p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
-    p.transition.spins=p.observed; p.transition.alpha=eye(observed_dimension,1);
+    p.transition.spins=p.observed; p.transition.alpha=eye(observed_dim,1);
     p.transition.beta=circshift(p.transition.alpha,1);
     model=cce_compile(ss,p,'labframe'); [hamiltonian,~]=cce_hamiltonian(model,[],struct());
     states=jsondecode(fileread(fullfile(states_folder,[name '_states.json'])));
@@ -87,7 +91,7 @@ for case_id=1:2
     [full_hamiltonian,~]=cce_hamiltonian(model,[3 4],struct());
 
     % Permute bath-first PyCCE ordering into the observed-first native basis
-    permutation=reshape(1:4*observed_dimension,observed_dimension,4).';
+    permutation=reshape(1:4*observed_dim,observed_dim,4).';
     permutation=permutation(:); reference_h=source.H(permutation,permutation);
     matrix_error=norm(full(full_hamiltonian)/(2*pi*1000)-reference_h,'fro');
     matrix_scale=norm(reference_h,'fro');
@@ -106,10 +110,10 @@ for case_id=1:2
     for k=1:numel(p.times)
         free=expm(-1i*full(full_hamiltonian)*p.times(k)/2);
         evolution=free*source_pulse*free; density=evolution*initial*evolution';
-        reduced=partial_trace(density,observed_dimension);
+        reduced=partial_trace(density,observed_dim);
         source(k)=2*b'*reduced*a;
         evolution=free*unitary_pulse*free; density=evolution*initial*evolution';
-        reduced=partial_trace(density,observed_dimension);
+        reduced=partial_trace(density,observed_dim);
         independent(k)=2*a'*reduced*b;
     end
     reference=expected(:,2)+1i*expected(:,3); errors(case_id)=max(abs(source-reference));
@@ -117,13 +121,14 @@ for case_id=1:2
                       'Stored source uses -i sigma_x with zero spectator block.');
     result=test_close(result,[name ' unitary CCE pulse'],actual,independent,1e-10,0,...
                       'Spinach uses exp(-i pi sigma_x/2), retaining spectator levels.');
-    result=test_true(result,[name ' distinct pulse semantics'],norm(source_pulse'*source_pulse-eye(4*observed_dimension),'fro')>1,...
+    result=test_true(result,[name ' distinct pulse semantics'],norm(source_pulse'*source_pulse-eye(4*observed_dim),'fro')>1,...
                      'Do not equate the source fixture pulse with a full unitary.');
 end
 disp(struct('VOTPP_error',errors(1),'Cumnt_error',errors(2)));
 
 end
 
+% Trace out four bath states in observed-first order
 function reduced=partial_trace(density,dimension)
 
 % Sum bath diagonal blocks in observed-first Hilbert order

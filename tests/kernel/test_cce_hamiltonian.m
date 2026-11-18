@@ -1,6 +1,10 @@
 % Tests direct and stock CCE cluster Hamiltonians. Syntax:
 %
-%                      result=test_cce_hamiltonian()
+%                    result=test_cce_hamiltonian()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -24,7 +28,7 @@ parameters.orientation=[0 0 0];
 parameters.cce.interaction_cutoff=Inf;
 parameters.cce.numerics=struct('atol',1e-5,'rtol',1e-12,'max_memory_bytes',1e8);
 
-% Exercise every validated assumption, Euler choice and retention selection
+% Exercise every validated assumption, Euler choice, and retention selection
 max_error=0; max_relative=0; max_propagator=0; comparisons=0;
 for angles={[0 0 0],[0.3 0.7 -0.2]}
     parameters.orientation=angles{1};
@@ -43,10 +47,10 @@ for angles={[0 0 0],[0.3 0.7 -0.2]}
                                   expm(full(-1i*reference*1e-7)),'fro');
             max_propagator=max(max_propagator,propagator_error);
             result=test_true(result,'dense propagator parity',...
-                              propagator_error<=parameters.cce.numerics.atol,...
-                              'Independent dense exponentials obey the requested observable budget.');
+                             propagator_error<=parameters.cce.numerics.atol,...
+                             'Independent dense exponentials obey the requested observable budget.');
             result=test_true(result,[assumption{1} '/' retention{1} ' parity'],...
-                  error_norm<=meta.roundoff_bound&&error_norm<=meta.observable_budget,'Stock/direct error must satisfy roundoff and requested budgets.');
+                             error_norm<=meta.roundoff_bound&&error_norm<=meta.observable_budget,'Stock/direct error must satisfy roundoff and requested budgets.');
         end
     end
 end
@@ -61,7 +65,7 @@ model=cce_compile(system,parameters,assumptions);
 mutant=system; mutant.inter.coupling.matrix{1,2}=mutant.inter.coupling.matrix{1,2}.';
 wrong=cce_hamiltonian(cce_compile(mutant,parameters,assumptions),[3 1],struct());
 result=test_true(result,'transpose mutation rejected',...
-                  norm(wrong-reference,'fro')>100*meta.roundoff_bound,'Antisymmetric ordered-cell convention is observable.');
+                 norm(wrong-reference,'fro')>100*meta.roundoff_bound,'Antisymmetric ordered-cell convention is observable.');
 
 % Check one-sided versus two-half-cell storage for a nonsymmetric tensor
 half=system; tensor=half.inter.coupling.matrix{1,2};
@@ -76,14 +80,14 @@ permutation=[3 1 2]; permuted_sys=sys;
 permuted_sys.isotopes=sys.isotopes(permutation);
 permuted_inter=inter; permuted_inter.zeeman.matrix=inter.zeeman.matrix(permutation);
 permuted_inter.coupling.matrix=inter.coupling.matrix(permutation,permutation);
-permuted_parameters=parameters; permuted_parameters.observed=3;
-permuted_parameters.cce.bath_spins=[1 2];
-permuted=cce_compile(create(permuted_sys,permuted_inter),permuted_parameters,assumptions);
+permuted_params=parameters; permuted_params.observed=3;
+permuted_params.cce.bath_spins=[1 2];
+permuted=cce_compile(create(permuted_sys,permuted_inter),permuted_params,assumptions);
 H=cce_hamiltonian(permuted,[1 2],struct());
 result=test_close(result,'physical spin permutation',...
                   H,reference,meta.roundoff_bound,0,'Relabelling leaves the ordered physical Hamiltonian invariant.');
 
-% Check a observed-spin system in nonascending physical order and a proper subset
+% Check an observed-spin system in nonascending physical order and a proper subset
 parameters.observed=[3 1]; parameters.cce.bath_spins=2;
 model=cce_compile(system,parameters,assumptions);
 [H,meta]=cce_hamiltonian(model,2,struct());
@@ -98,11 +102,11 @@ result=test_close(result,'observed-spin-only subset',...
 % Compare exterior fields with an explicit partial expectation of the full system
 parameters.observed=1; parameters.cce.bath_spins=[2 3];
 model=cce_compile(system,parameters,assumptions);
-[full_H,full_meta]=cce_hamiltonian(model,[2 3],struct());
+[full_h,full_meta]=cce_hamiltonian(model,[2 3],struct());
 spin_config.exterior_ids=3; spin_config.exterior_expectations=[0 0 1/2];
 [H,meta]=cce_hamiltonian(model,2,spin_config);
 embedding=kron(speye(meta.dimension),[1;0]);
-reference=embedding'*full_H*embedding;
+reference=embedding'*full_h*embedding;
 reference=reference-trace(reference-H)*speye(meta.dimension)/meta.dimension;
 result=test_close(result,'exterior expectation',...
                   H,reference,full_meta.roundoff_bound,0,'Exterior self energy is a removable scalar.');
@@ -116,7 +120,7 @@ reference=cce_hamiltonian(model,[2 3],struct('backend','stock'));
 result=test_close(result,'physical distance cutoff',...
                   H,reference,meta.roundoff_bound,0,'Both paths omit the same declared pairs.');
 result=test_true(result,'cutoff omission count',...
-                  size(model.omitted_pairs,1)==2,'Two physical pairs exceed three Angstrom.');
+                 size(model.omitted_pairs,1)==2,'Two physical pairs exceed three Angstrom.');
 
 % Reject a declared memory budget before allocating cluster-sized matrices
 small=parameters; small.cce.interaction_cutoff=Inf; small.cce.numerics.max_memory_bytes=1;
@@ -127,7 +131,7 @@ catch exception
     rejected=contains(exception.message,'max_memory_bytes');
 end
 result=test_true(result,'memory ceiling rejected',...
-                  rejected,'Insufficient explicit memory must stop before operator allocation.');
+                 rejected,'Insufficient explicit memory must stop before operator allocation.');
 
 % Reject an assumption name that has no declared physical meaning
 parameters.cce.interaction_cutoff=Inf; assumptions='unsupported';
@@ -138,7 +142,7 @@ catch
     rejected=true;
 end
 result=test_true(result,'unsupported assumption rejected',...
-                  rejected,'A physical approximation cannot be inferred from an unknown name.');
+                 rejected,'A physical approximation cannot be inferred from an unknown name.');
 assumptions='labframe';
 
 % Force automatic fallback for a nonzero rank-three giant-spin term
@@ -153,7 +157,7 @@ reference=cce_hamiltonian(model,[],struct('backend','stock'));
 result=test_close(result,'rank-three fallback',...
                   H,reference,meta.roundoff_bound,0,'Automatic fallback retains giant-spin terms.');
 result=test_true(result,'fallback recorded',...
-                  strcmp(meta.backend,'stock'),'Unsupported direct domains cannot be guessed.');
+                 strcmp(meta.backend,'stock'),'Unsupported direct domains cannot be guessed.');
 rejected=false;
 try
     cce_hamiltonian(model,[],struct('backend','direct'));
@@ -161,7 +165,7 @@ catch
     rejected=true;
 end
 result=test_true(result,'unsupported direct rejection',...
-                  rejected,'Explicit direct must fail closed.');
+                 rejected,'Explicit direct must fail closed.');
 
 end
 

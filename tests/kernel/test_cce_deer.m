@@ -1,5 +1,10 @@
-% Strict DEER frequency-window and species selection regression.
-% Syntax: result=test_cce_deer()
+% Strict DEER frequency-window and species selection regression. Syntax:
+%
+%                    result=test_cce_deer()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -114,7 +119,7 @@ for method={'cce','mecce','noise'}
     % Exercise the same invariant-subspace guard through interlaced recursion
     if ~strcmp(method{1},'noise')
         ip=projected; ip.cce.bath_state=struct('mode','interlaced','basis','uniform',...
-                                             'probabilities','uniform','samples',1,'seed',19);
+                                               'probabilities','uniform','samples',1,'seed',19);
         ip.cce.interlaced=struct('condition_sites',{{[2 3]}},'reference_state',1,'max_states',4);
         ip.cce.averaging='after_expansion'; rejected=false;
         try
@@ -201,7 +206,7 @@ cases{13}.cce.second_order=struct('enabled',true,'gap_tolerance',1,'overlap_tole
 cases{14}.analysis=struct('fit',false,'model','exponential');
 cases{15}.cce.approximation='generalized'; cases{15}.output='correlation'; sequences{15}=@noise_correlation;
 cases{15}.noise=struct('connected',false,'ordering','ordered','manifold','bath_only',...
-                      'terms',struct('support',2,'operator',eye(2),'weight',2));
+                       'terms',struct('support',2,'operator',eye(2),'weight',2));
 cases{16}=cases{15}; sequences{16}=@noise_correlation;
 cases{16}.noise.terms=rmfield(cases{16}.noise.terms,'weight');
 cases{16}.bath_jumps=struct('support',2,'operator',eye(2),'rate',1); sequences{16}=@cpmg_echo;
@@ -283,37 +288,28 @@ for method={'cce','mecce','megcce'}
                          'Native compilation preserves the static-field radius without legacy recompilation.');
         result=test_close(result,[name ' parity'],difference,0,1e-12,1e-12,...
                           'An explicit infinite radius must equal the unbounded static-field default.');
+
     end
     if isfield(r.cce,'basis'), r.cce=rmfield(r.cce,'basis'); end
 end
 
-% Require actual geometry for every finite static-field radius path
-result=radius_checks(result,ss,base);
-
-fprintf('DEER exact-boundary cases passed: selected sites [3 4], [3 6], and empty.\n');
-
-end
-
-% Exercise all driver, direct-evaluator and event-recompilation paths
-function result=radius_checks(result,spin_system,parameters)
-
 % Use a polarised exterior bath so dropping its fields is not innocuous
-parameters=rmfield(parameters,intersect(fieldnames(parameters),{'pump','noise'}));
-parameters.rho0=ones(2)/2; parameters.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
-parameters.cce.bath_state=struct('mode','explicit_product',...
-                             'rho',{{diag([1 0]),diag([1 0])}});
-parameters.cce.meanfield='static'; parameters.cce.meanfield_radius=2;
-parameters.cce.order=1;
+base=rmfield(base,intersect(fieldnames(base),{'pump','noise'}));
+base.rho0=ones(2)/2; base.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
+base.cce.bath_state=struct('mode','explicit_product',...
+                                 'rho',{{diag([1 0]),diag([1 0])}});
+base.cce.meanfield='static'; base.cce.meanfield_radius=2;
+base.cce.order=1;
 cluster=struct('id',1,'sites',2);
 for method={'cce','gcce','mecce','megcce'}
 
     % Choose each implemented evaluator without changing the missing geometry
-    parameters.cce.approximation='generalized'; parameters.output='signal';
-    if ismember(method{1},{'cce','mecce'}), parameters.cce.approximation='projected'; end
-    parameters.cce.basis.formalism='zeeman-hilb';
-    if ismember(method{1},{'mecce','megcce'}), parameters.cce.basis.formalism='zeeman-liouv'; end
-    model=cce_compile(spin_system,parameters,'labframe'); parameters=model.parameters;
-    spin_config=struct('bath_ids',[2 3],'bath_rho',{parameters.cce.bath_state.rho},...
+    base.cce.approximation='generalized'; base.output='signal';
+    if ismember(method{1},{'cce','mecce'}), base.cce.approximation='projected'; end
+    base.cce.basis.formalism='zeeman-hilb';
+    if ismember(method{1},{'mecce','megcce'}), base.cce.basis.formalism='zeeman-liouv'; end
+    model=cce_compile(ss,base,'labframe'); base=model.parameters;
+    spin_config=struct('bath_ids',[2 3],'bath_rho',{base.cce.bath_state.rho},...
                        'state_id',1,'configuration_id',1,'weight',1);
     contract=cce_capabilities(@free_evolution);
     schedule=struct('pulse_sequence',@free_evolution,'contract',contract);
@@ -323,7 +319,7 @@ for method={'cce','gcce','mecce','megcce'}
         partial=model; partial.coordinates_A=[0 0 0;1 0 0;3 0 0];
         partial.coordinates_A(missing,:)=NaN; rejected=false;
         try
-            contract.evaluator(partial,cluster,spin_config,schedule,parameters);
+            contract.evaluator(partial,cluster,spin_config,schedule,base);
         catch err
             rejected=strcmp(err.identifier,'cce:coordinates')&&...
                      contains(err.message,'meanfield_radius');
@@ -334,7 +330,7 @@ for method={'cce','gcce','mecce','megcce'}
     spatial=model; spatial.coordinates_A=[0 0 0;NaN NaN NaN;3 0 0];
     accepted=true;
     try
-        contract.evaluator(spatial,cluster,spin_config,schedule,parameters);
+        contract.evaluator(spatial,cluster,spin_config,schedule,base);
     catch
         accepted=false;
     end
@@ -344,23 +340,23 @@ for method={'cce','gcce','mecce','megcce'}
     % Driver and direct helper calls must report the same prerequisite
     master=ismember(method{1},{'mecce','megcce'});
     calls=cell(1,5+master); names=cell(size(calls));
-    calls(1:3)={@()clexpn(spin_system,@free_evolution,parameters,'labframe'),...
-                @()contract.evaluator(model,cluster,spin_config,schedule,parameters),...
+    calls(1:3)={@()clexpn(ss,@free_evolution,base,'labframe'),...
+                @()contract.evaluator(model,cluster,spin_config,schedule,base),...
                 @()cce_subsystem(model,cluster.sites,spin_config,[])};
     names(1:3)={'driver','cluster','controls'};
     if master
-        calls{6}=@()contract.evaluator(model,cluster,spin_config,schedule,parameters);
+        calls{6}=@()contract.evaluator(model,cluster,spin_config,schedule,base);
         names{6}='master';
     end
 
     % A controlled schedule must not bypass the pre-dispatch prerequisite
     driven=schedule; driven.controls=true;
-    calls{4}=@()contract.evaluator(model,cluster,spin_config,driven,parameters);
+    calls{4}=@()contract.evaluator(model,cluster,spin_config,driven,base);
     names{4}='controlled dispatch';
 
     % Projected enumeration must use the same checked evaluators
-    ip=parameters; ip.cce.bath_state=struct('mode','interlaced','basis','uniform',...
-                                      'probabilities','uniform','samples',1,'seed',7);
+    ip=base; ip.cce.bath_state=struct('mode','interlaced','basis','uniform',...
+                                            'probabilities','uniform','samples',1,'seed',7);
     ip.cce.interlaced=struct('condition_sites',{{[2 3]}},'reference_state',1,'max_states',4);
     spin_config.assignment=[1 1];
     sampled=struct('spin_config',spin_config,'weights',1,'bases',{{eye(2),eye(2)}},...
@@ -378,16 +374,17 @@ for method={'cce','gcce','mecce','megcce'}
         result=test_true(result,['Finite radius geometry ' method{1} ' ' names{k}],...
                          rejected,'A finite mean-field radius requires observed and exterior coordinates.');
     end
+
 end
 
 % Compile native inputs before state-dependent propagation geometry is known
-parameters.cce.approximation='generalized'; parameters.output='density'; parameters.times=[0 0.01];
-parameters.cce.basis.formalism='zeeman-hilb'; parameters.cce.meanfield_radius=2;
-models={spin_system,spin_system}; models{2}.inter.coordinates={[0 0 0],[1 0 0],[3 0 0]};
+base.cce.approximation='generalized'; base.output='density'; base.times=[0 0.01];
+base.cce.basis.formalism='zeeman-hilb'; base.cce.meanfield_radius=2;
+models={ss,ss}; models{2}.inter.coordinates={[0 0 0],[1 0 0],[3 0 0]};
 for geometry=1:2
     compiled=false;
     try
-        events=cce_compile(models{geometry},parameters,'labframe'); compiled=isstruct(events);
+        events=cce_compile(models{geometry},base,'labframe'); compiled=isstruct(events);
     catch
     end
     result=test_true(result,sprintf('Finite-radius pre-spin_config compilation %d',geometry),...
@@ -395,12 +392,12 @@ for geometry=1:2
 end
 
 % Complete geometry remains valid for observed, pumped, finite, and bath pulses
-spatial=spin_system; spatial.inter.coordinates={[0 0 0],[1 0 0],[3 0 0]};
+spatial=ss; spatial.inter.coordinates={[0 0 0],[1 0 0],[3 0 0]};
 names={'named','deer','finite','bath'};
 for method={'cce','gcce','mecce','megcce'}
     for control=1:numel(names)
         if control>=3&&~strcmp(method{1},'gcce'), continue; end
-        p=parameters; p.cce.approximation='generalized'; p.output='signal'; p.normalized=true;
+        p=base; p.cce.approximation='generalized'; p.output='signal'; p.normalized=true;
         if ismember(method{1},{'cce','mecce'}), p.cce.approximation='projected'; end
         if ismember(method{1},{'mecce','megcce'}), p.cce.basis.formalism='zeeman-liouv'; end
         sequence=@hahn_echo;
@@ -430,8 +427,8 @@ for method={'cce','gcce','mecce','megcce'}
                           1e-12,0,'An uncoupled zero-field observed-spin system prepared along x retains unit signal.');
         rejected=false;
         try
-            if control==2, pumped(spin_system,p);
-            else, clexpn(spin_system,sequence,p,'labframe'); end
+            if control==2, pumped(ss,p);
+            else, clexpn(ss,sequence,p,'labframe'); end
         catch err
             rejected=strcmp(err.identifier,'cce:coordinates');
         end
@@ -441,22 +438,22 @@ for method={'cce','gcce','mecce','megcce'}
 end
 
 % A finite radius excludes an actual polarised exterior coupling
-field_model=cce_compile(spatial,parameters,'labframe');
+field_model=cce_compile(spatial,base,'labframe');
 field_model.retained{1,3}=diag([0 0 4]);
 field_model.parameters.cce.meanfield_radius=2;
 [near,~]=cce_subsystem(field_model,2,struct(),[]);
-[H_near,~,~]=cce_generators(near,field_model.parameters,[]);
+[h_near,~,~]=cce_generators(near,field_model.parameters,[]);
 field_model.parameters.cce.meanfield_radius=4;
 [far,~]=cce_subsystem(field_model,2,struct(),[]);
-[H_far,R,K,field_par]=cce_generators(far,field_model.parameters,[]);
+[h_far,R,K,field_par]=cce_generators(far,field_model.parameters,[]);
 result=test_close(result,'Finite radius retains the physical exterior field',...
-                  full(H_far-H_near),kron(diag([1 -1]),eye(2)),0,0,...
+                  full(h_far-h_near),kron(diag([1 -1]),eye(2)),0,0,...
                   'Only the exterior spin inside the declared radius contributes its measured moment.');
 
 % A Cartesian exterior inversion reverses the subsequent physical mean field
 field_par.refocusing=struct('spins',3,'axis','x','angle',pi,'fraction',0.5);
 field_par.cce.numerics.propagator='expm';
-[echo,~]=hahn_echo(far,field_par,H_far,R,K);
+[echo,~]=hahn_echo(far,field_par,h_far,R,K);
 reference=zeros(numel(field_par.times),4);
 for n=1:numel(field_par.times)
     U=expm(1i*diag([1 -1])*field_par.times(n)/2)*...
@@ -468,9 +465,9 @@ result=test_close(result,'Exterior inversion changes the subsequent mean field',
 
 % Invalid scalar radii cannot silently disable or empty a mean field
 for radius={NaN,-1,-Inf,[1 2],1i,'2'}
-    parameters.cce.meanfield_radius=radius{1}; rejected=false;
+    base.cce.meanfield_radius=radius{1}; rejected=false;
     try
-        cce_options(spin_system,parameters,@hahn_echo,'labframe');
+        cce_options(ss,base,@hahn_echo,'labframe');
     catch err
         rejected=contains(err.message,'meanfield_radius');
     end
@@ -478,7 +475,7 @@ for radius={NaN,-1,-Inf,[1 2],1i,'2'}
                      'meanfield_radius must be a nonnegative real scalar or positive Inf.');
     rejected=false;
     try
-        cce_compile(spin_system,parameters,'labframe');
+        cce_compile(ss,base,'labframe');
     catch err
         rejected=contains(err.message,'meanfield_radius');
     end
@@ -486,10 +483,14 @@ for radius={NaN,-1,-Inf,[1 2],1i,'2'}
                      'Deferring geometry must not accept an invalid cutoff during compilation.');
 end
 
+fprintf('DEER exact-boundary cases passed: selected sites [3 4], [3 6], and empty.\n');
+
 end
 
 % Obtain experiment-owned selection without propagation or mean-field closure
 function selected=selection(model,parameters)
+
+% Resolve the pump selection at zero propagation time
 parameters.times=0; parameters.output='signal';
 parameters=rmfield(parameters,intersect(fieldnames(parameters),{'refocusing','noise'}));
 parameters.cce=model.parameters.cce; parameters.cce.meanfield='none';
@@ -498,10 +499,13 @@ if isfield(parameters.cce,'meanfield_radius'), parameters.cce=rmfield(parameters
 model.parameters=parameters; model.formalism='zeeman-hilb';
 [system,~]=cce_subsystem(model,model.bath_ids,struct(),[]);
 [~,selected]=bath_pumped_hahn(system,parameters,zeros(system.dimension),0,0);
+
 end
 
 % Apply the selected single bath pulse through the registered native experiment
 function [answer,details]=pumped(spin_system,parameters)
+
+% Map the selected bath pulse to an explicit native experiment
 model=cce_compile(spin_system,parameters,'labframe'); selected=selection(model,parameters);
 parameters=rmfield(parameters,'pump'); sequence=@free_evolution;
 if isfield(parameters,'noise'), sequence=@noise_correlation;
@@ -523,6 +527,7 @@ if isempty(selected.selected_sites)&&~isfield(parameters,'noise')&&...
     parameters.refocusing=struct('spins',parameters.observed,'operator',zeros(2),'fraction',0.5);
 end
 [answer,details]=clexpn(spin_system,sequence,parameters,'labframe');
+
 end
 
 

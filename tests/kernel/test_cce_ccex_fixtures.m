@@ -1,11 +1,15 @@
 % Pinned CCEX analytic and reduced-basic01 reference comparisons. Syntax:
 %
-%                     result=test_cce_ccex_fixtures()
+%                    result=test_cce_ccex_fixtures()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % CCEX cbcde24292e0e99755967267fe7c477fc029cb4d, CPU executable.
 % Saved decimal traces print ten digits after the point. The basic01
 % reduction uses the nearest six sites from its 978-spin selected bath.
-% Input units are Angstrom, Gauss, ms and rad/(ms Gauss); no isotope
+% Input units are Angstrom, Gauss, ms, and rad/(ms Gauss); no isotope
 % constants are silently substituted for the reference's declared values.
 % Hahn manifold-overlap traces are conjugated for the fixed physical receiver;
 % FID traces and the pinned external data are unchanged.
@@ -18,7 +22,7 @@ function result=test_cce_ccex_fixtures()
 result=new_test_result('kernel/cce_ccex_fixtures','CCEX fixture parity',...
                        'Analytic FID/Hahn and basic01 nearest-six CCE2.');
 data=jsondecode(fileread(fullfile(fileparts(mfilename('fullpath')),...
-                                'test_cce_ccex_data.json')));
+                                  'test_cce_ccex_data.json')));
 errors=zeros(1,numel(data));
 for f=1:numel(data)
     if iscell(data), fixture=data{f}; else, fixture=data(f); end
@@ -53,7 +57,7 @@ for f=1:numel(data)
     p.cce.order=fixture.order; p.transition.alpha=[1;0;0];
     p.transition.beta=[0;1;0]; p.orientation=[0 0 0];
     p.cce.interaction_cutoff=Inf; p.cce.graph=struct('mode','distance','radius',fixture.rdip,...
-                                         'score','coupling_norm');
+                                                     'score','coupling_norm');
     p.cce.meanfield='none'; p.times=fixture.times_ms(:).'/1000;
     p.cce.bath_state=struct('mode','mixed_product'); pulse_sequence=@free_evolution;
     p.cce.numerics=struct('atol',1e-7,'rtol',1e-7,'max_memory_bytes',2^29);
@@ -72,8 +76,8 @@ for f=1:numel(data)
             record=actual.raw{1}(index); ref=expected.real+1i*expected.imag;
             if fixture.pulses==1, ref=conj(ref); end
             result=test_true(result,'CCEX raw subset',...
-                max(abs(record.value-ref))<=max(record.abs_error_bound)+sqrt(2)*0.5e-10,...
-                'Raw singleton and pair traces agree before expansion.');
+                             max(abs(record.value-ref))<=max(record.abs_error_bound)+sqrt(2)*0.5e-10,...
+                             'Raw singleton and pair traces agree before expansion.');
         end
     end
     budget=max(actual.reduction.abs_error_bound)+sqrt(2)*0.5e-10;
@@ -89,8 +93,11 @@ end
 
 % Reproduce the reference's published point-dipole coefficient in rad/s
 function tensor=dipolar(r,g1,g2)
+
+% Convert the source point-dipole tensor into angular frequency
 distance=norm(r);
 tensor=1000*1.054571729*g1*g2*(eye(3)-3*(r.'*r)/distance^2)/distance^3;
+
 end
 
 

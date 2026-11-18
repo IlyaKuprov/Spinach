@@ -1,5 +1,10 @@
-% Exact W12 conditioning-set and probability regression tests.
-% Syntax: result=test_cce_interlacing()
+% Exact W12 conditioning-set and probability regression tests. Syntax:
+%
+%                    result=test_cce_interlacing()
+%
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -8,12 +13,33 @@ function result=test_cce_interlacing()
 % Construct overlapping superclusters around a single bath spin
 result=new_test_result('kernel/cce_interlacing','CCE projected interlacing',...
                        'Check unique configurations, conditional weights and shared denominator K.');
-[model,p,ensemble,schedule]=fixture(); pulse_sequence=@free_evolution; evaluator=schedule.contract.evaluator;
+
+% Compile the overlapping-pair model and its conditional bath ensemble
+sys.isotopes={'1H','1H','1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
+inter.coupling.matrix=cell(4);
+inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
+inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi);
+inter.coupling.matrix{1,4}=diag([0 0 7])/(2*pi);
+spin_system=create(sys,inter); p.observed=1; p.cce.bath_spins=2:4;
+p.cce.approximation='generalized'; p.normalized=false; p.cce.expansion='standard'; p.output='signal'; p.times=[0 0.2 0.4]; p.cce.order=2;
+p.rho0=[1 1;1 1]/2; p.transition.spins=1; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
+p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
+p.cce.graph=struct('mode','complete','score','coupling_norm');
+p.cce.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...
+                        'probabilities',{{[0.7 0.3],[0.2 0.8],[0.6 0.4]}});
+p.cce.meanfield='static'; p.cce.interlaced=struct('max_states',16,'reference_state',1);
+p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
+[~,details]=clexpn(spin_system,@free_evolution,p,'labframe');
+p=details.parameters; model=cce_compile(spin_system,p,'labframe');
+model.clusters=details.clusters; ensemble=details.ensemble;
+schedule=struct('pulse_sequence',@free_evolution,'contract',details.contract);
+
+pulse_sequence=@free_evolution; evaluator=schedule.contract.evaluator;
 
 % Refuse count-scaled storage before constructing conditioning assignments
 q=p; q.times=0; q.cce.approximation='projected'; q.normalized=true; q.cce.numerics.max_memory_bytes=1000;
 q.cce.interlaced=struct('max_states',8,'reference_state',1,...
-                    'condition_sites',{{[2 3 4]}},'raw_only',true);
+                        'condition_sites',{{[2 3 4]}},'raw_only',true);
 probe=struct('id',uint64(0),'sites',[],'groups',[]); refused=false;
 try
     cce_interlace(model,probe,ensemble,schedule,q,evaluator);
@@ -190,7 +216,7 @@ result=test_true(result,'Included-supercluster family generates the same K autom
 % At full order every conditioning cylinder is the full bath and W12 is exact
 p.cce.order=3; p.cce.interlaced.max_states=32; [integrated,~]=clexpn(model.spin_system,pulse_sequence,p,'labframe');
 mixture=p; mixture.cce.bath_state=struct('mode','explicit_product',...
-    'rho',{{diag([0.7 0.3]),diag([0.2 0.8]),diag([0.6 0.4])}});
+                                         'rho',{{diag([0.7 0.3]),diag([0.2 0.8]),diag([0.6 0.4])}});
 mixture.cce.meanfield='none'; mixture.cce=rmfield(mixture.cce,'interlaced');
 [exact,~]=clexpn(model.spin_system,pulse_sequence,mixture,'labframe');
 result=test_close(result,'Full-order W12 equals exact mixed bath',integrated,exact,...
@@ -222,9 +248,9 @@ result=test_close(result,'Interlaced full-bath zero baseline',full_bath,exact,..
 result=test_true(result,'Interlaced full-bath validity',all(full_bath_details.reduction.valid),...
                  'A singular auxiliary ratio must not invalidate an exact full-bath value.');
 
-% Preserve the same bypass for raw generalized observed signal
-q.cce.approximation='generalized'; q.normalized=false; q.rho0=p.rho0; [generalized,generalized_details]=clexpn(spin_system,pulse_sequence,q,'labframe');
-result=test_close(result,'Generalized interlaced full-bath zero baseline',generalized,...
+% Preserve the same bypass for raw generalised observed signal
+q.cce.approximation='generalized'; q.normalized=false; q.rho0=p.rho0; [generalised,generalised_details]=clexpn(spin_system,pulse_sequence,q,'labframe');
+result=test_close(result,'Generalized interlaced full-bath zero baseline',generalised,...
                   full_bath/2,1e-12,1e-12,...
                   'Raw generalized signal differs only by its initial amplitude of one half.');
 fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath(end)),real(exact(end)));
@@ -232,13 +258,13 @@ fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath(end)),real(exact
 % Require the common result schema and diagnostics on the interlaced path
 reference=q; reference.cce.bath_state=struct('mode','mixed_product'); reference.cce=rmfield(reference.cce,'interlaced'); [standard,standard_details]=clexpn(spin_system,pulse_sequence,reference,'labframe');
 result=test_true(result,'Interlaced common result fields',...
-                 isnumeric(generalized)&&isnumeric(standard)&&isequal(size(generalized),size(standard)),...
+                 isnumeric(generalised)&&isnumeric(standard)&&isequal(size(generalised),size(standard)),...
                  'Every native context returns the same numeric time-by-channel contract.');
 result=test_true(result,'Interlaced common diagnostic fields',...
-                 isequal(sort(fieldnames(generalized_details)),sort(fieldnames(standard_details))),...
+                 isequal(sort(fieldnames(generalised_details)),sort(fieldnames(standard_details))),...
                  'Interlaced results must carry numerical coverage and budget diagnostics.');
 q.cce.convergence=struct('ladders',struct('field','cce.order','values',{{2,2}}),...
-                     'max_work',10,'atol',1e-8,'rtol',1e-8,'checks',{{}});
+                         'max_work',10,'atol',1e-8,'rtol',1e-8,'checks',{{}});
 try
     [~,checked_details]=cce_converge(spin_system,q,pulse_sequence,'labframe');
     converged=strcmp(checked_details.convergence,'converged');
@@ -248,11 +274,11 @@ end
 result=test_true(result,'Interlaced convergence diagnostics',converged,...
                  'A complete exact interlaced calculation must be usable by cce_converge.');
 result=test_true(result,'Exact interlaced lower orders unavailable',...
-                 all(isnan(generalized_details.reduction.by_order(:,:,1:end-1)),'all')&&...
-                 all(~generalized_details.reduction.by_order_valid(:,:,1:end-1),'all'),...
+                 all(isnan(generalised_details.reduction.by_order(:,:,1:end-1)),'all')&&...
+                 all(~generalised_details.reduction.by_order_valid(:,:,1:end-1),'all'),...
                  'Bypassed lower orders must not masquerade as evaluated exact prefixes.');
-result=test_close(result,'Exact interlaced final prefix',generalized_details.reduction.by_order(:,:,end),...
-                  generalized,0,0,'The final prefix must contain the exact raw average.');
+result=test_close(result,'Exact interlaced final prefix',generalised_details.reduction.by_order(:,:,end),...
+                  generalised,0,0,'The final prefix must contain the exact raw average.');
 
 % Match ordinary master evaluation for recursive and full-bath interlacing
 sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.output='hush';
@@ -325,28 +351,6 @@ result=test_close(result,'Driven interlaced mixed-state equivalence',driven_erro
                   'Explicit uniform assignments and mixed local states give identical cluster averages.');
 fprintf('R6 driven interlacing accepted %d; maximum error %.3g\n',driven_ok,driven_error);
 
-end
-
-% Build a nontrivial static-exterior model with two included pair superclusters
-function [model,p,ensemble,schedule]=fixture()
-sys.isotopes={'1H','1H','1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
-inter.coupling.matrix=cell(4);
-inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
-inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi);
-inter.coupling.matrix{1,4}=diag([0 0 7])/(2*pi);
-spin_system=create(sys,inter); p.observed=1; p.cce.bath_spins=2:4;
-p.cce.approximation='generalized'; p.normalized=false; p.cce.expansion='standard'; p.output='signal'; p.times=[0 0.2 0.4]; p.cce.order=2;
-p.rho0=[1 1;1 1]/2; p.transition.spins=1; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
-p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
-p.cce.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...
-                    'probabilities',{{[0.7 0.3],[0.2 0.8],[0.6 0.4]}});
-p.cce.meanfield='static'; p.cce.interlaced=struct('max_states',16,'reference_state',1);
-p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
-[~,details]=clexpn(spin_system,@free_evolution,p,'labframe');
-p=details.parameters; model=cce_compile(spin_system,p,'labframe');
-model.clusters=details.clusters; ensemble=details.ensemble;
-schedule=struct('pulse_sequence',@free_evolution,'contract',details.contract);
 end
 
 

@@ -2,9 +2,13 @@
 %
 %                    result=test_cce_pycce_fixtures()
 %
+% Outputs:
+%
+%     result - scalar Spinach regression-test result structure
+%
 % Data: MICCoMpy/PyCCE d74d3cb683bf3caa07231654314e554f440833b4.
 % test_cce_pycce_data.json retains Stage-A inputs and complex raw traces.
-% kHz, ms, Gauss and rad/(ms Gauss) are converted explicitly to rad/s and s.
+% kHz, ms, Gauss, and rad/(ms Gauss) are converted explicitly to rad/s and s.
 % Alpha/beta are source eigenvectors including their relative gauge. PyCCE
 % observes the pulse-rotated observed basis and reverses Hahn manifold products
 % in its projected engine. The projected source signal already matches the
@@ -20,12 +24,12 @@ function result=test_cce_pycce_fixtures()
 result=new_test_result('kernel/cce_pycce_fixtures','PyCCE fixture parity',...
                        'Three fixtures, raw subsets and complex final reductions.');
 fixtures=jsondecode(fileread(fullfile(fileparts(mfilename('fullpath')),...
-                                    'test_cce_pycce_data.json')));
+                                      'test_cce_pycce_data.json')));
 raw_errors=zeros(1,numel(fixtures)); final_errors=raw_errors; bounds=raw_errors;
 for f=1:numel(fixtures)
     fixture=fixtures(f); nb=numel(fixture.bath.N);
 
-    % Initialize Spinach isotope metadata then install explicit canonical tensors
+    % Initialise Spinach isotope metadata then install explicit canonical tensors
     sys.isotopes=[{'14N'} reshape(fixture.bath.N,1,[])]; sys.magnet=0;
     sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
     inter.zeeman.matrix=repmat({zeros(3)},1,nb+1); inter.coupling.matrix=cell(nb+1);

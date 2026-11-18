@@ -38,88 +38,6 @@ grumble(sys,inter,specification);
 
 % Generate the finite bath using the authoritative native magnetic field
 s=specification; s.magnetic=sys.magnet;
-[added_sys,added_inter,bath]=generate_bath(s);
-
-% Append physical sites without changing the existing input arrays
-if isfield(sys,'isotopes'), count=numel(sys.isotopes); else, count=0; end
-sys.isotopes=[sys_isotopes(sys) added_sys.isotopes];
-if isfield(sys,'labels'), sys.labels=[sys.labels added_sys.isotopes]; end
-if count==0, inter.coordinates=cell(1,0); end
-inter.coordinates=[inter.coordinates added_inter.coordinates];
-
-% Preserve create's electron fallback when introducing a Zeeman declaration
-if count>0&&~isfield(inter,'zeeman')&&~isfield(inter,'suscept')&&isfield(added_inter,'zeeman')
-    constants=tolerances(struct('sys',struct('output','hush','enable',{{}})),struct());
-    inter.zeeman.matrix=cell(1,count);
-    for k=1:count
-        if sys.isotopes{k}(1)=='E', inter.zeeman.matrix{k}=constants.tols.freeg*eye(3); end
-    end
-end
-
-% Extend native interaction tables and insert only the generated block
-names={'zeeman','coupling'};
-for n=1:numel(names)
-    name=names{n};
-    if ~isfield(inter,name)&&~isfield(added_inter,name), continue; end
-    if ~isfield(inter,name), inter.(name)=struct(); end
-    if ~isfield(added_inter,name), added_inter.(name)=struct(); end
-    fields=union(fieldnames(inter.(name)),fieldnames(added_inter.(name)));
-    for k=1:numel(fields)
-        field=fields{k};
-        if isfield(added_inter.(name),field)&&~iscell(added_inter.(name).(field))
-            if isfield(inter.(name),field)&&~isequal(inter.(name).(field),added_inter.(name).(field))
-                error('spin_bath:ownership','Generated metadata conflicts with existing native input.');
-            end
-            inter.(name).(field)=added_inter.(name).(field); continue;
-        end
-        if isfield(inter.(name),field)
-            old=inter.(name).(field);
-        elseif strcmp(name,'zeeman')
-            old=cell(1,count);
-        else
-            old=cell(count);
-        end
-        if ~iscell(old), continue; end
-        if strcmp(name,'zeeman')
-            table=cell(1,numel(sys.isotopes)); table(1:count)=old;
-            if isfield(added_inter.(name),field)
-                table(count+1:end)=added_inter.(name).(field);
-            end
-        else
-            table=cell(numel(sys.isotopes),numel(sys.isotopes)); table(1:count,1:count)=old;
-            if isfield(added_inter.(name),field)
-                table(count+1:end,count+1:end)=added_inter.(name).(field);
-            end
-        end
-        inter.(name).(field)=table;
-    end
-end
-
-% Keep candidate labels and physical indices distinct after occupancy draws
-bath.spins=count+(1:numel(added_sys.isotopes));
-bath.spin_groups=cell(size(bath.groups));
-for n=1:numel(bath.groups)
-    [~,positions]=ismember(bath.groups{n},bath.ids);
-    bath.spin_groups{n}=bath.spins(positions);
-end
-
-end
-
-% Return an empty isotope row for an initially empty native input
-function isotopes=sys_isotopes(sys)
-if isfield(sys,'isotopes'), isotopes=sys.isotopes; else, isotopes=cell(1,0); end
-end
-
-% Construct a realisation using the finite-bath generation formulas
-function [sys,inter,bath]=generate_bath(specification)
-
-% Validate the explicit physical boundary
-bath_grumble(specification); s=specification;
-
-% Reject implicit lattice replication of joint isotopologues
-if isfield(s,'configurations')&&strcmp(s.mode,'lattice')&&prod(s.repeats)>1
-    error('Joint isotopologues require explicit sites, not implicit lattice replication.');
-end
 stream=[];
 if isfield(s,'seed'), stream=RandStream('mt19937ar','Seed',s.seed); end
 
@@ -228,10 +146,9 @@ end
 candidate_ids=ids; candidate_xyz=xyz; ids=ids(active); xyz=xyz(active,:);
 
 % Translate the selected realisation to native Spinach inputs
-sys.isotopes=species; sys.magnet=s.magnetic;
-inter.coordinates=mat2cell(xyz,ones(size(xyz,1),1),3).';
+added_inter.coordinates=mat2cell(xyz,ones(size(xyz,1),1),3).';
 if isfield(s,'tensors_Hz')
-    inter.zeeman.matrix=cell(1,numel(ids));
+    added_inter.zeeman.matrix=cell(1,numel(ids));
     for n=1:numel(ids)
         tensor=s.tensors_Hz(:,:,ids(n));
         tensor=rotation*tensor*rotation.';
@@ -242,24 +159,24 @@ if isfield(s,'tensors_Hz')
             if any(tensor,'all')
                 error('spin_bath:zero_field','Nonzero local Hz tensors require a nonzero magnetic field.');
             end
-            inter.zeeman.matrix{n}=zeros(3);
+            added_inter.zeeman.matrix{n}=zeros(3);
         elseif species{n}(1)=='E'
             constants=tolerances(struct('sys',struct('output','hush','enable',{{}})),struct());
-            inter.zeeman.matrix{n}=2*pi*tensor*constants.tols.freeg/frequency;
+            added_inter.zeeman.matrix{n}=2*pi*tensor*constants.tols.freeg/frequency;
         else
-            inter.zeeman.matrix{n}=1e6*(2*pi*tensor/frequency-eye(3));
+            added_inter.zeeman.matrix{n}=1e6*(2*pi*tensor/frequency-eye(3));
         end
     end
-    inter.zeeman.units='Hz';
+    added_inter.zeeman.units='Hz';
 end
 if isfield(s,'pairs_Hz')
-    inter.coupling.matrix=cell(numel(ids),numel(ids));
+    added_inter.coupling.matrix=cell(numel(ids),numel(ids));
     for n=1:numel(s.pairs_Hz)
         [present,index]=ismember(s.pairs_Hz(n).ids,ids);
         if all(present)
             tensor=s.pairs_Hz(n).tensor;
             if isscalar(tensor), tensor=tensor*eye(3); end
-            inter.coupling.matrix{index(1),index(2)}=rotation*tensor*rotation.';
+            added_inter.coupling.matrix{index(1),index(2)}=rotation*tensor*rotation.';
         end
     end
 end
@@ -280,6 +197,81 @@ end
 if strcmp(s.mode,'random')
     bath.measure_SI=measure; bath.dimension=s.dimension;
     bath.realized_density=numel(ids)/measure;
+end
+
+% Append physical sites without changing the existing input arrays
+if ~isfield(sys,'isotopes'), sys.isotopes=cell(1,0); end
+count=numel(sys.isotopes); sys.isotopes=[sys.isotopes species];
+if isfield(sys,'labels'), sys.labels=[sys.labels species]; end
+if count==0, inter.coordinates=cell(1,0); end
+inter.coordinates=[inter.coordinates added_inter.coordinates];
+
+% Preserve create's electron fallback when introducing a Zeeman declaration
+if count>0&&~isfield(inter,'zeeman')&&~isfield(inter,'suscept')&&isfield(added_inter,'zeeman')
+    constants=tolerances(struct('sys',struct('output','hush','enable',{{}})),struct());
+    inter.zeeman.matrix=cell(1,count);
+    for k=1:count
+        if sys.isotopes{k}(1)=='E', inter.zeeman.matrix{k}=constants.tols.freeg*eye(3); end
+    end
+end
+
+% Preserve standalone electron frequencies when extending an existing declaration
+if ~isfield(added_inter,'zeeman')&&(isfield(inter,'zeeman')||isfield(inter,'suscept'))&&...
+   any(cellfun(@(isotope)isotope(1)=='E',species))
+    constants=tolerances(struct('sys',struct('output','hush','enable',{{}})),struct());
+    added_inter.zeeman.matrix=cell(1,numel(species));
+    for k=1:numel(species)
+        if species{k}(1)=='E'
+            added_inter.zeeman.matrix{k}=constants.tols.freeg*eye(3);
+        end
+    end
+end
+
+% Extend native interaction tables and insert only the generated block
+names={'zeeman','coupling'};
+for n=1:numel(names)
+    name=names{n};
+    if ~isfield(inter,name)&&~isfield(added_inter,name), continue; end
+    if ~isfield(inter,name), inter.(name)=struct(); end
+    if ~isfield(added_inter,name), added_inter.(name)=struct(); end
+    fields=union(fieldnames(inter.(name)),fieldnames(added_inter.(name)));
+    for k=1:numel(fields)
+        field=fields{k};
+        if isfield(added_inter.(name),field)&&~iscell(added_inter.(name).(field))
+            if isfield(inter.(name),field)&&~isequal(inter.(name).(field),added_inter.(name).(field))
+                error('spin_bath:ownership','Generated metadata conflicts with existing native input.');
+            end
+            inter.(name).(field)=added_inter.(name).(field); continue;
+        end
+        if isfield(inter.(name),field)
+            old=inter.(name).(field);
+        elseif strcmp(name,'zeeman')
+            old=cell(1,count);
+        else
+            old=cell(count);
+        end
+        if ~iscell(old), continue; end
+        if strcmp(name,'zeeman')
+            table=cell(1,numel(sys.isotopes)); table(1:count)=old;
+            if isfield(added_inter.(name),field)
+                table(count+1:end)=added_inter.(name).(field);
+            end
+        else
+            table=cell(numel(sys.isotopes),numel(sys.isotopes)); table(1:count,1:count)=old;
+            if isfield(added_inter.(name),field)
+                table(count+1:end,count+1:end)=added_inter.(name).(field);
+            end
+        end
+        inter.(name).(field)=table;
+    end
+end
+
+% Keep candidate labels and physical indices distinct after occupancy draws
+bath.spins=count+(1:numel(species));
+bath.spin_groups=cell(size(bath.groups));
+for n=1:numel(bath.groups)
+    [~,positions]=ismember(bath.groups{n},bath.ids);
+    bath.spin_groups{n}=bath.spins(positions);
 end
 
 end
@@ -303,10 +295,57 @@ for k=1:numel(item.ids), [~,item.multiplicities(k)]=spin(item.isotopes{k}); end
 
 end
 
-% Validate finite-bath geometry, populations, and interaction units
-function bath_grumble(s)
-
-% Validate the declared geometry mode and magnetic field
+% Validate the native boundary without reinterpreting physical data
+function grumble(sys,inter,s)
+if ~isstruct(sys)||~isscalar(sys)||~isstruct(inter)||~isscalar(inter)||...
+   ~isstruct(s)||~isscalar(s)
+    error('spin_bath:inputs','Inputs must be scalar structures.');
+end
+if ~isfield(sys,'magnet')||~isnumeric(sys.magnet)||~isreal(sys.magnet)||...
+   ~isscalar(sys.magnet)||~isfinite(sys.magnet)
+    error('spin_bath:field','sys.magnet must specify the finite field in tesla.');
+end
+if isfield(s,'magnetic')
+    error('spin_bath:ownership','The magnetic field belongs to sys.magnet.');
+end
+if ~isfield(s,'isotopes')||~iscell(s.isotopes)||~isrow(s.isotopes)
+    error('spin_bath:isotopes','specification.isotopes must be a cell row.');
+end
+if isfield(sys,'isotopes')
+    if ~iscell(sys.isotopes)||(~isrow(sys.isotopes)&&~isempty(sys.isotopes))
+        error('spin_bath:isotopes','sys.isotopes must be a cell row.');
+    end
+    count=numel(sys.isotopes);
+else
+    count=0;
+end
+if count>0&&(~isfield(inter,'coordinates')||~iscell(inter.coordinates)||...
+             ~isequal(size(inter.coordinates),[1 count]))
+    error('spin_bath:coordinates','Existing sites require native coordinate rows.');
+end
+for k=1:count
+    coordinate=inter.coordinates{k};
+    if ~isnumeric(coordinate)||~isreal(coordinate)||~isequal(size(coordinate),[1 3])||...
+       any(~isfinite(coordinate))
+        error('spin_bath:coordinates','Existing coordinates must be finite 1-by-3 Angstrom rows.');
+    end
+end
+if isfield(sys,'labels')&&(~iscell(sys.labels)||numel(sys.labels)~=count)
+    error('spin_bath:labels','Existing labels must match the existing sites.');
+end
+for name={'zeeman','coupling'}
+    if ~isfield(inter,name{1}), continue; end
+    fields=fieldnames(inter.(name{1}));
+    for k=1:numel(fields)
+        value=inter.(name{1}).(fields{k});
+        if ~iscell(value), continue; end
+        if strcmp(name{1},'zeeman'), shape=[1 count]; else, shape=[count count]; end
+        if ~isequal(size(value),shape)&&~(count==0&&isempty(value))
+            error('spin_bath:tables','Existing native interaction tables must match the sites.');
+        end
+    end
+end
+s.magnetic=sys.magnet;
 if ~isstruct(s)||~isscalar(s)||~all(isfield(s,{'mode','isotopes','magnetic'}))||...
    ~ismember(s.mode,{'explicit','lattice','random'})||~iscellstr(s.isotopes)||...
    isempty(s.isotopes)||~isnumeric(s.magnetic)||~isscalar(s.magnetic)||...
@@ -318,8 +357,6 @@ if isfield(s,'seed')&&(~isnumeric(s.seed)||~isreal(s.seed)||~isscalar(s.seed)||.
    ~isfinite(s.seed)||s.seed<0||s.seed>2^32-1||s.seed~=fix(s.seed))
     error('Seed must be a nonnegative integer.');
 end
-
-% Reject unsupported bath properties rather than dropping their physical effect
 allowed={'mode','isotopes','magnetic','coordinates_A','fractional','cell_A','repeats',...
          'bounds_A','count','density','dimension','seed','exclusion_A','max_attempts','occupancy',...
          'rotation','translation_A','species','configurations','remove_ids',...
@@ -344,8 +381,6 @@ end
 if isfield(s,'isotopologues')&&~isfield(s,'occupancy')
     error('isotopologues requires occupancy.');
 end
-
-% Validate geometry-specific dimensions and required controls
 switch s.mode
     case 'explicit'
         if ~isfield(s,'coordinates_A')||~isnumeric(s.coordinates_A)||...
@@ -441,8 +476,6 @@ if isfield(s,'remove_ids')&&(~isnumeric(s.remove_ids)||~isreal(s.remove_ids)||..
    s.remove_ids~=fix(s.remove_ids)))
     error('Invalid deleted site IDs.');
 end
-
-% Reject unused explicit pair annotations before building interaction tensors
 if isfield(s,'pairs_Hz')
     unknown=setdiff(fieldnames(s.pairs_Hz),{'ids','tensor'});
     if ~isempty(unknown), error('Unsupported pairs_Hz.%s.',unknown{1}); end
@@ -480,8 +513,6 @@ if isfield(s,'isotopologues')
         error('isotopologues.max_configurations requires enumerate mode.');
     end
 end
-
-% Validate joint configuration populations before occupancy selection
 if isfield(s,'configurations')
     weights=[s.configurations.weight];
     if isempty(weights)||any(~isfinite(weights)|weights<0)||abs(sum(weights)-1)>numel(weights)*eps
@@ -500,58 +531,8 @@ if isfield(s,'isotopologues')
         error('Sampling count and seed required.');
     end
 end
-
-end
-
-% Validate the native boundary without reinterpreting physical data
-function grumble(sys,inter,s)
-if ~isstruct(sys)||~isscalar(sys)||~isstruct(inter)||~isscalar(inter)||...
-   ~isstruct(s)||~isscalar(s)
-    error('spin_bath:inputs','Inputs must be scalar structures.');
-end
-if ~isfield(sys,'magnet')||~isnumeric(sys.magnet)||~isreal(sys.magnet)||...
-   ~isscalar(sys.magnet)||~isfinite(sys.magnet)
-    error('spin_bath:field','sys.magnet must specify the finite field in tesla.');
-end
-if isfield(s,'magnetic')
-    error('spin_bath:ownership','The magnetic field belongs to sys.magnet.');
-end
-if ~isfield(s,'isotopes')||~iscell(s.isotopes)||~isrow(s.isotopes)
-    error('spin_bath:isotopes','specification.isotopes must be a cell row.');
-end
-if isfield(sys,'isotopes')
-    if ~iscell(sys.isotopes)||(~isrow(sys.isotopes)&&~isempty(sys.isotopes))
-        error('spin_bath:isotopes','sys.isotopes must be a cell row.');
-    end
-    count=numel(sys.isotopes);
-else
-    count=0;
-end
-if count>0&&(~isfield(inter,'coordinates')||~iscell(inter.coordinates)||...
-             ~isequal(size(inter.coordinates),[1 count]))
-    error('spin_bath:coordinates','Existing sites require native coordinate rows.');
-end
-for k=1:count
-    coordinate=inter.coordinates{k};
-    if ~isnumeric(coordinate)||~isreal(coordinate)||~isequal(size(coordinate),[1 3])||...
-       any(~isfinite(coordinate))
-        error('spin_bath:coordinates','Existing coordinates must be finite 1-by-3 Angstrom rows.');
-    end
-end
-if isfield(sys,'labels')&&(~iscell(sys.labels)||numel(sys.labels)~=count)
-    error('spin_bath:labels','Existing labels must match the existing sites.');
-end
-for name={'zeeman','coupling'}
-    if ~isfield(inter,name{1}), continue; end
-    fields=fieldnames(inter.(name{1}));
-    for k=1:numel(fields)
-        value=inter.(name{1}).(fields{k});
-        if ~iscell(value), continue; end
-        if strcmp(name{1},'zeeman'), shape=[1 count]; else, shape=[count count]; end
-        if ~isequal(size(value),shape)&&~(count==0&&isempty(value))
-            error('spin_bath:tables','Existing native interaction tables must match the sites.');
-        end
-    end
+if isfield(s,'configurations')&&strcmp(s.mode,'lattice')&&prod(s.repeats)>1
+    error('Joint isotopologues require explicit sites, not implicit lattice replication.');
 end
 end
 

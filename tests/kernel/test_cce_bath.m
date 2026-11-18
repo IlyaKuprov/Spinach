@@ -259,6 +259,49 @@ for variant=1:5
     end
 end
 
+% Tensor-free appended electrons retain standalone frequencies and dipolar scales
+spec=struct('mode','explicit','isotopes',{{'E','13C'}},...
+            'coordinates_A',[0 0 40;0 0 60]);
+[isolated,isolated_inter]=spin_bath(rmfield(native,'isotopes'),struct(),spec);
+standalone=create(isolated,isolated_inter);
+for variant=1:7
+    input=base;
+    switch variant
+        case 2
+            input.zeeman=struct();
+        case 3
+            input.zeeman.scalar={2.1,17};
+        case 4
+            input.zeeman.eigs={[2.1 2.2 2.3],[]}; input.zeeman.euler={[0.2 0.3 0.4],[]};
+        case 5
+            input.zeeman.matrix={diag([2.1 2.2 2.3]),eye(3)*13};
+        case 6
+            input.zeeman.units='Hz';
+        case 7
+            input.suscept=struct('chi',{{}},'xyz',{{}});
+    end
+    original=create(native,input); [augmented,output]=spin_bath(native,input,spec);
+    appended=create(augmented,output);
+    for k=1:2
+        result=test_close(result,['Tensor-free original Zeeman ' num2str(variant)],...
+                          appended.inter.zeeman.matrix{k},original.inter.zeeman.matrix{k},0,4*eps,...
+                          'Existing explicit and absent declarations keep their physical meaning.');
+        result=test_close(result,['Tensor-free appended Zeeman ' num2str(variant)],...
+                          appended.inter.zeeman.matrix{k+2},standalone.inter.zeeman.matrix{k},0,4*eps,...
+                          'A tensor-free electron must not lose its magnet-frequency splitting.');
+        result=test_close(result,['Tensor-free appended dipolar scale ' num2str(variant)],...
+                          appended.inter.zeeman.ddscal{k+2},standalone.inter.zeeman.ddscal{k},0,4*eps,...
+                          'Electron magnetic-moment scaling must also retain its standalone value.');
+    end
+end
+
+% An explicitly supplied zero electron tensor is not replaced by a fallback
+spec.isotopes={'E'}; spec.coordinates_A=[0 0 40]; spec.tensors_Hz=zeros(3);
+[augmented,output]=spin_bath(native,input,spec); appended=create(augmented,output);
+result=test_true(result,'Explicit appended zero g tensor retained',...
+                 nnz(appended.inter.zeeman.matrix{3})==0&&nnz(appended.inter.zeeman.ddscal{3})==0,...
+                 'A supplied zero tensor remains distinct from an omitted tensor.');
+
 end
 
 

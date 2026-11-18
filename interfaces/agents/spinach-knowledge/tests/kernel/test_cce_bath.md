@@ -51,3 +51,5 @@ result=test_cce_bath()
 ## Native interface
 
 Uses `spin_bath(sys,inter,specification)` with `sys.magnet` owning the magnetic field and row-vector isotope labels. All lattice, occupancy, covariance, tensor, candidate-ID, and exclusion assertions remain.
+
+Appended-bath regressions compare both the original and added Zeeman tensors with independently created systems across absent, explicitly empty, scalar, eigenvalue/Euler, matrix, units-only, and susceptibility-only declarations. The tensor-free added electron must retain its standalone splitting and dipolar scaling, whereas an explicitly zero local tensor remains zero.

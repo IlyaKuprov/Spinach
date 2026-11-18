@@ -16,3 +16,5 @@ The projected Hahn six-state electron/nitrogen bath checks zero-duration amplitu
 Named finite_drive coverage compares the declarative drive to the finite-control density bitwise and rejects invalid spins, axis, amplitude, detuning, duration, extra fields and competing events, and checks partial observation against independent coupled propagation.
 
 Every finite-interval physical check uses the native finite_drive experiment, including independent-axis overlaps, fractional starts, partial observations, coupled drift, and simultaneous GKSL relaxation. Explicit rejection assertions cover removed raw finite, ideal, and empty sequence inputs.
+
+Complex transverse preparation and a phased receiver compare projected CPMG/ESEEM with full-space evolution for odd and even inversion counts in Hilbert and Liouville representations, including zero elapsed time.

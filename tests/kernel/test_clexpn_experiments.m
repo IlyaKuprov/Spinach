@@ -41,6 +41,36 @@ for j=1:numel(sequences)
                       'Dense expm independently checks elapsed time, pulses and complex receiver.');
 end
 
+% Complex preparation exposes odd projected refocusing phases in both representations
+phased=p; phased.rho0=[0.5 -0.5i;0.5i 0.5]; phased.normalized=true;
+phased.coil=exp(0.37i)*[0 1;0 0];
+invariant=spin_system; invariant.inter.coupling.matrix{1,2}=[0 0 5;0 0 0;0 0 7];
+invariant.inter.coupling.matrix{2,1}=zeros(3);
+invariant.inter.zeeman.matrix{2}=diag([0 0 11]);
+phase_model=cce_compile(invariant,rmfield(phased,'cce_aux'),'labframe');
+[phase_cluster,~]=cce_subsystem(phase_model,2,struct(),[]);
+for sequence={@cpmg_echo,@cce_eseem}
+    for count=[1 2 3]
+        phased.nloops=count;
+        for formalism={'zeeman-hilb','zeeman-liouv'}
+            full_cluster=phase_cluster; full_cluster.formalism=formalism{1};
+            phased.cce.approximation='generalized';
+            [hf,rf,kf,full_p]=cce_generators(full_cluster,phased,[]);
+            expected=sequence{1}(full_cluster,full_p,hf,rf,kf);
+            phased.cce.approximation='projected';
+            [hp,rp,kp,proj_p]=cce_generators(full_cluster,phased,[]);
+            actual=sequence{1}(full_cluster,proj_p,hp,rp,kp);
+            result=test_close(result,'Projected fixture manifold invariance',...
+                              proj_p.cce_aux.projection_leakage,0,0,0,...
+                              'The comparison fixture has no observed-spin population transfer.');
+            result=test_close(result,sprintf('Projected phase %s %d %s',...
+                              func2str(sequence{1}),count,formalism{1}),...
+                              actual,expected,3e-13,3e-13,...
+                              'Physical coherence, complex receiver, and zero-time behaviour match full-space evolution.');
+        end
+    end
+end
+
 % Empty spectral selection is a documented no-pump control
 p.pump=struct('center',1e12,'halfwidth',0,'units','Hz','fraction',0.25,'allow_empty',true);
 actual=bath_pumped_hahn(cluster,p,H,R,K); expected=hahn_echo(cluster,p,H,R,K);

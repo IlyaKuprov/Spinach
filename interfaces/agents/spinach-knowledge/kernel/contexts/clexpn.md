@@ -36,3 +36,5 @@ The disjoint and disjoint_inter expansion families fix the retained physical-gro
 A projected request is rejected before subsystem construction when its registered experiment does not support projected generators. Finite_drive and refocusing_train therefore cannot silently discard driven observed-spin population transfer.
 
 The native input boundary rejects parameters.sequence, including empty arrays. Finite, fractional, overlapping, and partially observed controls belong to finite_drive; ideal trains belong to refocusing_train. No raw-event parameter adapter is provided.
+
+The optional cce.bath_radius is forwarded to graph selection. It retains bath sites within the stated Angstrom distance of any observed spin, including the boundary; diagnostics.graph reports retained and omitted physical IDs. This bath-domain cutoff is distinct from the graph edge radius.

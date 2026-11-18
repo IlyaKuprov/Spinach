@@ -115,7 +115,7 @@ if isequal(pulse_sequence,@noise_correlation)
     selection.bath_state=options.bath_state;
 end
 if strcmp(options.approximation,'projected'), selection.second_order=options.second_order; end
-for field={'groups','selection'}
+for field={'groups','selection','bath_radius'}
     if isfield(options,field{1}), selection.(field{1})=options.(field{1}); end
 end
 graph=cce_graph(model,selection);

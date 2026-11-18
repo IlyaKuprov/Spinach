@@ -36,6 +36,7 @@ Use `cce_transition(spin_system,parameters,assumptions)` to resolve an ordered p
 | `cce.bath_spins` | Ordered physical bath IDs, disjoint from observed IDs; default is the complement |
 | `cce.order` | Maximum retained order; omission uses the included-bath order; use the explicit convergence service for refinement |
 | `cce.expansion` | `standard`, `partition`, `disjoint` or `disjoint_inter`; partitioned forms require groups or an explicit partition policy |
+| `cce.bath_radius` | Optional observed-to-bath distance cutoff in Angstrom, inclusive at the boundary; distinct from the graph edge radius |
 | `cce.graph` | `complete`, distance, coupling or explicit connectivity, with the corresponding radius/threshold/sparse logical adjacency |
 | `cce.bath_state` | Mixed or sampled product bath states; supplied samples/probabilities/seeds define the sampling problem |
 | `cce.meanfield`, `cce.meanfield_radius` | Exterior product-state field policy and optional distance cutoff |
@@ -45,6 +46,8 @@ Use `cce_transition(spin_system,parameters,assumptions)` to resolve an ordered p
 | `cce.parallel`, `cce.checkpoint` | Scheduling and checkpoint controls |
 | `cce.convergence` | Independent refinement controls consumed by `cce_converge` |
 | `cce.basis` | Retained `zeeman-hilb` or `zeeman-liouv` basis declaration |
+
+Explicit `cce.backend='stock'` forces the independent stock construction; use the reported generator backend to verify a cross-check. Observable output may omit `coil` when the selected transition supplies detection. Isotope-selected preparation descriptors act only on observed spins, even when the bath contains the same isotope. Projected CPMG and ESEEM restore the physical coherence after odd inversion counts before applying the complex receiver and reference.
 
 `cce_options` validates the complete nested vocabulary. Unknown fields are errors. Algorithm controls belong under `parameters.cce`; physical input tensors belong in `sys`/`inter`; pulse, drive, preparation and detector choices belong to the experiment. The internal model and reducer records are not public parameter containers.
 

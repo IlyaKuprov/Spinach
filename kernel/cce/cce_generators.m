@@ -18,7 +18,7 @@
 % the tagged object, not numeric addition, goes to cce_evolution. Swap
 % left/right and reverse the projected dissipator with swap_matrix for
 % a refocusing pulse. These tags are never stock pulse-sequence inputs.
-% parameters.cce_backend selects auto/direct/stock. The returned
+% parameters.cce.backend selects auto/direct/stock. The returned
 % parameters.cce_aux contains ordering, Hamiltonian and rounding metadata.
 % Master-equation cce_aux.generator retains the physical Hamiltonians,
 % spin operators, and included jump pairs for completed raw-task evidence.
@@ -135,8 +135,7 @@ function [H,meta]=matrix(system,parameters)
 
 % Resolve only the construction backend; physical tensors are already in rad/s
 model=system.model; spin_config=system.configuration; bath_dimension=system.bath_dimension;
-backend='auto';
-if isfield(parameters,'cce_backend'), backend=parameters.cce_backend; end
+backend=parameters.cce.backend;
 if strcmp(backend,'auto')
     if model.direct_supported, backend='direct'; else, backend='stock'; end
 end
@@ -460,7 +459,7 @@ if isfield(parameters,'sequence')
 end
 if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
    ~strcmp(system.kind,'cce_subsystem')||~isstruct(parameters)||~isscalar(parameters)||...
-   ~isfield(parameters,'cce')||~all(isfield(parameters.cce,{'approximation','numerics','second_order'}))
+   ~isfield(parameters,'cce')||~all(isfield(parameters.cce,{'approximation','numerics','second_order','backend'}))
     error('cce_generators:input','A native retained subsystem and resolved parameters are required.');
 end
 if ~ischar(parameters.cce.approximation)||...
@@ -474,7 +473,8 @@ if ~isempty(cache)&&(~isstruct(cache)||~isscalar(cache)||...
    ~all(isfield(cache,{'signature','H','R','K','parameters','hits','misses'})))
     error('cce_generators:cache','Use [] or this generator service cache.');
 end
-if isfield(parameters,'cce_backend')&&~ismember(parameters.cce_backend,{'auto','direct','stock'})
+if ~ischar(parameters.cce.backend)||~isrow(parameters.cce.backend)||...
+   ~ismember(parameters.cce.backend,{'auto','direct','stock'})
     error('cce_generators:backend','Backend must be auto, direct or stock.');
 end
 end

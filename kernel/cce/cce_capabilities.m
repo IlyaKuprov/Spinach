@@ -52,8 +52,8 @@ if isequal(pulse_sequence,@noise_correlation)
     contract.auxiliary={'moment','mean_time','mean_zero','valid','abs_error_bound'};
 end
 
-% Reject checkpoints predating retained master-generator evidence
-contract.version=contract.version+1;
+% Reject checkpoints predating native backend and physical echo-phase corrections
+contract.version=contract.version+2;
 if isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@free_evolution)
     contract.version=contract.version+1;
 end
@@ -83,7 +83,8 @@ end
 % Bound retained time records before allocating subsystem or propagation arrays
 dc=prod(model.multiplicities(model.observed_ids)); components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density'), components=dc^2; end
-if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&iscell(parameters.coil)
+if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&...
+   isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
 bytes=3*numel(parameters.times)*(25*components+16*dc^2);

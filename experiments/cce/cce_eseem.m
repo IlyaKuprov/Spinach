@@ -11,6 +11,7 @@
 % rad/s), fraction and allow_empty; optional sites/species restrict the bath.
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
 % conventional generators or explicitly tagged projected branch generators.
+% Odd projected inversion counts restore the physical coherence before detection.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -56,6 +57,9 @@ for n=1:numel(parameters.times)
     segment=generator;
     if projected&&swapped, segment.left=H.right; segment.right=H.left; end
     rho=cce_evolution(spin_system,segment,[],rho,(1-previous)*parameters.times(n),1,'final');
+
+    % Restore the detected spin-manifold coherence after an odd inversion count
+    if projected&&swapped, rho=reshape(reshape(rho,db,db)',db^2,1); end
     for k=1:numel(coil)
         if isvector(rho), value=coil{k}'*rho;
         else, value=trace(coil{k}'*rho); end

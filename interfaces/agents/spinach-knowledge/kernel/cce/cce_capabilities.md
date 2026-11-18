@@ -36,3 +36,5 @@ Direct registered experiment callbacks reject cce.checkpoint before constructing
 Master-equation raw tasks retain the native generator evidence returned by cce_generators, including physical spin and Lindblad operators. The experiment capability versions advance for this raw-record schema, preventing a checkpoint without those records from being resumed as the current schema. Capability versions are implementation-owned schema identifiers, not a user-selected physical approximation.
 
 refocusing_train is an explicitly registered generalized Hilbert experiment with density/observable/signal reduction. Finite-drive and free-evolution checkpoint versions distinguish retained controlled-density evidence. The registered handles, not name heuristics, select evaluation.
+
+Observable output without an explicit coil has one selected-transition detector; memory preflight counts a cell receiver only when supplied. Checkpoint capability versions also distinguish native backend selection and physical projected echo detection, so earlier raw tasks are not reused under the corrected contracts.

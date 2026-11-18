@@ -67,6 +67,30 @@ result=test_close(result,'Projected actual detected reference',detector'*block,r
 result=test_true(result,'Output orientation declared',strcmp(meta.output_orientation,'time-by-detector'),...
                  'Experiments can rely on an explicit observation orientation.');
 
+% Isotope descriptors exclude matching bath spins from the observed-only view
+same_sys=sys; same_sys.isotopes={'E','E'}; same=create(same_sys,struct());
+selected=rmfield(p,{'rho0','coil','receiver_phase'});
+selected.observed=2; selected.transition.spins=2; selected.cce.bath_spins=1;
+selected.preparation=struct('states','Lx','spins','E');
+[selected,~]=cce_options(same,selected,@free_evolution,'labframe');
+same_model=cce_compile(same,selected,'labframe');
+[same_cluster,~]=cce_subsystem(same_model,1,struct(),[]);
+[rho,~,~]=cce_observation(same_cluster,selected);
+result=test_close(result,'Observed-only isotope preparation',rho,...
+                  kron([0 1;1 0]/2,eye(2)/2),0,0,...
+                  'A matching bath isotope cannot enter the observed preparation.');
+selected.detection=struct('operators','L+','spins','E');
+[~,coil,reference]=cce_observation(same_cluster,selected);
+result=test_close(result,'Observed-only isotope detection',coil,...
+                  kron([0 1;0 0],eye(2)),0,0,...
+                  'The observation service resolves the observed physical IDs only.');
+result=test_close(result,'Isotope descriptor reference',reference,0.5,0,0,...
+                  'Isotope and physical-ID selection have the same reference.');
+selected=rmfield(selected,'detection'); selected.normalized=true;
+actual=clexpn(same,@free_evolution,selected,'labframe');
+result=test_close(result,'Public isotope preparation',actual,ones(numel(selected.times),1),0,0,...
+                  'Both the empty and retained-bath tasks accept the observed isotope descriptor.');
+
 % Ambiguous normalization and unsupported projected observables fail explicitly
 bad=p; bad.rho0=eye(2)/2; bad.coil=[0 1;0 0]; bad.normalized=true;
 result=test_true(result,'Vanishing reference rejected',rejects(@()cce_observation(cluster,bad)),...

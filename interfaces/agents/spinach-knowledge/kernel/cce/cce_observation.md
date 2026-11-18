@@ -23,3 +23,5 @@ The default transition reference is evaluated in the bilinear order `exp(-1i*rec
 Receiver cells may be row or column vectors. Linear cell order defines output-channel order; references and normalisation divisors are always rows. Each normalisation decision uses only that detector's own scale.
 
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
+
+Preparation and detection descriptors may select isotope labels. The descriptor view contains only observed spins, including its isotope metadata; matching bath isotopes never enter an observed-only operator. Physical-ID ordering is retained even when observed IDs are not the first system IDs.

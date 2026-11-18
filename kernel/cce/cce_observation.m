@@ -31,6 +31,7 @@ model=cluster_system.model; dc=cluster_system.observed_dimension;
 db=cluster_system.bath_dimension; ids=model.observed_ids;
 local=cluster_system; local.physical_ids=ids; local.sites=[];
 local.multiplicities=model.multiplicities(ids); local.dimension=dc;
+local.isotopes=model.isotopes(ids);
 local.physical_to_local=zeros(size(model.physical_ids)); local.physical_to_local(ids)=1:numel(ids);
 local.formalism='zeeman-hilb'; local.local_operators=cellfun(...
     @pauli,num2cell(local.multiplicities),'UniformOutput',false);

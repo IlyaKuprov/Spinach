@@ -22,6 +22,23 @@ result=test_close(result,'Natural echo output',answer,ones(3,1),1e-13,1e-13,...
 result=test_true(result,'Natural numeric rather than wrapper',isnumeric(answer)&&...
                   isequal(size(answer),[3 1]),'The context returns the sequence array.');
 
+% Observable output may use the detector supplied by the selected transition
+observable=p; observable.output='observable';
+implicit=clexpn(spin_system,@free_evolution,observable,'labframe');
+observable.coil=[0 1;0 0]; explicit=clexpn(spin_system,@free_evolution,observable,'labframe');
+result=test_close(result,'Transition-derived observable detector',implicit,explicit,0,0,...
+                  'An omitted coil retains one transition-derived detection column.');
+
+% The physical bath radius reaches graph selection and cluster enumeration
+radial=spin_system; radial.inter.coordinates={[0 0 0],[0 0 2]};
+radius=p; radius.cce.bath_radius=1;
+[~,outside]=clexpn(radial,@free_evolution,radius,'labframe');
+radius.cce.bath_radius=2; [~,inside]=clexpn(radial,@free_evolution,radius,'labframe');
+result=test_true(result,'Native bath-radius truncation',isempty(outside.graph.bath_ids)&&...
+                 isequal(outside.graph.omitted_bath_ids,2)&&isempty(outside.clusters)&&...
+                 isequal(inside.graph.bath_ids,2)&&isempty(inside.graph.omitted_bath_ids),...
+                 'The explicit Angstrom radius includes its boundary and excludes distant sites.');
+
 % Direct standard-signature evaluation must match the full retained-cluster task
 model=cce_compile(spin_system,diagnostics.parameters,'labframe');
 [cluster,~]=cce_subsystem(model,2,struct(),[]);

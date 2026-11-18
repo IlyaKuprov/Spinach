@@ -14,7 +14,7 @@ The subsystem is cce_subsystem output; parameters uses the native cce_options co
 
 Projected output is an explicitly tagged H structure: kind=cce_projected, left/right conditional bath Hamiltonians, formalism, physical_ids, dissipator and swap_matrix. R and K are empty. Pass this object directly to cce_evolution, never to stock evolution or an arbitrary pulse sequence. Swap left/right for refocusing; for projected dissipation, the swapped dissipator is swap_matrix*conj(dissipator)*swap_matrix. Projection-changing Hamiltonians/jumps and dissipative virtual-state corrections are rejected. The existing static coherent second-order susceptibility is retained.
 
-cce_backend selects auto/direct/stock; this is an expert service construction override. Returned parameters.cce_aux reports the retained Hamiltonian construction metadata and rounding bound. The exact generator cache is separate from the subsystem cache; changed orientation, configuration, parameters or formalism invalidates reuse. No full-bath basis is allocated, and direct construction does not repeat create/basis.
+parameters.cce.backend selects auto/direct/stock in both context and direct native-service calls. Explicit stock selection uses the independent stock Hamiltonian builder even when direct construction is supported. Returned parameters.cce_aux reports the retained Hamiltonian construction metadata and rounding bound. The exact generator cache is separate from the subsystem cache; changed orientation, configuration, parameters or formalism invalidates reuse. No full-bath basis is allocated, and direct construction does not repeat create/basis.
 
 ## Native dissipative, noise and ensemble contract
 

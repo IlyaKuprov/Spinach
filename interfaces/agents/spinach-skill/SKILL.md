@@ -181,7 +181,7 @@ options enabled, `create` clears the ValueStore when reusing the pool.
 
 ## Native cluster-expansion input services
 
-The clexpn interface uses canonical sys/inter, physical IDs in parameters.observed, descriptive transition selectors, experiment-owned controls and approximation/ensemble/reduction options in parameters.cce. Read references/cce.md and the cce_options, cce_transition and spin_bath knowledge leaves before using these services. There is no legacy translator. Use the registered five-argument experiments through the four-argument context.
+The clexpn interface uses canonical sys/inter, physical IDs in parameters.observed, descriptive transition selectors, experiment-owned controls and approximation/ensemble/reduction options in parameters.cce. Read references/cce.md and the cce_options, cce_transition and spin_bath knowledge leaves before using these services. The legacy entry points have been removed; there is no legacy translator. Use the registered five-argument experiments through the four-argument context.
 
 ## Native retained-subsystem services
 

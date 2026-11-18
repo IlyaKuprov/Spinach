@@ -145,3 +145,5 @@ to use hahn_echo. Native control tests keep experiment-owned preparation and
 normalisation, independent dense references, and all physical assertions.
 
 Retained services validate their own consumed records; `cce_options` owns public input validation. `cce_schedule` and `cce_interlace` require the explicit registered evaluator and native parameters, with no method-name fallback. Internal graph, projection, state, control, and scalar-reduction records are numerical-engine inputs, not alternate public context parameters. Density extraction and reference normalisation within the internal control engine are file-local and preserve column-major ordering and complex detector phase.
+
+The legacy entry points `cce`, `cce_bath`, `cce_cluster`, `cce_master`, `cce_noise`, `cce_observe`, `cce_prepare`, `cce_sequence`, and `cce_validate` are removed, with no adapters or alternate parameter forms. Use `clexpn` and the registered experiments; construct baths with `spin_bath`. Lower-level work uses the native compilation, subsystem, generator, and observation services described above.

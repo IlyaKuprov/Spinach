@@ -2,6 +2,10 @@
 %
 %                         result=test_gcce_density()
 %
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_gcce_density()
@@ -55,7 +59,7 @@ result=test_true(result,'elementwise baseline zeros masked',any(~ratio_reduced.v
 result=test_true(result,'raw density retained',all(isfinite(records{1}(2).value),'all'),...
                  'Masking factors does not destroy direct raw density information.');
 
-% Reject nonpositive densities and unresolved initial scalar normalization
+% Reject nonpositive densities and unresolved initial scalar normalisation
 bad=p; bad.rho0=diag([1.1 -0.1]); caught=false;
 try
     cce_compile(spin_system,bad,'labframe');
@@ -136,8 +140,8 @@ result=test_close(result,'explicit pulse timestamps',observed,reference,1e-12,1e
                   'Independent propagation places the pulse at half the total elapsed time.');
 a=[1;0;0]; b=[0;1;0]; sx=[0 1 0;1 0 1;0 1 0]/sqrt(2);
 result=test_true(result,'spin-one selective distinction',...
-    norm(expm(-1i*pi*sx)-expm(-1i*pi*(a*b'+b*a')/2),'fro')>1,...
-    'A full physical spin-one pi rotation is not a selective transition pulse.');
+                 norm(expm(-1i*pi*sx)-expm(-1i*pi*(a*b'+b*a')/2),'fro')>1,...
+                 'A full physical spin-one pi rotation is not a selective transition pulse.');
 
 metrics.trace_error=max(trace_error);
 metrics.hermiticity_error=max(hermiticity_error);

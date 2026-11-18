@@ -1,5 +1,11 @@
-% Validate deferred powder composition, averaging order and input rejection.
-% Syntax: result=test_clexpn_orientation()
+% Validate deferred powder composition, averaging order, and input rejection.
+% Syntax:
+%
+%                    result=test_clexpn_orientation()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -94,7 +100,7 @@ result=test_true(result,'Orientation-dependent pump selection',...
                  isequal(selected{1},2)&&isempty(selected{2}),...
                  'Selection is recomputed after rotation, not shared across orientations.');
 
-% Internal averaging includes the empty-cluster normalization before products
+% Internal averaging includes the empty-cluster normalisation before products
 p.cce.averaging='internal_then_expansion';
 task=context_task(@clexpn,@hahn_echo,p,'labframe');
 [before,internal]=orientation_average(spin_system,task,outer);
@@ -144,7 +150,7 @@ expected=averaged(:,1).*prod(averaged(:,2:end)./averaged(:,1),2);
 result=test_close(result,'Internal spin and powder average',internal_sampled,expected,2e-14,2e-14,...
                   'Both quadrature and spin-state weights precede inclusion-exclusion.');
 
-% Integer quadratures are promoted before normalization, not rounded as integers
+% Integer quadratures are promoted before normalisation, not rounded as integers
 integer_grid=grid; integer_grid.weights=uint8([1 3]);
 [integer_answer,~]=orientation_average(spin_system,task,struct('grid',integer_grid));
 result=test_close(result,'Integer quadrature weights',integer_answer,internal_sampled,0,0,...
@@ -254,7 +260,7 @@ result=test_close(result,'Single-orientation checkpoint resume',resumed,written,
 bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 full_system=basis(spin_system,bas);
 ordinary_parameters=struct('grid',grid); ordinary_parameters.spins={'E'};
-[ordinary,ordinary_grid,ordinary_diagnostics]=powder(full_system,@constant_signal,...
+[ordinary,ordinary_grid,ordinary_diagnostics]=powder(full_system,@(~,~,~,~,~)1,...
                                                   ordinary_parameters,'labframe');
 result=test_close(result,'Ordinary powder pulse sequence',ordinary,sum(grid.weights),2e-15,0,...
                   'Deferred dispatch does not change the ordinary sequence branch.');
@@ -288,11 +294,6 @@ end
 result=test_true(result,'Assumptions agreement',rejected,...
                  'The outer context cannot silently change the nested assumptions.');
 
-end
-
-% An ordinary pulse sequence returns one at every quadrature orientation
-function answer=constant_signal(~,~,~,~,~)
-answer=1;
 end
 
 

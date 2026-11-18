@@ -2,6 +2,10 @@
 %
 %                  result=test_gcce_observed_mediation()
 %
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_gcce_observed_mediation()
@@ -24,7 +28,10 @@ p.cce.bath_state=struct('mode','mixed_product');
 p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
 % Compare singletons with the retained exact observed-mediated pair
-p.cce.order=1; first=clexpn(spin_system,@free_evolution,p,'labframe'); p.cce.order=2; [second,second_diagnostics]=clexpn(spin_system,@free_evolution,p,'labframe');
+p.cce.order=1;
+first=clexpn(spin_system,@free_evolution,p,'labframe');
+p.cce.order=2;
+[second,second_diagnostics]=clexpn(spin_system,@free_evolution,p,'labframe');
 result=test_true(result,'pair retained',numel(second_diagnostics.clusters)==3,...
                  'Bath-bath zero does not factorize transverse observed exchange.');
 

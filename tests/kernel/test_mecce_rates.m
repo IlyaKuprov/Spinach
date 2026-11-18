@@ -1,6 +1,14 @@
-% Analytic Lindblad rates, vectorisation and projected limitations.
+% Analytic Lindblad rates, vectorisation, and projected limitations.
 % Density answers are time-by-column-vectorised observed matrices.
 % Projected no-bath generators are scalars; an empty dissipator is zero.
+%
+% Syntax:
+%
+%                    result=test_mecce_rates()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -44,7 +52,8 @@ result=test_close(result,'Stock ME weak damping retained',clean(end,1),exp(-1e-5
 % Check the dephasing convention D[2Sz] at the declared rate
 p.bath_jumps.operator=diag([1 -1]); r=clexpn(s,@free_evolution,p,'labframe');
 expected=exp(-(2*rate+2.3i)*p.times)/2;
-result=test_close(result,'C7 numerical check',r(:,3),expected(:),1e-12,1e-12,'Dephasing rate equals twice coefficient.');
+result=test_close(result,'C7 numerical check',r(:,3),expected(:),1e-12,1e-12,...
+                  'Dephasing rate equals twice coefficient.');
 p.cce.approximation='projected'; p.output='signal'; projected=clexpn(s,@free_evolution,p,'labframe');
 result=test_close(result,'C7 numerical check',projected,2*expected(:),1e-12,1e-12,'Projected diagonal observed jump.');
 
@@ -141,7 +150,10 @@ fprintf('R5567 normalised full %.16g; projected truncation %.16g.\n',...
         2*real(rho(1,2)),exp(-0.5));
 
 % Continue accepting reducing projected subspaces with an excluded level
-p.cce.approximation='projected'; p.normalized=true; p.bath_jumps.operator=diag([1 0 2]); closed=clexpn(s,@free_evolution,p,'labframe');
+p.cce.approximation='projected';
+p.normalized=true;
+p.bath_jumps.operator=diag([1 0 2]);
+closed=clexpn(s,@free_evolution,p,'labframe');
 result=test_close(result,'Reducing three-level projected jump',closed(end),exp(-0.5),...
                   2e-12,2e-12,'An excluded level alone is not grounds for refusing a closed block.');
 

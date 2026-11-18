@@ -2,6 +2,10 @@
 %
 %                         result=test_cce_units()
 %
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_cce_units()

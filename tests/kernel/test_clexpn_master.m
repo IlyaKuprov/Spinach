@@ -1,8 +1,17 @@
-% Native master-equation, projected-block and conditioning callback tests.
-% Syntax: result=test_clexpn_master()
+% Native master-equation, projected-block, and conditioning callback tests.
+% Syntax:
+%
+%                    result=test_clexpn_master()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_clexpn_master()
+
+% Specify the physical system and regression targets
 result=new_test_result('kernel/clexpn_master','Native master equation CCE',...
                        'GKSL evolution and conditioned evaluator preservation.');
 sys.magnet=0; sys.isotopes={'E','1H','1H'}; sys.output='hush'; sys.parallel={'local',2};
@@ -101,8 +110,7 @@ result=test_true(result,'Full-bath evaluator callback',numel(calls)==4&&all(call
 result=test_true(result,'Conditioned physical assignments',~isempty(events),...
                  'Callbacks receive explicit parent-conditioned bath densities.');
 
-
-% Checkpoint payload retains contract version, moments, masks and uncertainties
+% Checkpoint payload retains contract version, moments, masks, and uncertainties
 file=[tempname '.mat']; p.cce.checkpoint=struct('file',file,'resume',false);
 [first,~]=clexpn(s,@free_evolution,p,'labframe'); p.cce.checkpoint.resume=true;
 [resumed,~]=clexpn(s,@free_evolution,p,'labframe'); delete(file);
@@ -113,9 +121,13 @@ result=test_close(result,'Native parallel determinism',parallel,first,0,0,'Worke
 
 % Capture physical conditioning, not just callback counts
 function raw=counted(model,cluster,configuration,schedule,parameters)
+
+% Record the retained cluster and conditioned bath state
 calls(end+1)=cluster.id; events{end+1}=configuration.bath_rho;
 raw=callback(model,cluster,configuration,schedule,parameters);
+
 end
+
 end
 
 

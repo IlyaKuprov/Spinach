@@ -1,19 +1,35 @@
 % Exhaustive product-state sampling and clock-transition regression tests.
-% Syntax: result=test_cce_sampling()
+% Syntax:
+%
+%                    result=test_cce_sampling()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_cce_sampling()
 
-% Build a observed avoided crossing with two longitudinal bath fields
+% Build an observed avoided crossing with two longitudinal bath fields
 result=new_test_result('kernel/cce_sampling','CCE product-state sampling',...
                        'Compare weighted samples, exact mixtures and clock-transition exterior fields.');
-[spin_system,p]=fixture();
+sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
+inter.coupling.matrix=cell(3); inter.coupling.matrix{1,2}=diag([0 0 3])/(2*pi);
+inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi); spin_system=create(sys,inter);
+spin_system.inter.zeeman.matrix{1}=[0 0 5;0 0 0;5 0 0];
+p.observed=1; p.cce.bath_spins=[2 3]; p.cce.expansion='standard';
+p.output='density'; p.times=[0 0.2 0.4]; p.cce.order=2; p.rho0=diag([1 0]);
+p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
+p.cce.graph=struct('mode','complete','score','coupling_norm'); p.cce.meanfield='none';
+p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 p.cce.bath_state=struct('mode','sampled','samples',1,'seed',17,'basis','uniform',...
-                    'probabilities',{{[0.7 0.3],[0.2 0.8]}});
+                        'probabilities',{{[0.7 0.3],[0.2 0.8]}});
 [~,diagnostics]=clexpn(spin_system,@free_evolution,p,'labframe');
 p=diagnostics.parameters; model=cce_compile(spin_system,p,'labframe');
-ensemble=diagnostics.ensemble; evaluator=diagnostics.contract.evaluator; schedule=struct('pulse_sequence',@free_evolution,'contract',diagnostics.contract);
+ensemble=diagnostics.ensemble;
+evaluator=diagnostics.contract.evaluator;
+schedule=struct('pulse_sequence',@free_evolution,'contract',diagnostics.contract);
 weights=[0.14 0.56 0.06 0.24]; sampled=zeros(2,2,numel(p.times));
 for a=1:2
     for b=1:2
@@ -31,7 +47,8 @@ p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.7 0.3]),diag([
 ensemble=diagnostics.ensemble;
 exact=reshape(exact.',2,2,[]);
 mixture_error=norm(sampled(:)-exact(:));
-result=test_close(result,'Exhaustive weighted samples equal exact product mixture',sampled,exact,1e-12,0,'Exhaustive weighted samples equal exact product mixture');
+result=test_close(result,'Exhaustive weighted samples equal exact product mixture',sampled,exact,1e-12,0,...
+                  'Exhaustive weighted samples equal exact product mixture');
 
 % Estimate the sampled full-bath mean uncertainty under internal averaging
 sampled=p;
@@ -51,7 +68,9 @@ sampled.cce.order=1; [~,truncated]=clexpn(spin_system,@free_evolution,sampled,'l
 result=test_true(result,'Internal truncated uncertainty unavailable',...
                  all(isnan(truncated.reduction.sampling_standard_error),'all'),...
                  'A nonlinear product-of-means estimate must not claim zero Monte Carlo uncertainty.');
-sampled.cce.order=2; sampled.cce.bath_state.samples=1; [~,single]=clexpn(spin_system,@free_evolution,sampled,'labframe');
+sampled.cce.order=2;
+sampled.cce.bath_state.samples=1;
+[~,single]=clexpn(spin_system,@free_evolution,sampled,'labframe');
 result=test_true(result,'Single sample uncertainty unavailable',...
                  all(isnan(single.reduction.sampling_standard_error),'all'),...
                  'One random draw cannot estimate its own sampling variance.');
@@ -63,7 +82,9 @@ result=test_true(result,'Single external sample uncertainty unavailable',...
 % Show that reducing samples and then averaging is not the reversed estimator
 sample_products=[2 1/2].*[3 1/3]; average_products=mean(sample_products);
 product_averages=mean([2 1/2])*mean([3 1/3]);
-result=test_true(result,'Average of products differs from product of averages',abs(average_products-product_averages)>0.9,'Average of products differs from product of averages');
+result=test_true(result,'Average of products differs from product of averages',...
+                 abs(average_products-product_averages)>0.9,...
+                 'Average of products differs from product of averages');
 
 % Compare static exterior fields to exact quantum dynamics at an avoided crossing
 spin_config=ensemble.spin_config(1); spin_config.bath_rho{2}=diag([1 0]);
@@ -74,29 +95,20 @@ p.cce.meanfield='none'; model=cce_compile(spin_system,p,'labframe');
 absent_field=evaluator(model,struct('id',1,'sites',2),spin_config,schedule,p);
 field_error=norm(sampled_field.value(:)-full.value(:));
 field_effect=norm(absent_field.value(:)-full.value(:));
-result=test_close(result,'Clock-transition static eigenstate exterior matches exact retained bath',sampled_field.value,full.value,1e-12,0,'Clock-transition static eigenstate exterior matches exact retained bath');
-result=test_true(result,'Omitting sampled exterior field changes clock-transition dynamics',field_effect>0.01,'Omitting sampled exterior field changes clock-transition dynamics');
+result=test_close(result,'Clock-transition static eigenstate exterior matches exact retained bath',...
+                  sampled_field.value,full.value,1e-12,0,...
+                  'Clock-transition static eigenstate exterior matches exact retained bath');
+result=test_true(result,'Omitting sampled exterior field changes clock-transition dynamics',field_effect>0.01,...
+                 'Omitting sampled exterior field changes clock-transition dynamics');
 
 % Check the avoided-crossing energy is stationary to first order in longitudinal field
 spin=pauli(2); x=spin.x; z=spin.z; delta=1e-4; gap=@(b) diff(sort(eig(5*x+b*z)));
 derivative=(gap(delta)-gap(-delta))/(2*delta);
-result=test_close(result,'Observed-spin gap has zero first-order longitudinal sensitivity',derivative,0,1e-12,0,'Observed-spin gap has zero first-order longitudinal sensitivity');
+result=test_close(result,'Observed-spin gap has zero first-order longitudinal sensitivity',derivative,0,1e-12,...
+                  0,'Observed-spin gap has zero first-order longitudinal sensitivity');
 fprintf('sampling mixture error %.3g; estimator difference %.6g; clock field error %.3g; omitted-field effect %.6g\n',...
         mixture_error,average_products-product_averages,field_error,field_effect);
 
-end
-
-% Prepare the observed transverse splitting using canonical lab-frame metadata
-function [spin_system,p]=fixture()
-sys.isotopes={'1H','1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
-inter.coupling.matrix=cell(3); inter.coupling.matrix{1,2}=diag([0 0 3])/(2*pi);
-inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi); spin_system=create(sys,inter);
-spin_system.inter.zeeman.matrix{1}=[0 0 5;0 0 0;5 0 0];
-p.observed=1; p.cce.bath_spins=[2 3]; p.cce.expansion='standard';
-p.output='density'; p.times=[0 0.2 0.4]; p.cce.order=2; p.rho0=diag([1 0]);
-p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm'); p.cce.meanfield='none';
-p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 end
 
 

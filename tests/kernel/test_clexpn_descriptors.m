@@ -3,6 +3,10 @@
 %
 %                  result=test_clexpn_descriptors()
 %
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_clexpn_descriptors()

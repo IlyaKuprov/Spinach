@@ -1,7 +1,11 @@
-% Tests native preparation, receiver phase, coils and reference normalization.
+% Tests native preparation, receiver phase, coils, and reference normalisation.
 % Syntax:
 %
 %                   result=test_clexpn_observation()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -91,7 +95,7 @@ actual=clexpn(same,@free_evolution,selected,'labframe');
 result=test_close(result,'Public isotope preparation',actual,ones(numel(selected.times),1),0,0,...
                   'Both the empty and retained-bath tasks accept the observed isotope descriptor.');
 
-% Ambiguous normalization and unsupported projected observables fail explicitly
+% Ambiguous normalisation and unsupported projected observables fail explicitly
 bad=p; bad.rho0=eye(2)/2; bad.coil=[0 1;0 0]; bad.normalized=true;
 result=test_true(result,'Vanishing reference rejected',rejects(@()cce_observation(cluster,bad)),...
                  'A zero initial detected signal cannot be a normalization divisor.');
@@ -106,12 +110,15 @@ end
 
 % Catch an expected contract failure without changing the public API
 function answer=rejects(callback)
+
+% Record whether the expected contract error occurs
 answer=false;
 try
     callback();
 catch
     answer=true;
 end
+
 end
 
 

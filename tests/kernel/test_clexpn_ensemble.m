@@ -1,8 +1,17 @@
-% Native ensemble ordering, elementwise density and partitioned-cluster tests.
-% Syntax: result=test_clexpn_ensemble()
+% Native ensemble ordering, elementwise density, and partitioned-cluster tests.
+% Syntax:
+%
+%                    result=test_clexpn_ensemble()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_clexpn_ensemble()
+
+% Specify the physical system and regression targets
 result=new_test_result('kernel/clexpn_ensemble','Native ensemble reduction',...
                        'Weighted estimators, elementwise density and partitioning.');
 sys.magnet=0; sys.isotopes={'E','1H','1H'}; sys.output='hush';

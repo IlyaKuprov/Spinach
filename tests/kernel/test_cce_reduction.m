@@ -1,4 +1,4 @@
-% Complex CCE algebra, gather ordering and additive polynomial tests.
+% Complex CCE algebra, gather ordering, and additive polynomial tests.
 %
 %                     result=test_cce_reduction()
 %

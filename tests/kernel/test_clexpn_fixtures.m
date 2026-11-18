@@ -1,5 +1,11 @@
 % Validate the immutable NV physical fixture and its explicit model choices.
-% Syntax: result=test_clexpn_fixtures()
+% Syntax:
+%
+%                    result=test_clexpn_fixtures()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 

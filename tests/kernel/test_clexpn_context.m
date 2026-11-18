@@ -1,7 +1,11 @@
-% Validate native context dispatch, natural output and capability rejection.
+% Validate native context dispatch, natural output, and capability rejection.
 % Syntax:
 %
 %                       result=test_clexpn_context()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -127,7 +131,28 @@ for field={'center','halfwidth','fraction','units','allow_empty','sites','specie
 end
 
 % Interlaced conditioning retains the original configuration rows
-[model,q,ensemble,contract]=fixture();
+interlace_sys.isotopes={'1H','1H','1H','1H'};
+interlace_sys.magnet=0;
+interlace_sys.disable={'hygiene'};
+interlace_sys.parallel={'processes',1};
+interlace_sys.output='hush';
+interlace_inter.coupling.matrix=cell(4);
+interlace_inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
+interlace_inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi);
+interlace_inter.coupling.matrix{1,4}=diag([0 0 7])/(2*pi);
+interlace_system=create(interlace_sys,interlace_inter); q.observed=1; q.cce.bath_spins=2:4;
+q.cce.approximation='generalized'; q.normalized=false; q.times=[0 0.2 0.4]; q.cce.order=2;
+q.rho0=[1 1;1 1]/2; q.transition.alpha=[1;0]; q.transition.beta=[0;1];
+q.orientation=[0 0 0]; q.cce.interaction_cutoff=Inf;
+q.cce.graph=struct('mode','complete','score','coupling_norm');
+q.cce.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...
+                        'probabilities',{{[0.7 0.3],[0.2 0.8],[0.6 0.4]}});
+q.cce.meanfield='static'; q.transition.spins=q.observed;
+q.cce.interlaced=struct('max_states',16);
+q.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
+[~,interlace_details]=clexpn(interlace_system,@free_evolution,q,'labframe');
+q=interlace_details.parameters; model=cce_compile(interlace_system,q,'labframe');
+ensemble=interlace_details.ensemble; contract=interlace_details.contract;
 q.cce.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3]}});
 selection=struct('method','gcce','expansion','standard','graph',q.cce.graph,'order',q.cce.order,...
                  'numerics',q.cce.numerics);
@@ -150,36 +175,17 @@ result=test_true(result,'Full-bath registered evaluator',...
 
 % Capture physical conditioning rather than merely counting numerical outputs
 function item=counted(model,cluster,configuration,sequence,parameters)
-    calls=calls+1;
-    if isempty(parent_assignment), parent_assignment=configuration.assignment; end
-    if ~all(ismember(4,q.cce.interlaced.condition_sites{1}))
-        conditioning=conditioning&&configuration.assignment(3)==parent_assignment(3);
-    end
-    evaluate=contract.evaluator; item=evaluate(model,cluster,configuration,sequence,parameters);
+
+% Preserve the parent assignment while recording evaluator calls
+calls=calls+1;
+if isempty(parent_assignment), parent_assignment=configuration.assignment; end
+if ~all(ismember(4,q.cce.interlaced.condition_sites{1}))
+    conditioning=conditioning&&configuration.assignment(3)==parent_assignment(3);
 end
+evaluate=contract.evaluator; item=evaluate(model,cluster,configuration,sequence,parameters);
 
 end
 
-% Reuse the established physical interlacing fixture without changing its parameters
-function [model,p,ensemble,contract]=fixture()
-sys.isotopes={'1H','1H','1H','1H'}; sys.magnet=0; sys.disable={'hygiene'}; sys.parallel={'processes',1}; sys.output='hush';
-inter.coupling.matrix=cell(4);
-inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
-inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi);
-inter.coupling.matrix{1,4}=diag([0 0 7])/(2*pi);
-spin_system=create(sys,inter); p.observed=1; p.cce.bath_spins=2:4;
-p.cce.approximation='generalized'; p.normalized=false; p.times=[0 0.2 0.4]; p.cce.order=2;
-p.rho0=[1 1;1 1]/2; p.transition.alpha=[1;0]; p.transition.beta=[0;1];
-p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
-p.cce.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...
-                    'probabilities',{{[0.7 0.3],[0.2 0.8],[0.6 0.4]}});
-p.cce.meanfield='static'; p.transition.spins=p.observed;
-p.cce.interlaced=struct('max_states',16);
-p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
-[~,diagnostics]=clexpn(spin_system,@free_evolution,p,'labframe');
-p=diagnostics.parameters; model=cce_compile(spin_system,p,'labframe');
-ensemble=diagnostics.ensemble; contract=diagnostics.contract;
 end
 
 

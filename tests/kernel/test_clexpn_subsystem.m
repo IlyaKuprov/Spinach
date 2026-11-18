@@ -1,7 +1,11 @@
-% Tests native compilation, retained ordering, configuration and cache keys.
+% Tests native compilation, retained ordering, configuration, and cache keys.
 % Syntax:
 %
 %                   result=test_clexpn_subsystem()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -54,7 +58,7 @@ result=test_true(result,'Empty bath retains observed space',...
                  empty.bath_dimension==1&&isempty(empty.bath_rho),...
                  'The empty cluster is the observed subsystem, not a scalar.');
 
-% Cache signatures include physical model, assumptions and representation
+% Cache signatures include physical model, assumptions, and representation
 [again,cache]=cce_subsystem(model,2,struct(),cache);
 result=test_true(result,'Exact cache hit',isequaln(cluster,again)&&cache.hits==1,...
                  'An unchanged request must reuse the same immutable view.');

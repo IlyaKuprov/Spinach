@@ -2,6 +2,10 @@
 %
 %                         result=test_gcce_exact()
 %
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
+%
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_gcce_exact()
@@ -115,7 +119,9 @@ for pure=[false true]
             end
             discrepancy=max(abs(record.value-reference),[],'all'); maximum=max(maximum,discrepancy);
             result=test_true(result,'raw full-observed-spin system exact',...
-                discrepancy<=max(record.abs_error_bound,[],'all')+100*dim^3*eps,'Independent analytic or dense reference.');
+                             discrepancy<=max(record.abs_error_bound,[],'all')+100*dim^3*eps,...
+                             'Independent analytic or dense reference.');
+
         end
         reduced=diagnostics.reduction; reduced.density=reshape(reduced.value.',2,2,[]);
         physical=cce_diagnostics(struct('observed_dimension',2),diagnostics.raw,reduced,...
@@ -123,6 +129,7 @@ for pure=[false true]
         trace_error=max(trace_error,max(physical.trace_error));
         hermiticity=max(hermiticity,max(physical.hermiticity_error));
         mineig=min(mineig,min(physical.minimum_eigenvalue));
+
     end
 end
 metrics.maximum_raw_error=maximum; metrics.trace_error=trace_error;
@@ -178,7 +185,9 @@ for method={'gcce','megcce'}
                     q.times=linspace(0,0.5,nt);
                     for normalized=[false true]
                         q.normalized=normalized; q.coil={eye(2),2*eye(2)};
-                        [expected,expected_bound]=column_evaluate(small,pulse_sequence,q); q.coil=q.coil.'; cases=cases+1;
+                        [expected,expected_bound]=column_evaluate(small,pulse_sequence,q);
+                        q.coil=q.coil.';
+                        cases=cases+1;
                         try
                             [actual,actual_bound]=column_evaluate(small,pulse_sequence,q);
                             value_error=max(value_error,norm(actual-expected,'fro'));
@@ -200,7 +209,7 @@ result=test_close(result,'Column observable values',value_error,0,2e-13,0,...
 result=test_close(result,'Column observable uncertainty',bound_error,0,2e-13,0,...
                   'Norm factors belong to observable columns, not to time rows.');
 
-% Mixed observable units must retain the same normalization decisions in column cells
+% Mixed observable units must retain the same normalisation decisions in column cells
 observe=q; observe.coil={1e-20*eye(2),1e20*eye(2)}; observe.normalized=true;
 [~,~,initial_signal,meta]=cce_observation(observed_system,observe);
 row=initial_signal./meta.normalization_divisor; observe.coil=observe.coil.';

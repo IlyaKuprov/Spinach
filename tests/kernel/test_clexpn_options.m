@@ -1,12 +1,16 @@
-% Deterministic lattice, occupancy, geometry and frame tests.
+% Deterministic lattice, occupancy, geometry, and frame tests.
 %
 %                         result=test_clexpn_options()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
 function result=test_clexpn_options()
 
-% Initialize standard harness fields only
+% Initialise standard harness fields only
 result=new_test_result('kernel/clexpn_options','Native CCE inputs and bath construction',...
                        'Nonorthogonal cells, occupancy, density and covariance.');
 
@@ -14,14 +18,20 @@ result=new_test_result('kernel/clexpn_options','Native CCE inputs and bath const
 s=struct('mode','lattice','isotopes',{{'1H','13C'}},'magnetic',1,...
          'cell_A',[2 0 0;1 3 0;0.2 0.4 4],'fractional',[0 0 0;0.25 0.5 0.75],...
          'repeats',[2 1 1]);
-[sys,~,bath]=spin_bath(struct('magnet',s.magnetic),struct(),rmfield(s,'magnetic')); expected=[s.fractional*s.cell_A;(s.fractional+[1 0 0])*s.cell_A];
-result=test_close(result,'Nonorthogonal row-vector cell convention',bath.coordinates_A,expected,0,0,'Nonorthogonal row-vector cell convention');
-result=test_true(result,'Unique physical site IDs',numel(sys.isotopes)==4&&numel(unique(bath.ids))==4,'Unique physical site IDs');
+[sys,~,bath]=spin_bath(struct('magnet',s.magnetic),struct(),rmfield(s,'magnetic'));
+expected=[s.fractional*s.cell_A;(s.fractional+[1 0 0])*s.cell_A];
+result=test_close(result,'Nonorthogonal row-vector cell convention',bath.coordinates_A,expected,0,0,...
+                  'Nonorthogonal row-vector cell convention');
+result=test_true(result,'Unique physical site IDs',numel(sys.isotopes)==4&&numel(unique(bath.ids))==4,...
+                 'Unique physical site IDs');
 
 % Check isotope occupancy without mutating the global random stream
 s.species={'1H','2H'}; s.occupancy=[0.4 0.6]; s.seed=791;
-state=rng; [~,~,a]=spin_bath(struct('magnet',s.magnetic),struct(),rmfield(s,'magnetic')); [~,~,b]=spin_bath(struct('magnet',s.magnetic),struct(),rmfield(s,'magnetic'));
-result=test_true(result,'Seeded isotope occupancy is reproducible and local',isequal(a,b)&&isequal(state,rng),'Seeded isotope occupancy is reproducible and local');
+state=rng;
+[~,~,a]=spin_bath(struct('magnet',s.magnetic),struct(),rmfield(s,'magnetic'));
+[~,~,b]=spin_bath(struct('magnet',s.magnetic),struct(),rmfield(s,'magnetic'));
+result=test_true(result,'Seeded isotope occupancy is reproducible and local',isequal(a,b)&&isequal(state,rng),...
+                 'Seeded isotope occupancy is reproducible and local');
 
 % Verify active frame rotation of coordinates and Cartesian interactions
 q=struct('mode','explicit','isotopes',{{'1H','13C'}},'magnetic',1,...
@@ -29,8 +39,10 @@ q=struct('mode','explicit','isotopes',{{'1H','13C'}},'magnetic',1,...
          'translation_A',[2 3 4]);
 q.pairs_Hz=struct('ids',[1 2],'tensor',[1 2 3;4 5 6;7 8 10]);
 [~,inter,bath]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
-result=test_close(result,'Coordinate covariance',bath.coordinates_A,q.coordinates_A*q.rotation.'+q.translation_A,0,0,'Coordinate covariance');
-result=test_close(result,'Tensor covariance',inter.coupling.matrix{1,2},q.rotation*q.pairs_Hz.tensor*q.rotation.',0,0,'Tensor covariance');
+result=test_close(result,'Coordinate covariance',bath.coordinates_A,...
+                  q.coordinates_A*q.rotation.'+q.translation_A,0,0,'Coordinate covariance');
+result=test_close(result,'Tensor covariance',inter.coupling.matrix{1,2},...
+                  q.rotation*q.pairs_Hz.tensor*q.rotation.',0,0,'Tensor covariance');
 
 % Preserve the preceding geometry fixture while checking tensor conversion
 saved_q=q;
@@ -40,7 +52,10 @@ q=struct('mode','explicit','isotopes',{{'1H','E','15N'}},'magnetic',1,...
          'coordinates_A',[0 0 0;1 0 0;2 0 0]);
 q.rotation=[0 -1 0;1 0 0;0 0 1];
 q.tensors_Hz=cat(3,[100 2 3;2 200 4;3 4 300],diag([400 500 600]),diag([-70 90 110]));
-[sys,inter]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic')); sys.output='hush'; sys.disable={'hygiene'}; sys.parallel={'local',1};
+[sys,inter]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
+sys.output='hush';
+sys.disable={'hygiene'};
+sys.parallel={'local',1};
 ss=create(sys,inter); tensor_error=0;
 for k=1:3
     reference=2*pi*q.rotation*q.tensors_Hz(:,:,k)*q.rotation.';
@@ -89,13 +104,17 @@ r=struct('mode','random','isotopes',{{'E'}},'magnetic',0,...
          'bounds_A',[0 0 0;100 200 0],'dimension',2,'density',1e17,...
          'seed',19,'max_attempts',10000,'exclusion_A',1);
 [~,~,bath]=spin_bath(struct('magnet',r.magnetic),struct(),rmfield(r,'magnetic')); surface_density=r.density;
-result=test_true(result,'Surface density gives twenty unique sites',numel(bath.ids)==20&&size(unique(bath.coordinates_A,'rows'),1)==20,'Surface density gives twenty unique sites');
-result=test_close(result,'SI density and area conversion',bath.realized_density,r.density,1,1e-14,'SI density and area conversion');
+result=test_true(result,'Surface density gives twenty unique sites',...
+                 numel(bath.ids)==20&&size(unique(bath.coordinates_A,'rows'),1)==20,...
+                 'Surface density gives twenty unique sites');
+result=test_close(result,'SI density and area conversion',bath.realized_density,r.density,1,1e-14,...
+                  'SI density and area conversion');
 
 % Reject duplicate positions and remove sites before preserving group closure
 q=rmfield(q,{'rotation','translation_A','pairs_Hz'}); q.coordinates_A=[0 0 0;1 0 0];
 q.groups={[1 2]}; q.remove_ids=2; [~,~,bath]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
-result=test_true(result,'Defect removal preserves physical group IDs',isequal(bath.ids,1)&&isequal(bath.groups,{1}),'Defect removal preserves physical group IDs');
+result=test_true(result,'Defect removal preserves physical group IDs',...
+                 isequal(bath.ids,1)&&isequal(bath.groups,{1}),'Defect removal preserves physical group IDs');
 q=rmfield(q,'remove_ids'); q.coordinates_A=zeros(2,3); rejected=false;
 try
     spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
@@ -113,7 +132,8 @@ result=test_true(result,'Complete groups and isotope row convention',...
                  'User groups explicitly partition every retained site.');
 
 % Check scalar isotropic interactions match explicitly supplied tensors
-q.pairs_Hz=struct('ids',[1 2],'tensor',37); [~,scalar]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
+q.pairs_Hz=struct('ids',[1 2],'tensor',37);
+[~,scalar]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
 q.pairs_Hz.tensor=37*eye(3); [~,tensor]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
 result=test_close(result,'Scalar isotropic tensor',scalar.coupling.matrix{1,2},...
                   tensor.coupling.matrix{1,2},0,0,'Both inputs are in Hz.');
@@ -121,7 +141,9 @@ result=test_close(result,'Scalar isotropic tensor',scalar.coupling.matrix{1,2},.
 % Check bath-to-Spinach point-dipole covariance without a Hamiltonian shortcut
 q=rmfield(q,'pairs_Hz'); R=[0 -1 0;1 0 0;0 0 1];
 q.rotation=R; q.translation_A=[3 4 5];
-[rsys,rinter]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic')); sys.output='hush'; rsys.output='hush';
+[rsys,rinter]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
+sys.output='hush';
+rsys.output='hush';
 sys.parallel={'local',1}; rsys.parallel={'local',1};
 plain=create(sys,inter); rotated=create(rsys,rinter);
 T=plain.inter.coupling.matrix{1,2}; Tr=rotated.inter.coupling.matrix{1,2};
@@ -211,7 +233,8 @@ result=test_true(result,'Random joint exclusion keeps candidate IDs',accepted,..
 q=rmfield(q,{'configurations','remove_ids'}); q.isotopes={'1H'};
 q.species={'1H','13C'}; q.occupancy=[1 0;0 1;1 0]; accepted=false;
 try
-    [sampled,~,~]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic')); accepted=isequal(sampled.isotopes,{'1H','13C','1H'});
+    [sampled,~,~]=spin_bath(struct('magnet',q.magnetic),struct(),rmfield(q,'magnetic'));
+    accepted=isequal(sampled.isotopes,{'1H','13C','1H'});
 catch exception
     fprintf('Random site probabilities: %s\n',exception.message);
 end
@@ -219,7 +242,8 @@ result=test_true(result,'Random site-resolved occupancy count',accepted,...
                  'Random per-site independent probabilities have one row per candidate, just like joint configurations.');
 fprintf('R5587 count and density each produce three candidates; retained joint IDs [1 3] and [3].\n');
 
-fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',max(abs(expected-a.candidate_coordinates_A),[],'all'),surface_density);
+fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',...
+        max(abs(expected-a.candidate_coordinates_A),[],'all'),surface_density);
 
 % Validate the new ownership boundary without invoking an old public entry point
 sys=struct('isotopes',{{'1H','13C'}},'magnet',1,'output','hush',...
@@ -229,11 +253,11 @@ p=struct('observed',1,'transition',struct('spins',1,'ms',[0.5 -0.5]),...
          'times',[0 1e-5 2e-5]);
 [resolved,policy]=cce_options(system,p,@sin,'labframe');
 result=test_true(result,'Declared physical defaults',...
-    strcmp(resolved.cce.approximation,'generalized')&&...
-    strcmp(resolved.cce.bath_state.mode,'mixed_product')&&...
-    strcmp(resolved.cce.meanfield,'none')&&policy.order_requires_convergence&&...
-    ~policy.physical_tensor_conversion&&isequal(resolved.cce.bath_spins,2),...
-    'Default resolution records assumptions and does not claim convergence.');
+                 strcmp(resolved.cce.approximation,'generalized')&&...
+                 strcmp(resolved.cce.bath_state.mode,'mixed_product')&&...
+                 strcmp(resolved.cce.meanfield,'none')&&policy.order_requires_convergence&&...
+                 ~policy.physical_tensor_conversion&&isequal(resolved.cce.bath_spins,2),...
+                 'Default resolution records assumptions and does not claim convergence.');
 explicit=resolved; explicit.cce.order=1;
 explicit.cce.numerics=struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e7);
 explicit.cce.approximation='projected';
@@ -241,13 +265,13 @@ explicit.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])
 explicit.bath_jumps=struct('support',2,'operator','L+','rate',3000);
 [checked,policy]=cce_options(system,explicit,@sin,'labframe');
 result=test_true(result,'Explicit physical input retained',...
-    isequal(checked.cce.bath_state.rho,explicit.cce.bath_state.rho)&&...
-    isequal(checked.bath_jumps,explicit.bath_jumps)&&...
-    isequal(checked.times,p.times)&&~policy.order_requires_convergence&&...
-    ~policy.resources_require_resolution&&~policy.accuracy_requires_resolution,...
-    'Populations and inverse-second jump rates are neither normalized nor converted.');
+                 isequal(checked.cce.bath_state.rho,explicit.cce.bath_state.rho)&&...
+                 isequal(checked.bath_jumps,explicit.bath_jumps)&&...
+                 isequal(checked.times,p.times)&&~policy.order_requires_convergence&&...
+                 ~policy.resources_require_resolution&&~policy.accuracy_requires_resolution,...
+                 'Populations and inverse-second jump rates are neither normalized nor converted.');
 
-% Reject obsolete ownership, unknown nested fields and invalid physical values
+% Reject obsolete ownership, unknown nested fields, and invalid physical values
 invalid=cell(1,12);
 invalid{1}=p; invalid{1}.observed_spins=1;
 invalid{2}=p; invalid{2}.assumptions='labframe';
@@ -289,14 +313,14 @@ pump.pump.units='rad/s'; pump.pump=rmfield(pump.pump,'sites');
 pump.pump.species={'13C'};
 [checked,policy]=cce_options(system,pump,@sin,'labframe');
 result=test_true(result,'Angular-frequency and species filters retained',...
-    isequal(checked.pump,pump.pump)&&strcmp(policy.pump_frequency_units,'rad/s'),...
-    'Explicit units and optional intersecting site/species filters belong to the experiment.');
+                 isequal(checked.pump,pump.pump)&&strcmp(policy.pump_frequency_units,'rad/s'),...
+                 'Explicit units and optional intersecting site/species filters belong to the experiment.');
 sampled=p; sampled.cce.bath_state=struct('mode','sampled','basis',{{eye(2)}},...
-    'probabilities',{{[0.8 0.2]}},'samples',7,'seed',19);
+                                         'probabilities',{{[0.8 0.2]}},'samples',7,'seed',19);
 state_before=rng; checked=cce_options(system,sampled,@sin,'labframe');
 result=test_true(result,'Seed and probabilities retained',...
-    isequal(state_before,rng)&&isequal(checked.cce.bath_state,sampled.cce.bath_state),...
-    'Option validation does not sample or alter the global random stream.');
+                 isequal(state_before,rng)&&isequal(checked.cce.bath_state,sampled.cce.bath_state),...
+                 'Option validation does not sample or alter the global random stream.');
 sampled.cce.bath_state.seed=2^32; rejected=false;
 try
     cce_options(system,sampled,@sin,'labframe');
@@ -312,11 +336,11 @@ inter.coupling.scalar={7};
 spec=struct('mode','explicit','isotopes',{{'13C'}},'coordinates_A',[1 2 3]);
 [augmented,inter,bath]=spin_bath(native,inter,spec);
 result=test_true(result,'Native append ownership',...
-    isequal(augmented.isotopes,{'1H','13C'})&&augmented.magnet==native.magnet&&...
-    inter.zeeman.scalar{1}==3&&inter.coupling.scalar{1,1}==7&&...
-    isequal(inter.coordinates,{[0 0 0],[1 2 3]})&&isequal(bath.spins,2)&&...
-    isequal(bath.spin_groups,{2}),...
-    'Existing tensors and labels survive; generated sites acquire physical indices.');
+                 isequal(augmented.isotopes,{'1H','13C'})&&augmented.magnet==native.magnet&&...
+                 inter.zeeman.scalar{1}==3&&inter.coupling.scalar{1,1}==7&&...
+                 isequal(inter.coordinates,{[0 0 0],[1 2 3]})&&isequal(bath.spins,2)&&...
+                 isequal(bath.spin_groups,{2}),...
+                 'Existing tensors and labels survive; generated sites acquire physical indices.');
 spec.magnetic=2; rejected=false;
 try
     spin_bath(native,inter,spec);
@@ -325,12 +349,12 @@ catch exception
 end
 result=test_true(result,'Duplicate field ownership refused',rejected,'sys.magnet is authoritative.');
 
-% Generalized density experiments supply a state rather than a transition
+% Generalised density experiments supply a state rather than a transition
 physical=rmfield(p,'transition'); physical.rho0=diag([0.8 0.2]);
 [checked,policy]=cce_options(system,physical,@sin,'labframe');
 result=test_true(result,'Explicit generalized state needs no transition',...
-    isequal(checked.rho0,physical.rho0)&&~isfield(policy,'transition'),...
-    'The experiment retains responsibility for propagation and detection.');
+                 isequal(checked.rho0,physical.rho0)&&~isfield(policy,'transition'),...
+                 'The experiment retains responsibility for propagation and detection.');
 physical.cce.approximation='projected'; rejected=false;
 try
     cce_options(system,physical,@sin,'labframe');
@@ -345,8 +369,8 @@ physical.cce.approximation='generalized'; physical.cce.meanfield='static';
 physical.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])}});
 checked=cce_options(system,physical,@sin,'labframe');
 result=test_true(result,'Static mean field with explicit product density',...
-    strcmp(checked.cce.meanfield,'static')&&isequal(checked.cce.bath_state,physical.cce.bath_state),...
-    'Static expectations need not be obtained by stochastic sampling.');
+                 strcmp(checked.cce.meanfield,'static')&&isequal(checked.cce.bath_state,physical.cce.bath_state),...
+                 'Static expectations need not be obtained by stochastic sampling.');
 physical.cce.meanfield='none'; physical.cce.meanfield_radius=10; rejected=false;
 try
     cce_options(system,physical,@sin,'labframe');

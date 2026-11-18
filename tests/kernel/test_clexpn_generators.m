@@ -1,7 +1,11 @@
-% Tests native generators, branch propagation, dissipation and finite pulses.
+% Tests native generators, branch propagation, dissipation, and finite pulses.
 % Syntax:
 %
 %                    result=test_clexpn_generators()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -102,7 +106,9 @@ system.bas.formalism='zeeman-liouv'; bath_model=cce_compile(system,dissipative,{
 [bath_cluster,~]=cce_subsystem(bath_model,2,struct(),[]);
 dissipative.bath_jumps=struct('support',2,'operator','L+','rate',rate);
 [hd,rd,kd,~,~]=cce_generators(bath_cluster,dissipative,[]);
-initial=kron([1 0;0 0],[0 0;0 1]); initial=initial(:); final=cce_evolution(bath_cluster,hd+1i*rd+1i*kd,[],initial,time,1,'final');
+initial=kron([1 0;0 0],[0 0;0 1]);
+initial=initial(:);
+final=cce_evolution(bath_cluster,hd+1i*rd+1i*kd,[],initial,time,1,'final');
 expected=kron([1 0;0 0],diag([1-exp(-rate*time),exp(-rate*time)]));
 result=test_close(result,'Raising-operator pumping rate',final,expected(:),2e-14,2e-13,...
                   'L=H+iR gives decay, not exponential population growth.');
@@ -187,12 +193,15 @@ end
 
 % Catch expected contract errors without accepting a silent fallback
 function answer=rejects(callback)
+
+% Record whether the expected contract error occurs
 answer=false;
 try
     callback();
 catch
     answer=true;
 end
+
 end
 
 

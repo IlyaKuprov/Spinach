@@ -1,5 +1,11 @@
-% Fourier normalization, Lorentzian, odd/even lengths and filter units.
-% Syntax: result=test_cce_spectrum()
+% Fourier normalisation, Lorentzian, odd/even lengths, and filter units.
+% Syntax:
+%
+%                    result=test_cce_spectrum()
+%
+% Outputs:
+%
+%     result - regression result with recorded checks and failures
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -18,7 +24,8 @@ for n=[63 64]
     time_norm=sum(abs(c).^2)*dt; frequency_norm=sum(abs(s.value).^2)*dw/(2*pi);
     result=test_close(result,'C7 numerical check',frequency_norm,time_norm,1e-12,1e-12,'Odd/even Parseval.');
     reconstructed=exp(-1i*t*omega.')*s.value*dw/(2*pi);
-    result=test_close(result,'C7 numerical check',reconstructed,c,1e-12,1e-12,'Odd/even inverse angular-frequency normalization.');
+    result=test_close(result,'C7 numerical check',reconstructed,c,1e-12,1e-12,...
+                      'Odd/even inverse angular-frequency normalization.');
     result=test_close(result,'C7 numerical check',s.frequency_hz,omega/(2*pi),0,0,'Hz axis conversion.');
     maximum=max(maximum,abs(frequency_norm-time_norm));
 end
@@ -33,11 +40,13 @@ lorentz_error=max(abs(s.value-reference));
 p.spectrum.frequency_grid=(0:0.5:8)'; p.spectrum.sidedness='one-sided';
 one=cce_spectrum(t,exp(-rate*t),p);
 expected=4*rate./(rate^2+p.spectrum.frequency_grid.^2); expected(1)=expected(1)/2;
-result=test_close(result,'C7 numerical check',one.value,expected,3e-6,1e-6,'One-sided folding preserves the DC weight.');
+result=test_close(result,'C7 numerical check',one.value,expected,3e-6,1e-6,...
+                  'One-sided folding preserves the DC weight.');
 
 % Check the zero-frequency filter integral in seconds squared
 p.spectrum.modulation=ones(size(t)); filtered=cce_spectrum(t,exp(-rate*t),p);
-result=test_close(result,'C7 numerical check',filtered.filter(1),100,1e-12,1e-12,'FID DC filter is total duration squared.');
+result=test_close(result,'C7 numerical check',filtered.filter(1),100,1e-12,1e-12,...
+                  'FID DC filter is total duration squared.');
 refused=false;
 try
     cce_spectrum(t,exp(-rate*t+1i*t),p);

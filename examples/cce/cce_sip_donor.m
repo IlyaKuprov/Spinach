@@ -1,7 +1,12 @@
 % Donor-envelope contact and valley interference in a silicon toy bath.
 % PyCCE Fig. 5, doi:10.1002/adts.202100254; anisotropic donor input gate.
 % The deliberately small model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=cce_sip_donor()
+% Syntax:
+%
+%             [answer,diagnostics]=cce_sip_donor()
+%
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -17,16 +22,20 @@ inter.zeeman.matrix=repmat({zeros(3)},1,3);
 inter.coupling.matrix=cell(3);
 
 % Explicit illustrative hyperfine and bath coupling tensors in Hz
-a=25; k0=0.85*2*pi/5.43;
+radius=25; valley_wavevector=0.85*2*pi/5.43;
 for n=2:3
 
     % Hydrogenic envelope and six-valley interference, illustrative scale
-    r=inter.coordinates{n};
-    contact=2e5*exp(-2*norm(r)/a)*(sum(cos(k0*r))/3)^2;
+    position=inter.coordinates{n};
+    contact=2e5*exp(-2*norm(position)/radius)*...
+            (sum(cos(valley_wavevector*position))/3)^2;
 
     % Retain observed Sz only for the explicitly projected donor model
     inter.coupling.matrix{1,n}=diag([0 0 contact]);
+
 end
+
+% Explicit dipolar coupling between the bath nuclei in Hz
 inter.coupling.matrix{2,3}=diag([200 200 -400]);
 
 % Coordinates define the toy geometry; all couplings above are explicit
@@ -44,7 +53,7 @@ parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                             'max_memory_bytes',2^28);
+                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn echo through the cluster-expansion context
 spin_system=create(sys,inter);
@@ -52,8 +61,9 @@ spin_system=create(sys,inter);
 
 % Plot the complex echo amplitude
 figure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+               1e6*parameters.times,imag(answer),'r--');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

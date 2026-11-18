@@ -1,7 +1,12 @@
 % Partitioned CCE for a strongly coupled electron pair in a planar layer.
 % Schuetz et al., doi:10.1103/PhysRevResearch.6.043303; finite exact patch.
 % The deliberately small model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=pcce_electron_layer()
+% Syntax:
+%
+%             [answer,diagnostics]=pcce_electron_layer()
+%
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -25,7 +30,10 @@ inter.coupling.matrix{3,4}=diag([300 300 -600]);
 
 % Declare observed-Sz projection for this projected electron-bath model
 for n=2:numel(sys.isotopes)
+
+    % Remove transverse observed-spin coupling components
     if ~isempty(inter.coupling.matrix{1,n}), inter.coupling.matrix{1,n}(:,1:2)=0; end
+
 end
 
 % Coordinates define the toy geometry; all couplings above are explicit
@@ -33,6 +41,8 @@ inter=rmfield(inter,'coordinates');
 
 % Local Hilbert basis for retained clusters
 bas.formalism='zeeman-hilb'; bas.approximation='none';
+
+% Spinach housekeeping
 spin_system=create(sys,inter);
 
 % Projected transition and total echo times in seconds
@@ -43,7 +53,8 @@ parameters.cce.order=2; parameters.cce.approximation='projected';
 parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-5,'rtol',1e-5,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-5,'rtol',1e-5,...
+                               'max_memory_bytes',2^28);
 parameters.cce.expansion='partition'; parameters.cce.groups={[2 3],4};
 parameters.cce.partition=struct('mode','user','max_dimension',4);
 
@@ -53,7 +64,8 @@ parameters.cce.partition=struct('mode','user','max_dimension',4);
 % Plot the measured complex echo amplitude
 kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
                 1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

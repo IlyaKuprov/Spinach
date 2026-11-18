@@ -5,6 +5,9 @@
 %
 %                         [answer,diagnostics]=cce_nv_diamond()
 %
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [answer,diagnostics]=cce_nv_diamond()
@@ -18,6 +21,8 @@ for n=2:5, inter.coupling.matrix{1,n}(:,1:2)=0; end
 
 % Local Hilbert basis for retained clusters
 bas.formalism='zeeman-hilb'; bas.approximation='none';
+
+% Spinach housekeeping
 spin_system=create(sys,inter);
 
 % Projected transition and total echo times in seconds
@@ -28,7 +33,8 @@ parameters.cce.order=2; parameters.cce.approximation='projected';
 parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...
+                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn experiment through the cluster context
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');

@@ -1,7 +1,12 @@
 % Finite observed spin-lock drive including the coupled nuclear drift.
 % Piecewise constant drive in rad/s; dense reference is in test_cce_examples.
 % This small illustrative model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=gcce_finite_drive()
+% Syntax:
+%
+%             [answer,diagnostics]=gcce_finite_drive()
+%
+% Returns one row of column-vectorised observed density per time point
+% in answer, and the cluster-expansion diagnostics structure in diagnostics.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -31,7 +36,8 @@ parameters.drive=struct('spins',1,'axis','x','amplitude',4e4,...
                         'detuning',0,'duration',20e-6);
 parameters.cce.bath_spins=2; parameters.cce.approximation='generalized';
 parameters.cce.order=1; parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                               'max_memory_bytes',2^28);
 
 % Run the named finite-drive experiment
 [answer,diagnostics]=clexpn(spin_system,@finite_drive,parameters,'labframe');

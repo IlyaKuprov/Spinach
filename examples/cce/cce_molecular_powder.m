@@ -1,7 +1,12 @@
 % Orientation-averaged molecular Hahn echo with explicit quadrature weights.
 % Two deuterons illustrate tensor rotation; three axes are not converged powder.
 % The deliberately small model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=cce_molecular_powder()
+% Syntax:
+%
+%             [answer,diagnostics]=cce_molecular_powder()
+%
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -42,7 +47,8 @@ parameters.times=linspace(0,200e-6,41);
 parameters.cce.bath_spins=2:3; parameters.cce.order=2;
 parameters.cce.approximation='generalized'; parameters.cce.basis=bas;
 parameters.cce.graph=struct('mode','complete');
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                               'max_memory_bytes',2^28);
 
 % Average complete Hahn echo expansions over the quadrature
 task=context_task(@clexpn,@hahn_echo,parameters,'labframe');
@@ -53,7 +59,8 @@ parameters.grid=struct('alphas',[0 0 pi/2],'betas',[0 pi/2 pi/2],...
 % Plot the projected complex signal
 kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
                 1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

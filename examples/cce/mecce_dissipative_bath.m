@@ -5,6 +5,9 @@
 %
 %            [answer,diagnostics]=mecce_dissipative_bath()
 %
+% Returns one row of column-vectorised observed density per time point
+% in answer, and the cluster-expansion diagnostics structure in diagnostics.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [answer,diagnostics]=mecce_dissipative_bath()
@@ -28,7 +31,8 @@ parameters.bath_jumps=struct('support',2,'operator','L+','rate',3000);
 parameters.cce.approximation='generalized';
 parameters.cce.order=1;
 parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                               'max_memory_bytes',2^28);
 
 % Run the named experiment in the cluster-expansion context
 spin_system=create(sys,inter);

@@ -1,7 +1,12 @@
 % Mixed 13C/29Si nuclear bath around a divacancy-like centre.
 % Seo et al., doi:10.1038/ncomms12935; full 4H-SiC geometry is gated.
 % The deliberately small model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=cce_sic_divacancy()
+% Syntax:
+%
+%             [answer,diagnostics]=cce_sic_divacancy()
+%
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -36,7 +41,7 @@ parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                             'max_memory_bytes',2^28);
+                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn echo through the cluster-expansion context
 spin_system=create(sys,inter);
@@ -44,8 +49,9 @@ spin_system=create(sys,inter);
 
 % Plot the complex echo amplitude
 figure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+               1e6*parameters.times,imag(answer),'r--');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

@@ -5,6 +5,9 @@
 %
 %                     [answer,diagnostics]=cce_single_nucleus()
 %
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [answer,diagnostics]=cce_single_nucleus()
@@ -24,6 +27,8 @@ inter.coupling.matrix{1,2}=[0 0 aper;0 0 0;0 0 apar]/(2*pi);
 
 % Local Hilbert basis for retained clusters
 bas.formalism='zeeman-hilb'; bas.approximation='none';
+
+% Spinach housekeeping
 spin_system=create(sys,inter);
 
 % Projected transition and total echo times in seconds
@@ -34,7 +39,8 @@ parameters.cce.order=1; parameters.cce.approximation='projected';
 parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,...
+                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn experiment through the cluster context
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
@@ -42,7 +48,8 @@ parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^28);
 % Plot the measured complex echo amplitude
 kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
                 1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

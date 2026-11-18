@@ -1,7 +1,12 @@
 % Spin-3/2 vacancy-like centre with mixed spin-half nuclear environment.
 % doi:10.1103/PhysRevA.109.022603; lattice and transition geometry gate.
 % This small illustrative model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=gcce_highspin_siv()
+% Syntax:
+%
+%             [answer,diagnostics]=gcce_highspin_siv()
+%
+% Returns one row of column-vectorised observed density per time point
+% in answer, and the cluster-expansion diagnostics structure in diagnostics.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -30,7 +35,8 @@ parameters.times=linspace(0,200e-6,31);
 parameters.cce.approximation='generalized';
 parameters.cce.order=2;
 parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                               'max_memory_bytes',2^28);
 
 % Spin system and free evolution
 spin_system=create(sys,inter);

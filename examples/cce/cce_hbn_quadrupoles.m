@@ -1,7 +1,12 @@
 % Planar high-spin 11B/14N bath with explicit quadrupolar tensors.
 % doi:10.1038/s41563-024-01869-4; isotope and EFG material inputs are gated.
 % The deliberately small model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=cce_hbn_quadrupoles()
+% Syntax:
+%
+%             [answer,diagnostics]=cce_hbn_quadrupoles()
+%
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -38,7 +43,7 @@ parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                             'max_memory_bytes',2^28);
+                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn echo through the cluster-expansion context
 spin_system=create(sys,inter);
@@ -46,8 +51,9 @@ spin_system=create(sys,inter);
 
 % Plot the complex echo amplitude
 figure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+               1e6*parameters.times,imag(answer),'r--');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

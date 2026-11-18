@@ -1,7 +1,12 @@
 % Effective electron with anisotropic 183W couplings: reduced rare-earth echo.
-% doi:10.1126/sciadv.abj9786; CIF, g-tensor and exclusion policy are gated.
+% doi:10.1126/sciadv.abj9786; CIF, g-tensor, and exclusion policy are gated.
 % The deliberately small model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=cce_erbium_cawo4()
+% Syntax:
+%
+%             [answer,diagnostics]=cce_erbium_cawo4()
+%
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -36,7 +41,7 @@ parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                             'max_memory_bytes',2^28);
+                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn echo through the cluster-expansion context
 spin_system=create(sys,inter);
@@ -44,8 +49,9 @@ spin_system=create(sys,inter);
 
 % Plot the complex echo amplitude
 figure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+               1e6*parameters.times,imag(answer),'r--');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

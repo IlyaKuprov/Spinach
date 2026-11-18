@@ -2,7 +2,12 @@
 % doi:10.1063/5.0303171 motivates the category; geometry is illustrative.
 % This small illustrative model is not a published material reproduction.
 % Independent density and negativity checks are in test_cce_examples.
-% Syntax: [answer,diagnostics]=gcce_two_centres()
+% Syntax:
+%
+%             [answer,diagnostics]=gcce_two_centres()
+%
+% Returns one row of column-vectorised observed density per time point
+% in answer, and the cluster-expansion diagnostics structure in diagnostics.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -20,8 +25,6 @@ inter.coupling.matrix{1,3}=diag([1700 900 2000]);
 inter.coupling.matrix{2,4}=diag([1300 800 1600]);
 inter.coupling.matrix{3,4}=diag([100 100 -200]);
 
-% Compile metadata, without a full-bath basis
-
 % Basis formalism for retained clusters
 bas.formalism='zeeman-hilb';
 
@@ -33,7 +36,8 @@ parameters.times=linspace(0,200e-6,31);
 parameters.cce.approximation='generalized';
 parameters.cce.order=2;
 parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                               'max_memory_bytes',2^28);
 
 % Run the named experiment in the cluster-expansion context
 spin_system=create(sys,inter);

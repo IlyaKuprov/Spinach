@@ -1,7 +1,12 @@
 % Hahn echo with a frequency-selected bath pump and finite bandwidth.
 % The pump selects physical bath site 2 in a 200 kHz spectral window.
 % The deliberately small model is not a published material reproduction.
-% Syntax: [answer,diagnostics]=cce_deer_bandwidth()
+% Syntax:
+%
+%             [answer,diagnostics]=cce_deer_bandwidth()
+%
+% Returns the normalised complex signal column in answer and the calculation
+% diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -31,7 +36,8 @@ spin_system=create(sys,inter);
 parameters.observed=1; parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
 parameters.times=linspace(0,200e-6,41);
 parameters.cce.approximation='projected'; parameters.cce.order=2;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                               'max_memory_bytes',2^28);
 parameters.pump=struct('sites',2,'center',0,'halfwidth',1e5,...
                        'units','Hz','fraction',0.25,'allow_empty',true);
 
@@ -41,7 +47,8 @@ parameters.pump=struct('sites',2,'center',0,'halfwidth',1e5,...
 % Plot the projected complex signal
 kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
                 1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds'); ylabel('normalised echo amplitude E(2τ)');
+xlabel('total echo time / microseconds');
+ylabel('normalised echo amplitude E(2τ)');
 legend('real','imaginary'); kgrid();
 
 end

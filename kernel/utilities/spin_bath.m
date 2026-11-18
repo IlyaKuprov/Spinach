@@ -4,19 +4,21 @@
 %
 %             [sys,inter,bath]=spin_bath(sys,inter,specification)
 %
-% Inputs:
+% Parameters:
+%
 %   sys           - native input structure; magnet is in tesla, isotopes
 %                   is a cell row (or absent for an initially empty system)
 %   inter         - native interaction structure; existing coordinates must
 %                   be a cell row of Angstrom coordinate rows
-%   specification - scalar structure: mode is explicit, lattice or random;
+%   specification - scalar structure: mode is explicit, lattice, or random;
 %                   isotopes is a cell row; coordinates_A/cell_A/bounds_A
 %                   are in Angstrom; tensors_Hz/pairs_Hz are in Hz. Geometry,
-%                   occupancy, groups, frames and random seed are explicit.
+%                   occupancy, groups, frames, and random seed are explicit.
 %                   magnetic is not accepted: sys.magnet owns the field.
 %                   No material, polarisation or quadrupole is inferred.
 %
 % Outputs:
+%
 %   sys,inter     - augmented native inputs, preserving existing properties
 %   bath          - generated geometry and occupancy; ids/groups retain the
 %                   candidate-site labels, spins/spin_groups are physical
@@ -108,14 +110,13 @@ function isotopes=sys_isotopes(sys)
 if isfield(sys,'isotopes'), isotopes=sys.isotopes; else, isotopes=cell(1,0); end
 end
 
-% Construct a realization using the finite-bath generation formulas
+% Construct a realisation using the finite-bath generation formulas
 function [sys,inter,bath]=generate_bath(specification)
 
 % Validate the explicit physical boundary
 bath_grumble(specification); s=specification;
 
-% Retain the validated isotope row-vector convention
-
+% Reject implicit lattice replication of joint isotopologues
 if isfield(s,'configurations')&&strcmp(s.mode,'lattice')&&prod(s.repeats)>1
     error('Joint isotopologues require explicit sites, not implicit lattice replication.');
 end
@@ -127,8 +128,8 @@ switch s.mode
     case 'explicit'
         xyz=s.coordinates_A; origin=1:size(xyz,1);
     case 'lattice'
-        [i,j,k]=ndgrid(0:s.repeats(1)-1,0:s.repeats(2)-1,0:s.repeats(3)-1);
-        shifts=[i(:) j(:) k(:)]; xyz=zeros(0,3); origin=[];
+        [x,y,z]=ndgrid(0:s.repeats(1)-1,0:s.repeats(2)-1,0:s.repeats(3)-1);
+        shifts=[x(:) y(:) z(:)]; xyz=zeros(0,3); origin=[];
         for n=1:size(shifts,1)
             xyz=[xyz;(s.fractional+shifts(n,:))*s.cell_A]; %#ok<AGROW>
             origin=[origin 1:size(s.fractional,1)]; %#ok<AGROW>
@@ -183,7 +184,7 @@ ids=ids(keep); xyz=xyz(keep,:); species=species(keep);
 if ~isempty(prob), prob=prob(keep,:); end
 if size(unique(xyz,'rows'),1)~=size(xyz,1), error('spin_bath:duplicates','Duplicate positions.'); end
 
-% Construct weighted isotopologues before choosing a physical realization
+% Construct weighted isotopologues before choosing a physical realisation
 configs=struct('ids',{},'isotopes',{},'weight',{},'multiplicities',{});
 if isfield(s,'configurations')
     for n=1:numel(s.configurations)
@@ -217,7 +218,7 @@ elseif isfield(s,'isotopologues')
     for n=1:numel(states), configs(n)=configuration(ids,states{n},weights(n)); end
 end
 
-% Sample occupancy only for a requested single physical realization
+% Sample occupancy only for a requested single physical realisation
 if ~isempty(prob)&&isempty(configs), species=draw(prob,s.species,stream); end
 if ~isempty(configs)
     chosen=configs(1); active=ismember(ids,chosen.ids); species=chosen.isotopes;
@@ -226,7 +227,7 @@ else
 end
 candidate_ids=ids; candidate_xyz=xyz; ids=ids(active); xyz=xyz(active,:);
 
-% Translate the selected realization to native Spinach inputs
+% Translate the selected realisation to native Spinach inputs
 sys.isotopes=species; sys.magnet=s.magnetic;
 inter.coordinates=mat2cell(xyz,ones(size(xyz,1),1),3).';
 if isfield(s,'tensors_Hz')
@@ -263,7 +264,7 @@ if isfield(s,'pairs_Hz')
     end
 end
 
-% Return explicit provenance, occupancy and immutable physical group labels
+% Return explicit provenance, occupancy, and immutable physical group labels
 bath.schema_version=1; bath.ids=ids; bath.coordinates_A=xyz;
 bath.isotopes=species; bath.configurations=configs;
 bath.candidate_ids=candidate_ids; bath.candidate_coordinates_A=candidate_xyz;
@@ -283,9 +284,8 @@ end
 
 end
 
-function names=draw(prob,species,stream)
-
 % Draw each categorical site independently, including explicit vacancies
+function names=draw(prob,species,stream)
 names=cell(1,size(prob,1)); labels=[species {''}];
 for k=1:size(prob,1)
     choice=find(rand(stream)<cumsum([prob(k,:) 1-sum(prob(k,:))]),1);
@@ -294,9 +294,8 @@ end
 
 end
 
-function item=configuration(ids,names,weight)
-
 % Preserve the actual Hilbert dimension of every occupied isotopic species
+function item=configuration(ids,names,weight)
 active=~cellfun(@isempty,names); item.ids=ids(active);
 item.isotopes=names(active); item.weight=weight;
 item.multiplicities=zeros(size(item.ids));
@@ -304,8 +303,10 @@ for k=1:numel(item.ids), [~,item.multiplicities(k)]=spin(item.isotopes{k}); end
 
 end
 
+% Validate finite-bath geometry, populations, and interaction units
 function bath_grumble(s)
 
+% Validate the declared geometry mode and magnetic field
 if ~isstruct(s)||~isscalar(s)||~all(isfield(s,{'mode','isotopes','magnetic'}))||...
    ~ismember(s.mode,{'explicit','lattice','random'})||~iscellstr(s.isotopes)||...
    isempty(s.isotopes)||~isnumeric(s.magnetic)||~isscalar(s.magnetic)||...
@@ -344,6 +345,7 @@ if isfield(s,'isotopologues')&&~isfield(s,'occupancy')
     error('isotopologues requires occupancy.');
 end
 
+% Validate geometry-specific dimensions and required controls
 switch s.mode
     case 'explicit'
         if ~isfield(s,'coordinates_A')||~isnumeric(s.coordinates_A)||...
@@ -479,6 +481,7 @@ if isfield(s,'isotopologues')
     end
 end
 
+% Validate joint configuration populations before occupancy selection
 if isfield(s,'configurations')
     weights=[s.configurations.weight];
     if isempty(weights)||any(~isfinite(weights)|weights<0)||abs(sum(weights)-1)>numel(weights)*eps

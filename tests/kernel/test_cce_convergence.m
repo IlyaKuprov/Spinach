@@ -85,6 +85,22 @@ p.cce.convergence=struct('ladders',order,'atol',1e-8,'rtol',0,'max_work',2);
 result=test_true(result,'invalid coverage cannot converge',~strcmp(invalid_details.convergence,'converged'),...
                  'Identical approximations with failed numerical validity are not convergence.');
 
+% A partially unavailable sampling estimate cannot become a finite aggregate
+request=converged_details.input_parameters; request.cce=rmfield(request.cce,'convergence');
+request.normalized=true; request.times=[0 0.001 0.01];
+request.cce.bath_state=struct('mode','sampled','samples',4,'seed',193,...
+                                'basis','uniform','probabilities','uniform');
+[~,available]=clexpn(spin_system,@free_evolution,request,'labframe');
+request.cce.numerics.atol=mean(available.reduction.abs_error_bound([1 end]));
+request.cce.numerics.rtol=0;
+request.cce.convergence=struct('ladders',order,'atol',1,'rtol',0,'max_work',2);
+[~,unavailable]=cce_converge(spin_system,request,@free_evolution,'labframe');
+errors=unavailable.reduction.sampling_standard_error;
+result=test_true(result,'Unavailable convergence sampling aggregate',...
+                 any(isfinite(errors))&&any(isnan(errors))&&...
+                 isnan(unavailable.convergence_report.comparisons.sampling_error),...
+                 'A missing estimate at one requested time is not discarded in favour of finite times.');
+
 % Reject malformed orders before saturating a legitimate finite-bath refinement
 for value={NaN,Inf,1.5,'2'}
     request=converged_details.input_parameters;

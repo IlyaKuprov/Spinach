@@ -113,7 +113,7 @@ else
     delta=abs(previous(ia,:)-current(ib,:));
     budget=control.atol+control.rtol*max(abs(previous(ia,:)),abs(current(ib,:)));
     numerical=max(prior.reduction.abs_error_bound(ia,:)+details.reduction.abs_error_bound(ib,:),[],'all');
-    sampling=max(prior.reduction.sampling_standard_error(ia,:)+details.reduction.sampling_standard_error(ib,:),[],'all');
+    sampling=max(prior.reduction.sampling_standard_error(ia,:)+details.reduction.sampling_standard_error(ib,:),[],'all','includemissing');
     difference=max(delta,[],'all');
     total=delta+prior.reduction.abs_error_bound(ia,:)+details.reduction.abs_error_bound(ib,:);
     ratio=total./budget; ratio(total==0&budget==0)=0;

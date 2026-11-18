@@ -19,3 +19,5 @@ Refine cluster order, bath extent, graph cutoff, bath-state samples and time res
 Order-ladder entries must be numeric, real, finite nonnegative integer scalars. They are validated before finite-bath saturation, which must not turn NaN, infinity, fractional values, or text into a valid order.
 
 Order saturation uses the resolved baseline bath IDs, including the default complement of observed spins. It does not require an explicit cce.bath_spins field or insert one into the recorded caller input.
+
+The maximum sampling uncertainty across shared times includes missing estimates: if any requested-time contribution is `NaN`, the reported `sampling_error` remains unavailable. A finite estimate at another time cannot hide it. Coverage and numerical-validity checks remain independent and unchanged.

@@ -70,10 +70,10 @@ for s=1:numel(raw)
         record=raw{s}(k); diagnostics.raw_records=diagnostics.raw_records+1;
         diagnostics.raw_invalid=diagnostics.raw_invalid+nnz(~record.valid);
         if isfield(record,'eigen_residual')
-            diagnostics.maximum_eigen_residual=max(diagnostics.maximum_eigen_residual,record.eigen_residual);
+            diagnostics.maximum_eigen_residual=max([diagnostics.maximum_eigen_residual record.eigen_residual],[],'includemissing');
         end
         if isfield(record,'orthogonality_residual')
-            diagnostics.maximum_orthogonality_residual=max(diagnostics.maximum_orthogonality_residual,record.orthogonality_residual);
+            diagnostics.maximum_orthogonality_residual=max([diagnostics.maximum_orthogonality_residual record.orthogonality_residual],[],'includemissing');
         end
     end
 end

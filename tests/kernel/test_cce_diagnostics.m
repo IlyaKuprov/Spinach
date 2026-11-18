@@ -88,6 +88,17 @@ result=test_close(result,'Sampled by-order means',sampled_info.reduction.by_orde
 result=test_close(result,'Sampled final prefix',sampled_info.reduction.by_order(:,:,end),sampled,...
                   1e-12,1e-12,'The result must not expose the first realization as an averaged prefix.');
 
+% Unavailable residuals and sampling errors remain unavailable in diagnostic aggregates
+records=physical_info.raw; records{1}(1).eigen_residual=NaN;
+records{1}(1).orthogonality_residual=NaN;
+modified=physical_info.reduction; modified.sampling_standard_error(:)=NaN;
+unavailable=cce_diagnostics(model,records,modified,p);
+result=test_true(result,'Unavailable diagnostic aggregates',...
+                 isnan(unavailable.maximum_eigen_residual)&&...
+                 isnan(unavailable.maximum_orthogonality_residual)&&...
+                 all(isnan(unavailable.sampling_standard_error),'all'),...
+                 'Missing estimates are not silently discarded by maximum or copy operations.');
+
 % Insert a negative eigenvalue without allowing automatic matrix repair
 modified=physical_info.reduction; modified.value(2,:)=[1.2 0 0 -0.2];
 before=reshape(modified.value.',2,2,numel(p.times)); diagnosed=cce_diagnostics(model,physical_info.raw,modified,p);

@@ -1,14 +1,29 @@
 % Bath-pumped Hahn echo with an explicitly selected spectral window.
+%
 % Syntax:
 %
 %                 [E,aux]=bath_pumped_hahn(spin_system,parameters,H,R,K)
+%
+% Parameters:
+%
+%     spin_system - retained subsystem supplied by clexpn
+%
+%     parameters  - experiment settings described below
+%
+%     H,R,K       - conventional or tagged projected generators
+%
+% Outputs:
+%
+%     E   - complex time-by-detector response
+%
+%     aux - retained propagation and numerical-error diagnostics
 %
 % parameters.times contains total sequence durations in seconds. transition
 % selects the observed two-state transition; rho0/coil or preparation may
 % override the prepared density and detector. normalized defaults to true
 % and divides by the actual detected initial reference. The pump requires
-% pump.center, halfwidth, units (Hz or
-% rad/s), fraction and allow_empty; optional sites/species restrict the bath.
+% pump.center, halfwidth, units (Hz or rad/s), fraction, and allow_empty;
+% optional sites/species restrict the bath.
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
 % conventional generators or explicitly tagged projected branch generators.
 % Detection uses a fixed physical receiver: the observed inversion takes the
@@ -30,8 +45,11 @@
 
 function [E,aux]=bath_pumped_hahn(spin_system,parameters,H,R,K)
 
-% Preparation and detection are owned by this experiment
-grumble(spin_system,parameters,H,R,K); aux=struct();
+% Validate the experiment inputs
+grumble(spin_system,parameters,H,R,K);
+
+% Prepare the physical density and receiver
+aux=struct();
 if ~isfield(parameters,'normalized'), parameters.normalized=true; end
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
 if ~iscell(coil), coil={coil}; end
@@ -54,11 +72,14 @@ if isfield(spec,'sites'), ids=intersect(ids,spec.sites,'stable'); end
 if isfield(spec,'species'), ids=ids(ismember(model.isotopes(ids),cellstr(spec.species))); end
 frequencies=zeros(size(ids));
 for k=1:numel(ids)
+
+    % Read the axial bath Zeeman frequency
     tensor=model.zeeman{ids(k)};
     if norm(tensor(3,1:2))>3*eps*norm(tensor(3,:))
         error('bath_pumped_hahn:axial','Spectral selection requires an axial canonical Zeeman field.');
     end
     frequencies(k)=tensor(3,3);
+
 end
 factor=1; if strcmp(spec.units,'Hz'), factor=2*pi; end
 distance=abs(frequencies-factor*spec.center); width=factor*spec.halfwidth;
@@ -90,16 +111,23 @@ end
 % Embed retained bath rotations for density and coherence-block propagation
 pump_operator=zeros(dc*db); local=spin_system; local.formalism='zeeman-hilb';
 for id=reshape(ids,1,[])
+
+    % Accumulate the retained physical-spin contribution
     pump_operator=pump_operator+cce_operator(local,'Lx',id);
+
 end
 if projected, pump_operator=pump_operator(1:db,1:db); end
 pump_rotation=expm(-1i*pi*pump_operator);
 
 % At zero elapsed time no control is applied, matching the reference signal
 for n=1:numel(parameters.times)
+
+    % Propagate and detect the current observation time
     rho=rho0; previous=0; swapped=false;
     if parameters.times(n)>0
         for j=1:numel(fractions)
+
+            % Apply the next free interval and physical rotation
             segment=generator;
             if projected&&swapped, segment.left=H.right; segment.right=H.left; end
             duration=(fractions(j)-previous)*parameters.times(n);
@@ -120,6 +148,7 @@ for n=1:numel(parameters.times)
                 end
             end
             previous=fractions(j);
+
         end
     end
     segment=generator;
@@ -129,12 +158,97 @@ for n=1:numel(parameters.times)
     % Restore the detected spin-manifold coherence after an odd inversion count
     if projected&&swapped, rho=reshape(reshape(rho,db,db)',db^2,1); end
     for k=1:numel(coil)
+
+        % Evaluate the fixed physical receiver
         if isvector(rho), value=coil{k}'*rho;
         else, value=trace(coil{k}'*rho); end
         if meta.normalized, value=value/reference(k); end
         E(n,k)=value;
     end
+
 end
+
+end
+
+% Propagate both invariant branches with the physical pulse projections
+function [E,aux]=projected_echo(system,parameters,H,ids,fractions,kinds,reference,meta)
+
+% Resolve both spectra once for the complete observation-time axis
+[va,ea]=eig(full((H.left+H.left')/2),'vector');
+[vb,eb]=eig(full((H.right+H.right')/2),'vector');
+ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
+oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
+residual=max(ra,rb); orthogonality=max(oa,ob); db=system.bath_dimension;
+
+% Construct the physical ideal rotations in retained spin order
+transition=system.model.transition;
+pa=kron(transition.alpha,eye(db)); pb=kron(transition.beta,eye(db));
+observed=kron((transition.alpha*transition.beta'+...
+               transition.beta*transition.alpha')/2,eye(db));
+pumped=zeros(system.dimension); local=system; local.formalism='zeeman-hilb';
+for id=reshape(ids,1,[]), pumped=pumped+cce_operator(local,'Lx',id); end
+rotations={expm(-1i*(pi*full(observed))),expm(-1i*(pi*full(pumped)))};
+pulses={{pa'*rotations{1}*pb,pb'*rotations{1}*pa},...
+        {pa'*rotations{2}*pa,pb'*rotations{2}*pb}};
+
+% Assemble the retained product bath density
+rho_b=1;
+for id=system.sites
+
+    % Accumulate the retained physical-spin contribution
+    where=find(system.configuration.bath_ids==id,1);
+    rho_b=kron(rho_b,system.configuration.bath_rho{where});
+
+end
+E=complex(zeros(numel(parameters.times),1));
+bounds=zeros(size(E));
+
+% Match the ordered branch products and their arithmetic error estimate
+for n=1:numel(parameters.times)
+
+    % Propagate and detect the current observation time
+    time=parameters.times(n); ua=eye(db); ub=eye(db); swapped=false; previous=0;
+    if time~=0
+        for j=1:numel(fractions)
+
+            % Apply the next free interval and physical rotation
+            duration=(fractions(j)-previous)*time;
+            left=(va.*exp(-1i*duration*ea).')*va';
+            right=(vb.*exp(-1i*duration*eb).')*vb';
+            if swapped, ua=right*ua; ub=left*ub;
+            else, ua=left*ua; ub=right*ub; end
+            pair=pulses{kinds(j)};
+            if kinds(j)==1
+                if ~swapped, ua=pair{2}*ua; ub=pair{1}*ub;
+                else, ua=pair{1}*ua; ub=pair{2}*ub; end
+                swapped=~swapped;
+            elseif ~swapped
+                ua=pair{1}*ua; ub=pair{2}*ub;
+            else
+                ua=pair{2}*ua; ub=pair{1}*ub;
+            end
+            previous=fractions(j);
+        end
+        duration=(1-previous)*time;
+        left=(va.*exp(-1i*duration*ea).')*va';
+        right=(vb.*exp(-1i*duration*eb).')*vb';
+        if swapped, ua=right*ua; ub=left*ub;
+        else, ua=left*ua; ub=right*ub; end
+        E(n)=conj(trace(ua*rho_b*ub'));
+    else
+        E(n)=1;
+    end
+    operations=28*db^3; gamma=operations*eps/(1-operations*eps);
+    bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+12*orthogonality+...
+              gamma*(1+time*H.hamiltonian_norm);
+end
+if ~meta.normalized, E=E*reference; bounds=bounds*abs(reference); end
+
+% Retain numerical propagation diagnostics
+aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
+           'orthogonality_residual',orthogonality,...
+           'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
+           'backend',parameters.cce_aux.backend);
 
 end
 
@@ -185,77 +299,6 @@ if isfield(spec,'species')&&(~iscellstr(spec.species)||~isrow(spec.species)||...
    any(~ismember(spec.species,spin_system.model.isotopes)))
     error('bath_pumped_hahn:species','Pump species must be a row of isotope labels from the model.');
 end
-end
-
-% Propagate both invariant branches with the physical pulse projections
-function [E,aux]=projected_echo(system,parameters,H,ids,fractions,kinds,reference,meta)
-
-% Resolve both spectra once for the complete observation-time axis
-[va,ea]=eig(full((H.left+H.left')/2),'vector');
-[vb,eb]=eig(full((H.right+H.right')/2),'vector');
-ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
-oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
-residual=max(ra,rb); orthogonality=max(oa,ob); db=system.bath_dimension;
-
-% Construct the physical ideal rotations in retained spin order
-transition=system.model.transition;
-pa=kron(transition.alpha,eye(db)); pb=kron(transition.beta,eye(db));
-observed=kron((transition.alpha*transition.beta'+...
-               transition.beta*transition.alpha')/2,eye(db));
-pumped=zeros(system.dimension); local=system; local.formalism='zeeman-hilb';
-for id=reshape(ids,1,[]), pumped=pumped+cce_operator(local,'Lx',id); end
-rotations={expm(-1i*(pi*full(observed))),expm(-1i*(pi*full(pumped)))};
-pulses={{pa'*rotations{1}*pb,pb'*rotations{1}*pa},...
-        {pa'*rotations{2}*pa,pb'*rotations{2}*pb}};
-rho_b=1;
-for id=system.sites
-    where=find(system.configuration.bath_ids==id,1);
-    rho_b=kron(rho_b,system.configuration.bath_rho{where});
-end
-E=complex(zeros(numel(parameters.times),1));
-bounds=zeros(size(E));
-
-% Match the ordered branch products and their arithmetic error estimate
-for n=1:numel(parameters.times)
-    time=parameters.times(n); ua=eye(db); ub=eye(db); swapped=false; previous=0;
-    if time~=0
-        for j=1:numel(fractions)
-            duration=(fractions(j)-previous)*time;
-            left=(va.*exp(-1i*duration*ea).')*va';
-            right=(vb.*exp(-1i*duration*eb).')*vb';
-            if swapped, ua=right*ua; ub=left*ub;
-            else, ua=left*ua; ub=right*ub; end
-            pair=pulses{kinds(j)};
-            if kinds(j)==1
-                if ~swapped, ua=pair{2}*ua; ub=pair{1}*ub;
-                else, ua=pair{1}*ua; ub=pair{2}*ub; end
-                swapped=~swapped;
-            elseif ~swapped
-                ua=pair{1}*ua; ub=pair{2}*ub;
-            else
-                ua=pair{2}*ua; ub=pair{1}*ub;
-            end
-            previous=fractions(j);
-        end
-        duration=(1-previous)*time;
-        left=(va.*exp(-1i*duration*ea).')*va';
-        right=(vb.*exp(-1i*duration*eb).')*vb';
-        if swapped, ua=right*ua; ub=left*ub;
-        else, ua=left*ua; ub=right*ub; end
-        E(n)=conj(trace(ua*rho_b*ub'));
-    else
-        E(n)=1;
-    end
-    operations=28*db^3; gamma=operations*eps/(1-operations*eps);
-    bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+12*orthogonality+...
-              gamma*(1+time*H.hamiltonian_norm);
-end
-if ~meta.normalized, E=E*reference; bounds=bounds*abs(reference); end
-aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
-           'orthogonality_residual',orthogonality,...
-           'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
-           'backend',parameters.cce_aux.backend);
-
 end
 
 

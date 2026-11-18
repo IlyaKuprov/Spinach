@@ -1,7 +1,12 @@
 % Validate closed-system experiments against independent matrix propagation.
+%
 % Syntax:
 %
 %                      result=test_clexpn_experiments()
+%
+% Outputs:
+%
+%     result - standard registered-test result structure
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -26,19 +31,28 @@ pulse=kron([0 -1i;-1i 0],eye(2));
 sequences={@free_evolution,@hahn_echo,@cpmg_echo,@cce_eseem}; p.nloops=3;
 fractions={[],0.5,([1 2 3]-0.5)/3,0.5};
 for j=1:numel(sequences)
+
+    % Compare each named sequence with dense propagation
     actual=sequences{j}(cluster,p,H,R,K); expected=zeros(size(actual));
     for n=1:numel(p.times)
+
+        % Propagate and detect the current observation time
         u=eye(4); previous=0;
         if p.times(n)>0
             for fraction=fractions{j}
+
+                % Apply the next free interval and physical rotation
                 u=pulse*expm(-1i*H*(fraction-previous)*p.times(n))*u; previous=fraction;
+
             end
         end
         u=expm(-1i*H*(1-previous)*p.times(n))*u;
         expected(n)=trace(coil'*u*rho0*u')/reference;
+
     end
     result=test_close(result,['Independent ' func2str(sequences{j})],actual,expected,3e-13,3e-13,...
                       'Dense expm independently checks elapsed time, pulses and complex receiver.');
+
 end
 
 % Complex preparation exposes odd projected refocusing phases in both representations
@@ -50,9 +64,15 @@ invariant.inter.zeeman.matrix{2}=diag([0 0 11]);
 phase_model=cce_compile(invariant,rmfield(phased,'cce_aux'),'labframe');
 [phase_cluster,~]=cce_subsystem(phase_model,2,struct(),[]);
 for sequence={@cpmg_echo,@cce_eseem}
+
+    % Select the refocusing experiment
     for count=[1 2 3]
+
+        % Propagate and detect the current observation time
         phased.nloops=count;
         for formalism={'zeeman-hilb','zeeman-liouv'}
+
+            % Compare Hilbert and Liouville representations
             full_cluster=phase_cluster; full_cluster.formalism=formalism{1};
             phased.cce.approximation='generalized';
             [hf,rf,kf,full_p]=cce_generators(full_cluster,phased,[]);
@@ -67,17 +87,28 @@ for sequence={@cpmg_echo,@cce_eseem}
                               func2str(sequence{1}),count,formalism{1}),...
                               actual,expected,3e-13,3e-13,...
                               'Physical coherence, complex receiver, and zero-time behaviour match full-space evolution.');
+
         end
+
     end
+
 end
 
 % A fixed receiver detects the physical coherence in every projected Hahn path
 for sites={[],2}
+
+    % Accumulate the retained physical-spin contribution
     [retained,~]=cce_subsystem(phase_model,sites{1},struct(),[]);
     for sequence={@hahn_echo,@bath_pumped_hahn}
+
+        % Select the fixed-receiver experiment
         for formalism={'zeeman-hilb','zeeman-liouv'}
+
+            % Compare Hilbert and Liouville representations
             retained.formalism=formalism{1};
             for normalised=[false true]
+
+                % Compare normalised and unnormalised detection
                 q=phased; q.normalized=normalised;
                 if isequal(sequence{1},@bath_pumped_hahn)
                     q.pump=struct('center',11,'halfwidth',0,'units','rad/s',...
@@ -97,9 +128,13 @@ for sites={[],2}
                     result=test_close(result,'Hahn non-spectral fixed receiver',fallback,expected,...
                                       3e-13,3e-13,'The interval fallback detects the same physical coherence.');
                 end
+
             end
+
         end
+
     end
+
 end
 
 % Nonzero dissipation and manifold-preserving rotations retain the fixed receiver
@@ -107,6 +142,8 @@ end
 retained.formalism='zeeman-liouv'; q=phased;
 q.bath_jumps=struct('support',2,'operator','L+','rate',2);
 for angle=[pi 2*pi]
+
+    % Set an interchanging or preserving rotation
     q.refocusing=struct('spins',1,'operator',angle*[0 1;1 0]/2,'time',0.007);
     q.cce.approximation='generalized';
     [hf,rf,kf,full_p]=cce_generators(retained,q,[]);
@@ -116,6 +153,7 @@ for angle=[pi 2*pi]
     actual=hahn_echo(retained,proj_p,hp,rp,kp);
     result=test_close(result,'Dissipative Hahn fixed receiver',actual,expected,...
                       3e-13,3e-13,'Applied and absent swaps use the original receiver and reference.');
+
 end
 
 % Default preparation also checks the bath-pumped spectral path against full space
@@ -140,16 +178,22 @@ result=test_close(result,'Empty allowed pump window',actual,expected,3e-13,3e-13
 % Free-evolution density has the same column-major ordering as direct partial trace
 p.output='density'; actual=free_evolution(cluster,p,H,R,K); expected=zeros(3,4);
 for n=1:numel(p.times)
+
+    % Propagate and detect the current observation time
     u=expm(-1i*H*p.times(n)); rho=u*rho0*u'; observed=zeros(2);
     for a=1:2
+
+        % Trace each observed-spin row over the bath
         for b=1:2, observed(a,b)=trace(rho((a-1)*2+(1:2),(b-1)*2+(1:2))); end
+
     end
     expected(n,:)=observed(:).';
+
 end
 result=test_close(result,'Column-major reduced density',actual,expected,3e-13,3e-13,...
                   'Direct free evolution returns physical observed density elements.');
 
-% A physical receiver phase remains complex before normalization
+% A physical receiver phase remains complex before normalisation
 phase=0.37; phased=p; phased.output='observable'; phased.normalized=false;
 phased.coil=exp(1i*phase)*model.transition.alpha*model.transition.beta';
 unphased=phased; unphased.coil=model.transition.alpha*model.transition.beta';
@@ -194,14 +238,20 @@ p.drive(2).axis='x'; p.drive(2).amplitude=3;
 actual=clexpn(system,@finite_drive,p,'labframe'); expected=zeros(size(actual));
 Sz=diag([0.5 -0.5]); Sx=[0 1;1 0]/2;
 for n=1:numel(p.times)
+
+    % Propagate and detect the current observation time
     t=p.times(n); state=rho; cuts=unique([0 t min([0.05 0.1 0.15 0.2],t)]);
     for k=1:numel(cuts)-1
+
+        % Propagate the simultaneous active drive intervals
         middle=(cuts(k)+cuts(k+1))/2; generator=zeros(2);
         if middle>0.05&&middle<0.15, generator=generator+9*Sz; end
         if middle>0.1&&middle<0.2, generator=generator+3*Sx+2*Sz; end
         U=expm(-1i*generator*(cuts(k+1)-cuts(k))); state=U*state*U';
+
     end
     expected(n,:)=state(:).';
+
 end
 result=test_close(result,'Overlapping finite intervals',actual,expected,3e-14,0,...
                   'Start/stop boundaries, detuning and partial intervals match dense expm.');
@@ -209,8 +259,11 @@ p.drive=p.drive(1); p.drive.axis=[0 0 1];
 p.drive=rmfield(p.drive,'time'); p.drive.fraction=0.5;
 actual=clexpn(system,@finite_drive,p,'labframe');
 for n=1:numel(p.times)
+
+    % Propagate and detect the current observation time
     U=expm(-1i*9*Sz*min(0.1,p.times(n)/2)); state=U*rho*U';
     expected(n,:)=state(:).';
+
 end
 result=test_close(result,'Fractional finite-drive placement',actual,expected,3e-14,0,...
                   'The duration remains in seconds while start scales with elapsed time.');
@@ -225,13 +278,19 @@ Sy=[0 -1i;1i 0]/2;
 drift=2*pi*(kron(Sx,Sx)+2*kron(Sy,Sy)+3*kron(Sz,Sz));
 drive=kron(7*Sx+2*Sz,eye(2));
 for n=1:numel(p.times)
+
+    % Propagate and detect the current observation time
     duration=min(0.1,p.times(n));
     U=expm(-1i*drift*(p.times(n)-duration))*expm(-1i*(drift+drive)*duration);
     state=U*kron(rho,eye(2)/2)*U'; observed=zeros(2);
     for a=1:2
+
+        % Trace each observed-spin row over the bath
         for b=1:2, observed(a,b)=trace(state((a-1)*2+(1:2),(b-1)*2+(1:2))); end
+
     end
     expected(n,:)=observed(:).';
+
 end
 result=test_close(result,'Finite-drive coupled drift',actual,expected,6e-14,0,...
                   'Dense full-bath propagation includes noncommuting dipolar drift.');
@@ -246,6 +305,8 @@ result=test_close(result,'Named finite-drive contract',named,actual(selected,:),
 invalid={struct('spins',2),struct('axis',[1 1 0]),struct('amplitude',Inf),...
          struct('detuning',1i),struct('duration',0),struct('extra',1)};
 for n=1:numel(invalid)
+
+    % Reject the invalid drive descriptor
     bad=q; field=fieldnames(invalid{n}); bad.drive.(field{1})=invalid{n}.(field{1});
     rejected=false;
     try
@@ -255,11 +316,15 @@ for n=1:numel(invalid)
     end
     result=test_true(result,['Named finite-drive validation ' field{1}],rejected,...
                       'Every declarative drive field is validated.');
+
 end
 bad=q; bad.times=[0 0.02]; partial=clexpn(system,@finite_drive,bad,'labframe');
 U=expm(-1i*(drift+drive)*0.02); state=U*kron(rho,eye(2)/2)*U'; observed=zeros(2);
 for a=1:2
+
+    % Trace each observed-spin row over the bath
     for b=1:2, observed(a,b)=trace(state((a-1)*2+(1:2),(b-1)*2+(1:2))); end
+
 end
 result=test_close(result,'Named finite-drive observation time',partial(2,:),observed(:).',...
                   6e-14,0,'An observation during a drive retains simultaneous coupled evolution.');
@@ -294,8 +359,11 @@ J=sqrt(2)*Sz; loss=J'*J;
 D=kron(conj(J),J)-(kron(eye(2),loss)+kron(loss.',eye(2)))/2;
 A=-1i*(kron(eye(2),7*Sx+2*Sz)-kron((7*Sx+2*Sz).',eye(2)))+D;
 for n=1:numel(p.times)
+
+    % Propagate and detect the current observation time
     duration=min(0.1,p.times(n));
     expected(n,:)=(expm(D*(p.times(n)-duration))*expm(A*duration)*rho(:)).';
+
 end
 result=test_close(result,'Finite-drive GKSL evolution',actual,expected,6e-14,0,...
                   'The dissipator remains active during and after the drive.');
@@ -303,6 +371,8 @@ p=rmfield(p,'bath_jumps'); p.cce=rmfield(p.cce,'basis');
 
 % Raw finite, ideal, and empty event arrays are all removed inputs
 for events={struct('type','finite'),struct('type','ideal'),struct([]),[]}
+
+    % Reject the removed raw sequence representation
     rejected=p; rejected=rmfield(rejected,'drive'); rejected.sequence=events{1};
     failed=false;
     try
@@ -312,6 +382,7 @@ for events={struct('type','finite'),struct('type','ideal'),struct([]),[]}
     end
     result=test_true(result,'Free evolution rejects raw events',failed,...
                      'Use finite_drive, refocusing_train, or a named echo experiment.');
+
 end
 p.cce.approximation='projected'; p.output='signal';
 failed=false;
@@ -323,12 +394,13 @@ end
 result=test_true(result,'Projected finite drives rejected',failed,...
                  'A finite observed drive requires generalized propagation.');
 
-
 % Product-ms selectors prepare all high-spin and multiple-centre examples
 isotopes={{'E4'},{'E3'},{'E','E'},{'E','51V'}};
 selectors={[-0.5 0.5],[-1 1],[-0.5 0.5;-0.5 0.5],[-0.5 0.5;3.5 3.5]};
 positions={[2 3],[1 3],[1 4],[1 9]}; dimensions=[4 3 4 16];
 for k=1:numel(isotopes)
+
+    % Prepare the specified product spin manifolds
     sys.isotopes=isotopes{k}; inter=struct();
     inter.zeeman.matrix=repmat({zeros(3)},1,numel(sys.isotopes));
     inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes)); system=create(sys,inter);
@@ -341,8 +413,8 @@ for k=1:numel(isotopes)
     result=test_close(result,sprintf('Example preparation selector %d',k),...
                       actual,expected(:).',2e-14,0,...
                       'Selected product manifolds replace hand-built preparation vectors.');
-end
 
+end
 
 % Coherent diagnostics retain the original arithmetic and exact-reference masks
 sys.magnet=0; sys.isotopes={'E','1H'}; sys.output='hush';

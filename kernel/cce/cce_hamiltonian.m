@@ -23,7 +23,7 @@
 %   meta - physical tensor order, dimensions, local operators, and backend
 %          metadata.
 %
-% See also cce_compile, cce_states.
+% See also cce_compile, cce_subsystem.
 %
 % ilya.kuprov@weizmann.ac.il
 

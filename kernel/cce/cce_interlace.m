@@ -31,7 +31,7 @@
 % Assignment probabilities use shifted logarithmic products, and numerical
 % residuals retain the worst constituent solve. raw_only leaves factors empty.
 %
-% See also cce_states, cce_reduce.
+% See also cce_reduce.
 % Reference: https://doi.org/10.1103/PhysRevB.86.035452
 %
 % ilya.kuprov@weizmann.ac.il

@@ -39,3 +39,5 @@ Tagged JSON reconstructs empty cells and field-name lists before cell operations
 The retained service uses the native compilation/input boundary: physical models come from cce_compile, and generated baths enter canonical sys/inter through spin_bath.
 
 Native experiment contracts are reconstructed through cce_capabilities; a different capability version is rejected rather than silently substituted. Registered sequence handles and @clexpn deferred descriptors are restored as callable handles. Tagged sparse arrays preserve numeric/logical type and dimensions, character matrices retain column-major layout, and string missingness is retained.
+
+External frame and unit declarations are validated before file parsing; self-describing MAT/JSON envelopes and CSV sidecars remain exempt from external physical-unit declarations. Field-valued tensors retain the explicit gyro_rad_s_T conversion to Hz.

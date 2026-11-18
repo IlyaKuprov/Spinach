@@ -177,3 +177,5 @@ A resumed calculation rechecks its current memory allowance but does not hash th
 Convergence reports preserve a partially unavailable sampling error: a `NaN` at any shared requested time makes the aggregate sampling uncertainty `NaN`, even when other times have finite estimates.
 
 Tensor-free appended electron baths retain standalone Zeeman and dipolar-scaling defaults even when the existing system declares Zeeman or susceptibility data; explicit bath tensors retain their supplied meaning. Finite Liouville drives report accumulated floating-point segment estimates with detector/reference scaling. Incomplete adaptive partitions raise clexpn:partition before production rather than returning an uncertified numeric answer.
+
+Native retained services validate caller-controlled inputs at their own entry boundary; cce_options resolves declared defaults before its local validation, and cce_reduce accepts both indexed records and native ensemble cells, including exact full-bath interlaced records.

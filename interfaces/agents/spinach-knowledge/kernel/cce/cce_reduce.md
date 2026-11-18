@@ -59,3 +59,5 @@ Native interlacing consumes factor, factor_valid, and factor_abs_error_bound onc
 Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.
 
 Interlaced per-sample order-prefix reasons have the same shape as their validity masks. The complete-bath shortcut marks unevaluated lower prefixes explicitly and retains the final reference reason, so orientation diagnostics can merge the sample records without indexing beyond their reason arrays.
+
+Native ensemble cells and indexed single-configuration records share the entry validation boundary. Native weights must be finite, nonnegative, and normalised; interlaced full-bath records remain an exact-reference bypass without a fabricated empty-cluster record. The conditional factor product is evaluated separately for each outer configuration before ensemble averaging.

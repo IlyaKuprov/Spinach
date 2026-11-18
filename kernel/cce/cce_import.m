@@ -54,10 +54,7 @@ if ismember(format,{'json','mat'})||...
     imported=struct('model',envelope.model,'result',envelope.payload); return;
 end
 
-% Require a frame for all non-self-describing physical input
-if ~isfield(units,'frame')||~ischar(units.frame)||isempty(units.frame)
-    error('External physical input requires a declared frame.');
-end
+% Apply the declared frame for non-self-describing physical input
 rotation=eye(3);
 if isfield(units,'rotation'), rotation=units.rotation; end
 imported=struct('schema_version',1,'source',filename,'input_units',units,...
@@ -92,7 +89,18 @@ switch format
         if ~ismember(size(data,2),[3 11])||any(~isfinite(data),'all')
             error('Tensor CSV needs id1,id2,scalar or nine row-major components.');
         end
-        imported.pairs_Hz=struct('ids',{},'tensor',{}); scale=tensor_factor(units);
+        imported.pairs_Hz=struct('ids',{},'tensor',{});
+        switch units.tensor
+            case 'Hz', scale=1;
+            case 'kHz', scale=1e3;
+            case 'MHz', scale=1e6;
+            case 'rad/s', scale=1/(2*pi);
+            case {'T','mT','G'}
+                scale=1;
+                if strcmp(units.tensor,'mT'), scale=1e-3; end
+                if strcmp(units.tensor,'G'), scale=1e-4; end
+                scale=scale*units.gyro_rad_s_T/(2*pi);
+        end
         for k=1:size(data,1)
             if size(data,2)==3, tensor=data(k,3)*eye(3);
             else, tensor=reshape(data(k,3:11),3,3).'; end
@@ -120,7 +128,6 @@ switch format
         imported.coordinates_A=atom_table(:,3:5)*length_factor(units)*rotation.';
         imported.voxel_vectors_A=vectors*length_factor(units)*rotation.';
         imported.grid_size=counts; imported.density=permute(reshape(values,fliplr(counts)),[3 2 1]);
-        if ~isfield(units,'density'), error('Cube density units must be declared.'); end
         imported.density_units=units.density;
 end
 
@@ -135,35 +142,11 @@ end
 function factor=length_factor(units)
 
 % Convert explicitly declared lengths into the native Spinach boundary
-if ~isfield(units,'length'), error('Length units are required.'); end
 switch units.length
     case 'angstrom', factor=1;
     case 'nm', factor=10;
     case 'm', factor=1e10;
     case 'bohr', factor=0.529177210544;
-    otherwise, error('Unsupported length units.');
-end
-
-end
-
-% Convert declared frequency or field tensor units to Hz
-function factor=tensor_factor(units)
-
-% Convert frequency or explicitly gyromagnetic field tensors into Hz
-if ~isfield(units,'tensor'), error('Tensor units are required.'); end
-switch units.tensor
-    case 'Hz', factor=1;
-    case 'kHz', factor=1e3;
-    case 'MHz', factor=1e6;
-    case 'rad/s', factor=1/(2*pi);
-    case {'T','mT','G'}
-        if ~isfield(units,'gyro_rad_s_T')||~isscalar(units.gyro_rad_s_T)||...
-           ~isfinite(units.gyro_rad_s_T), error('Field tensors need explicit rad/s/T gyro.'); end
-        scale=1;
-        if strcmp(units.tensor,'mT'), scale=1e-3; end
-        if strcmp(units.tensor,'G'), scale=1e-4; end
-        factor=scale*units.gyro_rad_s_T/(2*pi);
-    otherwise, error('Unsupported tensor units.');
 end
 
 end
@@ -245,6 +228,29 @@ if isfield(units,'rotation')&&(~isequal(size(units.rotation),[3 3])||...
    any(~isfinite(units.rotation),'all')||norm(units.rotation.'*units.rotation-eye(3),'fro')>100*eps||...
    abs(det(units.rotation)-1)>100*eps)
     error('Invalid frame rotation.');
+end
+if ismember(format,{'mat','json'})||(strcmp(format,'csv')&&isfile([filename '.json']))
+    return
+end
+if ~isfield(units,'frame')||~ischar(units.frame)||isempty(units.frame)
+    error('External physical input requires a declared frame.');
+end
+if ismember(format,{'xyz','csv','cube'})
+    if ~isfield(units,'length'), error('Length units are required.'); end
+    if ~ismember(units.length,{'angstrom','nm','m','bohr'}), error('Unsupported length units.'); end
+end
+if strcmp(format,'cube')&&~isfield(units,'density')
+    error('Cube density units must be declared.');
+end
+if strcmp(format,'tensor')
+    if ~isfield(units,'tensor'), error('Tensor units are required.'); end
+    if ~ismember(units.tensor,{'Hz','kHz','MHz','rad/s','T','mT','G'})
+        error('Unsupported tensor units.');
+    end
+    if ismember(units.tensor,{'T','mT','G'})&&...
+       (~isfield(units,'gyro_rad_s_T')||~isscalar(units.gyro_rad_s_T)||~isfinite(units.gyro_rad_s_T))
+        error('Field tensors need explicit rad/s/T gyro.');
+    end
 end
 end
 

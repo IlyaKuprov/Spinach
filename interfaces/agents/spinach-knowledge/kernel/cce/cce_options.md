@@ -61,3 +61,5 @@ A supplied cce.checkpoint requires a nonempty character filename; resume, if sup
 drive belongs to finite_drive. A refocusing cell row may accompany finite_drive or define refocusing_train; the single scalar hahn_echo descriptor is unchanged. train belongs to refocusing_train. Detailed waveform, pulse, and train validation remains experiment-owned.
 
 Caller-supplied sequence fields are rejected before compilation, including empty event arrays. Use finite_drive, refocusing_train, hahn_echo, or another registered experiment with its native physical controls. Native finite-drive descriptors remain valid during generator-side validation of simultaneous GKSL relaxation.
+
+Declared defaults are resolved before a single local validation stage checks ownership, nested vocabulary, and physical values. The seed range remains the exact mt19937ar interval 0 through 2^32-1; no physical population or numerical resource allowance is inferred.

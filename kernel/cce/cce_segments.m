@@ -136,7 +136,21 @@ for t=1:numel(schedule.times)
                     if ~isempty(exterior)
                         error('cce_segments:exterior_correlations','Exterior operator pulses require explicit dynamical sites.');
                     end
-                    P=embed_operator(event.operator,event.target,ids,model.multiplicities);
+
+                    % Embed the selective operator in the retained tensor order
+                    if any(~ismember(event.target,ids)), error('Selective operator targets must be retained.'); end
+                    slots=arrayfun(@(id) find(ids==id),event.target);
+                    rest=setdiff(1:numel(ids),slots,'stable'); order=[slots rest];
+                    dims=model.multiplicities(ids); d=prod(dims);
+                    base=kron(event.operator,eye(prod(dims(rest)))); map=zeros(d,1);
+                    for k=0:d-1
+                        digits=zeros(1,numel(dims)); remainder=k;
+                        for q=numel(dims):-1:1, digits(q)=mod(remainder,dims(q)); remainder=floor(remainder/dims(q)); end
+                        index=0;
+                        for q=order, index=index*dims(q)+digits(q); end
+                        map(k+1)=index+1;
+                    end
+                    P=base(map,map);
                     scale=1; if isfield(event,'angle')&&~isempty(event.angle), scale=event.angle; end
                     pulse=expm(-1i*scale*P)*pulse;
                 else
@@ -166,23 +180,6 @@ for t=1:numel(schedule.times)
 
 end
 
-end
-
-% Embed an arbitrary selective observed-spin system operator in the retained tensor order
-function operator=embed_operator(source,targets,ids,multiplicities)
-if any(~ismember(targets,ids)), error('Selective operator targets must be retained.'); end
-positions=arrayfun(@(id) find(ids==id),targets);
-rest=setdiff(1:numel(ids),positions,'stable'); order=[positions rest];
-dims=multiplicities(ids); d=prod(dims);
-base=kron(source,eye(prod(dims(rest)))); map=zeros(d,1);
-for k=0:d-1
-    digits=zeros(1,numel(dims)); remainder=k;
-    for j=numel(dims):-1:1, digits(j)=mod(remainder,dims(j)); remainder=floor(remainder/dims(j)); end
-    index=0;
-    for j=order, index=index*dims(j)+digits(j); end
-    map(k+1)=index+1;
-end
-operator=base(map,map);
 end
 
 % Convert validated axes into real Cartesian vectors

@@ -47,17 +47,6 @@ d=cluster_system.dimension; db=cluster_system.bath_dimension;
 projected=strcmp(parameters.cce.approximation,'projected');
 jumps=[];
 if isfield(parameters,'bath_jumps'), jumps=parameters.bath_jumps; end
-if ~isempty(jumps)
-
-    % Reuse the native input validator rather than duplicating jump conventions
-    validation=model.parameters;
-    validation.bath_jumps=parameters.bath_jumps;
-    cce_options(model.spin_system,validation,@cce_generators,model.assumptions);
-
-end
-if ~isempty(jumps)&&~projected&&~strcmp(cluster_system.formalism,'zeeman-liouv')
-    error('cce_generators:formalism','Dissipation requires zeeman-liouv.');
-end
 
 % Exact input comparison prevents stale orientation or configuration reuse
 if isfield(parameters,'cce_aux'), parameters=rmfield(parameters,'cce_aux'); end
@@ -102,7 +91,68 @@ if projected
         if ~isempty(jumps)
             error('cce:capability','Dissipative virtual-state corrections are unsupported.');
         end
-        [left,right]=correct_branches(cluster_system,parameters,left,right);
+
+        % Resolve isolated observed eigenvectors against the compiled transition
+        configuration=rmfield(cluster_system.configuration,{'exterior_ids','exterior_expectations'});
+        [observed_system,~]=cce_subsystem(model,[],configuration,[]);
+        observed_system.configuration.exterior_ids=[];
+        observed_system.configuration.exterior_expectations=zeros(0,3);
+        [observed_hamiltonian,~]=matrix(observed_system,parameters);
+        [vectors,energies]=eig(full((observed_hamiltonian+observed_hamiltonian')/2),'vector');
+        [energies,order]=sort(real(energies)); vectors=vectors(:,order);
+        [~,selected(1)]=max(abs(vectors'*model.transition.alpha).^2);
+        [~,selected(2)]=max(abs(vectors'*model.transition.beta).^2);
+        second=parameters.cce.second_order; observed=model.observed_ids;
+        ops=cell(1,3*numel(observed)); fields=cell(size(ops)); axes={'x','y','z'};
+        for c=1:numel(observed)
+            for a=1:3
+                slot=3*(c-1)+a;
+                ops{slot}=embed(pauli_axis(model.multiplicities(observed(c)),axes{a}),...
+                               c,model.multiplicities(observed));
+                field=zeros(cluster_system.bath_dimension);
+                for b=1:numel(cluster_system.sites)
+                    tensor=model.retained{observed(c),cluster_system.sites(b)};
+                    for axis=1:3
+                        field=field+tensor(a,axis)*embed(...
+                            pauli_axis(cluster_system.multiplicities(numel(observed)+b),axes{axis}),...
+                            b,cluster_system.multiplicities(numel(observed)+1:end));
+                    end
+                end
+                for b=1:numel(cluster_system.configuration.exterior_ids)
+                    field=field+eye(cluster_system.bath_dimension)*(...
+                        model.retained{observed(c),cluster_system.configuration.exterior_ids(b)}(a,:)*...
+                        cluster_system.configuration.exterior_expectations(b,:).');
+                end
+                fields{slot}=field;
+            end
+        end
+
+        % Add the declared virtual-state correction to each conditional branch
+        for branch=1:2
+            state=vectors(:,selected(branch)); gaps=energies(selected(branch))-energies;
+            outside=setdiff(1:numel(energies),selected(branch));
+            if any(abs(gaps(outside))<=second.gap_tolerance)
+                error('Virtual-state energy gap is below the explicit tolerance.');
+            end
+            names={'alpha','beta'};
+            if 1-abs(state'*model.transition.(names{branch}))^2>second.overlap_tolerance
+                error('Transition overlap is below the explicit tolerance.');
+            end
+            correction=zeros(cluster_system.bath_dimension);
+            for a=1:numel(fields)
+                for b=1:numel(fields)
+                    weight=0;
+                    for n=outside(:).'
+                        weight=weight+(state'*ops{a}*vectors(:,n))*...
+                                      (vectors(:,n)'*ops{b}*state)/gaps(n);
+                    end
+                    correction=correction+weight*fields{a}*fields{b};
+                end
+            end
+            if branch==1, left=left+correction; else, right=right+correction; end
+        end
+        left=(left+left')/2; right=(right+right')/2;
+
     end
     H=struct('kind','cce_projected','left',left,'right',right,...
              'formalism',cluster_system.formalism,'physical_ids',ids,...
@@ -111,7 +161,11 @@ if projected
     H.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)||strcmp(cluster_system.formalism,'zeeman-liouv')
         [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb);
-        H.swap_matrix=commutation(db);
+
+        % Map each column-major bath entry to its transposed position
+        labels=reshape(1:db^2,db,db).';
+        H.swap_matrix=sparse(1:db^2,labels(:),1,db^2,db^2);
+
     end
     R=[]; K=[];
 elseif strcmp(cluster_system.formalism,'zeeman-liouv')
@@ -381,82 +435,6 @@ op=source(labels,labels);
 
 end
 
-% Map column-vectorised matrices to their nonconjugated transpose
-function swap=commutation(dimension)
-
-% Map each column-major matrix entry to its transposed position
-labels=reshape(1:dimension^2,dimension,dimension).';
-swap=sparse(1:dimension^2,labels(:),1,dimension^2,dimension^2);
-
-end
-
-% Apply the established static virtual-state correction without a legacy call
-function [left,right]=correct_branches(system,parameters,left,right)
-
-% Resolve isolated observed eigenvectors against the compiled transition
-model=system.model;
-configuration=rmfield(system.configuration,{'exterior_ids','exterior_expectations'});
-[observed_system,~]=cce_subsystem(model,[],configuration,[]);
-observed_system.configuration.exterior_ids=[];
-observed_system.configuration.exterior_expectations=zeros(0,3);
-[observed_hamiltonian,~]=matrix(observed_system,parameters);
-[vectors,energies]=eig(full((observed_hamiltonian+observed_hamiltonian')/2),'vector');
-[energies,order]=sort(real(energies)); vectors=vectors(:,order);
-[~,selected(1)]=max(abs(vectors'*model.transition.alpha).^2);
-[~,selected(2)]=max(abs(vectors'*model.transition.beta).^2);
-second=parameters.cce.second_order; observed=model.observed_ids;
-ops=cell(1,3*numel(observed)); fields=cell(size(ops)); axes={'x','y','z'};
-for c=1:numel(observed)
-    for a=1:3
-        slot=3*(c-1)+a;
-        ops{slot}=embed(pauli_axis(model.multiplicities(observed(c)),axes{a}),...
-                        c,model.multiplicities(observed));
-        field=zeros(system.bath_dimension);
-        for b=1:numel(system.sites)
-            tensor=model.retained{observed(c),system.sites(b)};
-            for axis=1:3
-                field=field+tensor(a,axis)*embed(...
-                    pauli_axis(system.multiplicities(numel(observed)+b),axes{axis}),...
-                    b,system.multiplicities(numel(observed)+1:end));
-            end
-        end
-        for b=1:numel(system.configuration.exterior_ids)
-            field=field+eye(system.bath_dimension)*(...
-                model.retained{observed(c),system.configuration.exterior_ids(b)}(a,:)*...
-                system.configuration.exterior_expectations(b,:).');
-        end
-        fields{slot}=field;
-    end
-end
-
-% Add the declared virtual-state correction to each conditional branch
-for branch=1:2
-    state=vectors(:,selected(branch)); gaps=energies(selected(branch))-energies;
-    outside=setdiff(1:numel(energies),selected(branch));
-    if any(abs(gaps(outside))<=second.gap_tolerance)
-        error('Virtual-state energy gap is below the explicit tolerance.');
-    end
-    names={'alpha','beta'};
-    if 1-abs(state'*model.transition.(names{branch}))^2>second.overlap_tolerance
-        error('Transition overlap is below the explicit tolerance.');
-    end
-    correction=zeros(system.bath_dimension);
-    for a=1:numel(fields)
-        for b=1:numel(fields)
-            weight=0;
-            for n=outside(:).'
-                weight=weight+(state'*ops{a}*vectors(:,n))*...
-                    (vectors(:,n)'*ops{b}*state)/gaps(n);
-            end
-            correction=correction+weight*fields{a}*fields{b};
-        end
-    end
-    if branch==1, left=left+correction; else, right=right+correction; end
-end
-left=(left+left')/2; right=(right+right')/2;
-
-end
-
 % Embed one local matrix in the declared retained tensor-product order
 function op=embed(local,position,dims)
 
@@ -504,6 +482,49 @@ end
 if ~ischar(parameters.cce.backend)||~isrow(parameters.cce.backend)||...
    ~ismember(parameters.cce.backend,{'auto','direct','stock'})
     error('cce_generators:backend','Backend must be auto, direct or stock.');
+end
+if isfield(parameters,'bath_jumps')
+    jumps=parameters.bath_jumps;
+    if ~isstruct(jumps), error('cce_options:jumps','bath_jumps must be a structure array.'); end
+    model=system.model; selected=[model.observed_ids model.bath_ids];
+    for k=1:numel(jumps)
+        jump=jumps(k); required={'support','operator','rate'};
+        unknown=setdiff(fieldnames(jump),required);
+        if ~isempty(unknown)
+            error('cce_options:unknown','Unknown bath_jumps field: %s.',unknown{1});
+        end
+        if ~all(isfield(jump,required))
+            error('cce_options:jumps','Every bath jump needs support, operator and rate.');
+        end
+        ids=jump.support;
+        if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
+           any(~isfinite(ids))||any(ids~=fix(ids))||any(ids<1)||...
+           any(ids>model.spin_system.comp.nspins)||numel(unique(ids))~=numel(ids)
+            error('cce_options:spins','Invalid physical spin-ID row in bath_jumps.support.');
+        end
+        if ~all(ismember(ids,selected))
+            error('cce_options:jumps','Jump support must belong to selected observed or bath spins.');
+        end
+        if ~isnumeric(jump.rate)||~isreal(jump.rate)||~isscalar(jump.rate)||...
+           ~isfinite(jump.rate)||jump.rate<0
+            error('cce_options:value','Invalid nonnegative value for bath_jumps.rate.');
+        end
+        if ischar(jump.operator)
+            if ~isrow(jump.operator)||~ismember(jump.operator,{'L+','L-','Lx','Ly','Lz'})
+                error('cce_options:choice','Unsupported bath_jumps.operator.');
+            end
+            if numel(ids)~=1
+                error('cce_options:jumps','A named local jump needs one supporting spin.');
+            end
+        elseif ~isnumeric(jump.operator)||any(~isfinite(jump.operator),'all')||...
+               ~isequal(size(jump.operator),[prod(model.multiplicities(ids)) prod(model.multiplicities(ids))])
+            error('cce_options:jumps','A jump matrix must match its ordered support.');
+        end
+    end
+    if ~isempty(jumps)&&~strcmp(parameters.cce.approximation,'projected')&&...
+       ~strcmp(system.formalism,'zeeman-liouv')
+        error('cce_generators:formalism','Dissipation requires zeeman-liouv.');
+    end
 end
 end
 

@@ -47,7 +47,7 @@ grep -rl "sys.isotopes={'E'" examples/ | head # find by system type
 
 ## The canonical simulation
 
-Every Spinach simulation has the same seven-part shape. This is a real, working
+Most conventional Spinach simulations follow the seven-part shape below. This is a real, working
 liquid-state NMR simulation; the section comments are the house convention and
 should be kept.
 
@@ -241,3 +241,7 @@ result, check what physics says it must satisfy.
 
 Run MATLAB non-interactively for unattended work, and require a unique success
 marker at the end of the script rather than trusting exit status alone.
+
+## Cluster expansion without a full-bath basis
+
+For observed-spin/bath dynamics, construct canonical `sys` and `inter`, call `create`, and pass that system directly to `[answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)`. Do not call `basis` on the entire bath. The context constructs only retained subsystems. Use physical IDs in `parameters.observed`, total elapsed seconds in `parameters.times`, and approximation/ensemble controls in `parameters.cce`; choose a registered experiment from `experiments/cce`. Inspect validity and numerical bounds in `diagnostics.reduction` before interpreting a decay. Deferred orientation composition uses `context_task` with `orientation_average` or the descriptor route of `powder`. See [Cluster correlation expansions](cce.md) for the supported physics and native inputs.

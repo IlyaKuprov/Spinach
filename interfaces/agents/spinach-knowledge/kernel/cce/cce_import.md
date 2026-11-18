@@ -18,7 +18,7 @@ Import versioned CCE results, spin tables, tensors and cube samples.
 
 - MAT/JSON imports recover the model/result envelope; CSV may use the full JSON sidecar or an explicit id,isotope,x,y,z table.
 - XYZ coordinates, tensor CSV (isotropic scalar or Cartesian entries), and cube voxel data require explicit units. Canonical imported coordinates are Angstrom and tensor couplings are Hz.
-- Optional frame maps input axes to laboratory axes as r_lab=R*r_input and T_lab=R*T_input*R-transpose. Negative-atom-count/orbital cubes are refused.
+- The required frame string labels the input frame; optional units.rotation maps input axes to laboratory axes as r_lab=R*r_input and T_lab=R*T_input*R-transpose. Negative-atom-count/orbital cubes are refused.
 
 ## Inputs and outputs
 
@@ -28,7 +28,7 @@ imported=cce_import(filename,format,units)
 
 **Inputs**
 
-- `filename`, `format`, `units` — input path; mat/json/csv/xyz/tensor/cube; external length unit angstrom/nm/m/bohr, tensor unit Hz/kHz/MHz/rad/s/T/mT/G. Field units also require gamma_rad_per_s_T; optional frame is a proper rotation matrix.
+- `filename`, `format`, `units` — input path; mat/json/csv/xyz/tensor/cube; external length unit angstrom/nm/m/bohr, tensor unit Hz/kHz/MHz/rad/s/T/mT/G. Field units also require units.gyro_rad_s_T. units.frame is a required descriptive string for external physical data; units.rotation, if supplied, is a proper rotation matrix.
 
 **Outputs**
 

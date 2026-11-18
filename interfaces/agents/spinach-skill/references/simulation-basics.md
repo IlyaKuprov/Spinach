@@ -33,14 +33,14 @@ couplings, g-tensors, and correlation times come from the literature, from
 experiment, or from a quantum chemistry calculation - never from plausibility.
 If a parameter is unavailable, say so instead of inventing a number.
 
-**2. Start from the nearest example.** The `examples/` tree holds over 700
-working simulations across 37 problem areas, and almost every request resembles
-one of them. Locating the closest example and adapting it is faster and far more
-reliable than writing from scratch, because the example already encodes the
+**2. Start from the nearest example.** The `examples/` tree covers many
+application areas, and almost every request resembles a shipped simulation.
+Locating the closest example and adapting it is faster and far more reliable
+than writing from scratch, because the example already encodes the
 correct basis, context, assumptions, and processing chain for that physics.
 
 ```bash
-ls examples/                                  # 37 problem areas
+ls examples/                               # browse application areas
 grep -rl "hsqc" examples/ | head              # find by experiment
 grep -rl "sys.isotopes={'E'" examples/ | head # find by system type
 ```

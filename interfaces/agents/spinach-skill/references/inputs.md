@@ -54,7 +54,7 @@ Legal `sys.disable` entries, anything else being an error: `'pt'` (non-interacti
 `sys.enable` entries: `'zte'` (zero track elimination, off by default), `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
 `'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
-couplings),. With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
+couplings). With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
 
 `sim2liouv` refreshes existing basis cache identities after Hilbert-to-Liouville
 conversion; cached operators and Hamiltonians remain representation-specific.
@@ -735,19 +735,19 @@ Native cluster compilation consumes parameters.observed and parameters.cce.bath_
 
 ## Native retained generators, evolution and observation
 
-Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps and supported pairs.
+Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps, and supported pairs.
 
-Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase and the actual complex initial reference. The returned state/detector are not pre-normalized: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation. The former public driver and wrappers are removed; no translator or compatibility adapter is provided.
+Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase, and the actual complex initial reference. The returned state/detector are not pre-normalised: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation. The former public driver and wrappers are removed; no translator or compatibility adapter is provided.
 
 ## Native context and closed-system experiments
 
-Native closed-system experiments own times, transition, rho0/coil, preparation, normalized, nloops and pump selectors. Context-owned approximation, graph, order, bath state and numerical controls remain under parameters.cce. Signal normalization is experiment-owned, not a resolver default.
+Native closed-system experiments own times, transition, rho0/coil, preparation, `normalized`, nloops, and pump selectors. Context-owned approximation, graph, order, bath state and numerical controls remain under parameters.cce. Signal normalisation is experiment-owned, not a resolver default.
 
 ## Native dissipative, noise and ensemble contracts
 
-Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalized elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.
+Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalised elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.
 
-Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalized dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
+Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalised dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
 
 For a pinned NV numerical dataset, cce_fixture('nv_four_c13','6f7282b6') returns sys/inter physical data and source metadata with the original grid. Its full hyperfine tensors are not automatically projected; no transition, bath state, cluster order, or resource policy is selected. Coordinates remain metadata because all dipoles are explicit. See the CCE recipe for the fixture and orientation-composition contracts.
 

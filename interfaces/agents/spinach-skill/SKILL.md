@@ -1,6 +1,6 @@
 ---
 name: spinach-skill
-description: Sets up, runs, validates, debugs, and extends MATLAB Spinach simulations for NMR, EPR, DNP, MRI, relaxation, and optimal control. Use for Spinach scripts, pulse sequences, simulation results, basis/context choices, or repository changes. Not for unrelated MATLAB work or another package unless Spinach is part of the task.
+description: "Sets up, runs, validates, debugs, and extends MATLAB Spinach simulations for NMR, EPR, DNP, MRI, relaxation, and optimal control. Use for Spinach scripts, pulse sequences, simulation results, basis/context choices, or repository changes. Not for unrelated MATLAB work or another package unless Spinach is part of the task."
 compatibility: Requires a local Spinach checkout and MATLAB supported by that checkout; use MATLAB R2026b or later for the current repository. Runtime requirements are checked by fix_path. Source-only review is possible without MATLAB.
 ---
 
@@ -181,7 +181,7 @@ options enabled, `create` clears the ValueStore when reusing the pool.
 
 ## Native cluster-expansion input services
 
-The clexpn interface uses canonical sys/inter, physical IDs in parameters.observed, descriptive transition selectors, experiment-owned controls and approximation/ensemble/reduction options in parameters.cce. Read references/cce.md and the cce_options, cce_transition and spin_bath knowledge leaves before using these services. The legacy entry points have been removed; there is no legacy translator. Use the registered five-argument experiments through the four-argument context.
+The clexpn interface uses canonical sys/inter, physical IDs in parameters.observed, descriptive transition selectors, experiment-owned controls, and approximation/ensemble/reduction options in parameters.cce. Read references/cce.md and the cce_options, cce_transition and spin_bath knowledge leaves before using these services. The legacy entry points have been removed; there is no legacy translator. Use the registered five-argument experiments through the four-argument context.
 
 ## Native retained-subsystem services
 
@@ -189,9 +189,9 @@ Use cce_compile, cce_subsystem, cce_operator and cce_state for the native clexpn
 
 ## Native retained generators, evolution and observation
 
-Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps and supported pairs.
+Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps, and supported pairs.
 
-Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase and the actual complex initial reference. The returned state/detector are not pre-normalized: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation.
+Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase, and the actual complex initial reference. The returned state/detector are not pre-normalised: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation.
 
 ## Native context and closed-system experiments
 

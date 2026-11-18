@@ -46,3 +46,5 @@ Supplied-spin_config regression checks compare gCCE and ME-gCCE density, signal,
 ## Native contract
 
 The registered test uses clexpn with free_evolution and hahn_echo, natural numeric density/signal outputs, and native compile/subsystem/generator/evaluator services. Its selective bath pulse uses refocusing.spins=2, operator=pi*Sx, and fraction=0.4. All independent dense Liouville, zero-jump, correlated-support, PyCCE-reference, normalisation, memory-budget, and configuration-rejection assertions remain. Observed preparation belongs to parameters.rho0; bath configurations contain bath densities only, so the state-override checks bind their explicit initial observed density before direct evaluation. Legacy initial_rho, projection, and reference aliases are rejected at the corresponding native boundary.
+
+The independent configuration-state and reconstructed PyCCE tutorial fixtures execute inline with separate named physical and parameter structures, preserving the surrounding exact-dynamics fixture.

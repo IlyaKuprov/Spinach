@@ -161,9 +161,16 @@ end
 [ids,order]=sortrows(ids,[1 2 3]); indices=indices(order,:);
 identity=struct();
 if isfield(options,'checkpoint')
-    identity=struct('model',md5_hash(payload.model),'parameters',md5_hash(payload.parameters),...
+
+    % Available memory is a dispatch limit, not part of the physical calculation
+    physical=payload;
+    physical.parameters.cce.numerics=rmfield(physical.parameters.cce.numerics,'max_memory_bytes');
+    physical.model.parameters.cce.numerics=rmfield(physical.model.parameters.cce.numerics,'max_memory_bytes');
+    physical.model.numerics=rmfield(physical.model.numerics,'max_memory_bytes');
+    identity=struct('model',md5_hash(physical.model),'parameters',md5_hash(physical.parameters),...
                     'clusters',md5_hash(clusters),'schedule',md5_hash(payload.experiment),...
                     'samples',md5_hash(ensemble),'code',payload.contract_version);
+
 end
 state=struct('version',1,'identity',identity,'payload',payload,...
              'task_ids',ids,'completed',false(ns*nc,1),'records',{cell(ns*nc,1)},...

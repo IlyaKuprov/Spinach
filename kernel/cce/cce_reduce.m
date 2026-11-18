@@ -440,10 +440,12 @@ reduced=cce_reduce(baseline,clusters([]),empty);
 orders=0:selection.order; shape=[size(raw(1).value) numel(orders)];
 reduced.by_order=complex(NaN(shape)); reduced.by_order_error=Inf(shape);
 reduced.by_order_valid=false(shape); reduced.orders=orders;
+reduced.by_order_reason=repmat({'not_evaluated'},shape);
 if ~isempty(complete)
     reduced.by_order(:,:,end)=baseline.value;
     reduced.by_order_error(:,:,end)=baseline.abs_error_bound;
-    reduced.by_order_valid(:,:,end)=baseline.valid; return
+    reduced.by_order_valid(:,:,end)=baseline.valid;
+    reduced.by_order_reason(:,:,end)=reduced.reason; return
 end
 value=baseline.value; bound=baseline.abs_error_bound; valid=baseline.valid;
 for order=orders
@@ -454,6 +456,8 @@ for order=orders
     end
     reduced.by_order(:,:,order+1)=value; reduced.by_order_error(:,:,order+1)=bound;
     reduced.by_order_valid(:,:,order+1)=valid;
+    reasons=repmat({'ok'},size(valid)); reasons(~valid)={'raw_invalid'};
+    reduced.by_order_reason(:,:,order+1)=reasons;
 end
 reduced.value=value; reduced.abs_error_bound=bound; reduced.valid=valid;
 end

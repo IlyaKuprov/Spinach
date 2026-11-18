@@ -165,6 +165,91 @@ outer.grid.weights=[1 0]; [single,one]=orientation_average(spin_system,task,oute
 result=test_close(result,'Zero quadrature weight',single,one.orientations{1}.reduction.value,0,0,...
                   'Zero-measure orientations are omitted without changing the response.');
 
+% Single stochastic draws remain unavailable through both averaging orders
+request=task.parameters; request.cce.order=1;
+request.cce.interlaced=struct('reference_state',1,'max_states',9);
+probe_grid=grid; probe_grid.betas=[0 0];
+for mode={'sampled','interlaced'}
+    request.cce.bath_state=struct('mode',mode{1},'samples',1,'seed',19,...
+                                  'basis','uniform','probabilities','uniform');
+    for averaging={'after_expansion','internal_then_expansion'}
+        if strcmp(mode{1},'interlaced')&&strcmp(averaging{1},'internal_then_expansion'), continue; end
+        request.cce.averaging=averaging{1};
+        local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
+        saved_rng=rng; saved_task=local_task;
+        [~,single_draw]=orientation_average(spin_system,local_task,struct('grid',probe_grid));
+        result=test_true(result,'Unavailable single-draw uncertainty',...
+                         all(isnan(single_draw.reduction.sampling_standard_error),'all'),...
+                         'Quadrature nodes do not turn one spin draw into independent samples.');
+        result=test_true(result,'Orientation sampling state isolation',...
+                         isequal(saved_rng,rng)&&isequal(saved_task,local_task)&&...
+                         isequal(single_draw.orientations{1}.ensemble,single_draw.orientations{2}.ensemble),...
+                         'The task and global RNG are unchanged; orientations reuse the same spin draws.');
+    end
+end
+
+% A complete bath still counts independent spin draws rather than quadrature nodes
+request.cce.order=2; request.cce.averaging='internal_then_expansion';
+for count=[1 4]
+    request.cce.bath_state=struct('mode','sampled','samples',count,'seed',19,...
+                                  'basis','uniform','probabilities','uniform');
+    local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
+    [~,complete]=orientation_average(spin_system,local_task,struct('grid',probe_grid));
+    if count==1
+        result=test_true(result,'Complete-bath single-draw uncertainty',...
+                         all(isnan(complete.reduction.sampling_standard_error),'all'),...
+                         'Repeating an orientation cannot make an unavailable variance zero.');
+    else
+        values=zeros(numel(request.times),count);
+        for n=1:2
+            for k=1:count
+                values(:,k)=values(:,k)+complete.grid.weights(n)*...
+                            complete.orientations{n}.raw{k}(end).value;
+            end
+        end
+        result=test_close(result,'Internal complete-bath sampling uncertainty',...
+                          complete.reduction.sampling_standard_error,std(values,0,2)/sqrt(count),0,0,...
+                          'Every spin draw is averaged over orientations before estimating uncertainty.');
+    end
+    result=test_true(result,'Orientation value diagnostics remain cells',iscell(complete.values),...
+                     'Uncertainty work does not replace the orientation-resolved signals.');
+end
+
+% Complete interlacing preserves per-order reason shapes during diagnostic merging
+request.cce.averaging='after_expansion'; request.cce.bath_state.mode='interlaced';
+request.cce.bath_state.samples=1;
+local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
+[~,complete]=orientation_average(spin_system,local_task,struct('grid',probe_grid));
+result=test_true(result,'Complete interlaced orientation diagnostics',...
+                 all(complete.reduction.sampling_standard_error==0,'all')&&...
+                 isequal(size(complete.reduction.samples{1}.by_order_reason),...
+                         size(complete.reduction.samples{1}.by_order_valid)),...
+                 'Exact full-bath interlacing has zero sampling error and aligned diagnostic arrays.');
+
+% A shared ledger is rejected before any nested calculation writes a checkpoint
+request.cce=rmfield(request.cce,'bath_state'); request.cce.order=1;
+checkpoint=[tempname '.mat']; request.cce.checkpoint=struct('file',checkpoint,'resume',false);
+for resume=[false true]
+    request.cce.checkpoint.resume=resume;
+    local_task=context_task(@clexpn,@hahn_echo,request,'labframe'); refused=false;
+    try
+        orientation_average(spin_system,local_task,struct('grid',grid));
+    catch exception
+        refused=strcmp(exception.identifier,'orientation_average:checkpoint');
+    end
+    result=test_true(result,'Multi-orientation checkpoint preflight',refused&&~isfile(checkpoint),...
+                     'Both write and resume requests fail before creating the first ledger.');
+end
+request.cce.checkpoint.resume=false;
+local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
+one_grid=grid; one_grid.weights=[1 0];
+[written,~]=orientation_average(spin_system,local_task,struct('grid',one_grid));
+cleanup=onCleanup(@()delete(checkpoint));
+local_task.parameters.cce.checkpoint.resume=true;
+[resumed,~]=orientation_average(spin_system,local_task,struct('grid',one_grid));
+result=test_close(result,'Single-orientation checkpoint resume',resumed,written,0,0,...
+                  'Zero-weight nodes do not prevent a single physical ledger from being resumed.');
+
 % The ordinary five-argument pulse-sequence branch retains its grid contract
 bas.formalism='zeeman-hilb'; bas.approximation={'none'};
 full_system=basis(spin_system,bas);

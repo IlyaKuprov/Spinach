@@ -42,6 +42,15 @@ loaded=load(filename,'state'); state=loaded.state;
 result=test_true(result,'completed bitmap',all(state.completed),...
                  'All sixteen tasks are marked complete after resume.');
 
+% Resource availability must not invalidate an otherwise identical physical ledger
+resized=p; resized.cce.numerics.max_memory_bytes=2*p.cce.numerics.max_memory_bytes;
+[resource_resumed,resource_data]=clexpn(spin_system,@free_evolution,resized,'labframe');
+result=test_true(result,'Resource-independent checkpoint identity',...
+                 isequaln(resource_data.raw,uninterrupted_data.raw),...
+                 'Changing only the memory allowance preserves cached physical records.');
+result=test_close(result,'Resource-independent checkpoint replay',resource_resumed,uninterrupted,0,0,...
+                  'The new resource limit is checked before the same physical ledger is resumed.');
+
 % Keep adaptive pilot and held-out evaluations separate from checkpoint ownership
 adaptive=p; adaptive.cce=rmfield(adaptive.cce,'checkpoint'); adaptive.cce.order=1; adaptive.cce.expansion='partition';
 pilot=p; pilot.cce=rmfield(pilot.cce,'checkpoint'); pilot.cce.order=0;

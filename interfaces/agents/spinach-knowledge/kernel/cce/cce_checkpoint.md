@@ -50,3 +50,5 @@ Native identities, when present, require experiment and capability_version. Exis
 ## Native dissipative, noise and ensemble contract
 
 Versioned checksummed task ledger; actions read, write and validate. Native payloads include the experiment contract version, immutable physical inputs, task IDs and assignment weights. Raw moments, first moments, masks and uncertainty are stored before reduction. Checkpoint file and resume switches do not change physical identity; existing files require explicit resume.
+
+Checkpoint identities omit `cce.numerics.max_memory_bytes` from the hashed parameter/model copies; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, experiment, and capability revision remain bound to the ledger.

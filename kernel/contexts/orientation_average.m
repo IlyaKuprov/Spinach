@@ -27,6 +27,9 @@
 % is replaced; all other experiment parameters belong to the deferred task.
 % Orientations run serially; cluster/configuration parallelism may own the
 % existing pool. Inside an outer worker, nested CCE scheduling is serial.
+% A checkpoint file is supported only for one positive-weight orientation.
+% Reused spin draws are single statistical samples, not independent draws
+% at each orientation; unavailable sampling uncertainties remain NaN.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -41,6 +44,10 @@ else
     grid=parameters.grid;
 end
 grid=check_grid(grid); count=numel(grid.weights);
+if count>1&&isfield(task.parameters,'cce')&&isfield(task.parameters.cce,'checkpoint')
+    error('orientation_average:checkpoint',...
+          'Checkpoint files require exactly one positive-weight orientation.');
+end
 
 % Keep parallel ownership with an outer worker rather than starting a nested pool
 if ~isempty(getCurrentTask())
@@ -77,6 +84,23 @@ if strcmp(parameters.cce.averaging,'internal_then_expansion')
         raw=[raw records]; %#ok<AGROW>
     end
     reduction=cce_reduce(raw,orientations{1}.clusters,parameters);
+
+    % Quadrature nodes sharing a spin draw are not independent statistical samples
+    reduction.sampling_standard_error=orientations{1}.reduction.sampling_standard_error;
+    samples=numel(orientations{1}.raw);
+    complete=find(arrayfun(@(item)isequal(sort(item.sites),...
+                                        sort(parameters.cce.bath_spins)),orientations{1}.clusters),1);
+    if strcmp(parameters.cce.bath_state.mode,'sampled')&&samples>1&&...
+       ~isempty(complete)&&~(isfield(parameters,'noise')&&parameters.noise.connected)
+        state_values=zeros([size(reduction.value) samples]);
+        for n=1:count
+            for k=1:samples
+                state_values(:,:,k)=state_values(:,:,k)+grid.weights(n)*...
+                              orientations{n}.raw{k}(complete+1).value;
+            end
+        end
+        reduction.sampling_standard_error=std(state_values,0,3)/sqrt(samples);
+    end
 else
 
     % Accumulate completed expansions and conservative absolute error bounds
@@ -115,7 +139,7 @@ else
         end
     end
     for k=1:numel(samples), samples{k}.reason=samples{k}.by_order_reason(:,:,end); end
-    reduction.samples=samples; reduction.sampling_standard_error=zeros(size(reduction.value));
+    reduction.samples=samples;
     if numel(samples)>1&&all(abs(reduction.weights-1/numel(samples))<=eps)
         sampled=cellfun(@(x)x.value,samples,'UniformOutput',false);
         reduction.sampling_standard_error=std(cat(3,sampled{:}),0,3)/sqrt(numel(samples));

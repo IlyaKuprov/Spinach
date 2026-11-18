@@ -63,3 +63,5 @@ Native reduction does not forward the experiment-owned cce.numerics.propagator i
 Native interlacing consumes factor, factor_valid, and factor_abs_error_bound once, leaving the conditional raw response intact. With a full-bath raw record, it returns that exact average directly and marks all unavailable lower prefixes NaN/Inf/false. A single truncated interlaced reference has unavailable sampling uncertainty (NaN), not zero; multiple references use their sample standard error, and an exact full-bath average has zero sampling uncertainty.
 
 Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.
+
+Interlaced per-sample order-prefix reasons have the same shape as their validity masks. The complete-bath shortcut marks unevaluated lower prefixes explicitly and retains the final reference reason, so orientation diagnostics can merge the sample records without indexing beyond their reason arrays.

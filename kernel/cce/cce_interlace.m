@@ -12,17 +12,19 @@
 % configurations are unique and weights are conditional probabilities.
 % The distribution signature records assignments and weights exactly.
 %
-% Inputs:
+% Parameters:
+%
 %   model, cluster, ensemble, schedule, parameters - physical model, selected
-%   cluster, complete sampled ensemble, compiled sequence and interlaced
+%   cluster, complete sampled ensemble, compiled sequence, and interlaced
 %   settings.
 %   parameters.cce.interlaced - max_states, reference_state (ensemble spin_config
 %   index), optional condition_sites cell array and raw_only flag. The
 %   registered evaluator selects the experiment and propagation representation.
 %
 % Outputs:
+%
 %   raw - conditional raw cluster observable with condition_sites and
-%   conditional-average diagnostics for consistent denominator reduction.
+%         conditional-average diagnostics for consistent denominator reduction.
 %
 % Native controls are nested in parameters.cce. Native raw values stay
 % conditional averages; factor fields hold the separately reduced quotient.
@@ -46,6 +48,8 @@ end
 
 % Form the conditional average and its separately retained irreducible factor
 function raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
+
+% Check the explicit state budget before conditional enumeration
 spec=parameters.cce.interlaced;
 if ~isfield(spec,'max_states')||~isscalar(spec.max_states)||~isfinite(spec.max_states)||...
    spec.max_states<1||spec.max_states~=fix(spec.max_states)
@@ -70,6 +74,8 @@ for j=1:numel(model.bath_ids)
               'Interlaced reference bath_rho must agree with its basis assignment; use explicit_product for mixed states.');
     end
 end
+
+% Resolve the supplied cylinders or the selected supercluster family
 if isfield(spec,'condition_sites')
     cylinders=spec.condition_sites;
 else
@@ -102,6 +108,8 @@ bytes=8*count*(4*nb+5);
 if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
     error('cce_interlace:memory','Conditioning assignments and sorting workspace exceed the memory budget.');
 end
+
+% Enumerate unique product-state assignments inside the cylinder union
 assignments=zeros(count,nb); position=0;
 for k=1:numel(cylinders)
     varied=find(ismember(model.bath_ids,cylinders{k}));
@@ -113,6 +121,8 @@ for k=1:numel(cylinders)
     end
 end
 assignments=unique(assignments,'rows','sorted'); count=size(assignments,1);
+
+% Form conditional weights with a common logarithmic scale
 logweights=zeros(count,1);
 for j=1:nb
     logweights=logweights+log(ensemble.probabilities{j}(assignments(:,j)));
@@ -121,6 +131,8 @@ shift=max(logweights);
 if ~isfinite(shift), error('cce_interlace:zero_mass','Conditioning event has zero probability.'); end
 weights=exp(logweights-shift); logmass=shift+log(sum(weights));
 weights=weights/sum(weights); mass=exp(logmass); retained=find(weights>0);
+
+% Average raw records before forming any irreducible quotient
 for n=reshape(retained,1,[])
     configuration=reference; configuration.assignment=assignments(n,:);
     for j=1:nb

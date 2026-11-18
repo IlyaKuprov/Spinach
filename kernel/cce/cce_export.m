@@ -4,18 +4,20 @@
 %
 % filename must end in .mat, .json, or .csv; model and result are scalar
 % structures. MAT/JSON store a versioned envelope with both structures;
-% JSON preserves numeric type, shape, complex components and nonfinite
+% JSON preserves numeric type, shape, complex components, and nonfinite
 % values, sparse storage, and registered native experiment contracts.
 % Registered sequence handles and @clexpn are portable; other handles are
 % rejected. CSV stores numeric arrays as long-form real/imaginary rows.
 % A JSON sidecar, filename.json, retains the full result and diagnostics.
 % CSV is a human-readable view; its sidecar is the round-trip authority.
 %
-% Inputs:
-%   filename - .mat, .json or .csv destination.
-%   model, result - scalar structures to serialize.
+% Parameters:
+%
+%   filename - .mat, .json, or .csv destination.
+%   model, result - scalar structures to serialise.
 %
 % Outputs:
+%
 %   No return value; writes the requested file (and JSON sidecar for CSV).
 %
 % See also cce_import.
@@ -24,7 +26,7 @@
 
 function cce_export(filename,model,result)
 
-% Validate serialization choices before opening a destination
+% Validate serialisation choices before opening a destination
 grumble(filename,model,result);
 
 % Infer the representation without extending the fixed public signature
@@ -34,13 +36,19 @@ envelope=struct('schema','spinach-cce','version',1,'model',model,'payload',resul
 % Preserve native MATLAB arrays or explicitly typed JSON values
 switch format
     case 'mat'
+
+        % Store the complete native envelope without conversion
         save(filename,'envelope');
     case 'json'
+
+        % Encode typed values before writing the JSON envelope
         fid=fopen(filename,'w');
         if fid<0, error('Cannot open export destination.'); end
         cleanup=onCleanup(@()fclose(fid));
         fwrite(fid,jsonencode(pack(envelope)),'char');
     case 'csv'
+
+        % Write the numeric view and its authoritative JSON sidecar
         fid=fopen(filename,'w');
         if fid<0, error('Cannot open export destination.'); end
         cleanup=onCleanup(@()fclose(fid));
@@ -59,6 +67,7 @@ end
 
 end
 
+% Preserve MATLAB types and dimensions in recursively encoded JSON
 function encoded=pack(value)
 
 % Encode type and dimensions instead of relying on lossy JSON inference
@@ -99,18 +108,16 @@ end
 
 end
 
+% Validate the destination suffix and scalar data structures
 function grumble(filename,model,result)
-
 if ~ischar(filename)||~isrow(filename)||isempty(filename)||...
    ~isstruct(model)||~isscalar(model)||~isstruct(result)||~isscalar(result)
     error('Invalid CCE export arguments.');
 end
-
 [~,~,extension]=fileparts(filename);
 if ~ismember(lower(extension),{'.mat','.json','.csv'})
     error('CCE export requires a .mat, .json or .csv filename.');
 end
-
 end
 
 

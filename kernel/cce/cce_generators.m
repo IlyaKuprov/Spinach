@@ -9,8 +9,8 @@
 % requires zeeman-liouv, except explicitly tagged projected branches. A
 % projected dissipator acts on an alpha/beta coherence block, not a density.
 % Its swapped branch is swap_matrix*conj(dissipator)*swap_matrix'.
-% parameters.bath_jumps uses support, operator and rate; supported spin
-% descriptors are L+, L-, Lx, Ly and Lz, or explicit ordered matrices.
+% parameters.bath_jumps uses support, operator, and rate; supported spin
+% descriptors are L+, L-, Lx, Ly, and Lz, or explicit ordered matrices.
 % Zero-rate jumps are omitted before closure checks; active split supports
 % and exterior jumps driving a frozen mean field are refused.
 % Projected H has kind='cce_projected', left/right Hamiltonians and a
@@ -19,10 +19,22 @@
 % left/right and reverse the projected dissipator with swap_matrix for
 % a refocusing pulse. These tags are never stock pulse-sequence inputs.
 % parameters.cce.backend selects auto/direct/stock. The returned
-% parameters.cce_aux contains ordering, Hamiltonian and rounding metadata.
+% parameters.cce_aux contains ordering, Hamiltonian, and rounding metadata.
 % Master-equation cce_aux.generator retains the physical Hamiltonians,
 % spin operators, and included jump pairs for completed raw-task evidence.
 % cache is [] or the separate exact generator cache returned here.
+%
+% Parameters:
+%
+%   cluster_system - retained subsystem returned by cce_subsystem
+%   parameters     - resolved native experiment and numerical options
+%   cache          - [] or the exact generator cache returned previously
+%
+% Outputs:
+%
+%   H,R,K      - retained generators or tagged projected branches
+%   parameters - input options with generator diagnostics in cce_aux
+%   cache      - exact-input generator cache with hit and miss counts
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -41,6 +53,7 @@ if ~isempty(jumps)
     validation=model.parameters;
     validation.bath_jumps=parameters.bath_jumps;
     cce_options(model.spin_system,validation,@cce_generators,model.assumptions);
+
 end
 if ~isempty(jumps)&&~projected&&~strcmp(cluster_system.formalism,'zeeman-liouv')
     error('cce_generators:formalism','Dissipation requires zeeman-liouv.');
@@ -109,6 +122,7 @@ elseif strcmp(cluster_system.formalism,'zeeman-liouv')
     [R,jump_records]=dissipator(cluster_system,jumps,[],[]); K=zeros(size(H));
 else
     H=ham; R=zeros(size(H)); K=zeros(size(H));
+
 end
 
 % Retain the physical master-generator evidence with its completed raw task
@@ -159,6 +173,7 @@ for n=1:numel(ids)
         ops{n,axis}=kron(kron(speye(prod(dims(1:n-1))),...
                             sparse(local{axis})),speye(prod(dims(n+1:end))));
     end
+
 end
 
 % Build either the validated Cartesian Hamiltonian or the stock reference
@@ -233,6 +248,7 @@ if strcmp(backend,'direct')
                 end
             end
         end
+
     end
 else
 
@@ -254,6 +270,7 @@ else
         indices=indices(:); H=H(indices,indices);
     end
     sum_norm=norm(H,'fro'); operations=dimension*numel(ids)^2;
+
 end
 
 % Add static exterior mean fields after the common ordering is established
@@ -273,7 +290,7 @@ if isfield(spin_config,'exterior_ids')
     end
 end
 
-% Report the unsymmetrized residual and a dimension/operation roundoff bound
+% Report the unsymmetrised residual and a dimension/operation roundoff bound
 meta.antihermitian_residual=norm(H-H','fro');
 roundoff=operations*eps/(1-operations*eps);
 meta.roundoff_bound=roundoff*max(sum_norm,realmin)+...
@@ -283,7 +300,7 @@ if meta.antihermitian_residual>2*meta.roundoff_bound
 end
 H=(H+H')/2;
 
-% Return ordering, operators, backend and approximation provenance
+% Return ordering, operators, backend, and approximation provenance
 meta.physical_ids=ids; meta.dimensions=dims; meta.dimension=dimension;
 meta.observed_dimension=prod(model.multiplicities(model.observed_ids));
 meta.bath_dimension=bath_dimension; meta.operators=ops;
@@ -292,8 +309,6 @@ meta.source_hash=model.source_hash; meta.omitted_pairs=model.omitted_pairs;
 meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
 
 end
-
-% Validate structure, IDs, and explicitly supplied exterior expectations
 
 % Assemble loss and jump terms for conventional or conditional density blocks
 function [R,records]=dissipator(system,jumps,va,vb)
@@ -324,6 +339,8 @@ for k=1:numel(jumps)
     else
         local=jump.operator;
     end
+
+    % Embed the declared jump and inspect conditional-manifold closure
     op=embed_jump(local,jump.support,ids,system.multiplicities);
     if projected
         left=va'*op*va; right=vb'*op*vb; loss=op'*op;
@@ -336,10 +353,13 @@ for k=1:numel(jumps)
     else
         left=op; right=op;
     end
+
+    % Accumulate the GKSL gain and both anticommutator loss terms
     R=R+jump.rate*(kron(conj(right),left)-...
         0.5*kron(eye(n),left'*left)-0.5*kron((right'*right).',eye(n)));
     records(end+1)=struct('support',jump.support,'rate',jump.rate,...
                           'left',left,'right',right); %#ok<AGROW>
+
 end
 
 end
@@ -363,8 +383,11 @@ end
 
 % Map column-vectorised matrices to their nonconjugated transpose
 function swap=commutation(dimension)
+
+% Map each column-major matrix entry to its transposed position
 labels=reshape(1:dimension^2,dimension,dimension).';
 swap=sparse(1:dimension^2,labels(:),1,dimension^2,dimension^2);
+
 end
 
 % Apply the established static virtual-state correction without a legacy call
@@ -405,6 +428,8 @@ for c=1:numel(observed)
         fields{slot}=field;
     end
 end
+
+% Add the declared virtual-state correction to each conditional branch
 for branch=1:2
     state=vectors(:,selected(branch)); gaps=energies(selected(branch))-energies;
     outside=setdiff(1:numel(energies),selected(branch));
@@ -434,10 +459,13 @@ end
 
 % Embed one local matrix in the declared retained tensor-product order
 function op=embed(local,position,dims)
+
+% Form the ordered product with identities on all other spins
 op=1;
 for k=1:numel(dims)
     if k==position, op=kron(op,local); else, op=kron(op,eye(dims(k))); end
 end
+
 end
 
 % Select one local Cartesian spin operator without repeated full embeddings

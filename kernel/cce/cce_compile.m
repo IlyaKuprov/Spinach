@@ -5,12 +5,24 @@
 %
 % spin_system is create output; parameters obeys cce_options. Tensors
 % remain in rad/s and coordinates in Angstrom. No full-bath basis is built.
-% The calling context resolves cce.numerics.atol, rtol and max_memory_bytes.
+% The calling context resolves cce.numerics.atol, rtol, and max_memory_bytes.
 % Observed and bath IDs retain the caller's order; groups retain physical IDs.
 % A supplied basis selects zeeman-hilb or zeeman-liouv; absent basis selects
 % zeeman-hilb. Stale full-system basis arrays are removed. Local representations
 % are complete, not restricted bases. The model owns canonical tensors,
-% assumptions, native parameters, isotope labels, dimensions and projectors.
+% assumptions, native parameters, isotope labels, dimensions, and projectors.
+%
+% Parameters:
+%
+%   spin_system - physical system returned by create
+%   parameters  - native CCE options with resolved numerical tolerances,
+%                 memory budget, and orientation in radians
+%   assumptions - stock interaction assumption string or argument cell
+%
+% Outputs:
+%
+%   model - canonical angular-frequency tensors, physical-spin ordering,
+%           coordinates in Angstrom, and retained approximation metadata
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -110,6 +122,7 @@ for n=1:nspins
             part=retain_pair(value,spin_system.inter.coupling.strength{ids(1),ids(2)});
             if direction==2, value=value.'; part=part.'; end
             tensor=tensor+value; retained=retained+part;
+
         end
 
         % Apply only the explicitly requested physical distance cutoff
@@ -131,6 +144,7 @@ for n=1:nspins
         end
         model.retained{n,k}=retained; model.retained{k,n}=retained.';
     end
+
 end
 
 % Bind the physically pruned stock fallback to the same model
@@ -142,6 +156,7 @@ for n=1:nspins
     scale=norm(spin_system.inter.zeeman.matrix{n},'fro')+...
           abs(spin_system.inter.basefrqs(n));
     model.canonical_roundoff=model.canonical_roundoff+27*eps*scale;
+
 end
 
 % Exclude execution-only options from the physical model fingerprint
@@ -211,8 +226,8 @@ switch strength
 
         % Leave unsupported domains for the stock backend
         tensor=zeros(3);
-end
 
+end
 
 end
 

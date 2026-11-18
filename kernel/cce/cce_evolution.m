@@ -13,6 +13,20 @@
 % bath-coherence vector. Conventional Hilbert states are square matrices.
 % The small retained-space implementation avoids a repeated basis build.
 %
+% Parameters:
+%
+%   cluster_system - retained subsystem returned by cce_subsystem
+%   L              - angular-frequency generator or tagged projected pair
+%   coil           - detector matrix/vector or cell of detectors
+%   rho            - initial Hilbert matrix or column-major state vector
+%   timestep       - finite time step in seconds
+%   nsteps         - nonnegative integer number of intervals
+%   output         - 'final', 'trajectory', 'observable', or 'total'
+%
+% Outputs:
+%
+%   answer - propagated states or detector values in the layout above
+%
 % ilya.kuprov@weizmann.ac.il
 
 function answer=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
@@ -96,8 +110,16 @@ for step=steps
         case 'final'
             answer=state;
     end
+
 end
 
+end
+
+% Do not silently erase non-Hermitian evolution from a Hilbert generator
+function hermitian(H)
+if norm(H-H','fro')>size(H,1)*eps(max(1,norm(H,'fro')))
+    error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
+end
 end
 
 % Validate dimensions and explicit evolution semantics
@@ -150,13 +172,6 @@ if strcmp(output,'observable')
                                  all(isfinite(x),'all'),coil))
         error('cce_evolution:coil','Every detector must match the propagated state.');
     end
-end
-end
-
-% Do not silently erase non-Hermitian evolution from a Hilbert generator
-function hermitian(H)
-if norm(H-H','fro')>size(H,1)*eps(max(1,norm(H,'fro')))
-    error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
 end
 end
 

@@ -2,7 +2,7 @@
 %
 %                    analysis=cce_analyse(result,parameters)
 %
-% result contains times, value, valid. parameters.analysis.fit defaults
+% result contains times, value, and valid. parameters.analysis.fit defaults
 % to false. When true, require observable (column), envelope='magnitude'
 % or 'real', model='exponential' or 'stretched_exponential', interval=[a b]
 % in seconds, weights (one positive inverse-variance weight per time),
@@ -13,15 +13,17 @@
 % Invalid or nondecaying/oscillatory fitting windows are refused with
 % warnings in the returned structure, never silently deleted or clipped.
 %
-% Inputs:
-%   result - times, value and valid.
+% Parameters:
+%
+%   result - times, value, and valid.
 %   parameters.analysis - fit (default false); when enabled: observable
-%   column, envelope, model, interval in seconds, positive weights,
-%   confidence and confidence_level.
+%                         column, envelope, model, interval in seconds, positive weights,
+%                         confidence and confidence_level.
 %
 % Outputs:
-%   analysis - retained data/masks, status, warnings and fit
-%   parameters/diagnostics.
+%
+%   analysis - retained data/masks, status, warnings, and fit
+%              parameters/diagnostics.
 %
 % See also cce_diagnostics.
 %
@@ -35,6 +37,8 @@ analysis=struct('times',result.times,'value',result.value,'valid',result.valid,.
                 'status','not_requested','warnings',{{}},'fit',[]);
 if ~isfield(parameters,'analysis')||~isfield(parameters.analysis,'fit')||...
    ~parameters.analysis.fit, return; end
+
+% Select the requested observable, envelope, and fitting interval
 a=parameters.analysis; t=result.times(:); column=a.observable;
 y=result.value(:,column); valid=result.valid(:,column);
 if strcmp(a.envelope,'magnitude'), y=abs(y); else, y=real(y); end
@@ -99,12 +103,15 @@ end
 
 % Evaluate the positive-parameter envelope in scaled seconds
 function values=decay(q,t)
+
+% Recover positive parameters from logarithmic optimisation coordinates
 beta=1;
 if numel(q)==3, beta=exp(q(3)); end
 values=exp(q(1))*exp(-(t/exp(q(2))).^beta);
+
 end
 
-% Check observations, confidence procedure and fitting intervals
+% Check observations, confidence procedure, and fitting intervals
 function grumble(result,parameters)
 if ~isstruct(result)||~all(isfield(result,{'times','value','valid'}))||...
    ~isnumeric(result.times)||~isreal(result.times)||~isvector(result.times)||...

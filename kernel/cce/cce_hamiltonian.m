@@ -7,19 +7,21 @@
 % spin_config is a scalar struct with optional backend (auto/direct/stock),
 % exterior_ids and exterior_expectations (one real [Ix Iy Iz] row per ID).
 % Exterior fields use exactly the model's retained pair interactions.
-% meta reports IDs, dimensions, operators, backend and roundoff residuals.
+% meta reports IDs, dimensions, operators, backend, and roundoff residuals.
 %
-% Inputs:
+% Parameters:
+%
 %   model - output of cce_compile.
 %   sites - physical bath IDs; [] selects the observed baseline.
 %   spin_config - scalar structure with optional backend override, exterior_ids
-%   and exterior_expectations (one real Ix/Iy/Iz row per exterior ID).
-%   Exterior fields use retained model pair interactions.
+%                 and exterior_expectations (one real Ix/Iy/Iz row per exterior ID).
+%                 Exterior fields use retained model pair interactions.
 %
 % Outputs:
+%
 %   H - Hermitian cluster Hamiltonian in rad/s.
-%   meta - physical tensor order, dimensions, local operators and backend
-%   metadata.
+%   meta - physical tensor order, dimensions, local operators, and backend
+%          metadata.
 %
 % See also cce_compile, cce_states.
 %
@@ -27,7 +29,7 @@
 
 function [H,meta]=cce_hamiltonian(model,sites,spin_config)
 
-% Check cluster membership, spin_config and the requested backend
+% Check cluster membership, spin_config, and the requested backend
 grumble(model,sites,spin_config);
 
 % Resolve the validated construction path
@@ -48,6 +50,7 @@ if strcmp(backend,'stock')
     % Reserve every stock spherical component as a dense worst case
     ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
     copies=copies+sum((2*(1:ranks)+1).^2);
+
 end
 if ~isfinite(dimension)||16*dimension^2*copies>model.numerics.max_memory_bytes
     error('cluster Hamiltonian exceeds numerics.max_memory_bytes.');
@@ -67,6 +70,7 @@ for n=1:numel(ids)
         ops{n,axis}=kron(kron(speye(prod(dims(1:n-1))),...
                             sparse(local{axis})),speye(prod(dims(n+1:end))));
     end
+
 end
 
 % Build either the validated Cartesian Hamiltonian or the stock reference
@@ -141,6 +145,7 @@ if strcmp(backend,'direct')
                 end
             end
         end
+
     end
 else
 
@@ -162,6 +167,7 @@ else
         indices=indices(:); H=H(indices,indices);
     end
     sum_norm=norm(H,'fro'); operations=dimension*numel(ids)^2;
+
 end
 
 % Add static exterior mean fields after the common ordering is established
@@ -181,7 +187,7 @@ if isfield(spin_config,'exterior_ids')
     end
 end
 
-% Report the unsymmetrized residual and a dimension/operation roundoff bound
+% Report the unsymmetrised residual and a dimension/operation roundoff bound
 meta.antihermitian_residual=norm(H-H','fro');
 roundoff=operations*eps/(1-operations*eps);
 meta.roundoff_bound=roundoff*max(sum_norm,realmin)+...
@@ -191,7 +197,7 @@ if meta.antihermitian_residual>2*meta.roundoff_bound
 end
 H=(H+H')/2;
 
-% Return ordering, operators, backend and approximation provenance
+% Return ordering, operators, backend, and approximation provenance
 meta.physical_ids=ids; meta.dimensions=dims; meta.dimension=dimension;
 meta.observed_dimension=prod(model.multiplicities(model.observed_ids));
 meta.bath_dimension=prod(model.multiplicities(sites)); meta.operators=ops;

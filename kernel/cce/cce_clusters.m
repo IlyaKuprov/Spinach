@@ -2,7 +2,7 @@
 %
 %             clusters=cce_clusters(model,graph,parameters)
 %
-% model supplies physical_ids, bath_ids, observed_ids, multiplicities.
+% model supplies physical_ids, bath_ids, observed_ids, and multiplicities.
 % graph is cce_graph output. parameters.order counts groups, not sites;
 % groups is an optional cell partition of graph.bath_ids (default single
 % sites). Non-singleton group construction belongs to cce_partition.
@@ -14,20 +14,23 @@
 % mobius_power is signed int64, dimension includes the observed-spin system,
 % and bath_dimension excludes it. Empty-cluster raw data are separate.
 % All nonempty subsets are retained, including disconnected subsets.
-% selected_counts, actual_counts and cap_overrun report closure costs;
+% selected_counts, actual_counts, and cap_overrun report closure costs;
 % family_id is the exact canonical family string, not a collision-prone
 % numeric hash. config_id=0 denotes the shared unconditioned spin_config.
 %
-% Inputs:
+% Parameters:
+%
 %   model, graph - prepared model and physical connectivity.
 %   parameters - order, optional groups (default singleton sites), explicit
-%   group-ID clusters, and cluster_cap (default Inf); frozen partition groups
-%   are passed in by the driver.
+%                group-ID clusters, and cluster_cap (default Inf); frozen partition groups
+%                are passed in by the driver.
 %
 % Outputs:
+%
 %   clusters - ordered records with stable IDs, physical sites, order,
-%   groups, hilbert_dim, proper-subcluster references, per-order reduction
-%   powers, score, tuple_id and closure_only.
+%              groups, dimension, proper_subsets, direct_children, mobius_power,
+%              connected_components, config_id, inclusion_reason, weight, family_id,
+%              selected_counts, actual_counts, and cap_overrun.
 %
 % See also cce_graph, cce_partition, cce_reduce.
 %
@@ -139,6 +142,8 @@ end
 % Close the selected family by successive immediate-subset deletion
 family=selected;
 for order=max_order:-1:2
+
+    % Add immediate subsets and remove duplicate group combinations
     rows=family(cellfun(@numel,family)==order);
     for k=1:numel(rows)
         for omitted=1:order
@@ -153,6 +158,7 @@ for order=max_order:-1:2
         end
         [~,indices]=unique(padded,'rows'); family=family(indices);
     end
+
 end
 
 % Sort by cardinality and lexical IDs and construct exact family identity
@@ -257,6 +263,8 @@ end
 
 % Compute signed inclusion-exclusion powers with checked int64 arithmetic
 for k=numel(clusters):-1:1
+
+    % Subtract contributions from all already processed superclusters
     power=int64(1);
     for j=k+1:numel(clusters)
         if ismember(k,clusters(j).proper_subsets)
@@ -269,11 +277,13 @@ for k=numel(clusters):-1:1
         end
     end
     clusters(k).mobius_power=power;
+
 end
 
+% Bound three family/sorting copies and the dense group graph
 function check_storage(count)
 
-    % Three family/sorting copies and the dense group graph
+    % Check the workspace size against the explicit budget
     bytes=9*ng^2+3*count*family_bytes;
     if ~isfinite(bytes)||bytes>budget
         error('cce_clusters:memory',...

@@ -15,9 +15,10 @@
 % realisations, not an invented generator. Successful output means only
 % the requested finite ladder comparisons passed, not a global theorem.
 % answer is the unchanged numeric baseline; diagnostics carries the status
-% converged, limit_reached or not_converged; no physics is changed silently.
+% converged, limit_reached, or not_converged; no physics is changed silently.
 %
-% Inputs:
+% Parameters:
+%
 %   spin_system, parameters - physical model and ordinary CCE settings plus
 %   cce.convergence.ladders (field and cell-row values), atol, rtol, max_work,
 %   and optional checks (cell of explicit parameter overrides).
@@ -25,6 +26,7 @@
 %   assumptions - Spinach interaction assumption string
 %
 % Outputs:
+%
 %   answer - numeric baseline; diagnostics - convergence status, original
 %   input_parameters and convergence_report containing comparisons, work
 %   usage and acceptance metadata.
@@ -51,6 +53,8 @@ report=repmat(struct('field','','step',0,'difference',Inf,'scaled_difference',In
                      'passed',false),1,capacity); recorded=0;
 all_pass=audit.acceptable; limited=false;
 for k=1:numel(control.ladders)
+
+    % Evaluate successive levels of this independent approximation ladder
     ladder=control.ladders(k); passed=true;
     for j=2:numel(ladder.values)
         if work>=control.max_work, limited=true; break; end
@@ -68,6 +72,7 @@ for k=1:numel(control.ladders)
     end
     all_pass=all_pass&&passed;
     if limited, break; end
+
 end
 
 % Assess held-out choices separately instead of reusing pilot samples
@@ -96,14 +101,16 @@ if limited, diagnostics.convergence='limit_reached';
 elseif all_pass, diagnostics.convergence='converged'; end
 diagnostics.input_parameters=parameters;
 diagnostics.convergence_report=struct('comparisons',report(1:recorded),'work',work,...
-    'max_work',control.max_work,'complete_coverage',audit.complete_coverage,...
-    'atol',control.atol,'rtol',control.rtol,...
-    'scope','independent finite ladders around the unchanged baseline');
+                                      'max_work',control.max_work,'complete_coverage',audit.complete_coverage,...
+                                      'atol',control.atol,'rtol',control.rtol,...
+                                      'scope','independent finite ladders around the unchanged baseline');
 
 end
 
 % Compare shared times without hiding missing coverage or numerical error
 function entry=compare(previous,prior,current,details,audit,current_audit,control,field,step)
+
+% Match the original time mesh and add both numerical error estimates
 [shared,ia,ib]=intersect(prior.parameters.times,details.parameters.times,'stable');
 coverage=numel(shared)==numel(prior.parameters.times)&&...
          audit.acceptable&&current_audit.acceptable;
@@ -113,7 +120,9 @@ else
     delta=abs(previous(ia,:)-current(ib,:));
     budget=control.atol+control.rtol*max(abs(previous(ia,:)),abs(current(ib,:)));
     numerical=max(prior.reduction.abs_error_bound(ia,:)+details.reduction.abs_error_bound(ib,:),[],'all');
-    sampling=max(prior.reduction.sampling_standard_error(ia,:)+details.reduction.sampling_standard_error(ib,:),[],'all','includemissing');
+    sampling=max(prior.reduction.sampling_standard_error(ia,:)+...
+                 details.reduction.sampling_standard_error(ib,:),...
+                 [],'all','includemissing');
     difference=max(delta,[],'all');
     total=delta+prior.reduction.abs_error_bound(ia,:)+details.reduction.abs_error_bound(ib,:);
     ratio=total./budget; ratio(total==0&budget==0)=0;
@@ -124,9 +133,10 @@ entry=struct('field',field,'step',step,'difference',difference,...
              'scaled_difference',scaled,'coverage',coverage,...
              'numerical_error',numerical,'sampling_error',sampling,...
              'passed',coverage&&scaled<=1);
+
 end
 
-% Require explicit independent ladders, tolerances and a finite work cap
+% Require explicit independent ladders, tolerances, and a finite work cap
 function grumble(spin_system,parameters)
 if isstruct(parameters)&&isfield(parameters,'checkpoint')
     error('cce_converge:checkpoint','Shared checkpoints are not convergence inputs.');

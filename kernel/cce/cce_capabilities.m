@@ -3,11 +3,20 @@
 %                 contract=cce_capabilities(pulse_sequence)
 %
 % pulse_sequence is a registered five-argument experiment handle. The
-% contract declares generator representations, reduction algebra and the
+% contract declares generator representations, reduction algebra, and the
 % evaluator used by the context. Unregistered handles are rejected before
 % any basis or generator is constructed; names are not matched heuristically.
 % Master-equation task records retain generator evidence; capability versions
 % distinguish that raw-record schema when validating a checkpoint.
+%
+% Parameters:
+%
+%   pulse_sequence - registered five-argument experiment function handle
+%
+% Outputs:
+%
+%   contract - supported representations, outputs, reduction algebra,
+%              evaluator handle, and checkpoint capability version
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -15,7 +24,8 @@ function contract=cce_capabilities(pulse_sequence)
 
 % Require an actual registered function handle
 grumble(pulse_sequence);
-registered={@free_evolution,@finite_drive,@refocusing_train,@hahn_echo,@cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
+registered={@free_evolution,@finite_drive,@refocusing_train,@hahn_echo,...
+            @cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
 if ~any(cellfun(@(sequence)isequal(sequence,pulse_sequence),registered))
     error('cce_capabilities:unregistered','Experiment is not registered for clexpn.');
 end
@@ -137,6 +147,7 @@ if exist('aux','var')&&isfield(aux,'density')
     raw.density=aux.density;
 end
 
+% Retain unreduced noise moments and their validity evidence
 if exist('aux','var')&&isfield(aux,'moment')
     raw.moment=aux.moment; raw.mean_time=aux.mean_time; raw.mean_zero=aux.mean_zero;
     raw.abs_error_bound=aux.abs_error_bound; raw.valid=aux.valid;

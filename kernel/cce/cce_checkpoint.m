@@ -1,24 +1,26 @@
-% Read, write or validate a versioned CCE task checkpoint. Syntax:
+% Read, write, or validate a versioned CCE task checkpoint. Syntax:
 %
 %                  state=cce_checkpoint(filename,action,state)
 %
-% filename is a MAT file; action is 'read', 'write' or 'validate'. The
+% filename is a MAT file; action is 'read', 'write', or 'validate'. The
 % state contains version=1, identity (model/parameter/cluster/schedule/
-% sample hashes), payload, task_ids, completed, records and checksum.
-% Read requires the expected identity and task_ids in state. Validation
+% sample hashes), payload, task_ids, completed, records, and checksum.
+% Read requires the expected identity and task_ids in state.
 % Native payloads also bind the registered experiment contract version and
-% retain noise moments, uncertainty and validity masks without reduction.
+% retain noise moments, uncertainty, and validity masks without reduction.
 % Validation checks the full schema and checksum without modifying the file. Write
 % closes a same-directory temporary before atomic POSIX replacement;
 % an existing file with different identity is never overwritten.
 %
-% Inputs:
+% Parameters:
+%
 %   filename - MAT checkpoint path.
 %   action - read, write, or validate.
-%   state - version 1 identity, payload, task_ids, completed, records and
-%   checksum; for reading, expected identity and task_ids.
+%   state - version 1 identity, payload, task_ids, completed, records, and
+%           checksum; for reading, expected identity and task_ids.
 %
 % Outputs:
+%
 %   state - validated/read/written checkpoint state.
 %
 % See also cce_schedule.
@@ -47,6 +49,7 @@ if strcmp(action,'read')
         error('cce_checkpoint:identity','Checkpoint identity or task list differs.');
     end
     return
+
 end
 
 % Require a consistent indexed completion ledger and versioned payload
@@ -66,7 +69,7 @@ if ~all(isfield(state,fields))||~isequal(state.version,1)||...
     error('cce_checkpoint:schema','Invalid versioned checkpoint ledger.');
 end
 
-% Cover the payload, identities, completion bitmap and raw numerical data
+% Cover the payload, identities, completion bitmap, and raw numerical data
 content=state;
 if isfield(content,'checksum'), content=rmfield(content,'checksum'); end
 checksum=md5_hash(content);

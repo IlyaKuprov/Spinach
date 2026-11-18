@@ -6,7 +6,7 @@
 % parameters.times gives elapsed times in seconds. rho0 and coil are explicit
 % observed-spin matrices, or transition selects preparation and detection.
 % preparation may contain state and detector descriptors. normalized defaults
-% to true for signals. output is signal, observable or density; density output
+% to true for signals. output is signal, observable, or density; density output
 % is the column-vectorised observed density, one row per elapsed time.
 % Optional aux retains coherent spectral residuals and absolute error bounds.
 % Finite Hilbert controls use segmentwise expm and preserve the original
@@ -24,7 +24,19 @@
 % estimate 64*eps*n*(1+norm(L,1)*time), scaled by the detector/reference.
 % Master-equation generators retain dense arithmetic. L=H+1i*R+1i*K.
 % Projected propagation carries a
-% coherence block, not a physical density; density requires generalized CCE.
+% coherence block, not a physical density; density requires generalised CCE.
+%
+% Parameters:
+%
+%   spin_system - retained subsystem returned by cce_subsystem
+%   parameters  - experiment options with elapsed times in seconds,
+%                 preparation, detection, output, and resolved CCE policy
+%   H,R,K       - angular-frequency generators, or a tagged projected H
+%
+% Outputs:
+%
+%   answer - time-by-detector signal or time-by-vectorised-density array
+%   aux    - propagation diagnostics and absolute numerical error estimates
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -48,6 +60,8 @@ if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-lio
    ~isfield(parameters,'bath_operator')
     [answer,aux]=projected_fid(spin_system,parameters,H,reference,meta); return
 end
+
+% Select the detector layout and retained generator representation
 if ~iscell(coil), detectors={coil}; else, detectors=coil; end
 if isstruct(H), generator=H; else, generator=H+1i*R+1i*K; end
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
@@ -115,6 +129,8 @@ if liouville
     aux.abs_error_bound=(64*eps*size(generator,1)*(1+argument))*scale;
     aux.error_bound_kind='floating_point_estimate';
 end
+
+% Measure coherent spectral residuals without changing the Hamiltonian
 if coherent
     if any(~isfinite(generator),'all')||...
        norm(generator-generator','fro')>size(generator,1)*eps(max(1,norm(generator,'fro')))
@@ -140,6 +156,8 @@ end
 
 % Every requested elapsed time starts from the same prepared density matrix
 for n=1:numel(parameters.times)
+
+    % Propagate the original state to this elapsed time
     if coherent
         if parameters.times(n)==0
             rho=rho0;
@@ -184,6 +202,8 @@ for n=1:numel(parameters.times)
             end
         end
     end
+
+    % Trace out the bath before applying observed-spin detection
     if density||~isstruct(H)
         dc=spin_system.observed_dimension; db=spin_system.bath_dimension;
         blocks=reshape(full(rho),[db dc db dc]);
@@ -212,15 +232,20 @@ for n=1:numel(parameters.times)
             answer(n,k)=value;
         end
     end
+
 end
 
 end
 
 % Compile finite events in physical-spin order without invoking a driver
 function [starts,drives]=finite_controls(system,p,events)
+
+% Allocate event times and a Hilbert representation for local operators
 starts=zeros(numel(events),numel(p.times));
 drives=cell(1,numel(events)); local=system; local.formalism='zeeman-hilb';
 for k=1:numel(events)
+
+    % Build each retained target drive in its declared Cartesian direction
     e=events(k);
     if any(~ismember(e.target,system.physical_ids))
         error('cce_acquire:exterior','Finite drives require retained target spins.');
@@ -242,16 +267,22 @@ for k=1:numel(events)
     drives{k}=drive;
     if strcmp(e.placement,'fraction'), starts(k,:)=e.at*p.times;
     else, starts(k,:)=e.at; end
+
 end
+
 end
 
 % Split every observation interval at drive starts and stops
 function [rho,bound]=driven_evolution(system,L,rho,total,events,starts,drives)
+
+% Include every drive boundary inside this observation interval
 stops=starts+reshape([events.duration],[],1);
 scale=0; coherent=strcmp(system.formalism,'zeeman-hilb');
 boundaries=unique([0;total;starts(starts>0&starts<total);stops(stops>0&stops<total)]);
 if coherent, boundaries=[0;boundaries]; end
 for k=1:numel(boundaries)-1
+
+    % Add simultaneously active drives without changing multiplication order
     left=boundaries(k); right=boundaries(k+1); generator=L;
     midpoint=(left+right)/2;
     active=find(starts<=midpoint&stops>midpoint&right~=left);
@@ -263,14 +294,16 @@ for k=1:numel(boundaries)-1
     else
         rho=cce_evolution(system,generator,[],rho,right-left,1,'final');
     end
+
 end
 bound=16*system.dimension^3*eps*scale;
+
 end
 
 % Propagate both conditional branches with their measured spectral residuals
 function [answer,aux]=projected_fid(system,parameters,H,reference,meta)
 
-% Diagonalize each bath Hamiltonian once in its original numerical convention
+% Diagonalise each bath Hamiltonian once in its original numerical convention
 [va,ea]=eig(full((H.left+H.left')/2),'vector');
 [vb,eb]=eig(full((H.right+H.right')/2),'vector');
 ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');

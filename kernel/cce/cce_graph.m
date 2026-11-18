@@ -19,18 +19,20 @@
 % follows bath_ids. gCCE retains edges between bath sites attached to
 % the same connected observed-spin system unless approximate=true.
 %
-% Inputs:
+% Parameters:
+%
 %   model - physical IDs, observed/bath IDs, multiplicities, coordinates in
-%   Angstrom and pair records (ids, real Cartesian tensor in rad/s).
+%           Angstrom and pair records (ids, real Cartesian tensor in rad/s).
 %   parameters.graph - mode; mode-specific radius (Angstrom), threshold
-%   (rad/s), or adjacency; score is coupling_norm (default), resonance
-%   (mismatch matrix and positive mismatch_scale, both rad/s), or supplied
-%   (scores matrix); optional bath_radius defaults to Inf.
+%                      (rad/s), or adjacency; score is coupling_norm (default), resonance
+%                      (mismatch matrix and positive mismatch_scale, both rad/s), or supplied
+%                      (scores matrix); optional bath_radius defaults to Inf.
 %
 % Outputs:
+%
 %   graph - bath_ids, sparse logical adjacency, scores, pair_norm,
-%   observed_mediated, approximate, omitted_bath_ids, selection_mode and
-%   requires_convergence.
+%           observed_mediated, approximate, omitted_bath_ids, selection_mode, and
+%           requires_convergence.
 %
 % Native noise support can also be specified by noise.descriptors.spins;
 % these physical IDs participate in the same nonzero-mean support graph.
@@ -90,7 +92,7 @@ for k=1:numel(model.pairs)
 
 end
 
-% Keep the observed-spin system joint unless state/detection factorization is proven
+% Keep the observed-spin system joint unless state/detection factorisation is proven
 attached=any(attachments,2); mediated=attached&attached.';
 mediated(1:n+1:end)=false;
 

@@ -6,18 +6,20 @@
 % raw is a cell of cluster-record arrays. result supplies value, valid,
 % abs_error_bound and optionally density/sampling_standard_error. Bounds
 % are numerical estimates, not truncation confidence intervals. Invalid
-% reasons, time coverage and density tests are reported independently;
-% no normalization, positivity projection or sample censoring is done.
+% reasons, time coverage, and density tests are reported independently;
+% no normalisation, positivity projection, or sample censoring is done.
 %
-% Inputs:
+% Parameters:
+%
 %   model - prepared physical model; raw - cell of cluster-record arrays.
 %   result - CCE value, valid mask, abs_error_bound, and optional
-%   density/sampling_standard_error.
+%            density/sampling_standard_error.
 %   parameters - numerical tolerances and observable declarations.
 %
 % Outputs:
-%   diagnostics - numerical/conditioning, cluster, sample and density
-%   diagnostic fields.
+%
+%   diagnostics - numerical/conditioning, cluster, sample, and density
+%                 diagnostic fields.
 %
 % Native parameters.cce supplies numerical policy; parameters.output=
 % density identifies a time-by-vectorised-density reduction value.
@@ -61,21 +63,28 @@ for k=1:numel(value)
     diagnostics.invalid_reasons{k}=strjoin(reasons(1:count),',');
 end
 
-% Keep raw propagation, reduction and sampling errors distinguishable
+% Keep raw propagation, reduction, and sampling errors distinguishable
 diagnostics.maximum_eigen_residual=0;
 diagnostics.maximum_orthogonality_residual=0;
 diagnostics.raw_invalid=0; diagnostics.raw_records=0;
 for s=1:numel(raw)
+
+    % Aggregate retained propagation evidence without discarding invalid data
     for k=1:numel(raw{s})
         record=raw{s}(k); diagnostics.raw_records=diagnostics.raw_records+1;
         diagnostics.raw_invalid=diagnostics.raw_invalid+nnz(~record.valid);
         if isfield(record,'eigen_residual')
-            diagnostics.maximum_eigen_residual=max([diagnostics.maximum_eigen_residual record.eigen_residual],[],'includemissing');
+            diagnostics.maximum_eigen_residual=max(...
+                [diagnostics.maximum_eigen_residual record.eigen_residual],...
+                [],'includemissing');
         end
         if isfield(record,'orthogonality_residual')
-            diagnostics.maximum_orthogonality_residual=max([diagnostics.maximum_orthogonality_residual record.orthogonality_residual],[],'includemissing');
+            diagnostics.maximum_orthogonality_residual=max(...
+                [diagnostics.maximum_orthogonality_residual record.orthogonality_residual],...
+                [],'includemissing');
         end
     end
+
 end
 diagnostics.sampling_standard_error=[];
 if isfield(result,'sampling_standard_error')
@@ -95,6 +104,8 @@ if isfield(result,'density')&&~isempty(result.density)
     diagnostics.trace_error=nan(nt,1); diagnostics.hermiticity_error=nan(nt,1);
     diagnostics.minimum_eigenvalue=nan(nt,1); diagnostics.physicality_valid=false(nt,1);
     for k=1:nt
+
+        % Test trace, Hermiticity, and positivity against the declared budget
         rho=density(:,:,k);
         if ~all(isfinite(rho),'all'), continue; end
         bound=norm(result.abs_error_bound(k,:));
@@ -106,6 +117,7 @@ if isfield(result,'density')&&~isempty(result.density)
             diagnostics.trace_error(k)<=sqrt(dimension)*bound+threshold&&...
             diagnostics.hermiticity_error(k)<=2*bound+threshold&&...
             diagnostics.minimum_eigenvalue(k)>=-bound-threshold;
+
     end
     diagnostics.physicality_pass=all(diagnostics.physicality_valid);
 end

@@ -1,4 +1,4 @@
-% Import versioned CCE results, spin tables and Cartesian tensors. Syntax:
+% Import versioned CCE results, spin tables, and Cartesian tensors. Syntax:
 %
 %                 imported=cce_import(filename,format,units)
 %
@@ -16,15 +16,17 @@
 % and Hz. Cube output retains density samples and explicit voxel geometry;
 % negative atom counts/orbital cubes are rejected rather than guessed.
 %
-% Inputs:
+% Parameters:
+%
 %   filename, format, units - input path; mat/json/csv/xyz/tensor/cube;
 %   external length unit angstrom/nm/m/bohr, tensor unit
-%   Hz/kHz/MHz/rad/s/T/mT/G. Field units also require gamma_rad_per_s_T;
-%   optional frame is a proper rotation matrix.
+%   Hz/kHz/MHz/rad/s/T/mT/G. Field units also require gyro_rad_s_T;
+%   frame names the input frame, and optional rotation is a proper matrix.
 %
 % Outputs:
+%
 %   imported - recovered model/result or canonical spin/tensor/cube data with
-%   explicit metadata.
+%              explicit metadata.
 %
 % See also cce_export, spin_bath.
 %
@@ -64,6 +66,8 @@ imported=struct('schema_version',1,'source',filename,'input_units',units,...
 % Parse strict tables rather than inferring isotope names or frequency units
 switch format
     case 'xyz'
+
+        % Read the declared site count and Cartesian coordinate rows
         fid=fopen(filename,'r'); cleanup=onCleanup(@()fclose(fid));
         n=str2double(fgetl(fid)); imported.comment=fgetl(fid);
         if ~isscalar(n)||~isfinite(n)||n<0||n~=fix(n), error('Invalid XYZ site count.'); end
@@ -72,6 +76,8 @@ switch format
         imported.labels=data{1}.'; imported.ids=1:n;
         imported.coordinates_A=data{2}*length_factor(units)*rotation.';
     case 'csv'
+
+        % Retain physical IDs, isotope labels, and coordinate units
         data=readtable(filename,'TextType','string');
         if ~all(ismember({'id','isotope','x','y','z'},data.Properties.VariableNames))
             error('Spin CSV requires id,isotope,x,y,z.');
@@ -80,6 +86,8 @@ switch format
         imported.coordinates_A=[data.x data.y data.z]*length_factor(units)*rotation.';
         if numel(unique(imported.ids))~=height(data), error('Duplicate physical IDs.'); end
     case 'tensor'
+
+        % Rotate scalar or full Cartesian pair tensors into laboratory axes
         data=readmatrix(filename); data=data(~all(isnan(data),2),:);
         if ~ismember(size(data,2),[3 11])||any(~isfinite(data),'all')
             error('Tensor CSV needs id1,id2,scalar or nine row-major components.');
@@ -92,6 +100,8 @@ switch format
                                        'tensor',scale*rotation*tensor*rotation.');
         end
     case 'cube'
+
+        % Preserve voxel geometry and density units without interpolation
         fid=fopen(filename,'r'); cleanup=onCleanup(@()fclose(fid));
         imported.comment={fgetl(fid),fgetl(fid)};
         line=sscanf(fgetl(fid),'%f').'; atoms=line(1);
@@ -121,6 +131,7 @@ end
 
 end
 
+% Convert declared length units to Angstrom
 function factor=length_factor(units)
 
 % Convert explicitly declared lengths into the native Spinach boundary
@@ -135,6 +146,7 @@ end
 
 end
 
+% Convert declared frequency or field tensor units to Hz
 function factor=tensor_factor(units)
 
 % Convert frequency or explicitly gyromagnetic field tensors into Hz
@@ -156,6 +168,7 @@ end
 
 end
 
+% Recover the typed arrays and structures from the encoded envelope
 function value=unpack(encoded)
 
 % Reconstitute each numeric component and the original MATLAB array shape
@@ -210,15 +223,13 @@ end
 
 end
 
+% Validate file format, unit fields, and an optional frame rotation
 function grumble(filename,format,units)
-
 if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
    ~ismember(format,{'mat','json','csv','xyz','tensor','cube'})||...
    ~isstruct(units)||~isscalar(units)
     error('Invalid CCE import arguments.');
 end
-
-% Require unit fields to belong to the requested physical file format
 allowed={};
 if ismember(format,{'xyz','csv','cube'}), allowed={'length','rotation','frame'}; end
 if strcmp(format,'tensor'), allowed={'tensor','rotation','gyro_rad_s_T','frame'}; end
@@ -230,13 +241,11 @@ if isfield(units,'gyro_rad_s_T')&&isfield(units,'tensor')&&...
    ~ismember(units.tensor,{'T','mT','G'})
     error('units.gyro_rad_s_T is only used for field-valued tensors.');
 end
-
 if isfield(units,'rotation')&&(~isequal(size(units.rotation),[3 3])||...
    any(~isfinite(units.rotation),'all')||norm(units.rotation.'*units.rotation-eye(3),'fro')>100*eps||...
    abs(det(units.rotation)-1)>100*eps)
     error('Invalid frame rotation.');
 end
-
 end
 
 

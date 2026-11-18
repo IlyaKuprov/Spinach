@@ -26,3 +26,5 @@ the legacy driver. cce_acquire compiles native declarations into internal events
 
 Example: gcce_finite_drive. Validation: test_clexpn_experiments and the independent
 dense reference in test_cce_examples.
+
+Elapsed times and native drive/ideal-control descriptor fields are checked locally before acquisition; validation does not compile and discard a pulse-event array.

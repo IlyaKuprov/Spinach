@@ -9,3 +9,5 @@ This experiment rejects sequence, drive, refocusing, and train fields, including
 Conventional generators obey L=H+1i*R+1i*K. Hilbert evolution reuses one eigensystem. Generalised Liouville evolution uses the stock step action or the explicit stock propagator choice, with its established absolute floating-point estimate. Projected evolution carries a coherence block, not a physical density. Selected-transition FIDs retain branch-product ordering, the evaluated bath trace at zero time, and bath-dimension residual bounds. Detection follows the actual complex receiver and normalisation reference.
 
 The optional aux carries absolute error bounds and applicable eigensystem, orthogonality, Hamiltonian, and backend evidence. The cce_acquire knowledge entry retains the detailed numerical conventions for all shared branches. At truncated cluster order, elementwise density reduction need not preserve positivity.
+
+Elapsed times and the absence of control descriptors are checked locally before acquisition.

@@ -39,3 +39,5 @@ Refocusing may alternatively specify axis and angle for a Cartesian physical-spi
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
 
 Checkpoint capability versions distinguish the fixed physical receiver; regenerate records produced under the preceding spin-manifold-overlap convention.
+
+Projected coherent, generalised Hilbert, and master-equation propagation are explicit branches in the experiment body. The physical pulse remains fixed across direct segment propagation; receiver conventions and arithmetic bounds are unchanged.

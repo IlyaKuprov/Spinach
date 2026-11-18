@@ -7,3 +7,5 @@ Experiment owns validation, preparation, and detection through cce_observation. 
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
 
 Detection uses the fixed physical receiver: after an odd observed-spin manifold interchange, the propagated bath-coherence block is adjointed, including its initial complex preparation coefficient. The receiver itself and the initial normalisation reference are not conjugated. The single midpoint inversion requires this adjoint at positive elapsed time. Zero elapsed time applies no pulse.
+
+The declared signal-normalisation default is resolved before the local input checks and physical preparation.

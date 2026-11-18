@@ -15,3 +15,5 @@ Caller-supplied parameters.sequence is rejected, including empty arrays. Use fin
 Detection uses the fixed physical receiver: after an odd observed-spin manifold interchange, the propagated bath-coherence block is adjointed, including its initial complex preparation coefficient. The receiver itself and the initial normalisation reference are not conjugated. Zero elapsed time applies no pulse. The bath pump does not interchange observed-spin manifolds; the observed midpoint inversion does.
 
 Bath-pulse matrices are constructed in Hilbert space in both supported propagation representations; Liouville states are reshaped only for the physical density/coherence rotation.
+
+The coherent projected branch explicitly composes the selected observed and bath rotations in time order in the experiment body. Numerical bounds and the complete pre-pruning selected-site metadata accompany its response.

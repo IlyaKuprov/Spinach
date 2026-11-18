@@ -28,11 +28,13 @@
 
 function E=cce_eseem(spin_system,parameters,H,R,K)
 
+% Set the declared signal normalisation default
+if ~isfield(parameters,'normalized'), parameters.normalized=true; end
+
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
 
 % Prepare the density and receiver for the declared transition
-if ~isfield(parameters,'normalized'), parameters.normalized=true; end
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
 if ~iscell(coil), coil={coil}; end
 

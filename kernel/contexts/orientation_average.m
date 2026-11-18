@@ -25,6 +25,8 @@
 % transition selectors and graph. Zero-weight orientations are omitted.
 % Deferred grid weights are normalized. Nested parameters.orientation
 % is replaced; all other experiment parameters belong to the deferred task.
+% Orientations run serially; cluster/configuration parallelism may own the
+% existing pool. Inside an outer worker, nested CCE scheduling is serial.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -39,6 +41,13 @@ else
     grid=parameters.grid;
 end
 grid=check_grid(grid); count=numel(grid.weights);
+
+% Keep parallel ownership with an outer worker rather than starting a nested pool
+if ~isempty(getCurrentTask())
+    [task.parameters,~]=cce_options(spin_system,task.parameters,...
+                                    task.pulse_sequence,task.assumptions);
+    task.parameters.cce.parallel.mode='serial';
+end
 
 % Run independently rotated physical systems without a full-bath basis
 orientations=cell(1,count); values=cell(1,count);

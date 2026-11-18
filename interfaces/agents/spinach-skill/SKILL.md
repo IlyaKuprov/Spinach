@@ -196,3 +196,5 @@ Observation owns preparation/detection descriptors, physical-ID ordering, receiv
 ## Native context and closed-system experiments
 
 Use clexpn for the native context and experiments/cce for free_evolution, hahn_echo, cpmg_echo, bath_pumped_hahn and cce_eseem. The context returns a natural numeric array; diagnostics are optional second output. Read references/cce.md for supported representations and experiments.
+
+For cluster-expansion input fixtures and deferred orientation composition, follow [Cluster correlation expansions](references/cce.md): cce_fixture supplies pinned physical data, while context_task and orientation_average compose native clexpn dynamics without a full-bath basis.

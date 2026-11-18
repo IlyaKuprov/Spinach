@@ -81,7 +81,9 @@ Inspect numerical error, denominator conditioning, density validity and sampling
 
 ## Orientation composition
 
-`clexpn` accepts a fixed `parameters.orientation`. For orientation averaging, obtain a deferred task with `parameters.context.mode='defer'`, then pass that descriptor to `orientation_average` with the declared grid/rank and matching assumptions. Reduction occurs separately at each orientation before the orientation-weighted numerical answers are combined. Never average Hamiltonians or irreducible factors as a replacement for averaging completed experiment results. `powder` can accept the same registered deferred descriptor; its ordinary five-argument callback path is distinct. See [Contexts](contexts.md).
+For one orientation, set parameters.orientation. Bind a deferred task with task=context_task(@clexpn,pulse_sequence,parameters,assumptions), then call [answer,diagnostics]=orientation_average(spin_system,task,outer). outer.grid is a shipped grid filename or a structure with alphas, betas, gammas (radians), and weights. Positive weights are normalised and zero-weight orientations omitted. There is no parameters.context.mode or grid/rank interface. powder(spin_system,task,outer,assumptions) also accepts this descriptor and returns the quadrature as its second output and native diagnostics as its third; outer and nested assumptions must agree.
+
+Each orientation constructs its own tensors, transition, graph, pump selection, and dynamics. cce.averaging='after_expansion' averages completed expansions and their bounds/masks; 'internal_then_expansion' averages raw records and the observed-only reference across orientations and spin configurations before reduction, requiring a common cluster family. Never average Hamiltonians. Orientations are serial; cluster/configuration scheduling may own the existing pool. Inside an outer worker the nested scheduling is serial. The ordinary five-argument powder callback remains separate; see [Contexts](contexts.md).
 
 ## Native adaptive and sampling controls
 
@@ -147,3 +149,7 @@ normalisation, independent dense references, and all physical assertions.
 Retained services validate their own consumed records; `cce_options` owns public input validation. `cce_schedule` and `cce_interlace` require the explicit registered evaluator and native parameters, with no method-name fallback. Internal graph, projection, state, control, and scalar-reduction records are numerical-engine inputs, not alternate public context parameters. Density extraction and reference normalisation within the internal control engine are file-local and preserve column-major ordering and complex detector phase.
 
 The legacy entry points `cce`, `cce_bath`, `cce_cluster`, `cce_master`, `cce_noise`, `cce_observe`, `cce_prepare`, `cce_sequence`, and `cce_validate` are removed, with no adapters or alternate parameter forms. Use `clexpn` and the registered experiments; construct baths with `spin_bath`. Lower-level work uses the native compilation, subsystem, generator, and observation services described above.
+
+## Source-pinned physical fixtures
+
+Use [sys,inter,fixture]=cce_fixture('nv_four_c13','6f7282b6') for the fixed four-13C NV input dataset. It supplies full physical tensors, source metadata, coordinates as metadata, and the original 41-point total-time row through 0.5 ms. Apply observed-Sz projection explicitly in the example; select the transition, bath state, order, numerical policy, and execution resources separately. Do not replace this fixed bath with an isotope-abundance sample or shorten its grid when reproducing the fixture.

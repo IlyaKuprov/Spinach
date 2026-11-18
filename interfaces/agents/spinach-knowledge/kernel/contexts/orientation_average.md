@@ -12,3 +12,5 @@ Each orientation independently resolves physical tensors, transitions, graphs an
 - internal_then_expansion: average raw cluster responses, including the observed-only reference, across orientations and spin configurations before inclusion-exclusion. Identical cluster families are required at every orientation; an orientation-dependent family mismatch is rejected. Use an explicit common graph when needed.
 
 answer is the natural numeric experiment output. diagnostics contains grid, orientations (one full nested diagnostic record per point), values (one numeric answer per point), parameters, reduction and elapsed_seconds. The two averaging orders are different estimators and generally do not commute.
+
+Orientations are evaluated serially. Nested cluster/configuration parallelism may use the pool already configured by create. When the composition itself runs on an outer worker, its nested cce.parallel.mode is set to serial; no nested pool is requested. The resolved scheduling mode is visible in the per-orientation diagnostics.

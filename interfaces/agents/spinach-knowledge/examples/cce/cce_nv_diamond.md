@@ -1,7 +1,7 @@
 # cce_nv_diamond
 
-Syntax: `[answer,diagnostics]=cce_nv_diamond()`. The numeric answer is the projected Hahn-echo amplitude; diagnostics is the separate clexpn audit record.
+Syntax: [answer,diagnostics]=cce_nv_diamond(). The numeric answer is the projected Hahn-echo amplitude; diagnostics is the separate clexpn record.
 
-The example uses standard sys/inter/bas/parameters blocks, a declarative magnetic-quantum-number transition, and `clexpn(spin_system,@hahn_echo,parameters,'labframe')`. Physical tensors, elapsed-time grid, graph, retained order and bath state are unchanged.
+cce_fixture('nv_four_c13','6f7282b6') supplies the original full physical tensors, four fixed 13C coordinates, source metadata, and literal 41-point grid through 0.5 ms. The example visibly applies observed-Sz projection, sets the mS=-1/+1 transition, mixed-product bath, order two, graph, and numerical policy, and calls clexpn(spin_system,@hahn_echo,parameters,'labframe'). This is a fixed numerical fixture, not natural-abundance diamond.
 
-Independent analytic, source-pinned or dense checks and frozen physical arrays are retained in `tests/kernel/test_cce_examples.m`.
+The independent PyCCE complex reference and its conjugation convention remain in tests/kernel/test_cce_examples.m. Source tensors, total times, physical-site order, and observable phase are preserved.

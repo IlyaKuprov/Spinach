@@ -133,15 +133,25 @@ loaded=load(filename,'state');
 result=test_true(result,'write failure integrity',refused&&isequaln(loaded.state,state),...
                  'A missing target directory cannot damage the existing checkpoint.');
 
-% Force a real save failure with a read-only directory around a good file
-[status,message]=fileattrib(folder,'-w','u'); %#ok<FILEATTRIB>
+% Deny new-file creation around a known-good checkpoint
+if ispc
+    [status,message]=system(sprintf('icacls "%s" /deny "*S-1-1-0:(WD,AD)"',folder));
+    status=(status==0);
+else
+    [status,message]=fileattrib(folder,'-w','u'); %#ok<FILEATTRIB>
+end
 if ~status, error('test_cce_checkpoint:permissions','%s',message); end
 refused=false;
 try
     cce_checkpoint(filename,'write',state); catch
     refused=true;
 end
-[status,message]=fileattrib(folder,'+w','u'); %#ok<FILEATTRIB>
+if ispc
+    [status,message]=system(sprintf('icacls "%s" /remove:d "*S-1-1-0"',folder));
+    status=(status==0);
+else
+    [status,message]=fileattrib(folder,'+w','u'); %#ok<FILEATTRIB>
+end
 if ~status, error('test_cce_checkpoint:permissions','%s',message); end
 loaded=load(filename,'state');
 result=test_true(result,'actual save failure integrity',refused&&isequaln(loaded.state,state),...

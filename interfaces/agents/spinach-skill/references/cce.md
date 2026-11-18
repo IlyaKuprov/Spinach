@@ -175,3 +175,5 @@ For deferred orientation averaging, a checkpoint ledger is supported only for on
 A resumed calculation rechecks its current memory allowance but does not hash that resource allowance into the physical checkpoint identity. This includes automatically resolved memory budgets on hosts where available memory changes between calls.
 
 Convergence reports preserve a partially unavailable sampling error: a `NaN` at any shared requested time makes the aggregate sampling uncertainty `NaN`, even when other times have finite estimates.
+
+Tensor-free appended electron baths retain standalone Zeeman and dipolar-scaling defaults even when the existing system declares Zeeman or susceptibility data; explicit bath tensors retain their supplied meaning. Finite Liouville drives report accumulated floating-point segment estimates with detector/reference scaling. Incomplete adaptive partitions raise clexpn:partition before production rather than returning an uncertified numeric answer.

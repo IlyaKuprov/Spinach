@@ -385,6 +385,33 @@ for method={'gcce','megcce'}
     end
 end
 
+% Reject every incomplete adaptive partition before a one-output production call
+for graph_mode={'complete','explicit'}
+    for refusal=1:4
+        q=choices(); q.cce.expansion='partition'; q.cce.order=1; q.cce.groups={2,3,4};
+        q.cce.graph.mode=graph_mode{1};
+        if strcmp(graph_mode{1},'explicit'), q.cce.graph.adjacency=sparse(~eye(3)); end
+        q.cce.partition=struct('mode','adaptive','max_dimension',8,...
+                               'patch_atol',1e-10,'patch_rtol',1e-10,...
+                               'max_rounds',5,'max_probes',100,'patches',{{2:4}},...
+                               'pilot_configs',ensemble.spin_config,'heldout_configs',held);
+        switch refusal
+            case 1, q.cce.partition.max_probes=1;
+            case 2, q.cce.partition.max_dimension=2;
+            case 3, q.cce.partition.max_rounds=1;
+            case 4, q.cce.partition.patch_atol=1e-3; q.cce.partition.patch_rtol=0;
+        end
+        rejected=false;
+        try
+            clexpn(spin_system,@hahn_echo,q,'labframe');
+        catch exception
+            rejected=strcmp(exception.identifier,'clexpn:partition');
+        end
+        result=test_true(result,['Incomplete production partition ' graph_mode{1} ' ' num2str(refusal)],...
+                         rejected,'Pilot, held-out, capacity, and iteration failures cannot become ordinary answers.');
+    end
+end
+
 % Print quantitative evidence without adding nonstandard result fields
 fprintf('PARTITION_METRICS dense_error=%.3e pair_error=%.3e disjoint_error=%.3e cross_effect=%.3e adaptive_rounds=%d probes=%d heldout=%.3e\n',...
         max(abs(whole-exact)),max(abs(paired-exact)),...

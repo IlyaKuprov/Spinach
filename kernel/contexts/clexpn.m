@@ -134,35 +134,18 @@ end
 graph=cce_graph(model,selection);
 if isfield(options,'partition')
     partition=cce_partition(model,graph,parameters);
+    if ~partition.complete
+        error('clexpn:partition','Partition adaptation is incomplete: %s.',partition.diagnostics.reason);
+    end
     selection.groups=partition.groups;
     if ~isempty(partition.groups), parameters.cce.groups=partition.groups; end
     model.parameters=parameters; model.groups=partition.groups; policy.partition=partition;
 end
 clusters=cce_clusters(model,graph,selection);
 model.parameters=parameters;
-ensemble=spin_ensemble(model,parameters.cce.bath_state);
-schedule.pulse_sequence=pulse_sequence; schedule.contract=contract;
-
-% Scheduler calls the registered evaluator, which calls the five-argument experiment
-raw=cce_schedule(model,clusters,ensemble,schedule,parameters,contract.evaluator);
-reduced=cce_reduce(raw,clusters,parameters); answer=reduced.value;
-
-% Keep diagnostics separate from the natural sequence output
-diagnostics.raw=raw; diagnostics.clusters=clusters; diagnostics.graph=graph;
-diagnostics.reduction=reduced; diagnostics.policy=policy;
-diagnostics.parameters=parameters; diagnostics.contract=contract;
-diagnostics.physical_ids=model.physical_ids; diagnostics.observed_ids=model.observed_ids;
-diagnostics.bath_ids=model.bath_ids; diagnostics.ensemble=ensemble;
-if isfield(parameters,'spectrum')
-    diagnostics.spectrum=cce_spectrum(parameters.times,answer,...
-                                     struct('spectrum',parameters.spectrum));
-end
-diagnostics.elapsed_seconds=toc(started);
-
-end
 
 % Construct product-state assignments without changing the caller's random stream
-function ensemble=spin_ensemble(model,state)
+state=parameters.cce.bath_state;
 ids=model.bath_ids; count=1;
 if ismember(state.mode,{'sampled','interlaced'}), count=state.samples; end
 bytes=count*(1024+16*sum(model.multiplicities(ids).^2)+32*numel(ids));
@@ -203,6 +186,24 @@ for n=1:count
 end
 ensemble=struct('spin_config',configs,'weights',[configs.weight],...
                 'bases',{bases},'probabilities',{probabilities});
+schedule.pulse_sequence=pulse_sequence; schedule.contract=contract;
+
+% Scheduler calls the registered evaluator, which calls the five-argument experiment
+raw=cce_schedule(model,clusters,ensemble,schedule,parameters,contract.evaluator);
+reduced=cce_reduce(raw,clusters,parameters); answer=reduced.value;
+
+% Keep diagnostics separate from the natural sequence output
+diagnostics.raw=raw; diagnostics.clusters=clusters; diagnostics.graph=graph;
+diagnostics.reduction=reduced; diagnostics.policy=policy;
+diagnostics.parameters=parameters; diagnostics.contract=contract;
+diagnostics.physical_ids=model.physical_ids; diagnostics.observed_ids=model.observed_ids;
+diagnostics.bath_ids=model.bath_ids; diagnostics.ensemble=ensemble;
+if isfield(parameters,'spectrum')
+    diagnostics.spectrum=cce_spectrum(parameters.times,answer,...
+                                     struct('spectrum',parameters.spectrum));
+end
+diagnostics.elapsed_seconds=toc(started);
+
 end
 
 % Validate the public context signature before any expensive work

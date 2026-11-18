@@ -38,3 +38,5 @@ Master-equation raw tasks retain the native generator evidence returned by cce_g
 refocusing_train is an explicitly registered generalized Hilbert experiment with density/observable/signal reduction. Finite-drive and free-evolution checkpoint versions distinguish retained controlled-density evidence. The registered handles, not name heuristics, select evaluation.
 
 Observable output without an explicit coil has one selected-transition detector; memory preflight counts a cell receiver only when supplied. Checkpoint capability versions also distinguish native backend selection and physical projected echo detection, so earlier raw tasks are not reused under the corrected contracts.
+
+Hahn and bath-pumped Hahn capability versions distinguish the fixed physical receiver from stored historical spin-manifold overlaps, rejecting checkpoints from the preceding convention.

@@ -71,6 +71,66 @@ for sequence={@cpmg_echo,@cce_eseem}
     end
 end
 
+% A fixed receiver detects the physical coherence in every projected Hahn path
+for sites={[],2}
+    [retained,~]=cce_subsystem(phase_model,sites{1},struct(),[]);
+    for sequence={@hahn_echo,@bath_pumped_hahn}
+        for formalism={'zeeman-hilb','zeeman-liouv'}
+            retained.formalism=formalism{1};
+            for normalised=[false true]
+                q=phased; q.normalized=normalised;
+                if isequal(sequence{1},@bath_pumped_hahn)
+                    q.pump=struct('center',11,'halfwidth',0,'units','rad/s',...
+                                  'fraction',0.25,'allow_empty',true);
+                end
+                q.cce.approximation='generalized';
+                [hf,rf,kf,full_p]=cce_generators(retained,q,[]);
+                expected=sequence{1}(retained,full_p,hf,rf,kf);
+                q.cce.approximation='projected';
+                [hp,rp,kp,proj_p]=cce_generators(retained,q,[]);
+                actual=sequence{1}(retained,proj_p,hp,rp,kp);
+                result=test_close(result,'Hahn physical fixed receiver',actual,expected,...
+                                  3e-13,3e-13,'Complex preparation and detector match full-space evolution.');
+                if isequal(sequence{1},@hahn_echo)&&strcmp(formalism{1},'zeeman-hilb')
+                    plain=rmfield(hp,{'hamiltonian_abs_error_bound','hamiltonian_norm'});
+                    fallback=hahn_echo(retained,proj_p,plain,rp,kp);
+                    result=test_close(result,'Hahn non-spectral fixed receiver',fallback,expected,...
+                                      3e-13,3e-13,'The interval fallback detects the same physical coherence.');
+                end
+            end
+        end
+    end
+end
+
+% Nonzero dissipation and manifold-preserving rotations retain the fixed receiver
+[retained,~]=cce_subsystem(phase_model,2,struct(),[]);
+retained.formalism='zeeman-liouv'; q=phased;
+q.bath_jumps=struct('support',2,'operator','L+','rate',2);
+for angle=[pi 2*pi]
+    q.refocusing=struct('spins',1,'operator',angle*[0 1;1 0]/2,'time',0.007);
+    q.cce.approximation='generalized';
+    [hf,rf,kf,full_p]=cce_generators(retained,q,[]);
+    expected=hahn_echo(retained,full_p,hf,rf,kf);
+    q.cce.approximation='projected';
+    [hp,rp,kp,proj_p]=cce_generators(retained,q,[]);
+    actual=hahn_echo(retained,proj_p,hp,rp,kp);
+    result=test_close(result,'Dissipative Hahn fixed receiver',actual,expected,...
+                      3e-13,3e-13,'Applied and absent swaps use the original receiver and reference.');
+end
+
+% Default preparation also checks the bath-pumped spectral path against full space
+q=rmfield(phased,{'rho0','coil'}); q.normalized=true;
+q.pump=struct('center',11,'halfwidth',0,'units','rad/s',...
+              'fraction',0.25,'allow_empty',false);
+retained.formalism='zeeman-hilb'; q.cce.approximation='generalized';
+[hf,rf,kf,full_p]=cce_generators(retained,q,[]);
+expected=bath_pumped_hahn(retained,full_p,hf,rf,kf);
+q.cce.approximation='projected';
+[hp,rp,kp,proj_p]=cce_generators(retained,q,[]);
+actual=bath_pumped_hahn(retained,proj_p,hp,rp,kp);
+result=test_close(result,'Bath-pumped spectral fixed receiver',actual,expected,...
+                  3e-13,3e-13,'Spectral propagation retains the full-space physical receiver.');
+
 % Empty spectral selection is a documented no-pump control
 p.pump=struct('center',1e12,'halfwidth',0,'units','Hz','fraction',0.25,'allow_empty',true);
 actual=bath_pumped_hahn(cluster,p,H,R,K); expected=hahn_echo(cluster,p,H,R,K);

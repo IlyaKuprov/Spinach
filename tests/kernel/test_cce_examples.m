@@ -500,7 +500,7 @@ for n=1:numel(parameters.times)
 
     % Independent full-bath Hahn propagators for a maximally mixed state
     ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+    reference(n)=conj(trace(ub*ua*(ua*ub)'))/dimension;
 end
 reference_error=max(abs(answer-reference));
 
@@ -608,7 +608,7 @@ for n=1:numel(parameters.times)
 
     % Independent full-bath Hahn propagators for a maximally mixed state
     ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+    reference(n)=conj(trace(ub*ua*(ua*ub)'))/dimension;
 end
 reference_error=max(abs(answer-reference));
 
@@ -717,7 +717,7 @@ for n=1:numel(parameters.times)
 
     % Independent full-bath Hahn propagators for a maximally mixed state
     ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+    reference(n)=conj(trace(ub*ua*(ua*ub)'))/dimension;
 end
 reference_error=max(abs(answer-reference));
 
@@ -823,7 +823,7 @@ for n=1:numel(parameters.times)
 
     % Independent full-bath Hahn propagators for a maximally mixed state
     ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+    reference(n)=conj(trace(ub*ua*(ua*ub)'))/dimension;
 end
 reference_error=max(abs(answer-reference));
 
@@ -937,7 +937,7 @@ for n=1:numel(parameters.times)
 
     % Independent full-bath Hahn propagators for a maximally mixed state
     ua=expm(-1i*ha*parameters.times(n)/2); ub=expm(-1i*hb*parameters.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+    reference(n)=conj(trace(ub*ua*(ua*ub)'))/dimension;
 end
 reference_error=max(abs(answer-reference));
 
@@ -1071,11 +1071,11 @@ a=parameters.transition.alpha; b=parameters.transition.beta;
 parameters.bath_state=struct('mode','mixed_product');
 parameters.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
 
-% PyCCE reports the opposite off-diagonal element: conjugate its complex trace
+% The projected PyCCE signal uses the same fixed physical receiver
 result=struct('value',answer,'times',parameters.times(:),'valid',true(size(answer)));
 reference=[1.0000000000000073 0.80412187352127196 0.97076472650584211 0.97345787001549855 0.92208749592281747 0.89487943408951576 0.97304683857265373 0.93078025774994988 0.86125671741742393 0.99661776302799532 0.76355437703758766 0.99904105154528788 0.9882134199268271 0.95383133371749873 0.86766134502112169 0.98965017367005748 0.89372993555346014 0.8732162021890324 0.98602797149751487 0.82356170821295749 0.99419409116745483 0.93938769167121006 0.9940891681376085 0.86777114512359543 0.9860547697233486 0.84220648442521762 0.93028570851733106 0.98826030630667416 0.82912496114994416 0.97421567083728422 0.95985232702599865 0.98902742105821617 0.86305059097592329 0.99445386679999404 0.79888714808310557 0.97200285714316348 0.96135900760617921 0.85148111754718481 0.96346493820569012 0.97793634578837296 0.9615196189824301].'+...
           1i*[3.4800759960904551e-33 -2.3669791480982818e-06 3.9053578383864199e-08 4.1251546477359897e-06 1.3322998842642245e-06 -1.9800296667105094e-05 2.7234071561477375e-06 -4.4544694809084375e-06 -4.2527858745940881e-06 -4.0487554818223102e-08 3.5977740510985286e-05 1.2251660190342334e-07 6.6845336712676628e-07 8.2300776394647603e-06 -1.6303824478936545e-05 9.7554193182357096e-07 -3.5152718524314725e-05 -4.581728372659567e-05 3.2348614343623995e-07 8.2517282974561609e-06 -2.5910341445473197e-06 2.4206767247835291e-05 3.6414673240542315e-06 1.0680014272253585e-05 5.5858781900956123e-06 4.8774427328959467e-05 1.3601894267783467e-05 -5.3571546260425495e-06 -1.8314667050526693e-05 -2.0325127606064874e-05 1.7291666493708969e-05 -2.6488761044315708e-06 -0.00015685884541566557 4.8639994138961556e-06 0.00013334140466861785 -9.8320747276684197e-06 3.1600752332004179e-05 0.00014601325410634766 9.4604540883105856e-06 1.1986705000717478e-05 -3.3514391192247085e-05].';
-result.reference_error=max(abs(result.value-conj(reference)));
+result.reference_error=max(abs(result.value-reference));
 fprintf('NV pinned PyCCE CCE2 maximum complex error: %.3g.\n',result.reference_error);
 fprintf('Seo ensemble T2=0.796 ms,n=2.220 is not a four-nucleus target.\n');
 
@@ -1199,7 +1199,7 @@ for n=1:numel(result.times)
 
     % Independent full-bath Hahn propagators for a maximally mixed state
     ua=expm(-1i*ha*result.times(n)/2); ub=expm(-1i*hb*result.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+    reference(n)=conj(trace(ub*ua*(ua*ub)'))/dimension;
 end
 result.reference_error=max(abs(result.value-reference));
 fprintf('Independent dense Hahn maximum complex error: %.3g.\n',result.reference_error);
@@ -1347,7 +1347,7 @@ for n=1:numel(result.times)
 
     % Independent full-bath Hahn propagators for a maximally mixed state
     ua=expm(-1i*ha*result.times(n)/2); ub=expm(-1i*hb*result.times(n)/2);
-    reference(n)=trace(ub*ua*(ua*ub)')/dimension;
+    reference(n)=conj(trace(ub*ua*(ua*ub)'))/dimension;
 end
 result.reference_error=max(abs(result.value-reference));
 fprintf('Independent dense Hahn maximum complex error: %.3g.\n',result.reference_error);
@@ -1658,7 +1658,7 @@ for n=1:numel(times)
     u=expm(-1i*H*times(n)/4); v=expm(-1i*H*times(n)/2);
     if times(n)==0, rho=rho0;
     else, propagator=v*refocus*u*pump*u; rho=propagator*rho0*propagator'; end
-    reference(n)=conj(trace(detector'*rho)/trace(detector'*rho0));
+    reference(n)=trace(detector'*rho)/trace(detector'*rho0);
 end
 reference_error=max(abs(answer-reference));
 snapshot=struct('reference',reference,'reference_error',reference_error);

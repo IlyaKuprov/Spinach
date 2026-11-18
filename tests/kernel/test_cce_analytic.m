@@ -55,8 +55,9 @@ for k=1:numel(q.times)
     ua=expm(-1i*hb*b)*expm(-1i*ha*a);
     ub=expm(-1i*ha*b)*expm(-1i*hb*a);
     values(k)=exp(-1i*phase*(a-b))*trace(ua*ub')/2;
+    if t>=q.refocusing.time, values(k)=conj(values(k)); end
 end
-result=test_close(result,'Absolute pulse dense manifold reference',absolute,values,...
+result=test_close(result,'Absolute pulse fixed receiver reference',absolute,values,...
                   2e-12,2e-12,'Each requested duration uses only pulses at or before its endpoint.');
 fprintf('Absolute pulse dense discrepancy %.3g.\n',max(abs(absolute-values)));
 
@@ -101,6 +102,11 @@ for propagation={'eig','expm'}
                       expected_density,2e-12,2e-12,...
                       'Both propagators omit a later pulse and include the endpoint pulse.');
 end
+
+% Verify projected detection against the independently propagated full density
+result=test_close(result,'Projected absolute full-density receiver',absolute,...
+                  2*expected_density(:,3),2e-12,2e-12,...
+                  'The fixed transition detector agrees with independent full-space propagation.');
 
 % Report the measured metrics
 disp(metrics);

@@ -18,3 +18,7 @@ Named finite_drive coverage compares the declarative drive to the finite-control
 Every finite-interval physical check uses the native finite_drive experiment, including independent-axis overlaps, fractional starts, partial observations, coupled drift, and simultaneous GKSL relaxation. Explicit rejection assertions cover removed raw finite, ideal, and empty sequence inputs.
 
 Complex transverse preparation and a phased receiver compare projected CPMG/ESEEM with full-space evolution for odd and even inversion counts in Hilbert and Liouville representations, including zero elapsed time.
+
+Fixed-receiver Hahn regressions compare complete complex amplitudes with independent full-density or generalised propagation. Coverage includes a bath and an empty bath, complex observed preparation, Hilbert and Liouville representations, spectral and interval paths, and normalised and unnormalised detection; zero time retains the initial reference.
+
+Nonzero bath relaxation checks projected master echoes with manifold-interchanging and preserving rotations. Bath pumping constructs its rotation in Hilbert space even when the state is propagated in Liouville space.

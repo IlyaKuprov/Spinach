@@ -9,3 +9,7 @@ Bath-pumped Hahn evaluation uses `clexpn(spin_system,@bath_pumped_hahn,parameter
 Pump selection applies the single declared unit conversion and an explicit interval convention: boundary=open uses abs(frequency-center)<halfwidth, whereas boundary=closed (the native default) includes both endpoints. A zero-width open window selects nothing; a zero-width closed window can select an exact resonance. Empty selection requires allow_empty. aux.selected_sites records the complete physical selection before retained-cluster pruning, and aux.boundary_rule records strict_abs_less_than or abs_less_than_or_equal. The capability version also binds the retained generator evidence used by checkpoints.
 
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
+
+Detection uses the fixed physical receiver: after an odd observed-spin manifold interchange, the propagated bath-coherence block is adjointed, including its initial complex preparation coefficient. The receiver itself and the initial normalisation reference are not conjugated. Zero elapsed time applies no pulse. The bath pump does not interchange observed-spin manifolds; the observed midpoint inversion does.
+
+Bath-pulse matrices are constructed in Hilbert space in both supported propagation representations; Liouville states are reshaped only for the physical density/coherence rotation.

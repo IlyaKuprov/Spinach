@@ -11,6 +11,8 @@
 % rad/s), fraction and allow_empty; optional sites/species restrict the bath.
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
 % conventional generators or explicitly tagged projected branch generators.
+% Detection uses a fixed physical receiver: the observed inversion takes the
+% bath-coherence adjoint, including the prepared coherence, before detection.
 %
 % Pump center and halfwidth are finite scalars, halfwidth is nonnegative;
 % fraction is in [0,1] and allow_empty is a logical scalar. sites lists
@@ -86,9 +88,9 @@ if projected&&isempty(H.dissipator)&&...
 end
 
 % Embed retained bath rotations for density and coherence-block propagation
-pump_operator=zeros(dc*db);
+pump_operator=zeros(dc*db); local=spin_system; local.formalism='zeeman-hilb';
 for id=reshape(ids,1,[])
-    pump_operator=pump_operator+cce_operator(spin_system,'Lx',id);
+    pump_operator=pump_operator+cce_operator(local,'Lx',id);
 end
 if projected, pump_operator=pump_operator(1:db,1:db); end
 pump_rotation=expm(-1i*pi*pump_operator);
@@ -123,6 +125,9 @@ for n=1:numel(parameters.times)
     segment=generator;
     if projected&&swapped, segment.left=H.right; segment.right=H.left; end
     rho=cce_evolution(spin_system,segment,[],rho,(1-previous)*parameters.times(n),1,'final');
+
+    % Restore the detected spin-manifold coherence after an odd inversion count
+    if projected&&swapped, rho=reshape(reshape(rho,db,db)',db^2,1); end
     for k=1:numel(coil)
         if isvector(rho), value=coil{k}'*rho;
         else, value=trace(coil{k}'*rho); end
@@ -197,8 +202,8 @@ transition=system.model.transition;
 pa=kron(transition.alpha,eye(db)); pb=kron(transition.beta,eye(db));
 observed=kron((transition.alpha*transition.beta'+...
                transition.beta*transition.alpha')/2,eye(db));
-pumped=zeros(system.dimension);
-for id=reshape(ids,1,[]), pumped=pumped+cce_operator(system,'Lx',id); end
+pumped=zeros(system.dimension); local=system; local.formalism='zeeman-hilb';
+for id=reshape(ids,1,[]), pumped=pumped+cce_operator(local,'Lx',id); end
 rotations={expm(-1i*(pi*full(observed))),expm(-1i*(pi*full(pumped)))};
 pulses={{pa'*rotations{1}*pb,pb'*rotations{1}*pa},...
         {pa'*rotations{2}*pa,pb'*rotations{2}*pb}};
@@ -237,7 +242,7 @@ for n=1:numel(parameters.times)
         right=(vb.*exp(-1i*duration*eb).')*vb';
         if swapped, ua=right*ua; ub=left*ub;
         else, ua=left*ua; ub=right*ub; end
-        E(n)=trace(ua*rho_b*ub');
+        E(n)=conj(trace(ua*rho_b*ub'));
     else
         E(n)=1;
     end

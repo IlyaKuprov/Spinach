@@ -36,4 +36,6 @@ result=test_cce_exact()
 
 ## Native interface
 
-Uses `clexpn` with `@free_evolution` or `@hahn_echo`. `parameters.transition.spins` states physical transition support. Natural numeric output and separate raw-cluster diagnostics are checked against independent dense manifold calculations. Full-order bypass is checked by exact equality to the full-cluster raw response.
+Uses `clexpn` with `@free_evolution` or `@hahn_echo`. `parameters.transition.spins` states physical transition support. Natural numeric output and separate raw-cluster diagnostics are checked against independent full-density calculations with an explicit fixed transition detector. Full-order bypass is checked by exact equality to the full-cluster raw response.
+
+The dense reference embeds both independently assembled spin-manifold propagators into the full observed-spin/bath Hilbert space, applies the physical observed-spin inversion, propagates the initial density, and detects with an unchanged transition operator. Pure complex and maximally mixed bath preparations cover every retained subset; FID and zero-time controls remain included.

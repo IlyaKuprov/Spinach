@@ -40,3 +40,5 @@ The native projected and generalized experiments both request normalized detecte
 ## Native interface
 
 Uses `clexpn` with `@hahn_echo`, explicit transition support and `normalized=true` for both projected and generalized physical signals. Approximation is selected with `parameters.cce.approximation`. Separate raw/subset/final and external-only reduction assertions remain unchanged.
+
+Pinned external JSON traces remain unchanged. Receiver conversion is explicit: projected PyCCE Hahn traces already match the fixed physical receiver, whereas generalised pulse-rotated detection retains its conjugation. Raw-subset and final complex comparisons use the same convention.

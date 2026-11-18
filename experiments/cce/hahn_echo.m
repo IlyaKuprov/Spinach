@@ -11,6 +11,8 @@
 % rad/s), fraction and allow_empty; optional sites/species restrict the bath.
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
 % conventional generators or explicitly tagged projected branch generators.
+% Detection uses a fixed physical receiver: an odd manifold interchange takes
+% the bath-coherence adjoint, including the prepared coherence, before detection.
 %
 % output=density returns column-vectorised generalized observed density.
 % It requires a physical initial density and does not normalize a receiver.
@@ -51,6 +53,14 @@ end
 if ~iscell(coil), coil={coil}; end
 projected=isstruct(H); E=complex(zeros(numel(parameters.times),numel(reference)));
 aux=struct();
+
+% Conjugate the prepared coherence, but leave the detector and reference fixed
+inverted=0;
+if projected
+    detector=coil{1}(1);
+    if detector~=0, inverted=conj(reference/conj(detector))*conj(detector); end
+    if meta.normalized, inverted=inverted/reference; end
+end
 if density
     if projected, error('hahn_echo:density','Projected blocks do not define an observed density.'); end
     E=complex(zeros(numel(parameters.times),spin_system.observed_dimension^2));
@@ -120,13 +130,13 @@ end
 if projected&&~density&&isempty(H.dissipator)&&...
    ~strcmp(spin_system.formalism,'zeeman-liouv')&&~isfield(parameters,'pump')&&...
    all(isfield(H,{'hamiltonian_abs_error_bound','hamiltonian_norm'}))
-    [E,aux]=projected_echo(spin_system,parameters,H,reference,meta,rotation,positions);
+    [E,aux]=projected_echo(spin_system,parameters,H,reference,inverted,meta,rotation,positions);
     aux.pulse_time=positions; aux.pulse_applied=parameters.times>0&positions<=parameters.times; return
 end
 
 % Keep ideal master-equation propagation on the native stock action path
 if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipator))
-    [E,aux]=master_echo(spin_system,parameters,H,R,K,rho0,coil,meta,rotation,positions,density);
+    [E,aux]=master_echo(spin_system,parameters,H,R,K,rho0,coil,meta,rotation,positions,density,inverted);
     aux.pulse_time=positions; aux.pulse_applied=parameters.times>0&positions<=parameters.times; return
 end
 fractions=0.5;
@@ -170,6 +180,9 @@ for n=1:numel(parameters.times)
         end
     end
     rho=cce_evolution(spin_system,segment,[],rho,(1-previous)*parameters.times(n),1,'final');
+
+    % Restore the detected spin-manifold coherence after an odd inversion count
+    if projected&&swapped, rho=reshape(reshape(rho,db,db)',db^2,1); end
     if density
         rho=reshape(rho,dc*db,dc*db); observed=complex(zeros(dc));
         for a=1:dc
@@ -251,7 +264,7 @@ end
 end
 
 % Propagate the two invariant branches once per interval; retain spectral bounds
-function [E,aux]=projected_echo(system,parameters,H,reference,meta,pulse,positions)
+function [E,aux]=projected_echo(system,parameters,H,reference,inverted,meta,pulse,positions)
 
 % Resolve the branch spectra once, not once per observation time
 [va,ea]=eig(full((H.left+H.left')/2),'vector');
@@ -284,11 +297,11 @@ end
 % Keep the branch-product order and zero-time convention explicit
 E=complex(zeros(numel(parameters.times),1)); bounds=zeros(size(E));
 for n=1:numel(parameters.times)
-    time=parameters.times(n);
+    time=parameters.times(n); swapped=false;
     if time==0
         value=trace(rho_b);
     else
-        ua=eye(db); ub=eye(db); previous=0; swapped=false;
+        ua=eye(db); ub=eye(db); previous=0;
         if positions(n)<=time
             dt=positions(n);
             ua=((va.*exp(-1i*dt*ea).')*va')*ua;
@@ -301,6 +314,8 @@ for n=1:numel(parameters.times)
         else, ua=left*ua; ub=right*ub; end
         value=trace(ua*rho_b*ub');
     end
+    if swapped, value=conj(value)*inverted;
+    elseif ~meta.normalized, value=value*reference; end
     E(n)=value;
     operations=20*db^3; gamma=operations*eps/(1-operations*eps);
     bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+8*orthogonality+...
@@ -309,7 +324,7 @@ end
 
 % A selected-transition detector scales only unnormalised responses
 if ~meta.normalized
-    E=E*reference; bounds=bounds*abs(reference);
+    bounds=bounds*abs(reference);
 end
 aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
            'orthogonality_residual',orthogonality,...
@@ -412,7 +427,7 @@ end
 end
 
 % Propagate an ideal pulse between native master-equation intervals
-function [answer,aux]=master_echo(system,p,H,R,K,rho0,coils,meta,pulse,positions,density)
+function [answer,aux]=master_echo(system,p,H,R,K,rho0,coils,meta,pulse,positions,density,inverted)
 
 % Preserve column-major density ordering and the Spinach generator sign
 dc=system.observed_dimension; db=system.bath_dimension; projected=isstruct(H);
@@ -472,7 +487,11 @@ for n=1:numel(p.times)
     end
     if projected
         answer(n)=trace(reshape(vector,db,db));
-        if ~meta.normalized, answer(n)=answer(n)*meta.initial_signal; end
+        if time>0&&positions(n)<=time&&swapped
+            answer(n)=conj(answer(n))*inverted;
+        elseif ~meta.normalized
+            answer(n)=answer(n)*meta.initial_signal;
+        end
     else
         rho=reshape(vector,dc*db,dc*db); observed=complex(zeros(dc));
         for a=1:dc

@@ -1,4 +1,4 @@
-% Independent dense manifold reference for four-spin projected CCE. Syntax:
+% Independent full-density receiver reference for four-spin projected CCE. Syntax:
 %
 %                         result=test_cce_exact()
 %
@@ -7,7 +7,7 @@
 function result=test_cce_exact()
 
 % Specify independent full-Hilbert and subset comparisons
-result=new_test_result('kernel/cce_exact','CCE exact manifold validation',...
+result=new_test_result('kernel/cce_exact','CCE exact fixed-receiver validation',...
                        'Four bath spins, pure/mixed states, FID/Hahn and raw subsets.');
 
 % Build a deterministic model without sharing the CCE Hamiltonian builder
@@ -77,6 +77,8 @@ for pure=[false true]
                 end
             end
             ha=hb+coupling/2; hb=hb-coupling/2;
+            initial=kron([1 1;1 1]/2,rho); receiver=kron([0 1;0 0],eye(dim));
+            inversion=kron([0 -1i;-1i 0],eye(dim));
             reference=zeros(numel(p.times),1);
             for k=1:numel(p.times)
                 t=p.times(k);
@@ -86,7 +88,9 @@ for pure=[false true]
                 else
                     ua=expm(-1i*ha*t); ub=expm(-1i*hb*t);
                 end
-                reference(k)=trace(ua*rho*ub');
+                U=blkdiag(ua,ub);
+                if hahn&&t>0, U=inversion*U; end
+                reference(k)=2*trace(receiver'*U*initial*U');
             end
             discrepancy=max(abs(record.value-reference)); maximum=max(maximum,discrepancy);
             bound=max(record.abs_error_bound); max_bound=max(max_bound,bound);

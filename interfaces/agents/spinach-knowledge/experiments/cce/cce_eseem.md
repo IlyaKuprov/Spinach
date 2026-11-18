@@ -6,4 +6,4 @@ Experiment owns validation, preparation and detection through cce_observation. t
 
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
 
-After the projected midpoint inversion, the bath-coherence adjoint restores detection in the original physical spin-manifold ordering. Zero elapsed time applies no pulse. This preserves complex preparation and receiver phase rather than reporting the toggling-frame coherence.
+Detection uses the fixed physical receiver: after an odd observed-spin manifold interchange, the propagated bath-coherence block is adjointed, including its initial complex preparation coefficient. The receiver itself and the initial normalisation reference are not conjugated. The single midpoint inversion requires this adjoint at positive elapsed time. Zero elapsed time applies no pulse.

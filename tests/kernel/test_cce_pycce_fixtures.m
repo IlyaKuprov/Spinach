@@ -6,8 +6,9 @@
 % test_cce_pycce_data.json retains Stage-A inputs and complex raw traces.
 % kHz, ms, Gauss and rad/(ms Gauss) are converted explicitly to rad/s and s.
 % Alpha/beta are source eigenvectors including their relative gauge. PyCCE
-% observes the pulse-rotated observed basis (and reverses Hahn manifold products
-% in its projected engine), so its one-pulse signal is conjugated here.
+% observes the pulse-rotated observed basis and reverses Hahn manifold products
+% in its projected engine. The projected source signal already matches the
+% fixed receiver; only the generalised source signal is conjugated here.
 % Logical-pi PyCCE projections annihilate spectator levels; our physical
 % unitary preserves them. The discrepancy is separately measured, not hidden.
 %
@@ -58,6 +59,8 @@ for f=1:numel(fixtures)
     % Resolve the exact observed-state and selective logical-pulse convention
     p.observed=1; p.cce.bath_spins=2:nb+1; p.cce.approximation='generalized';
     if strcmp(fixture.compute.method,'cce'), p.cce.approximation='projected'; end
+    convention=-1;
+    if strcmp(fixture.compute.method,'cce'), convention=1; end
     p.cce.order=2;
     p.orientation=[0 0 0]; p.cce.interaction_cutoff=Inf;
     p.cce.graph=struct('mode','complete','score','coupling_norm'); p.cce.meanfield='none';
@@ -75,7 +78,7 @@ for f=1:numel(fixtures)
         expected=fixture.raw(j); sites=sort(expected.sites(:).');
         index=find(arrayfun(@(r)isequal(r.sites,sites),actual.clusters),1)+1;
         if isempty(sites), index=1; end
-        record=actual.raw{1}(index); reference=expected.real-1i*expected.imag;
+        record=actual.raw{1}(index); reference=expected.real+1i*convention*expected.imag;
         discrepancy=max(abs(record.value-reference));
         raw_errors(f)=max(raw_errors(f),discrepancy);
         bound=max(record.abs_error_bound);
@@ -85,7 +88,7 @@ for f=1:numel(fixtures)
     end
 
     % Preserve external signal-column labels and the documented phase convention
-    reference=fixture.coherence_real-1i*fixture.coherence_imag;
+    reference=fixture.coherence_real+1i*convention*fixture.coherence_imag;
     final_errors(f)=max(abs(value-reference));
     result=test_true(result,'PyCCE final signal',...
                      final_errors(f)<=2*max(actual.reduction.abs_error_bound),...
@@ -97,7 +100,7 @@ for f=1:numel(fixtures)
         expected=fixture.raw(j); sites=sort(expected.sites(:).');
         index=find(arrayfun(@(r)isequal(r.sites,sites),actual.clusters),1)+1;
         if isempty(sites), index=1; end
-        records(index).value=expected.real-1i*expected.imag;
+        records(index).value=expected.real+1i*convention*expected.imag;
     end
     for j=1:numel(records), records(j).abs_error_bound(:)=0; end
     reduction=struct('method',fixture.compute.method,'order',p.cce.order,...

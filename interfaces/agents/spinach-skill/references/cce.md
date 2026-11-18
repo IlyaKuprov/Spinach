@@ -47,7 +47,7 @@ Use `cce_transition(spin_system,parameters,assumptions)` to resolve an ordered p
 | `cce.convergence` | Independent refinement controls consumed by `cce_converge` |
 | `cce.basis` | Retained `zeeman-hilb` or `zeeman-liouv` basis declaration |
 
-Explicit `cce.backend='stock'` forces the independent stock construction; use the reported generator backend to verify a cross-check. Observable output may omit `coil` when the selected transition supplies detection. Isotope-selected preparation descriptors act only on observed spins, even when the bath contains the same isotope. Projected CPMG and ESEEM restore the physical coherence after odd inversion counts before applying the complex receiver and reference.
+Explicit `cce.backend='stock'` forces the independent stock construction; use the reported generator backend to verify a cross-check. Observable output may omit `coil` when the selected transition supplies detection. Isotope-selected preparation descriptors act only on observed spins, even when the bath contains the same isotope. Projected Hahn, bath-pumped Hahn, CPMG, and two-pulse ESEEM all use the fixed physical receiver. After odd observed-spin manifold interchanges, adjoint the bath-coherence block including its initial preparation coefficient; do not conjugate the receiver or the initial normalisation reference. Zero time has no inversion, and manifold-preserving pulses do not change the coherence ordering.
 
 `cce_options` validates the complete nested vocabulary. Unknown fields are errors. Algorithm controls belong under `parameters.cce`; physical input tensors belong in `sys`/`inter`; pulse, drive, preparation and detector choices belong to the experiment. The internal model and reducer records are not public parameter containers.
 

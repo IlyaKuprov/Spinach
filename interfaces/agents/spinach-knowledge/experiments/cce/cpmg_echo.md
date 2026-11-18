@@ -6,4 +6,4 @@ Experiment owns validation, preparation and detection through cce_observation. t
 
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
 
-Projected evolution restores the physical detected coherence by taking the bath-coherence adjoint after an odd inversion count. Even counts remain in the original ordering, and zero elapsed time applies no pulse. Complex preparation and receiver phase therefore retain the same convention as full-space evolution.
+Detection uses the fixed physical receiver: after an odd observed-spin manifold interchange, the propagated bath-coherence block is adjointed, including its initial complex preparation coefficient. The receiver itself and the initial normalisation reference are not conjugated. Even nloops retains the original coherence ordering; odd nloops requires the adjoint. Zero elapsed time applies no pulse.

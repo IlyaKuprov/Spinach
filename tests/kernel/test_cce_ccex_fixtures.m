@@ -7,6 +7,8 @@
 % reduction uses the nearest six sites from its 978-spin selected bath.
 % Input units are Angstrom, Gauss, ms and rad/(ms Gauss); no isotope
 % constants are silently substituted for the reference's declared values.
+% Hahn manifold-overlap traces are conjugated for the fixed physical receiver;
+% FID traces and the pinned external data are unchanged.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -60,6 +62,7 @@ for f=1:numel(data)
     end
     p.transition.spins=p.observed;
     [value,actual]=clexpn(spin_system,pulse_sequence,p,'labframe'); reference=fixture.real+1i*fixture.imag;
+    if fixture.pulses==1, reference=conj(reference); end
     errors(f)=max(abs(value-reference));
     if isfield(fixture,'raw')
         for j=1:numel(fixture.raw)
@@ -67,6 +70,7 @@ for f=1:numel(data)
             index=find(arrayfun(@(r)isequal(r.sites,sites),actual.clusters),1)+1;
             if isempty(sites), index=1; end
             record=actual.raw{1}(index); ref=expected.real+1i*expected.imag;
+            if fixture.pulses==1, ref=conj(ref); end
             result=test_true(result,'CCEX raw subset',...
                 max(abs(record.value-ref))<=max(record.abs_error_bound)+sqrt(2)*0.5e-10,...
                 'Raw singleton and pair traces agree before expansion.');

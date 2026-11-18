@@ -37,3 +37,5 @@ result=test_cce_ccex_fixtures()
 ## Native interface
 
 Uses `clexpn` with `@free_evolution` or `@hahn_echo` and projected expansion policy. Physical support is looked up in `diagnostics.clusters`; raw responses and numerical bounds remain in `diagnostics.raw` and `diagnostics.reduction`. Every pinned CCEX complex-trace comparison is retained.
+
+Pinned external JSON traces remain unchanged. Receiver conversion is explicit: CCEX Hahn spin-manifold overlaps are conjugated to the fixed physical receiver; FID references are unchanged. Raw-subset and final complex comparisons use the same convention.

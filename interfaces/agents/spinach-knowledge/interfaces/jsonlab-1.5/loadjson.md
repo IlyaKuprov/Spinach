@@ -1,6 +1,8 @@
 # interfaces/jsonlab-1.5/loadjson.m
 
-- MATLAB source: [loadjson.m](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/loadjson.m)
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
+- MATLAB source: `interfaces/jsonlab-1.5/loadjson.m` (source removed)
 - Related documentation: [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=Main_Page)
 - Signature: `data = loadjson(fname,varargin)`
 

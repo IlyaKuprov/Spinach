@@ -1,6 +1,8 @@
 # interfaces/jsonlab-1.5/saveubjson.m
 
-[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/saveubjson.m) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
+`interfaces/jsonlab-1.5/saveubjson.m` (source removed) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 
 **Call:** `json=saveubjson(rootname,obj,varargin)`. The implementation also accepts `saveubjson(obj)`; the one-input form derives a root name from the input variable, or uses `root` when that value is unnamed. With a root name, use `saveubjson(rootname,obj,filename)`, an options structure, or name/value pairs. A sole character optional argument is interpreted as a filename; `FileName` is the corresponding option.
 

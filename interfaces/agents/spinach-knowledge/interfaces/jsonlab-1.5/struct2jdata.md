@@ -1,6 +1,8 @@
 # interfaces/jsonlab-1.5/struct2jdata.m
 
-[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/struct2jdata.m) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
+`interfaces/jsonlab-1.5/struct2jdata.m` (source removed) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 
 **Call:** `newdata=struct2jdata(data,varargin)` converts a JSONLab JData struct representation back to MATLAB data. `data` is expected to be a struct or struct array. The implementation checks the MATLAB-side field names `x0x5F_ArrayType_` and `x0x5F_ArrayData_`; optional metadata fields are `x0x5F_ArraySize_`, `x0x5F_ArrayIsSparse_`, and `x0x5F_ArrayIsComplex_`.
 

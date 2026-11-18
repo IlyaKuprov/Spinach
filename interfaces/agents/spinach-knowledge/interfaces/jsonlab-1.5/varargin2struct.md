@@ -1,6 +1,8 @@
 # interfaces/jsonlab-1.5/varargin2struct.m
 
-[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/varargin2struct.m) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
+`interfaces/jsonlab-1.5/varargin2struct.m` (source removed) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 
 **Call:** `opt=varargin2struct(varargin)` converts the elements of a MATLAB argument cell into a scalar structure. With no inputs it returns an empty structure. It accepts alternating character-vector name/value pairs, scalar struct arguments, or a mixture of the two.
 

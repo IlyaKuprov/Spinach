@@ -1,6 +1,8 @@
 # interfaces/jsonlab-1.5/savejson.m
 
-[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/savejson.m) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
+`interfaces/jsonlab-1.5/savejson.m` (source removed) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 
 **Call:** `json=savejson(rootname,obj,varargin)`. The implementation also accepts `savejson(obj)`; the one-input form uses the input variable name as the root name, falling back to `root` for an unnamed expression. With a root name, use `savejson(rootname,obj,filename)`, an options structure, or name/value pairs. A sole character optional argument is treated as the filename; `FileName` is the equivalent option.
 

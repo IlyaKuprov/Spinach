@@ -1,9 +1,11 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m
 
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
 > Historical Spinach variant, not the article’s capped waveform: SNSA is a soft RF spillout penalty rather than the published hard amplitude limit. For a source-deposited and independently propagated broadband inversion pulse, use [BIBOP](../Kobzar_JMR_2004/bebop_bibop_profiles.md).
 
 - Signature: `bb_inversion_pulse()`
-- Source: [examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m)
+- Source: `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m` (source removed)
 
 ## Purpose
 

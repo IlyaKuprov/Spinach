@@ -41,3 +41,5 @@ parameters.grid=struct('alphas',[0 0],'betas',[0 pi/2],...
 ```
 
 The descriptor branch dispatches to orientation_average before defaults, basis, or full-system generators. The descriptor branch returns its normalised Euler quadrature as the second output; the optional third output carries nested diagnostics. On the ordinary function-handle branch the third output is empty, and supplied quadrature weights are used without renormalisation. Outer assumptions must equal the descriptor's assumptions. See orientation_average for both averaging orders and explicit-grid validation.
+
+Deferred descriptors and agreement of outer and nested assumptions are checked locally before orientation_average is called. The ordinary powder defaults and pulse-sequence path are unchanged.

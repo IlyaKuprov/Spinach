@@ -35,7 +35,7 @@
 
 function [answer,diagnostics]=orientation_average(spin_system,task,parameters)
 
-% Validate the descriptor before invoking any nested calculation
+% Validate the request before resolving its named quadrature
 grumble(spin_system,task,parameters); started=tic;
 if ischar(parameters.grid)
     grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',parameters.grid),...
@@ -43,7 +43,14 @@ if ischar(parameters.grid)
 else
     grid=parameters.grid;
 end
-grid=check_grid(grid); count=numel(grid.weights);
+
+% Validate the descriptor and resolved quadrature before any nested calculation
+grumble(spin_system,task,struct('grid',grid));
+fields={'alphas','betas','gammas','weights'};
+for n=1:numel(fields), grid.(fields{n})=double(grid.(fields{n})(:)); end
+keep=grid.weights>0;
+for n=1:numel(fields), grid.(fields{n})=grid.(fields{n})(keep); end
+grid.weights=grid.weights/sum(grid.weights); count=numel(grid.weights);
 if count>1&&isfield(task.parameters,'cce')&&isfield(task.parameters.cce,'checkpoint')
     error('orientation_average:checkpoint',...
           'Checkpoint files require exactly one positive-weight orientation.');
@@ -164,16 +171,23 @@ if ~isstruct(task)||~isscalar(task)||~all(isfield(task,fields))||...
    numel(fieldnames(task))~=numel(fields)
     error('orientation_average:task','Supply a context_task descriptor.');
 end
-context_task(task.context,task.pulse_sequence,task.parameters,task.assumptions);
+if ~isa(task.context,'function_handle')||~isequal(task.context,@clexpn)||...
+   ~isa(task.pulse_sequence,'function_handle')||...
+   ~isstruct(task.parameters)||~isscalar(task.parameters)||...
+   ~ischar(task.assumptions)||~isrow(task.assumptions)||isempty(task.assumptions)
+    error('orientation_average:task','Supply a valid deferred clexpn experiment.');
+end
+if isfield(task.parameters,'sequence')
+    error('context_task:sequence','Use finite_drive, refocusing_train, or hahn_echo, not parameters.sequence.');
+end
+cce_capabilities(task.pulse_sequence);
 if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'grid')||...
    ~(isstruct(parameters.grid)||(ischar(parameters.grid)&&...
      isrow(parameters.grid)&&~isempty(parameters.grid)))
     error('orientation_average:grid','Supply a grid name or explicit quadrature structure.');
 end
-end
-
-% Validate and normalise the same Euler-angle quadrature used by powder
-function grid=check_grid(grid)
+if ischar(parameters.grid), return; end
+grid=parameters.grid;
 fields={'alphas','betas','gammas','weights'};
 if ~isstruct(grid)||~isscalar(grid)||~all(isfield(grid,fields))||...
    numel(fieldnames(grid))~=numel(fields)
@@ -186,14 +200,10 @@ for n=1:numel(fields)
        numel(value)~=count||any(~isfinite(value))
         error('orientation_average:grid','Grid fields must be equally long finite real vectors.');
     end
-    grid.(fields{n})=double(value(:));
 end
 if any(grid.weights<0)||~isfinite(sum(grid.weights))||sum(grid.weights)<=0
     error('orientation_average:weights','Quadrature weights must be nonnegative with positive sum.');
 end
-keep=grid.weights>0;
-for n=1:numel(fields), grid.(fields{n})=grid.(fields{n})(keep); end
-grid.weights=grid.weights/sum(grid.weights);
 end
 
 

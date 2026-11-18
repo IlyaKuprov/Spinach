@@ -120,11 +120,7 @@ function [answer,sph_grid,diagnostics]=powder(spin_system,pulse_sequence,...
 % Dispatch deferred contexts before defaults, basis or generator construction
 diagnostics=[];
 if isstruct(pulse_sequence)
-    if ~ischar(assumptions)||~isrow(assumptions)||...
-       ~isfield(pulse_sequence,'assumptions')||...
-       ~isequal(assumptions,pulse_sequence.assumptions)
-        error('powder:assumptions','Outer and deferred context assumptions must agree.');
-    end
+    grumble(spin_system,pulse_sequence,parameters,assumptions);
     [answer,diagnostics]=orientation_average(spin_system,pulse_sequence,parameters);
     sph_grid=diagnostics.grid; return
 end
@@ -379,6 +375,24 @@ end
 
 % Consistency checking
 function grumble(spin_system,pulse_sequence,parameters,assumptions)
+if isstruct(pulse_sequence)
+    if ~isscalar(pulse_sequence)||~all(isfield(pulse_sequence,{'context','pulse_sequence','parameters','assumptions'}))||...
+       ~isa(pulse_sequence.context,'function_handle')||~isequal(pulse_sequence.context,@clexpn)||...
+       ~isa(pulse_sequence.pulse_sequence,'function_handle')||...
+       ~isstruct(pulse_sequence.parameters)||~isscalar(pulse_sequence.parameters)
+        error('powder:task','Supply a deferred clexpn experiment descriptor.');
+    end
+    if ~ischar(assumptions)||~isrow(assumptions)||...
+       ~isequal(assumptions,pulse_sequence.assumptions)
+        error('powder:assumptions','Outer and deferred context assumptions must agree.');
+    end
+    if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'comp')||...
+       ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'grid')||...
+       ~(isstruct(parameters.grid)||(ischar(parameters.grid)&&isrow(parameters.grid)&&~isempty(parameters.grid)))
+        error('powder:task','Supply a Spinach system and deferred quadrature parameters.');
+    end
+    return
+end
 if ~isfield(parameters,'grid')
     error('spherical averaging grid must be specified in parameters.grid variable.');
 elseif isempty(parameters.grid)

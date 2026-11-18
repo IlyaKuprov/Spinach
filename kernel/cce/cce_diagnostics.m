@@ -30,7 +30,10 @@
 
 function diagnostics=cce_diagnostics(model,raw,result,parameters)
 
-% Reject unsupported optional inputs before selecting an execution path
+% Validate the supplied records before interpreting native density output
+grumble(model,raw,result,parameters);
+
+% Select the declared numerical policy and observed-density representation
 if isfield(parameters,'cce')
     if isfield(parameters,'output')&&strcmp(parameters.output,'density')
         dimension=prod(model.multiplicities(model.observed_ids));
@@ -39,8 +42,7 @@ if isfield(parameters,'cce')
     parameters=struct('times',parameters.times,'numerics',parameters.cce.numerics);
 end
 
-% Check shapes before combining numerical validity and time coverage
-grumble(model,raw,result,parameters);
+% Combine numerical validity and time coverage
 value=result.value; valid=result.valid&isfinite(value)&...
       isfinite(result.abs_error_bound)&result.abs_error_bound>=0;
 tolerance=parameters.numerics.atol+parameters.numerics.rtol*abs(value);
@@ -134,20 +136,39 @@ end
 function grumble(model,raw,result,parameters)
 if ~isstruct(model)||~iscell(raw)||~isstruct(result)||...
    ~all(isfield(result,{'value','valid','abs_error_bound'}))||...
-   ~isstruct(parameters)||~all(isfield(parameters,{'times','numerics'}))||...
-   ~all(isfield(parameters.numerics,{'atol','rtol'}))||...
+   ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'times')||...
    isempty(result.value)||~isnumeric(result.value)||...
    ~islogical(result.valid)||~isequal(size(result.value),size(result.valid),size(result.abs_error_bound))||...
    size(result.value,1)~=numel(parameters.times)
     error('cce_diagnostics:input','Result arrays must match the requested time mesh.');
 end
+if isfield(parameters,'cce')
+    if ~isstruct(parameters.cce)||~isscalar(parameters.cce)||~isfield(parameters.cce,'numerics')
+        error('cce_diagnostics:input','Supply the declared numerical tolerances.');
+    end
+    if isfield(parameters,'output')&&strcmp(parameters.output,'density')
+        if ~all(isfield(model,{'multiplicities','observed_ids'}))||...
+           size(result.value,2)~=prod(model.multiplicities(model.observed_ids))^2
+            error('cce_diagnostics:input','Density values must match the observed Hilbert dimension.');
+        end
+    end
+    numerics=parameters.cce.numerics;
+else
+    if ~isfield(parameters,'numerics')
+        error('cce_diagnostics:input','Supply the declared numerical tolerances.');
+    end
+    numerics=parameters.numerics;
+end
+if ~isstruct(numerics)||~isscalar(numerics)||~all(isfield(numerics,{'atol','rtol'}))
+    error('cce_diagnostics:input','Supply the declared numerical tolerances.');
+end
 for field={'atol','rtol'}
-    value=parameters.numerics.(field{1});
+    value=numerics.(field{1});
     if ~isnumeric(value)||~isscalar(value)||~isreal(value)||~isfinite(value)||value<0
         error('cce_diagnostics:input','Numerical tolerances must be finite nonnegative scalars.');
     end
 end
-if parameters.numerics.atol+parameters.numerics.rtol==0
+if numerics.atol+numerics.rtol==0
     error('cce_diagnostics:input','At least one numerical tolerance must be positive.');
 end
 if isfield(result,'density')&&~isempty(result.density)&&...

@@ -21,3 +21,5 @@ Order-ladder entries must be numeric, real, finite nonnegative integer scalars. 
 Order saturation uses the resolved baseline bath IDs, including the default complement of observed spins. It does not require an explicit cce.bath_spins field or insert one into the recorded caller input.
 
 The maximum sampling uncertainty across shared times includes missing estimates: if any requested-time contribution is `NaN`, the reported `sampling_error` remains unavailable. A finite estimate at another time cannot hide it. Coverage and numerical-validity checks remain independent and unchanged.
+
+The experiment function handle and explicit assumption arguments are checked locally before any baseline or refinement is evaluated.

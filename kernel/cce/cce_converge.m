@@ -40,7 +40,7 @@
 function [answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)
 
 % Reject shared checkpoints before evaluating any independent refinement
-grumble(spin_system,parameters);
+grumble(spin_system,parameters,pulse_sequence,assumptions);
 control=parameters.cce.convergence; baseline=parameters;
 baseline.cce=rmfield(baseline.cce,'convergence');
 [answer,diagnostics]=clexpn(spin_system,pulse_sequence,baseline,assumptions); work=1;
@@ -137,7 +137,14 @@ entry=struct('field',field,'step',step,'difference',difference,...
 end
 
 % Require explicit independent ladders, tolerances, and a finite work cap
-function grumble(spin_system,parameters)
+function grumble(spin_system,parameters,pulse_sequence,assumptions)
+if ~isa(pulse_sequence,'function_handle')
+    error('cce_converge:sequence','Supply an experiment function handle.');
+end
+if ~(ischar(assumptions)&&isrow(assumptions)&&~isempty(assumptions))&&...
+   ~(iscell(assumptions)&&isrow(assumptions)&&~isempty(assumptions)&&ischar(assumptions{1}))
+    error('cce_converge:assumptions','Supply explicit stock assume arguments.');
+end
 if isstruct(parameters)&&isfield(parameters,'checkpoint')
     error('cce_converge:checkpoint','Shared checkpoints are not convergence inputs.');
 end

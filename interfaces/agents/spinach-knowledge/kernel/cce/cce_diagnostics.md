@@ -42,3 +42,5 @@ Native requests pass the resolved `parameters` with `parameters.cce.numerics`. W
 Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.
 
 A supplied unavailable (`NaN`) spectral or orthogonality residual remains unavailable in the maximum across raw records; it is not discarded in favour of a finite residual from another record. Sampling standard errors, including `NaN`, are copied unchanged.
+
+Native result shapes and numerical policy are validated before interpreting vectorised density values; the observed Hilbert dimension must match the supplied density columns.

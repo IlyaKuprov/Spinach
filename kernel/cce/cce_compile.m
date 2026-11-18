@@ -28,19 +28,16 @@
 
 function model=cce_compile(spin_system,parameters,assumptions)
 
-% Validate native options without translating obsolete parameter forms
+% Resolve native defaults without translating obsolete parameter forms
 [parameters,~]=cce_options(spin_system,parameters,@cce_compile,assumptions);
-if ~all(isfield(parameters.cce.numerics,{'atol','rtol','max_memory_bytes'}))
-    error('cce_compile:policy','Resolve atol, rtol and max_memory_bytes before compilation.');
-end
+
+% Validate the compiler inputs before copying or rotating physical tensors
+grumble(spin_system,parameters,assumptions);
 
 % Carry only a supported representation, never full-system basis arrays
 formalism='zeeman-hilb';
 if isfield(spin_system,'bas')
     formalism=spin_system.bas.formalism;
-    if ~ismember(formalism,{'zeeman-hilb','zeeman-liouv'})
-        error('cce_compile:formalism','Only complete Zeeman representations are supported.');
-    end
     spin_system=rmfield(spin_system,'bas');
 end
 
@@ -229,6 +226,50 @@ switch strength
 
 end
 
+end
+
+% Validate the compiler-owned geometry, representation, and numerical policy
+function grumble(spin_system,parameters,assumptions)
+if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'comp')||...
+   ~isstruct(parameters)||~isscalar(parameters)||...
+   ~all(isfield(parameters,{'observed','orientation','cce'}))
+    error('cce_compile:input','Supply a Spinach system and native CCE parameters.');
+end
+if ~(ischar(assumptions)&&isrow(assumptions)&&~isempty(assumptions))&&...
+   ~(iscell(assumptions)&&isrow(assumptions)&&~isempty(assumptions)&&ischar(assumptions{1}))
+    error('cce_compile:assumptions','Supply explicit stock assume arguments.');
+end
+if ~isnumeric(parameters.orientation)||~isreal(parameters.orientation)||...
+   ~isequal(size(parameters.orientation),[1 3])||any(~isfinite(parameters.orientation))
+    error('cce_compile:orientation','Supply a finite 1-by-3 orientation in radians.');
+end
+for ids={parameters.observed,parameters.cce.bath_spins}
+    value=ids{1};
+    if ~isnumeric(value)||~isreal(value)||(~isempty(value)&&~isrow(value))||...
+       any(~isfinite(value)|value<1|value>spin_system.comp.nspins|value~=fix(value))||...
+       numel(unique(value))~=numel(value)
+        error('cce_compile:spins','Supply distinct physical spin identifiers in rows.');
+    end
+end
+if isempty(parameters.observed)||~isempty(intersect(parameters.observed,parameters.cce.bath_spins))
+    error('cce_compile:spins','Observed spins must be nonempty and disjoint from the bath.');
+end
+if ~all(isfield(parameters.cce.numerics,{'atol','rtol','max_memory_bytes'}))
+    error('cce_compile:policy','Resolve atol, rtol and max_memory_bytes before compilation.');
+end
+for name={'atol','rtol','max_memory_bytes'}
+    value=parameters.cce.numerics.(name{1});
+    if ~isnumeric(value)||~isreal(value)||~isscalar(value)||~isfinite(value)||value<0
+        error('cce_compile:policy','Numerical budgets must be finite nonnegative scalars.');
+    end
+end
+if parameters.cce.numerics.max_memory_bytes==0
+    error('cce_compile:policy','The memory budget must be positive.');
+end
+if isfield(spin_system,'bas')&&...
+   ~ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
+    error('cce_compile:formalism','Only complete Zeeman representations are supported.');
+end
 end
 
 

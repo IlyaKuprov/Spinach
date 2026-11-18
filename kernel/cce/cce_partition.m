@@ -25,6 +25,9 @@
 
 function partition=cce_partition(model,graph,parameters)
 
+% Validate native partition controls before constructing internal selections
+grumble(model,graph,parameters);
+
 % Keep experiment parameters intact while resolving the partition controls
 native_parameters=parameters; options=parameters.cce;
 parameters=struct('partition',options.partition,'graph',options.graph,...
@@ -40,8 +43,7 @@ if isfield(native_parameters,'noise')
     parameters.bath_state=options.bath_state;
 end
 
-% Validate declared bounds and canonicalise physical group membership
-grumble(model,graph,parameters);
+% Canonicalise physical group membership
 p=parameters.partition; ids=graph.bath_ids;
 [~,positions]=ismember(ids,model.physical_ids); dims=model.multiplicities(positions);
 
@@ -291,15 +293,38 @@ end
 
 end
 
+% Recognise a finite scalar integer at or above the declared lower bound
+function valid=integer(value,lower)
+valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&...
+      value>=lower&&mod(value,1)==0;
+
+end
+
+% Recognise a finite nonnegative absolute or relative tolerance
+function valid=tolerance(value)
+valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&value>=0;
+
+end
+
 % Validate declared group membership and partition bounds
 function grumble(model,graph,parameters)
 if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids','multiplicities'}))||...
    ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','pair_norm'}))||...
-   ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'partition')||...
-   ~isstruct(parameters.partition)||~isscalar(parameters.partition)
+   ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
+   ~isstruct(parameters.cce)||~isscalar(parameters.cce)||...
+   ~all(isfield(parameters.cce,{'partition','graph','order','numerics','expansion','approximation'}))||...
+   ~isstruct(parameters.cce.partition)||~isscalar(parameters.cce.partition)
     error('Canonical model, graph, and scalar partition parameters are required.');
 end
-p=parameters.partition; ids=graph.bath_ids;
+parameters=parameters.cce; p=parameters.partition; ids=graph.bath_ids;
+if ~isstruct(parameters.numerics)||~isscalar(parameters.numerics)||...
+   ~isfield(parameters.numerics,'max_memory_bytes')||...
+   ~isnumeric(parameters.numerics.max_memory_bytes)||...
+   ~isreal(parameters.numerics.max_memory_bytes)||...
+   ~isscalar(parameters.numerics.max_memory_bytes)||...
+   ~isfinite(parameters.numerics.max_memory_bytes)||parameters.numerics.max_memory_bytes<=0
+    error('A finite positive partition memory budget is required.');
+end
 if ~isnumeric(model.physical_ids)||~isreal(model.physical_ids)||...
    ~isrow(model.physical_ids)||any(~isfinite(model.physical_ids))||...
    ~isnumeric(model.multiplicities)||~isreal(model.multiplicities)||...
@@ -363,19 +388,6 @@ if strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive)
         end
     end
 end
-end
-
-% Recognise a finite scalar integer at or above the declared lower bound
-function valid=integer(value,lower)
-valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&...
-      value>=lower&&mod(value,1)==0;
-
-end
-
-% Recognise a finite nonnegative absolute or relative tolerance
-function valid=tolerance(value)
-valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&value>=0;
-
 end
 
 

@@ -52,3 +52,5 @@ The context passes the native parameters structure directly to cce_partition(mod
 Native adaptive patch selection removes the experiment-owned propagator preference only from its internal graph and cluster-selection request. The native evaluator still receives the original numerical preference, so an explicit stock master-equation propagator is used unchanged for pilot, held-out, and production dynamics.
 
 Only the native experiment parameter contract is accepted. Exact-patch evaluation always obtains its callback from the registered pulse sequence; no method-name dispatch or event-schedule compiler is used.
+
+Native partition bounds and group membership are checked before constructing the internal graph and cluster-selection request.

@@ -22,6 +22,7 @@
 %
 % GKSL relaxation uses stock exponential action and its floating-point
 % estimate 64*eps*n*(1+norm(L,1)*time), scaled by the detector/reference.
+% Finite Liouville drives sum this estimate over their nonzero intervals.
 % Master-equation generators retain dense arithmetic. L=H+1i*R+1i*K.
 % Projected propagation carries a
 % coherence block, not a physical density; density requires generalised CCE.
@@ -42,14 +43,16 @@
 
 function [answer,aux]=cce_acquire(spin_system,parameters,H,R,K)
 
-% Preparation and detection belong to this experiment, not to its context
-grumble(spin_system,parameters,H,R,K);
-events=cce_pulse_events(parameters);
+% Set the experiment-owned normalisation and density detector defaults
 if ~isfield(parameters,'normalized'), parameters.normalized=true; end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     parameters.normalized=false;
     if ~isfield(parameters,'coil'), parameters.coil=eye(spin_system.observed_dimension); end
 end
+
+% Validate preparation and detection before compiling physical controls
+grumble(spin_system,parameters,H,R,K);
+events=cce_pulse_events(parameters);
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
 selected=~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&isfield(meta,'transition');
 
@@ -58,7 +61,39 @@ if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-lio
    ~(isfield(parameters,'output')&&strcmp(parameters.output,'density'))&&isempty(events)&&...
    ~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&...
    ~isfield(parameters,'bath_operator')
-    [answer,aux]=projected_fid(spin_system,parameters,H,reference,meta); return
+
+    % Diagonalise each bath Hamiltonian once in its original numerical convention
+    [va,ea]=eig(full((H.left+H.left')/2),'vector');
+    [vb,eb]=eig(full((H.right+H.right')/2),'vector');
+    ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
+    oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
+    residual=max(ra,rb); orthogonality=max(oa,ob);
+    rho=1;
+    for k=1:numel(spin_system.bath_rho), rho=kron(rho,spin_system.bath_rho{k}); end
+    answer=complex(zeros(numel(parameters.times),1)); bounds=zeros(size(answer));
+
+    % Keep the branch multiplication order and forward bound of the reference
+    for n=1:numel(parameters.times)
+        time=parameters.times(n);
+        ua=eye(spin_system.bath_dimension); ub=ua;
+        if time~=0
+            ua=((va.*exp(-1i*time*ea).')*va')*ua;
+            ub=((vb.*exp(-1i*time*eb).')*vb')*ub;
+        end
+        answer(n)=trace(ua*rho*ub');
+        operations=12*spin_system.bath_dimension^3; gamma=operations*eps/(1-operations*eps);
+        bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+4*orthogonality+...
+                  gamma*(1+time*H.hamiltonian_norm);
+    end
+    if ~meta.normalized
+        answer=answer*reference; bounds=bounds*abs(reference);
+    end
+    aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
+               'orthogonality_residual',orthogonality,...
+               'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
+               'backend',parameters.cce_aux.backend);
+    return
+
 end
 
 % Select the detector layout and retained generator representation
@@ -82,7 +117,37 @@ if ~isempty(events)
     if segmented
         segments=cce_segments(spin_system,parameters,H,events);
     else
-        [starts,drives]=finite_controls(spin_system,parameters,events);
+
+        % Allocate event times and a Hilbert representation for local operators
+        starts=zeros(numel(events),numel(parameters.times));
+        drives=cell(1,numel(events)); local=spin_system; local.formalism='zeeman-hilb';
+        for k=1:numel(events)
+
+            % Build each retained target drive in its declared Cartesian direction
+            e=events(k);
+            if any(~ismember(e.target,spin_system.physical_ids))
+                error('cce_acquire:exterior','Finite drives require retained target spins.');
+            end
+            axis=e.axis;
+            if ischar(axis), axis=double('xyz'==axis); end
+            detuning=e.detuning;
+            drive=sparse(spin_system.dimension,spin_system.dimension);
+            for target=e.target
+                for a=1:3
+                    names={'Lx','Ly','Lz'}; weight=e.amplitude*axis(a);
+                    if a==3, weight=weight+detuning; end
+                    if weight~=0, drive=drive+weight*cce_operator(local,names{a},target); end
+                end
+            end
+            if strcmp(spin_system.formalism,'zeeman-liouv')
+                drive=kron(speye(spin_system.dimension),drive)-kron(drive.',speye(spin_system.dimension));
+            end
+            drives{k}=drive;
+            if strcmp(e.placement,'fraction'), starts(k,:)=e.at*parameters.times;
+            else, starts(k,:)=e.at; end
+
+        end
+
     end
 end
 
@@ -96,6 +161,7 @@ if controlled
 end
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
 projected_me=isstruct(H)&&strcmp(spin_system.formalism,'zeeman-liouv');
+driven_liouville=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-liouv');
 liouville=isempty(events)&&(projected_me||(~isstruct(H)&&...
           strcmp(spin_system.formalism,'zeeman-liouv')));
 if projected_me
@@ -108,9 +174,11 @@ if projected_me
 end
 
 % Preserve the stock density action and its arithmetic estimate
-if liouville
-    engine=spin_system.model.spin_system; engine.bas.formalism='sphten-liouv';
-    engine.tols.prop_chop=0;
+if liouville||driven_liouville
+    if liouville
+        engine=spin_system.model.spin_system; engine.bas.formalism='sphten-liouv';
+        engine.tols.prop_chop=0;
+    end
     scale=ones(1,size(answer,2));
     if projected_me
         scale=norm(reshape(full(coil),spin_system.bath_dimension,[]),2);
@@ -125,8 +193,12 @@ if liouville
         end
         if meta.normalized, scale=scale./abs(reference); end
     end
-    argument=norm(-1i*generator,1)*parameters.times(:);
-    aux.abs_error_bound=(64*eps*size(generator,1)*(1+argument))*scale;
+    if driven_liouville
+        aux.abs_error_bound=zeros(size(answer));
+    else
+        argument=norm(-1i*generator,1)*parameters.times(:);
+        aux.abs_error_bound=(64*eps*size(generator,1)*(1+argument))*scale;
+    end
     aux.error_bound_kind='floating_point_estimate';
 end
 
@@ -200,6 +272,8 @@ for n=1:numel(parameters.times)
                 if meta.normalized, norms=norms./abs(reference); end
                 aux.abs_error_bound(n,:)=bound*norms;
             end
+        elseif driven_liouville
+            aux.abs_error_bound(n,:)=bound*scale;
         end
     end
 
@@ -237,41 +311,6 @@ end
 
 end
 
-% Compile finite events in physical-spin order without invoking a driver
-function [starts,drives]=finite_controls(system,p,events)
-
-% Allocate event times and a Hilbert representation for local operators
-starts=zeros(numel(events),numel(p.times));
-drives=cell(1,numel(events)); local=system; local.formalism='zeeman-hilb';
-for k=1:numel(events)
-
-    % Build each retained target drive in its declared Cartesian direction
-    e=events(k);
-    if any(~ismember(e.target,system.physical_ids))
-        error('cce_acquire:exterior','Finite drives require retained target spins.');
-    end
-    axis=e.axis;
-    if ischar(axis), axis=double('xyz'==axis); end
-    detuning=e.detuning;
-    drive=sparse(system.dimension,system.dimension);
-    for target=e.target
-        for a=1:3
-            names={'Lx','Ly','Lz'}; weight=e.amplitude*axis(a);
-            if a==3, weight=weight+detuning; end
-            if weight~=0, drive=drive+weight*cce_operator(local,names{a},target); end
-        end
-    end
-    if strcmp(system.formalism,'zeeman-liouv')
-        drive=kron(speye(system.dimension),drive)-kron(drive.',speye(system.dimension));
-    end
-    drives{k}=drive;
-    if strcmp(e.placement,'fraction'), starts(k,:)=e.at*p.times;
-    else, starts(k,:)=e.at; end
-
-end
-
-end
-
 % Split every observation interval at drive starts and stops
 function [rho,bound]=driven_evolution(system,L,rho,total,events,starts,drives)
 
@@ -293,46 +332,15 @@ for k=1:numel(boundaries)-1
         scale=scale+1+abs(right-left)*norm(full(generator),2);
     else
         rho=cce_evolution(system,generator,[],rho,right-left,1,'final');
+        scale=scale+1+abs(right-left)*norm(generator,1);
     end
 
 end
-bound=16*system.dimension^3*eps*scale;
-
+if coherent
+    bound=16*system.dimension^3*eps*scale;
+else
+    bound=64*eps*size(L,1)*scale;
 end
-
-% Propagate both conditional branches with their measured spectral residuals
-function [answer,aux]=projected_fid(system,parameters,H,reference,meta)
-
-% Diagonalise each bath Hamiltonian once in its original numerical convention
-[va,ea]=eig(full((H.left+H.left')/2),'vector');
-[vb,eb]=eig(full((H.right+H.right')/2),'vector');
-ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
-oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
-residual=max(ra,rb); orthogonality=max(oa,ob);
-rho=1;
-for k=1:numel(system.bath_rho), rho=kron(rho,system.bath_rho{k}); end
-answer=complex(zeros(numel(parameters.times),1)); bounds=zeros(size(answer));
-
-% Keep the branch multiplication order and forward bound of the reference
-for n=1:numel(parameters.times)
-    time=parameters.times(n);
-    ua=eye(system.bath_dimension); ub=ua;
-    if time~=0
-        ua=((va.*exp(-1i*time*ea).')*va')*ua;
-        ub=((vb.*exp(-1i*time*eb).')*vb')*ub;
-    end
-    answer(n)=trace(ua*rho*ub');
-    operations=12*system.bath_dimension^3; gamma=operations*eps/(1-operations*eps);
-    bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+4*orthogonality+...
-              gamma*(1+time*H.hamiltonian_norm);
-end
-if ~meta.normalized
-    answer=answer*reference; bounds=bounds*abs(reference);
-end
-aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
-           'orthogonality_residual',orthogonality,...
-           'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
-           'backend',parameters.cce_aux.backend);
 
 end
 

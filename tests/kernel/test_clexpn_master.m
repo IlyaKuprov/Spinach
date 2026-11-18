@@ -119,6 +119,59 @@ p.cce=rmfield(p.cce,'checkpoint'); p.cce.parallel=struct('mode','clusters','batc
 parallel=clexpn(s,@free_evolution,p,'labframe');
 result=test_close(result,'Native parallel determinism',parallel,first,0,0,'Workers return raw indexed records only.');
 
+% Finite Liouville drives retain uncertainty under strict numerical budgets
+request=p; request.cce.parallel.mode='serial'; request.cce.numerics.atol=1e-30;
+request.cce.numerics.rtol=0; request.times=[0 0.05 0.1 0.2];
+request.drive=struct('spins',1,'axis','x','time',0.02,...
+                     'duration',0.1,'amplitude',7,'detuning',2);
+request.drive(2)=request.drive; request.drive(2).time=0.06;
+request.drive(2).axis='y'; request.drive(2).amplitude=3;
+[~,driven]=clexpn(s,@finite_drive,request,'labframe');
+request=driven.parameters; drive_model=cce_compile(s,request,'labframe');
+drive_model.formalism='zeeman-liouv';
+checks=cce_diagnostics(drive_model,driven.raw,driven.reduction,request);
+result=test_true(result,'Driven Liouville numerical budget is not exact',...
+                 all(driven.raw{1}(end).abs_error_bound(2:end)>0)&&...
+                 ~any(checks.numerical_budget_met(2:end),'all'),...
+                 'Full-bath reductions propagate nonzero segment estimates into budget diagnostics.');
+
+% Independently sum the declared arithmetic estimate over all finite intervals
+[retained,~]=cce_subsystem(drive_model,drive_model.bath_ids,struct(),[]);
+[H,R,K,local]=cce_generators(retained,request,[]); L=H+1i*R+1i*K;
+[~,aux]=finite_drive(retained,local,H,R,K); hilbert=retained; hilbert.formalism='zeeman-hilb';
+x=cce_operator(hilbert,'Lx',1); y=cce_operator(hilbert,'Ly',1); z=cce_operator(hilbert,'Lz',1);
+identity=speye(retained.dimension); controls={7*x+2*z,3*y+2*z};
+for k=1:2, controls{k}=kron(identity,controls{k})-kron(controls{k}.',identity); end
+estimates=zeros(numel(request.times),1);
+for n=1:numel(request.times)
+    time=request.times(n); starts=[request.drive.time]; stops=starts+[request.drive.duration];
+    cuts=unique([0 time starts(starts>0&starts<time) stops(stops>0&stops<time)]);
+    for k=1:numel(cuts)-1
+        generator=L; midpoint=(cuts(k)+cuts(k+1))/2;
+        for j=find(starts<=midpoint&stops>midpoint), generator=generator+controls{j}; end
+        estimates(n)=estimates(n)+1+(cuts(k+1)-cuts(k))*norm(generator,1);
+    end
+end
+estimates=64*eps*size(L,1)*estimates;
+result=test_close(result,'Driven Liouville segment estimate',aux.abs_error_bound,2*estimates,...
+                  16*eps*norm(estimates),0,...
+                  'Selected normalised coherence divides by its one-half preparation reference.');
+
+% Explicit receiver magnitude and normalisation scale the same propagation estimate
+local.coil={[0 3;0 0];[0 0;0 2]}; local.normalized=false;
+[~,receivers]=finite_drive(retained,local,H,R,K);
+result=test_close(result,'Driven Liouville receiver scaling',receivers.abs_error_bound,...
+                  estimates*[3 2],8*eps*norm(estimates*[3 2],'fro'),0,...
+                  'Observable bounds follow receiver-column order.');
+local.normalized=true; [~,normalised]=finite_drive(retained,local,H,R,K);
+result=test_close(result,'Driven Liouville reference scaling',normalised.abs_error_bound,...
+                  estimates*[2 2],8*eps*norm(estimates*[2 2],'fro'),0,...
+                  'Each receiver divides by its own initial expectation.');
+local.output='density'; [~,densities]=finite_drive(retained,local,H,R,K);
+result=test_close(result,'Driven Liouville density scaling',densities.abs_error_bound,...
+                  repmat(estimates,1,4),16*eps*norm(estimates),0,...
+                  'Density entries retain the unscaled segment estimate.');
+
 % Capture physical conditioning, not just callback counts
 function raw=counted(model,cluster,configuration,schedule,parameters)
 

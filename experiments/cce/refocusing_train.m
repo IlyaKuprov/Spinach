@@ -3,6 +3,15 @@
 %
 %       [answer,aux]=refocusing_train(spin_system,parameters,H,R,K)
 %
+% Parameters:
+%
+%    spin_system - native retained subsystem from cce_subsystem
+%
+%    parameters  - experiment structure with the fields described below
+%
+%    H,R,K       - angular-frequency generators in the retained basis;
+%                  L=H+1i*R+1i*K for conventional matrix generators
+%
 % parameters.times contains elapsed seconds. refocusing is a cell row of
 % ideal descriptors: physical spins, integrated Hermitian operator or
 % axis/angle, and time or fraction. Alternatively train declares name (xy8
@@ -11,12 +20,21 @@
 % conventions apply. Generalised Hilbert dynamics only. aux retains the
 % compiled intervals, pulse matrices, exterior expectations, and densities.
 %
+% Outputs:
+%
+%    answer - one row per elapsed time: detected signals or observables,
+%             or the column-vectorised observed density
+%
+%    aux    - arithmetic error bounds, compiled segments, and densities
+%
 % ilya.kuprov@weizmann.ac.il
 
 function [answer,aux]=refocusing_train(spin_system,parameters,H,R,K)
 
-% Compile experiment-owned ideal timings and propagate the retained subsystem
+% Check consistency
 grumble(spin_system,parameters,H,R,K);
+
+% Compile ideal pulse timings and propagate the retained subsystem
 [answer,aux]=cce_acquire(spin_system,parameters,H,R,K);
 
 end
@@ -26,14 +44,17 @@ function grumble(spin_system,parameters,H,R,K)
 if ~isstruct(spin_system)||~isfield(spin_system,'formalism')||...
    ~strcmp(spin_system.formalism,'zeeman-hilb')||~isnumeric(H)||...
    ~isnumeric(R)||~isnumeric(K)||any(R(:))||any(K(:))
-    error('refocusing_train:generators','Ideal trains require generalized closed Hilbert dynamics.');
+    error('refocusing_train:generators',...
+          'Ideal trains require generalized closed Hilbert dynamics.');
 end
 if isfield(parameters,'sequence')
-    error('refocusing_train:sequence','Use refocusing_train native descriptors, not parameters.sequence.');
+    error('refocusing_train:sequence',...
+          'Use refocusing_train native descriptors, not parameters.sequence.');
 end
 if ~isstruct(parameters)||~isscalar(parameters)||...
    ~xor(isfield(parameters,'refocusing'),isfield(parameters,'train'))||isfield(parameters,'drive')
-    error('refocusing_train:input','Supply either refocusing descriptors or one named train.');
+    error('refocusing_train:input',...
+          'Supply either refocusing descriptors or one named train.');
 end
 end
 

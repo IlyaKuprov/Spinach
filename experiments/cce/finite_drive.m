@@ -3,6 +3,15 @@
 %
 %     [answer,aux]=finite_drive(spin_system,parameters,H,R,K)
 %
+% Parameters:
+%
+%    spin_system - native retained subsystem from cce_subsystem
+%
+%    parameters  - experiment structure with the fields described below
+%
+%    H,R,K       - angular-frequency generators in the retained basis;
+%                  L=H+1i*R+1i*K for conventional matrix generators
+%
 % parameters.times gives increasing elapsed seconds, including during a drive.
 % parameters.drive is a nonempty structure row, each element with fields:
 %   spins     - unique physical observed-spin identifiers
@@ -16,10 +25,18 @@
 % Equal-length amplitude/duration rows specify consecutive waveform slices.
 % A matching time row gives explicit starts, including overlapping slices.
 % Optional refocusing is a cell row of ideal-pulse descriptors (spins,
-% operator or axis/angle, and time or fraction). The complete drift stays active. Preparation,
-% detection, output and normalization follow free_evolution. Projected branches
-% are not supported. Pulse events are compiled inside this experiment.
-% Mixed ideal/finite controls require generalized Hilbert dynamics.
+% operator or axis/angle, and time or fraction). The complete drift stays
+% active. Preparation, detection, output, and normalisation follow
+% free_evolution. Projected branches are not supported. Pulse events
+% are compiled inside this experiment.
+% Mixed ideal/finite controls require generalised Hilbert dynamics.
+%
+% Outputs:
+%
+%    answer - one row per elapsed time: detected signals or observables,
+%             or the column-vectorised observed density
+%
+%    aux    - propagation diagnostics and absolute arithmetic error bounds
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -41,17 +58,20 @@ if ~isstruct(spin_system)||~isfield(spin_system,'model')||...
 end
 cce_pulse_events(parameters);
 if isfield(parameters,'sequence')
-    error('finite_drive:sequence','Use finite_drive native drive descriptors, not parameters.sequence.');
+    error('finite_drive:sequence',...
+          'Use finite_drive native drive descriptors, not parameters.sequence.');
 end
 for k=1:numel(parameters.drive)
     ids=parameters.drive(k).spins;
     if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
        numel(unique(ids))~=numel(ids)||any(~ismember(ids,spin_system.model.observed_ids))
-        error('finite_drive:spins','Finite drives address unique observed-spin identifiers.');
+        error('finite_drive:spins',...
+              'Finite drives address unique observed-spin identifiers.');
     end
 end
 if ~isnumeric(H)||~isnumeric(R)||~isnumeric(K)
-    error('finite_drive:generators','Finite drives require conventional numeric generators.');
+    error('finite_drive:generators',...
+          'Finite drives require conventional numeric generators.');
 end
 end
 

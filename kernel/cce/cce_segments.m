@@ -44,7 +44,8 @@ end
 retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
 dc=prod(model.multiplicities(model.observed_ids)); components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density'), components=dc^2; end
-if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&iscell(parameters.coil)
+if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&...
+   isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
 retained=retained+3*numel(schedule.times)*(25*components+16*dc^2);

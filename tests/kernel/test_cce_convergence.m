@@ -103,6 +103,19 @@ fprintf('CCE independent ladder discrepancy %.3g; work %d; capped status %s; inv
         max([converged_details.convergence_report.comparisons.difference]),...
         converged_details.convergence_report.work,capped_details.convergence,invalid_details.convergence);
 
+% Resolve the default bath before capping order refinements at its finite size
+default_bath=converged_details.input_parameters; default_bath.cce=rmfield(default_bath.cce,'bath_spins');
+default_bath.cce.convergence.ladders=struct('field','cce.order','values',{{1,2,5}});
+[default_value,default_details]=cce_converge(spin_system,default_bath,@free_evolution,'labframe');
+explicit_bath=default_bath; explicit_bath.cce.bath_spins=[2 3];
+[explicit_value,explicit_details]=cce_converge(spin_system,explicit_bath,@free_evolution,'labframe');
+result=test_close(result,'Default bath order ladder',default_value,explicit_value,0,0,...
+                  'Default and explicit physical bath IDs preserve the same baseline.');
+result=test_true(result,'Default bath finite-order cap',...
+                 isequaln(default_details.convergence_report,explicit_details.convergence_report)&&...
+                 ~isfield(default_details.input_parameters.cce,'bath_spins'),...
+                 'Orders beyond the bath saturate without changing the recorded caller input.');
+
 end
 
 

@@ -59,7 +59,7 @@ for k=1:numel(control.ladders)
         trial=baseline; pieces=strsplit(ladder.field,'.');
         trial=setfield(trial,pieces{:},ladder.values{j});
         if strcmp(ladder.field,'cce.order')
-            trial.cce.order=min(trial.cce.order,numel(trial.cce.bath_spins));
+            trial.cce.order=min(trial.cce.order,numel(diagnostics.bath_ids));
         end
         [current,details]=clexpn(spin_system,pulse_sequence,trial,assumptions); work=work+1;
         current_audit=cce_diagnostics(model,details.raw,details.reduction,details.parameters);

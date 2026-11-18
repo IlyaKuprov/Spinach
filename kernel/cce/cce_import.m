@@ -3,6 +3,8 @@
 %                 imported=cce_import(filename,format,units)
 %
 % format: mat/json (cce_export envelopes returning model/result),
+% including registered native experiment contracts. Import rejects a
+% capability-version mismatch; sparse storage is preserved.
 % csv (export sidecar or table
 % id,isotope,x,y,z), xyz, tensor (CSV id1,id2,value or id1,id2,xx,...,zz),
 % or cube. Scalars denote isotropic tensors.
@@ -158,6 +160,18 @@ function value=unpack(encoded)
 
 % Reconstitute each numeric component and the original MATLAB array shape
 switch encoded.kind
+    case 'contract'
+        value=cce_capabilities(str2func(encoded.name));
+        if value.version~=encoded.version
+            error('cce_import:contract','The stored experiment capability version differs.');
+        end
+    case 'function'
+        value=str2func(encoded.name);
+        if ~isequal(value,@clexpn), cce_capabilities(value); end
+    case 'sparse'
+        value=sparse(unpack(encoded.rows),unpack(encoded.columns),...
+                     unpack(encoded.entries),encoded.shape(1),encoded.shape(2));
+        value=cast(value,encoded.class);
     case 'integer'
         if prod(encoded.shape)==0
             value=zeros(encoded.shape.',encoded.class); return;
@@ -175,6 +189,7 @@ switch encoded.kind
         if isfield(encoded,'shape'), value=reshape(value,encoded.shape.'); end
     case 'string'
         value=reshape(string(encoded.items),encoded.shape.');
+        if isfield(encoded,'missing'), value(unpack(encoded.missing))=missing; end
     case 'cell'
         items=encoded.items;
         if isempty(items), items=cell(0,1); end

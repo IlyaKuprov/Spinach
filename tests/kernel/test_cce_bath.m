@@ -232,6 +232,29 @@ fprintf('R5587 count and density each produce three candidates; retained joint I
 
 fprintf('CCE bath: lattice error %.3g; density %.16g m^-2; all geometric checks complete.\n',max(abs(expected-a.candidate_coordinates_A),[],'all'),surface_density);
 
+% Preserve absent and explicit Zeeman inputs when appending a tensor-bearing bath
+native.isotopes={'E','13C'}; native.magnet=1; native.output='hush';
+native.disable={'hygiene'}; native.parallel={'processes',1};
+base=struct('coordinates',{{[0 0 0],[0 0 20]}});
+spec=struct('mode','explicit','isotopes',{{'1H'}},'coordinates_A',[0 0 40],...
+            'tensors_Hz',diag([100 200 300]));
+for variant=1:5
+    input=base;
+    if variant==2, input.zeeman=struct(); end
+    if variant==3, input.zeeman.scalar={2.1,17}; end
+    if variant==4
+        input.zeeman.eigs={[2.1 2.2 2.3],[]}; input.zeeman.euler={[0.2 0.3 0.4],[]};
+    end
+    if variant==5, input.zeeman.matrix={diag([2.1 2.2 2.3]),eye(3)*13}; end
+    original=create(native,input); [augmented,output]=spin_bath(native,input,spec);
+    appended=create(augmented,output);
+    for k=1:2
+        result=test_close(result,['Appended bath preserves Zeeman ' num2str(variant)],...
+                          appended.inter.zeeman.matrix{k},original.inter.zeeman.matrix{k},0,4*eps,...
+                          'Introducing a new table preserves existing magnet-frequency or explicit Zeeman tensors.');
+    end
+end
+
 end
 
 

@@ -45,6 +45,15 @@ if isfield(sys,'labels'), sys.labels=[sys.labels added_sys.isotopes]; end
 if count==0, inter.coordinates=cell(1,0); end
 inter.coordinates=[inter.coordinates added_inter.coordinates];
 
+% Preserve create's electron fallback when introducing a Zeeman declaration
+if count>0&&~isfield(inter,'zeeman')&&~isfield(inter,'suscept')&&isfield(added_inter,'zeeman')
+    constants=tolerances(struct('sys',struct('output','hush','enable',{{}})),struct());
+    inter.zeeman.matrix=cell(1,count);
+    for k=1:count
+        if sys.isotopes{k}(1)=='E', inter.zeeman.matrix{k}=constants.tols.freeg*eye(3); end
+    end
+end
+
 % Extend native interaction tables and insert only the generated block
 names={'zeeman','coupling'};
 for n=1:numel(names)

@@ -17,3 +17,5 @@ Retained segment arrays and propagation workspaces are counted before allocation
 No legacy model/parameter translation or propagation-result wrapper is provided.
 
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
+
+Observable detection may omit coil when a transition supplies the detector. Segment memory accounting retains one detection channel in that case; ideal trains and mixed finite/ideal drives use the same optional-field contract.

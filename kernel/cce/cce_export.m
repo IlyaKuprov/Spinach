@@ -5,7 +5,9 @@
 % filename must end in .mat, .json, or .csv; model and result are scalar
 % structures. MAT/JSON store a versioned envelope with both structures;
 % JSON preserves numeric type, shape, complex components and nonfinite
-% values. CSV stores numeric vectors/matrices as long-form real/imag rows.
+% values, sparse storage, and registered native experiment contracts.
+% Registered sequence handles and @clexpn are portable; other handles are
+% rejected. CSV stores numeric arrays as long-form real/imaginary rows.
 % A JSON sidecar, filename.json, retains the full result and diagnostics.
 % CSV is a human-readable view; its sidecar is the round-trip authority.
 %
@@ -48,7 +50,7 @@ switch format
             value=result.(names{k});
             if isnumeric(value)
                 for j=1:numel(value)
-                    fprintf(fid,'%s,%d,%.17g,%.17g\n',names{k},j,real(value(j)),imag(value(j)));
+                    fprintf(fid,'%s,%d,%.17g,%.17g\n',names{k},j,full(real(value(j))),full(imag(value(j))));
                 end
             end
         end
@@ -60,7 +62,11 @@ end
 function encoded=pack(value)
 
 % Encode type and dimensions instead of relying on lossy JSON inference
-if isinteger(value)
+if issparse(value)
+    [rows,columns,entries]=find(value);
+    encoded=struct('kind','sparse','class',class(value),'shape',size(value),...
+                   'rows',pack(rows),'columns',pack(columns),'entries',pack(entries));
+elseif isinteger(value)
     encoded=struct('kind','integer','class',class(value),'shape',size(value),...
                    'bytes',typecast(value(:),'uint8').');
 elseif isnumeric(value)||islogical(value)
@@ -68,11 +74,19 @@ elseif isnumeric(value)||islogical(value)
                    'real',{arrayfun(@(v)sprintf('%.17g',v),real(value(:)),'UniformOutput',false)},...
                    'imag',{arrayfun(@(v)sprintf('%.17g',v),imag(value(:)),'UniformOutput',false)});
 elseif ischar(value)
-    encoded=struct('kind','char','value',value,'shape',size(value));
+    encoded=struct('kind','char','value',value(:).','shape',size(value));
 elseif isstring(value)
-    encoded=struct('kind','string','shape',size(value),'items',{cellstr(value(:))});
+    encoded=struct('kind','string','shape',size(value),'items',{cellstr(value(:))},...
+                   'missing',pack(ismissing(value)));
 elseif iscell(value)
     encoded=struct('kind','cell','shape',size(value),'items',{cellfun(@pack,value(:),'UniformOutput',false)});
+elseif isa(value,'function_handle')
+    if ~isequal(value,@clexpn), cce_capabilities(value); end
+    encoded=struct('kind','function','name',func2str(value));
+elseif isstruct(value)&&isscalar(value)&&all(isfield(value,{'pulse_sequence','evaluator'}))&&...
+       isa(value.pulse_sequence,'function_handle')&&isa(value.evaluator,'function_handle')&&...
+       isequal(value,cce_capabilities(value.pulse_sequence))
+    encoded=struct('kind','contract','name',func2str(value.pulse_sequence),'version',value.version);
 elseif isstruct(value)
     names=fieldnames(value); entries=cell(numel(value),numel(names));
     for k=1:numel(value)

@@ -322,6 +322,21 @@ result=test_true(result,'Scaled non-Hermitian pulse rejected',all(rejected),...
                  'A small operator norm cannot hide non-Hermiticity compensated by a large angle.');
 fprintf('R6 scaled pulse rejections %d/2\n',sum(rejected));
 
+% Preserve transition-derived detection through both segmented control routes
+for coil_sequence={@refocusing_train,@finite_drive}
+    [coil_model,coil_request,~]=fixture(); coil_request.output='observable';
+    coil_request=rmfield(coil_request,'drive');
+    coil_request.refocusing={struct('spins',1,'time',0.05,'axis','x','angle',pi)};
+    if isequal(coil_sequence{1},@finite_drive)
+        coil_request.drive=struct('spins',1,'duration',0.1,'axis','x','amplitude',7,'detuning',3);
+    end
+    implicit=clexpn(coil_model.spin_system,coil_sequence{1},coil_request,'labframe');
+    coil_request.coil=coil_model.transition.alpha*coil_model.transition.beta';
+    explicit=clexpn(coil_model.spin_system,coil_sequence{1},coil_request,'labframe');
+    result=test_close(result,['Optional coil: ' func2str(coil_sequence{1})],implicit,explicit,...
+                      1e-12,1e-12,'Omitted coils use the selected transition in segmented propagation.');
+end
+
 end
 
 % Trace the independent bath index in the dense Kronecker reference

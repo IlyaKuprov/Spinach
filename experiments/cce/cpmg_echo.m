@@ -1,7 +1,7 @@
 % Ideal CPMG echo; nloops pi pulses at (2*k-1)/(2*nloops).
 % Syntax:
 %
-%                 E=cpmg_echo(spin_system,parameters,H,R,K)
+%                 [E,aux]=cpmg_echo(spin_system,parameters,H,R,K)
 %
 % Parameters:
 %
@@ -25,9 +25,12 @@
 %    E - complex signal array, with one row per requested time and one
 %        column per receiver; dimensionless when normalised
 %
+%    aux.abs_error_bound - time-by-receiver floating-point propagation
+%                          estimate, not a rigorous forward error bound
+%
 % ilya.kuprov@weizmann.ac.il
 
-function E=cpmg_echo(spin_system,parameters,H,R,K)
+function [E,aux]=cpmg_echo(spin_system,parameters,H,R,K)
 
 % Set the declared signal normalisation default
 if ~isfield(parameters,'normalized'), parameters.normalized=true; end
@@ -41,6 +44,8 @@ if ~iscell(coil), coil={coil}; end
 
 % Allocate the signal and choose the propagation representation
 projected=isstruct(H); E=complex(zeros(numel(parameters.times),numel(reference)));
+scale=cellfun(@(x)norm(x,'fro'),coil(:).')./abs(meta.normalization_divisor);
+aux.abs_error_bound=zeros(size(E)); aux.error_bound_kind='floating_point_estimate';
 if projected, generator=H; else, generator=H+1i*R+1i*K; end
 
 % Build ideal observed-spin transition pulses without a global bath basis
@@ -59,7 +64,7 @@ fractions=((1:parameters.nloops)-0.5)/parameters.nloops;
 for n=1:numel(parameters.times)
 
     % Start each time point from the same prepared density
-    rho=rho0; previous=0; swapped=false;
+    rho=rho0; previous=0; swapped=false; state_error=0;
     if parameters.times(n)>0
         for j=1:numel(fractions)
 
@@ -67,7 +72,8 @@ for n=1:numel(parameters.times)
             segment=generator;
             if projected&&swapped, segment.left=H.right; segment.right=H.left; end
             duration=(fractions(j)-previous)*parameters.times(n);
-            rho=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+            [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+            state_error=state_error+estimate;
 
             % Invert the transition or exchange its projected branches
             if projected
@@ -85,8 +91,9 @@ for n=1:numel(parameters.times)
     % Propagate from the final pulse to the detection time
     segment=generator;
     if projected&&swapped, segment.left=H.right; segment.right=H.left; end
-    rho=cce_evolution(spin_system,segment,[],rho,...
-                      (1-previous)*parameters.times(n),1,'final');
+    duration=(1-previous)*parameters.times(n);
+    [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+    aux.abs_error_bound(n,:)=(state_error+estimate)*scale;
 
     % Restore the detected spin-manifold coherence after an odd inversion count
     if projected&&swapped, rho=reshape(reshape(rho,bath_dim,bath_dim)',bath_dim^2,1); end

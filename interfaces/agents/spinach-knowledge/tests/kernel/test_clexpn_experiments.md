@@ -24,3 +24,5 @@ Complex transverse preparation and a phased receiver compare projected CPMG/ESEE
 Fixed-receiver Hahn regressions compare complete complex amplitudes with independent full-density or generalised propagation. Coverage includes a bath and an empty bath, complex observed preparation, Hilbert and Liouville representations, spectral and interval paths, and normalised and unnormalised detection; zero time retains the initial reference.
 
 Nonzero bath relaxation checks projected master echoes with manifold-interchanging and preserving rotations. Bath pumping constructs its rotation in Hilbert space even when the state is propagated in Liouville space.
+
+CPMG and ESEEM full-bath regressions compare each receiver’s accumulated estimate to an independent unitary norm calculation. They distinguish zero elapsed time from positive-time numerical budget failure in both Zeeman representations and in projected and generalised propagation.

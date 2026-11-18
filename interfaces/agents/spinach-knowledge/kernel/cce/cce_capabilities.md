@@ -42,3 +42,5 @@ Observable output without an explicit coil has one selected-transition detector;
 Hahn and bath-pumped Hahn capability versions distinguish the fixed physical receiver from stored historical spin-manifold overlaps, rejecting checkpoints from the preceding convention.
 
 Handle type and registry membership are validated together before the contract is constructed; evaluator callbacks retain their external five-argument contract.
+
+CPMG and ESEEM checkpoint versions reject raw records predating their accumulated propagation-error estimates.

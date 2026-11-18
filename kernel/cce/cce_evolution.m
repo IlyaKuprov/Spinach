@@ -1,7 +1,7 @@
 % Propagate a retained cluster using conventional or tagged branch generators.
 % Syntax:
 %
-%   answer=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
+%   [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
 %
 % L is H+1i*R+1i*K for conventional generators, or cce_generators projected
 % output. timestep is seconds; nsteps is a nonnegative integer. 'final'
@@ -27,9 +27,14 @@
 %
 %   answer - propagated states or detector values in the layout above
 %
+%   state_error - optional column of absolute Frobenius-norm propagation
+%                 estimates for the evaluated states (one for 'final').
+%                 These measure floating-point propagation only, before
+%                 detection or summation; they are not rigorous bounds.
+%
 % ilya.kuprov@weizmann.ac.il
 
-function answer=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
+function [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
 
 % Reject unsupported representation/output pairs before propagation
 grumble(cluster_system,L,coil,rho,timestep,nsteps,output);
@@ -76,6 +81,23 @@ switch output
 end
 steps=0:nsteps;
 if strcmp(output,'final'), steps=nsteps; end
+
+% Estimate state roundoff using the CCE segment arithmetic models
+if nargout>1
+    elapsed=abs(timestep)*steps(:);
+    if projected&&isempty(L.dissipator)
+        frequency=norm(L.left,1)+norm(L.right,1);
+        roundoff=16*d^3*eps;
+    elseif hilbert
+        frequency=2*norm(L,1); roundoff=16*d^3*eps;
+    else
+        if projected, frequency=norm(generator,1); else, frequency=norm(L,1); end
+        roundoff=64*d^2*eps;
+    end
+    state_error=roundoff*norm(rho,'fro')*((elapsed>0)+elapsed*frequency);
+end
+
+% Propagate each requested state without compounding previous time samples
 for step=steps
 
     % Evaluate from the original state to avoid cumulative time-step drift

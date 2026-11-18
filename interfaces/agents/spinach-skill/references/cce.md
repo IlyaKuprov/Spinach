@@ -181,3 +181,5 @@ Tensor-free appended electron baths retain standalone Zeeman and dipolar-scaling
 Native retained services validate caller-controlled inputs at their own entry boundary; cce_options resolves declared defaults before its local validation, and cce_reduce accepts both indexed records and native ensemble cells, including exact full-bath interlaced records.
 
 The compiler, partition selector, convergence driver, diagnostics, and deferred orientation context own their consumed input checks. Hahn experiment branches expose their propagation directly, and the native subsystem/generator services are the active state and dissipative-generator paths.
+
+CPMG and ESEEM retain a floating-point propagation estimate per time and receiver, including the actual normalisation reference. A valid full-bath signal can exceed the numerical budget; zero elapsed time incurs no propagation error.

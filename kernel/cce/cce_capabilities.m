@@ -59,7 +59,8 @@ end
 
 % Reject checkpoints predating native backend and physical echo-phase corrections
 contract.version=contract.version+2;
-if isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@free_evolution)
+if isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@free_evolution)||...
+   isequal(pulse_sequence,@cpmg_echo)||isequal(pulse_sequence,@cce_eseem)
     contract.version=contract.version+1;
 end
 
@@ -110,40 +111,34 @@ if isstruct(H)&&~parameters.cce.second_order.enabled&&...
     error('cce:population_transfer','Projected states must be invariant under the cluster Hamiltonian.');
 end
 pulse_sequence=schedule.pulse_sequence;
-if isequal(pulse_sequence,@noise_correlation)||isequal(pulse_sequence,@free_evolution)||...
-   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)||isequal(pulse_sequence,@hahn_echo)||...
-   isequal(pulse_sequence,@bath_pumped_hahn)
-    [answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
-else
-    answer=pulse_sequence(spin_system,parameters,H,R,K);
-end
+[answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
 
 % Preserve the experiment's natural numeric layout in the scheduler record
 raw.cluster_id=cluster.id; raw.value=answer;
 raw.abs_error_bound=zeros(size(answer)); raw.valid=isfinite(answer);
 raw.weight=configuration.weight;
 if isfield(parameters.cce_aux,'generator'), raw.generator=parameters.cce_aux.generator; end
-if exist('aux','var')&&isfield(aux,'abs_error_bound')
+if isfield(aux,'abs_error_bound')
     raw.abs_error_bound=aux.abs_error_bound;
 end
-if exist('aux','var')&&isfield(aux,'eigen_residual')
+if isfield(aux,'eigen_residual')
     raw.eigen_residual=aux.eigen_residual;
     raw.orthogonality_residual=aux.orthogonality_residual;
     raw.hamiltonian_bound=aux.hamiltonian_bound; raw.backend=aux.backend;
 end
 
 % Retain the experiment-owned inclusion decision for each observation time
-if exist('aux','var')&&isfield(aux,'pulse_time')
+if isfield(aux,'pulse_time')
     raw.pulse_time=aux.pulse_time; raw.pulse_applied=aux.pulse_applied;
 end
 
 % Retain generalized echo density and numerical propagation diagnostics
-if exist('aux','var')&&isfield(aux,'density')
+if isfield(aux,'density')
     raw.density=aux.density;
 end
 
 % Retain unreduced noise moments and their validity evidence
-if exist('aux','var')&&isfield(aux,'moment')
+if isfield(aux,'moment')
     raw.moment=aux.moment; raw.mean_time=aux.mean_time; raw.mean_zero=aux.mean_zero;
     raw.abs_error_bound=aux.abs_error_bound; raw.valid=aux.valid;
 end

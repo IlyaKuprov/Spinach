@@ -500,6 +500,69 @@ result=test_close(result,'Projected six-state zero-time trace',...
                   actual,trace(rho_b),0,0,...
                   'Zero-duration propagation evaluates the supplied density trace.');
 
+% A complete bath can yield a valid echo above a strict propagation budget
+q=struct('observed',1,'times',[0 0.019],'output','observable','nloops',3);
+q.transition=struct('spins',1,'ms',[0.5 -0.5]);
+q.rho0=[0.5 -0.4i;0.4i 0.5]; detector=3*exp(0.37i)*[0 1;0 0];
+q.cce.order=1; q.cce.graph.mode='complete';
+q.cce.numerics=struct('atol',1e-30,'rtol',1e-30,'max_memory_bytes',1e8);
+for sequence={@cpmg_echo,@cce_eseem}
+
+    % Count the nonzero free intervals separated by ideal inversions
+    intervals=2;
+    if isequal(sequence{1},@cpmg_echo), intervals=q.nloops+1; end
+    for approximation={'projected','generalized'}
+
+        % Generalised detection supports independently scaled complex receivers
+        q.cce.approximation=approximation{1}; q.coil=detector;
+        if strcmp(approximation{1},'generalized'), q.coil={detector;2i*detector}; end
+        for formalism={'zeeman-hilb','zeeman-liouv'}
+
+            % Compare the segment sum with the norm-preserving closed-system estimate
+            q.cce.basis.formalism=formalism{1};
+            for normalised=[false true]
+
+                % Exercise the production dispatch, exact reduction, and budget decision
+                q.normalized=normalised;
+                [~,d]=clexpn(invariant,sequence{1},q,'labframe');
+                model=cce_compile(invariant,d.parameters,'labframe'); model.formalism=formalism{1};
+                checks=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
+                [retained,~]=cce_subsystem(model,2,struct(),[]);
+                [H,R,K,local]=cce_generators(retained,d.parameters,[]);
+                [rho,coils,reference]=cce_observation(retained,local);
+                if ~iscell(coils), coils={coils}; end
+                if isstruct(H)&&~isempty(H.dissipator)
+                    db=retained.bath_dimension; scale=64*eps*db^2;
+                    frequency=norm(-1i*(kron(eye(db),H.left)-kron(H.right.',eye(db)))+H.dissipator,1);
+                elseif isstruct(H)
+                    scale=16*eps*retained.bath_dimension^3;
+                    frequency=norm(H.left,1)+norm(H.right,1);
+                elseif strcmp(formalism{1},'zeeman-hilb')
+                    scale=16*eps*retained.dimension^3; frequency=2*norm(H,1);
+                else
+                    scale=64*eps*size(H,1); frequency=norm(H+1i*R+1i*K,1);
+                end
+                weights=cellfun(@(x)norm(x,'fro'),coils(:).');
+                if normalised, weights=weights./abs(reference); end
+                expected=scale*(intervals+q.times(2)*frequency)*norm(rho,'fro')*weights;
+                label=sprintf('%s %s %s normalised=%d',func2str(sequence{1}),...
+                              approximation{1},formalism{1},normalised);
+                result=test_close(result,['Echo segment estimates ' label],...
+                                  d.reduction.abs_error_bound(2,:)./expected,ones(size(expected)),0,5e-14,...
+                                  'Ideal pulses preserve the state norm; detection scales each segment sum.');
+                result=test_true(result,['Echo strict budget ' label],...
+                                 all(checks.valid,'all')&&all(d.reduction.abs_error_bound(1,:)==0)&&...
+                                 all(checks.numerical_budget_met(1,:))&&~any(checks.numerical_budget_met(2,:)),...
+                                 'Only the unevolved signal meets the strict numerical budget.');
+
+            end
+
+        end
+
+    end
+
+end
+
 end
 
 

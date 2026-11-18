@@ -68,11 +68,15 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **General Formatting:** When in doubt about formatting, mimic the existing code. Refer to functions in the `kernel` and `experiments` folders for the correct style and structure if unsure.
 
+* **Paragraph spacing:** Each logically distinct code stage must be preceded and followed by a blank line and must have a comment line as its first line. In <start> ... <end> type code structures, the starting statement must be followed by a blank line and the final `end` must be preceded by a blank line.   
+
 ### Comments and Function Headers
 
 * **Code Comments:** Above every conceptually distinct operation, write exactly one line explaining its purpose, preceded by one blank line. Omit the final full stop for a one-sentence comment. Put extended explanations in the function header rather than long body comment blocks.
 
 * **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose and, where applicable, its usage syntax, input parameters, and outputs. For non-example functions, format this documentation header exactly as seen in the `kernel` and `experiments` directories, and do not omit any expected sections. For examples, follow the Spinach example coding style below; no-argument, no-output demonstrations must not acquire empty library-style `Inputs`, `Outputs`, or `Syntax` sections. Helper functions should have a one-line comment above their signature with a description of what they do. Preserve existing author attribution.
+
+* **Function header compactness:** Do not turn function headers into modification logs and warning lists. Warnings belong in grumblers.
 
 ## Spinach Kernel Coding Elegance
 

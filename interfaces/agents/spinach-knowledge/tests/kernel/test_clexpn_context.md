@@ -8,6 +8,6 @@ The bath-pumped Hahn contract is checked at five pump placements (including both
 
 ## Native interface
 
-The recursive evaluator checks use a native compiled model, the context-produced ensemble, and the registered free_evolution evaluator. Generalized amplitudes remain unnormalized in this physical fixture. Explicit probability rows retain the same state order and weights. Parent-conditioning preservation is asserted unchanged. The native complete-bath contract is checked by one evaluator call per physical configuration, using the product of bath multiplicities; native irreducible records carry the response in value rather than a separate factor alias.
+The recursive evaluator checks use a native compiled model, the context-produced ensemble, and the registered free_evolution evaluator. Generalised amplitudes remain unnormalised in this physical fixture. Explicit probability rows retain the same state order and weights. Parent-conditioning preservation is asserted unchanged. The native complete-bath contract is checked by one evaluator call per physical configuration, using the product of bath multiplicities; native records retain the conditional response in `value` and the separately reduced quotient in `factor`.
 
 Regression coverage includes native bath-radius exclusion and inclusive boundary selection, and transition-derived observable detection without an explicit coil.

@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Compare direct factors, signed powers and additive inclusion-exclusion.
+Compare direct factors, signed powers, and additive inclusion-exclusion.
 
 ## Behaviour
 
@@ -34,7 +34,7 @@ result=test_cce_reduction()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

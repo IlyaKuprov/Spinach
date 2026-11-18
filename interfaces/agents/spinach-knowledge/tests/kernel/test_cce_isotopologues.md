@@ -4,7 +4,7 @@
 
 ## Purpose
 
-H/D probabilities, actual Hilbert dimensions and local sampling.
+H/D probabilities, actual Hilbert dimensions, and local sampling.
 
 ## Behaviour
 
@@ -33,7 +33,7 @@ result=test_cce_isotopologues()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
@@ -44,4 +44,4 @@ Public optional-field contracts are explicit in reused fixtures: irrelevant meth
 
 ## Native interfaces
 
-The registered test constructs configurations with `spin_bath(sys,inter,specification)` and propagates normalized numeric signals with `clexpn(spin_system,@free_evolution,p,'labframe')`. The observed physical ID and transition selector are explicit; the remaining physical spins form the bath; expansion controls are nested under `p.cce`. The independent isotope-specific analytic phase averages and all probability, dimension, RNG, sampling and ceiling assertions are retained.
+The registered test constructs configurations with `spin_bath(sys,inter,specification)` and propagates normalised numeric signals with `clexpn(spin_system,@free_evolution,p,'labframe')`. The observed physical ID and transition selector are explicit; the remaining physical spins form the bath; expansion controls are nested under `p.cce`. The independent isotope-specific analytic phase averages and all probability, dimension, RNG, sampling, and ceiling assertions are retained.

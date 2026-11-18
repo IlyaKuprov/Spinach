@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Coverage, error budgets, unphysical density and raw residuals.
+Coverage, error budgets, unphysical density, and raw residuals.
 
 ## Behaviour
 
@@ -34,7 +34,7 @@ result=test_cce_diagnostics()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

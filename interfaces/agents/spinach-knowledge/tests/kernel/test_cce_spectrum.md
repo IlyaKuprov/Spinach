@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Parseval, inverse normalization, Lorentzian, sidedness and units.
+Parseval, inverse normalisation, Lorentzian, sidedness, and units.
 
 ## Behaviour
 
@@ -27,7 +27,7 @@ result=test_cce_spectrum()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
@@ -36,4 +36,4 @@ result=test_cce_spectrum()
 
 ## Native contract
 
-The standalone native Fourier service uses `cce_spectrum(times,correlation,parameters)`. No legacy CCE driver, compiler, or method dispatch is used. All direct-transform, normalization, Lorentzian, filter-unit, stationarity, one-sided ordering, and per-column scale assertions remain in this test.
+The standalone native Fourier service uses `cce_spectrum(times,correlation,parameters)`. No legacy CCE driver, compiler, or method dispatch is used. All direct-transform, normalisation, Lorentzian, filter-unit, stationarity, one-sided ordering, and per-column scale assertions remain in this test.

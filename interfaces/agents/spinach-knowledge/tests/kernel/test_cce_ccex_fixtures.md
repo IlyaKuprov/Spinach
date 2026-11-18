@@ -27,7 +27,7 @@ result=test_cce_ccex_fixtures()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

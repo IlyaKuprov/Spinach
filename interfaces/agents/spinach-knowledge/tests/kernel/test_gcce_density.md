@@ -8,7 +8,7 @@ Baseline zeros mask truncated ratios and full order bypasses them.
 
 ## Native interface
 
-Uses native `clexpn` density arrays (one column-major vectorized density per time row) and separate reduction diagnostics. Trace, Hermiticity and minimum eigenvalue are computed directly without repairing the densities. A direct reducer probe disables the full-order bypass to retain the undefined-ratio masking assertion. Sampling checks inspect native physical configurations, including deterministic probabilities and unchanged global RNG.
+Uses native `clexpn` density arrays (one column-major vectorised density per time row) and separate reduction diagnostics. Trace, Hermiticity, and minimum eigenvalue are computed directly without repairing the densities. A direct reducer probe disables the full-order bypass to retain the undefined-ratio masking assertion. Sampling checks inspect native physical configurations, including deterministic probabilities and unchanged global RNG.
 
 ## Behaviour
 
@@ -47,7 +47,7 @@ result=test_gcce_density()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

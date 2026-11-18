@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Zero bath, isolated phase and one-spin Hahn modulation.
+Zero bath, isolated phase, and one-spin Hahn modulation.
 
 ## Behaviour
 
@@ -30,7 +30,7 @@ result=test_cce_analytic()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
@@ -39,6 +39,6 @@ result=test_cce_analytic()
 
 Native calls use free_evolution and hahn_echo with the original complex phase, total-time mesh, analytic one-spin modulation, isolated observed-spin phase, and disconnected-bath assertions. The absolute pulse is a refocusing descriptor at 0.001 seconds; native raw pulse_applied metadata verifies exclusion before the timestamp and inclusion at equality. The independent manifold exponentials are unchanged.
 
-Independent full-density exponentials also check absolute refocusing before, at, and after its timestamp for both eig and expm generalized propagation. The direct interval path applies its rotation only when that sample includes the pulse.
+Independent full-density exponentials also check absolute refocusing before, at, and after its timestamp for both eig and expm generalised propagation. The direct interval path applies its rotation only when that sample includes the pulse.
 
 The absolute-time Hahn reference uses the fixed physical receiver: only samples containing the observed-spin inversion interchange the detected coherence. Both the analytic spin-manifold expression and independent full-density propagation verify the complex signal before, at, and after the pulse.

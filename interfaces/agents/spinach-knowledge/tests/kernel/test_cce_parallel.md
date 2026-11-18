@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Serial, one/two workers, common samples and resource caps.
+Serial, one/two workers, common samples, and resource caps.
 
 ## Behaviour
 
@@ -34,14 +34,14 @@ result=test_cce_parallel()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_parallel.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-Checks resident-memory refusal for 200 observable columns on both gCCE and generalized master-equation paths; the four raw output records alone require 6,020,000 bytes against a 5,000,000-byte cap.
+Checks resident-memory refusal for 200 observable columns on both gCCE and generalised master-equation paths; the four raw output records alone require 6,020,000 bytes against a 5,000,000-byte cap.
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 

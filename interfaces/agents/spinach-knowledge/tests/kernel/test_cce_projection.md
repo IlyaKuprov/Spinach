@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Check explicit states, projected fields and resolved virtual levels.
+Check explicit states, projected fields, and resolved virtual levels.
 
 ## Behaviour
 
@@ -34,7 +34,7 @@ result=test_cce_projection()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

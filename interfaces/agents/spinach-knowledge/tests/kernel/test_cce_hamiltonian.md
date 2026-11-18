@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Check arbitrary spin, ordering, rotations, retention and fallback.
+Check arbitrary spin, ordering, rotations, retention, and fallback.
 
 ## Behaviour
 
@@ -39,7 +39,7 @@ result=test_cce_hamiltonian()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
@@ -48,4 +48,4 @@ result=test_cce_hamiltonian()
 
 ## Native interface
 
-Uses `cce_compile(spin_system,parameters,assumptions)` and retained `cce_hamiltonian` direct/stock engines. Native physical IDs and nested expansion policy replace the flat parameter structure; all Hamiltonian, propagator, ordering, retention, fallback and memory assertions are preserved.
+Uses `cce_compile(spin_system,parameters,assumptions)` and retained `cce_hamiltonian` direct/stock engines. Native physical IDs and nested expansion policy replace the flat parameter structure; all Hamiltonian, propagator, ordering, retention, fallback, and memory assertions are preserved.

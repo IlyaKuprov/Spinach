@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Amplitude damping, dephasing, column convention and T1 limitation.
+Amplitude damping, dephasing, column convention, and T1 limitation.
 
 ## Behaviour
 
@@ -29,7 +29,7 @@ result=test_mecce_rates()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

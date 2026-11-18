@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Check finite drives, waveform refinement and named pulse schedules.
+Check finite drives, waveform refinement, and named pulse schedules.
 
 ## Behaviour
 
@@ -40,7 +40,7 @@ result=test_cce_controls()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
@@ -49,7 +49,7 @@ result=test_cce_controls()
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 
-A supplied observed density and polarized bath state are checked against an independent dense finite-pulse propagator, including normalization by the experiment-owned initial observable. The native subsystem rejects unsupported bath-configuration reference overrides.
+A supplied observed density and polarised bath state are checked against an independent dense finite-pulse propagator, including normalisation by the experiment-owned initial observable. The native subsystem rejects unsupported bath-configuration reference overrides.
 
 The registered identifier is unchanged. All original physical checks run through
 clexpn, finite_drive, hahn_echo, refocusing_train, or native compiled subsystem

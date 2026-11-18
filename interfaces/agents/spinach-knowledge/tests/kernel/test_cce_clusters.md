@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Check frontier enumeration, closure, powers and physical group costs.
+Check frontier enumeration, closure, powers, and physical group costs.
 
 ## Behaviour
 
@@ -43,7 +43,7 @@ result=test_cce_clusters()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

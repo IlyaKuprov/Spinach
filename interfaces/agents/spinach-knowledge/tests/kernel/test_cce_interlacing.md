@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Check unique configurations, conditional weights and shared denominator K.
+Check unique configurations, conditional weights, and shared denominator K.
 
 ## Behaviour
 
@@ -32,7 +32,7 @@ result=test_cce_interlacing()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

@@ -30,7 +30,7 @@ result=test_cce_lunghi_fixtures()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
@@ -41,4 +41,4 @@ Public optional-field contracts are explicit in reused fixtures: irrelevant meth
 
 ## Native interface
 
-The source-matrix reference is compiled with cce_compile and the selective transition is propagated through clexpn with hahn_echo. Each independent fixture starts with a fresh native parameter structure; its source eigenstates, dense reference propagators and declared normalized detected amplitude are unchanged. Physical transition support is explicit in transition.spins.
+The source-matrix reference is compiled with cce_compile and the selective transition is propagated through clexpn with hahn_echo. Each independent fixture starts with a fresh native parameter structure; its source eigenstates, dense reference propagators, and declared normalised detected amplitude are unchanged. Physical transition support is explicit in transition.spins.

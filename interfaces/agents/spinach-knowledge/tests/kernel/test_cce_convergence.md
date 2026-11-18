@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Independent order/time ladders, resource exhaustion and held-out checks.
+Independent order/time ladders, resource exhaustion, and held-out checks.
 
 ## Behaviour
 
@@ -33,7 +33,7 @@ result=test_cce_convergence()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 

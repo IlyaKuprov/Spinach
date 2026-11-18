@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Three fixtures, raw subsets and complex final reductions.
+Three fixtures, raw subsets, and complex final reductions.
 
 ## Behaviour
 
@@ -28,17 +28,17 @@ result=test_cce_pycce_fixtures()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_pycce_fixtures.m)
 - [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
-The native projected and generalized experiments both request normalized detected amplitude explicitly. All raw-trace and final-complex-signal comparisons remain unchanged.
+The native projected and generalised experiments both request normalised detected amplitude explicitly. All raw-trace and final-complex-signal comparisons remain unchanged.
 
 ## Native interface
 
-Uses `clexpn` with `@hahn_echo`, explicit transition support and `normalized=true` for both projected and generalized physical signals. Approximation is selected with `parameters.cce.approximation`. Separate raw/subset/final and external-only reduction assertions remain unchanged.
+Uses `clexpn` with `@hahn_echo`, explicit transition support and `normalized=true` for both projected and generalised physical signals. Approximation is selected with `parameters.cce.approximation`. Separate raw/subset/final and external-only reduction assertions remain unchanged.
 
 Pinned external JSON traces remain unchanged. Receiver conversion is explicit: projected PyCCE Hahn traces already match the fixed physical receiver, whereas generalised pulse-rotated detection retains its conjugation. Raw-subset and final complex comparisons use the same convention.

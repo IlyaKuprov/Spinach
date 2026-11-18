@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Partial ledger resume, identity rejection and write integrity.
+Partial ledger resume, identity rejection, and write integrity.
 
 ## Behaviour
 
@@ -38,7 +38,7 @@ result=test_cce_checkpoint()
 
 **Outputs**
 
-- `result` — standard test-harness result with checks, pass/fail status and diagnostics. Printed numerical metrics are not additional result fields.
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
 
 ## References
 
@@ -47,6 +47,6 @@ result=test_cce_checkpoint()
 
 ## Native experiment coverage
 
-The registered test enters through clexpn with free_evolution, finite_drive, and noise_correlation. It preserves interrupted raw/reduced replay, adaptive-partition pilot ownership, tensor/tolerance/seed/time identities, checksum and completed-record integrity, actual filesystem save failure, execution-neutral restart, and fresh-versus-cold physical-model checks. Projected/generalized Hilbert and master-equation requests are explicit native approximation and representation choices. Direct callbacks and interlacing refuse checkpoint ownership; an independent convergence request cannot share a ledger.
+The registered test enters through clexpn with free_evolution, finite_drive, and noise_correlation. It preserves interrupted raw/reduced replay, adaptive-partition pilot ownership, tensor/tolerance/seed/time identities, checksum and completed-record integrity, actual filesystem save failure, execution-neutral restart, and fresh-versus-cold physical-model checks. Projected/generalised Hilbert and master-equation requests are explicit native approximation and representation choices. Direct callbacks and interlacing refuse checkpoint ownership; an independent convergence request cannot share a ledger.
 
-The real save-failure test denies file creation in its owned temporary directory: POSIX owner write permission on Unix, and a temporary NTFS creation-deny rule on Windows. Windows directory read-only attributes alone do not refuse file creation. The rule is removed before loading and comparing the known-good checkpoint; no production checkpoint behavior or numerical tolerance is changed.
+The real save-failure test denies file creation in its owned temporary directory: POSIX owner write permission on Unix, and a temporary NTFS creation-deny rule on Windows. Windows directory read-only attributes alone do not refuse file creation. The rule is removed before loading and comparing the known-good checkpoint; no production checkpoint behaviour or numerical tolerance is changed.

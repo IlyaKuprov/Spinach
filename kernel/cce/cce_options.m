@@ -4,30 +4,32 @@
 %
 % [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions)
 %
-% Inputs:
+% Parameters:
+%
 %   spin_system    - create output; canonical tensors are already in rad/s
 %   parameters     - scalar structure with observed (physical spin-ID row),
 %                    and times (nonnegative increasing seconds). A transition
 %                    selector is required for projected evolution; explicit
-%                    generalized-state experiments need not supply one.
+%                    generalised-state experiments need not supply one.
 %                    Experiment controls stay at top level; approximation,
-%                    cluster selection, ensembles and reduction live in cce.
+%                    cluster selection, ensembles, and reduction live in cce.
 %   pulse_sequence - experiment function handle; its detailed preparation,
-%                    propagation and detection checks belong to the experiment
+%                    propagation, and detection checks belong to the experiment
 %   assumptions    - explicit stock assume name or cell row of arguments
 %
 % Outputs:
+%
 %   parameters - resolved new-contract values, never translated old fields
-%   policy     - declared defaults, units and deferred resource/convergence
+%   policy     - declared defaults, units, and deferred resource/convergence
 %                decisions. Missing order is [] and requires the context's
 %                convergence policy; it never means a converged full bath.
 %
-% Defaults: generalized evolution, the complete supplied finite bath graph,
-% mixed product bath density, no mean field, power-counting reduction and
+% Defaults: generalised evolution, the complete supplied finite bath graph,
+% mixed product bath density, no mean field, power-counting reduction, and
 % averaging completed expansions. Explicit physical populations, quadrupoles,
-% polarisation, jump directions/rates and second-order projection are never
+% polarisation, jump directions/rates, and second-order projection are never
 % invented. Canonical tensors and declared pump frequencies are not converted.
-% noise.descriptors contains operators, spins and coefficient; its physical
+% noise.descriptors contains operators, spins, and coefficient; its physical
 % validation and retained-cluster matrix construction belong to noise_correlation.
 % New experiment-specific fields must be added explicitly to this contract.
 %
@@ -177,6 +179,7 @@ elseif strcmp(c.graph.mode,'explicit')
     end
 end
 
+% Validate physical bath populations and their sampling declarations
 state=c.bath_state;
 if ~isfield(state,'mode'), error('cce_options:state','A bath-state mode is required.'); end
 choice(state.mode,{'mixed_product','explicit_product','sampled','interlaced'},'cce.bath_state.mode');
@@ -194,15 +197,15 @@ if ismember(state.mode,{'sampled','interlaced'})
     end
     seed(state.seed); integer(state.samples,'bath_state.samples',1);
     basis_uniform=ischar(state.basis)&&strcmp(state.basis,'uniform');
-    populations_uniform=ischar(state.probabilities)&&strcmp(state.probabilities,'uniform');
+    uniform_populations=ischar(state.probabilities)&&strcmp(state.probabilities,'uniform');
     if (~basis_uniform&&(~iscell(state.basis)||~isequal(size(state.basis),[1 numel(bath)])))||...
-       (~populations_uniform&&(~iscell(state.probabilities)||~isequal(size(state.probabilities),[1 numel(bath)])))
+       (~uniform_populations&&(~iscell(state.probabilities)||~isequal(size(state.probabilities),[1 numel(bath)])))
         error('cce_options:state','Sampled-state tables must follow the bath IDs or explicitly specify uniform.');
     end
     for k=1:numel(bath)
         d=system.comp.mults(bath(k));
         if basis_uniform, U=eye(d); else, U=state.basis{k}; end
-        if populations_uniform, probabilities=ones(1,d)/d; else, probabilities=state.probabilities{k}; end
+        if uniform_populations, probabilities=ones(1,d)/d; else, probabilities=state.probabilities{k}; end
         if ~isnumeric(U)||~isequal(size(U),[d d])||any(~isfinite(U),'all')||...
            norm(U'*U-eye(d),'fro')>d*eps*max(1,norm(U,'fro')^2)
             error('cce_options:state','Each sampled basis must be orthonormal.');
@@ -303,7 +306,7 @@ if ~isnumeric(ids)||~isreal(ids)||(~isrow(ids)&&~isempty(ids))||...
 end
 end
 
-% Validate a true population density, never silently normalize it
+% Validate a true population density, never silently normalise it
 function density(rho,dimension)
 if ~isnumeric(rho)||~isequal(size(rho),[dimension dimension])||any(~isfinite(rho),'all')
     error('cce_options:density','A density matrix has the wrong dimension or nonfinite entries.');

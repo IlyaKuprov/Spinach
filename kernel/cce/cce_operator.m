@@ -3,18 +3,28 @@
 %                 A=cce_operator(cluster_system,operators,spins)
 %
 % cluster_system is cce_subsystem output. operators is Lx, Ly, Lz, L+, L-
-% or E. spins is a physical-ID row, isotope label or 'all'; a row selects
+% or E. spins is a physical-ID row, isotope label, or 'all'; a row selects
 % a sum. Cell rows of operators and spins select an ordered product of sums,
 % as in the stock operator service. E is the dimensionless unit operator.
 % Hilbert output is a sparse matrix; zeeman-liouv output is the commutation
 % superoperator for column-major density vectorisation. No hidden normalisation
 % or physical population is applied. Unsupported labels or absent IDs fail.
 %
+% Parameters:
+%
+%   cluster_system - retained subsystem returned by cce_subsystem
+%   operators      - character label or cell row of canonical operator labels
+%   spins          - physical-ID row, isotope label, 'all', or matching cell row
+%
+% Outputs:
+%
+%   A - sparse Hilbert operator or column-major commutation superoperator
+%
 % ilya.kuprov@weizmann.ac.il
 
 function A=cce_operator(cluster_system,operators,spins)
 
-% Check the view, descriptor shape and explicit tensor-product selections
+% Check the view, descriptor shape, and explicit tensor-product selections
 grumble(cluster_system,operators,spins);
 if ischar(operators), operators={operators}; spins={spins}; end
 
@@ -53,8 +63,10 @@ for n=1:numel(operators)
         matrix=cluster_system.local_operators{local}.(fields{position});
         term=term+kron(kron(speye(prod(dims(1:local-1))),matrix),...
                        speye(prod(dims(local+1:end))));
+
     end
     A=A*term;
+
 end
 
 % Stock commutator convention for column-major density vectors

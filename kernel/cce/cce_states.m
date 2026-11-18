@@ -8,10 +8,11 @@
 % Sampling supplies basis/probabilities cells (or the character 'uniform'),
 % samples and seed. Threefry substreams are global state IDs, not workers.
 % Each spin_config contains rho0, bath_ids, bath_rho, expectations,
-% state_id, configuration_id and weight. Exterior fields use these same
+% state_id, configuration_id, and weight. Exterior fields use these same
 % states for every cluster. No global random stream is modified.
 %
-% Inputs:
+% Parameters:
+%
 %   model - prepared physical model.
 %   parameters.bath_state -
 %   mode=mixed_product|explicit_product|sampled|interlaced; explicit mode
@@ -21,8 +22,9 @@
 %   state/projectors.
 %
 % Outputs:
+%
 %   ensemble - observed-spin density, bath IDs, spin_configs, weights, assignments,
-%   mode, configuration ID and state IDs. Each spin_config carries the same
+%   mode, configuration ID, and state IDs. Each spin_config carries the same
 %   exterior assignment for all its clusters.
 %
 % See also cce_interlace, cce_subsystem.
@@ -35,7 +37,7 @@ function ensemble=cce_states(model,parameters)
 % Validate explicit physical states and sampling controls
 grumble(model,parameters);
 
-% Resolve the observed-spin initial density matrix without introducing a hidden polarization
+% Resolve the observed-spin initial density matrix without introducing a hidden polarisation
 d_obs=prod(model.multiplicities(model.observed_ids));
 if isfield(parameters,'rho0')
     rho_obs=parameters.rho0;
@@ -75,7 +77,7 @@ if isfield(parameters.bath_state,'configuration_id')
     config_id=parameters.bath_state.configuration_id;
 end
 
-% Bound retained densities, assignments, expectations and record metadata
+% Bound retained densities, assignments, expectations, and record metadata
 prototype=struct('rho0',rho_obs,'bath_ids',ids,'bath_rho',{rhos},...
                  'expectations',zeros(nb,3),'state_id',0,...
                  'configuration_id',config_id,'weight',1/ns);
@@ -108,6 +110,7 @@ for s=1:ns
             spin_configs(s).expectations(j,a)=real(trace(rhos{j}*operators{a}));
         end
     end
+
 end
 
 % Return explicit ensemble records rather than an implicit random iterator

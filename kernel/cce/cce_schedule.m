@@ -5,7 +5,7 @@
 % raw is a cell per input spin_config, containing the empty-cluster record
 % followed by cluster records in input order. Tasks execute in ascending
 % configuration/state/cluster ID order; no reduction occurs on workers.
-% parallel.mode is serial (default), clusters or states. Parallel modes
+% parallel.mode is serial (default), clusters, or states. Parallel modes
 % require a pool already started by create using explicit sys.parallel.
 % parallel.batch_size and max_tasks are optional positive integer caps;
 % batch_size defaults to the worker count. numerics.max_memory_bytes
@@ -15,7 +15,8 @@
 % native batch concurrency. Their memory preflight includes retained master
 % generators and full physical construction before projection.
 %
-% Inputs:
+% Parameters:
+%
 %   model, clusters, ensemble, schedule, parameters, evaluator - prepared
 %   objects and evaluator function handle. Optional parallel.mode,
 %   parallel.batch_size, parallel.max_tasks, and checkpoint.file/resume;
@@ -23,6 +24,7 @@
 %   size.
 %
 % Outputs:
+%
 %   raw - cell per input spin_config, each containing the baseline record then
 %   cluster records in input order.
 %
@@ -82,14 +84,14 @@ if noise, resident=resident+3*ns*nc*(32*nt+16); end
 segment_count=0;
 if isequal(schedule.pulse_sequence,@finite_drive)||isequal(schedule.pulse_sequence,@refocusing_train)
     events=cce_pulse_events(parameters);
-    for time=parameters.times
+    for t=parameters.times
         starts=[events.at].'; stops=starts;
         for j=1:numel(events)
-            if strcmp(events(j).placement,'fraction'), starts(j)=starts(j)*time; end
+            if strcmp(events(j).placement,'fraction'), starts(j)=starts(j)*t; end
             stops(j)=starts(j);
             if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
         end
-        segment_count=segment_count+numel(unique([0;time;starts(starts>0&starts<time);stops(stops>0&stops<time)]));
+        segment_count=segment_count+numel(unique([0;t;starts(starts>0&starts<t);stops(stops>0&stops<t)]));
     end
 end
 
@@ -122,6 +124,7 @@ for k=0:numel(clusters)
                  8*(2*numel(ids)+labels);
         resident=resident+3*ns*retained; workspace=workspace+retained;
         propagated=propagated^2;
+
     end
     workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
     peak=max(peak,workspace);
@@ -189,8 +192,8 @@ if isfield(parameters.cce,'checkpoint')
     parameters.cce=rmfield(parameters.cce,'checkpoint');
 end
 pending=find(~state.completed);
-for first=1:batch_size:numel(pending)
-    selected=pending(first:min(first+batch_size-1,numel(pending)));
+for b=1:batch_size:numel(pending)
+    selected=pending(b:min(b+batch_size-1,numel(pending)));
     records=cell(numel(selected),1); tasks=indices(selected,:);
     if strcmp(mode,'serial')
         for j=1:numel(selected)
@@ -215,6 +218,7 @@ for n=1:ns
     end
     raw{n}=[records{:}];
 end
+
 end
 
 % Invoke exactly the registered evaluator on ordinary and conditioned paths

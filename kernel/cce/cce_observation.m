@@ -1,4 +1,4 @@
-% Compile retained-cluster preparation, detection and normalization reference.
+% Compile retained-cluster preparation, detection, and normalisation reference.
 % Syntax:
 %
 %   [rho0,coil,reference,meta]=cce_observation(cluster_system,parameters)
@@ -11,15 +11,29 @@
 % operators and spins for cce_operator. Descriptor spins are physical IDs.
 % A selected transition supplies the standard preparation/detection only
 % when neither an explicit override nor a descriptor is present. No
-% polarized state is guessed when no transition or preparation is given.
+% polarised state is guessed when no transition or preparation is given.
 % receiver_phase is radians and multiplies the detected signal by
 % exp(-1i*receiver_phase). normalized is explicit logical; default false.
-% reference is the actual initial detected signal before normalization.
+% reference is the actual initial detected signal before normalisation.
 % meta.normalization_divisor is reference if normalized, otherwise ones;
 % meta.initial_signal always reports the unnormalised initial detection.
 % Nothing in this service divides the state or detector by the reference.
 % Projected output is a column-major bath-coherence block with a trace
 % detector; generalised output follows cluster_system.formalism.
+%
+% Parameters:
+%
+%   cluster_system - retained subsystem returned by cce_subsystem
+%   parameters     - preparation and detection descriptors, optional observed
+%                    density rho0 and detector coil, receiver_phase in radians,
+%                    and the declared cce.approximation
+%
+% Outputs:
+%
+%   rho0      - retained density matrix or column-major density/coherence vector
+%   coil      - matching detector matrix, vector, or cell array of detectors
+%   reference - initial detected signal, one entry per detector
+%   meta      - ordering, receiver phase, and applied normalisation reference
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -33,11 +47,12 @@ local=cluster_system; local.physical_ids=ids; local.sites=[];
 local.multiplicities=model.multiplicities(ids); local.dimension=dc;
 local.isotopes=model.isotopes(ids);
 local.physical_to_local=zeros(size(model.physical_ids)); local.physical_to_local(ids)=1:numel(ids);
-local.formalism='zeeman-hilb'; local.local_operators=cellfun(...
-    @pauli,num2cell(local.multiplicities),'UniformOutput',false);
-phase=0; normalized=false;
+local.formalism='zeeman-hilb';
+local.local_operators=cellfun(@pauli,num2cell(local.multiplicities),...
+                            'UniformOutput',false);
+phase=0; normalised=false;
 if isfield(parameters,'receiver_phase'), phase=parameters.receiver_phase; end
-if isfield(parameters,'normalized'), normalized=parameters.normalized; end
+if isfield(parameters,'normalized'), normalised=parameters.normalized; end
 
 % Explicit expert density overrides the named experimental preparation
 if isfield(parameters,'rho0')
@@ -73,8 +88,9 @@ else
     error('cce_observation:detection','Declare a detector or select an observed transition.');
 end
 if ~iscell(detectors), detectors={detectors}; end
-if isempty(detectors)||~isvector(detectors)||~all(cellfun(@(x)isnumeric(x)&&...
-        isequal(size(x),[dc dc])&&all(isfinite(x),'all'),detectors))
+if isempty(detectors)||~isvector(detectors)||...
+   ~all(cellfun(@(x)isnumeric(x)&&isequal(size(x),[dc dc])&&...
+                   all(isfinite(x),'all'),detectors))
     error('cce_observation:detection','Every detector must be a finite observed-spin matrix.');
 end
 for k=1:numel(detectors), detectors{k}=exp(1i*phase)*detectors{k}; end
@@ -82,8 +98,8 @@ reference=cellfun(@(x)trace(x'*observed),detectors(:).');
 if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
     reference=exp(-1i*phase)*(model.transition.alpha'*observed*model.transition.beta);
 end
-if normalized&&any(abs(reference)<=cellfun(@(x)dc*eps*norm(x,'fro')*...
-                                                  norm(observed,'fro'),detectors(:).'))
+if normalised&&any(abs(reference)<=cellfun(@(x)dc*eps*norm(x,'fro')*...
+                                             norm(observed,'fro'),detectors(:).'))
     error('cce_observation:reference','Cannot normalize by a vanishing detected reference.');
 end
 
@@ -119,17 +135,17 @@ else
     if isscalar(coil), coil=coil{1}; end
 end
 
-% Keep actual and applied references distinct so normalization occurs once
+% Keep actual and applied references distinct so normalisation occurs once
 meta=struct('physical_ids',cluster_system.physical_ids,'observed_ids',ids,...
-            'receiver_phase',phase,'normalized',normalized,...
+            'receiver_phase',phase,'normalized',normalised,...
             'initial_signal',reference,'normalization_divisor',ones(size(reference)),...
             'output_orientation','time-by-detector','vectorization','column-major');
-if normalized, meta.normalization_divisor=reference; end
+if normalised, meta.normalization_divisor=reference; end
 if isfield(model,'transition'), meta.transition=model.transition; end
 
 end
 
-% Reject ambiguous preparation, detection and receiver conventions
+% Reject ambiguous preparation, detection, and receiver conventions
 function grumble(system,parameters)
 if isfield(parameters,'sequence')
     error('cce_observation:sequence','Use finite_drive, refocusing_train, or hahn_echo, not parameters.sequence.');

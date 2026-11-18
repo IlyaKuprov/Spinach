@@ -2,27 +2,29 @@
 %
 %                   manifolds=cce_project(model,parameters)
 %
-% parameters.transition.alpha and beta are normalized orthogonal vectors in
+% parameters.transition.alpha and beta are normalised orthogonal vectors in
 % model.observed_ids product order. Optional second_order.enabled defaults
 % to false; when true, gap_tolerance (rad/s) and overlap_tolerance (0..1)
 % are mandatory. Only cce/mecce admit the projected second-order model.
 %
-% manifolds.alpha/beta contain vector, projector, energy, expectations and
+% manifolds.alpha/beta contain vector, projector, energy, expectations, and
 % susceptibility. For bath operators B_j coupled to observed operator S_j,
 % the virtual-level correction is sum_jk susceptibility(j,k)*B_j*B_k.
 % Operator indices j enumerate x,y,z for successive observed spins. No
 % eigenvalue-index state selection or bath-denominator approximation is
 % hidden: the latter is the stated observed-gap perturbation model.
 %
-% Inputs:
+% Parameters:
+%
 %   model - prepared observed-spin system model.
-%   parameters.transition.alpha, .beta - normalized orthogonal state vectors.
+%   parameters.transition.alpha, .beta - normalised orthogonal state vectors.
 %   Optional parameters.second_order.enabled; when true,
 %   parameters.second_order.gap_tolerance in rad/s and overlap_tolerance are
 %   mandatory.
 %
 % Outputs:
-%   manifolds - alpha/beta state, projector, energy, expectations and
+%
+%   manifolds - alpha/beta state, projector, energy, expectations, and
 %   susceptibility records, with observed-spin system operators and projection metadata.
 %
 % See also cce_compile, cce_generators.
@@ -53,8 +55,8 @@ for name={'alpha','beta'}
     manifold.projector=state*state'; manifold.energy=real(state'*H_obs*state);
     manifold.expectations=zeros(numel(model.observed_ids),3);
     for n=1:numel(model.observed_ids)
-        for axis=1:3
-            manifold.expectations(n,axis)=real(state'*meta.operators{n,axis}*state);
+        for a=1:3
+            manifold.expectations(n,a)=real(state'*meta.operators{n,a}*state);
         end
     end
 
@@ -88,6 +90,7 @@ for name={'alpha','beta'}
 
     % Store manifold-specific first- and second-order coefficients
     manifold.susceptibility=susceptibility; manifolds.(name{1})=manifold;
+
 end
 
 end

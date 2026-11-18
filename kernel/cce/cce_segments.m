@@ -11,6 +11,20 @@
 % Cartesian rotations update subsequent fields; exterior operator pulses
 % and finite exterior drives are refused. Memory is checked before matrices.
 %
+% Parameters:
+%
+%   system     - retained subsystem returned by cce_subsystem
+%   parameters - experiment parameters with a seconds-valued times row,
+%                cce controls, and cce_aux.operators
+%   drift      - retained drift Hamiltonian in rad/s
+%   events     - internal finite/ideal event structure row
+%
+% Outputs:
+%
+%   segments - timing schedule and one cell per sample for interval durations
+%              in seconds, Hamiltonians in rad/s, endpoint pulses, and
+%              exterior spin expectations
+%
 % ilya.kuprov@weizmann.ac.il
 
 function segments=cce_segments(system,parameters,drift,events)
@@ -40,7 +54,7 @@ for k=1:numel(schedule.times)
 
 end
 
-% Reserve sparse complex Hamiltonians, dense pulses and exterior expectations
+% Reserve sparse complex Hamiltonians, dense pulses, and exterior expectations
 retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
 dc=prod(model.multiplicities(model.observed_ids)); components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density'), components=dc^2; end
@@ -60,7 +74,7 @@ segments.durations=cell(size(schedule.times)); segments.hamiltonians=cell(size(s
 segments.pulses=cell(size(schedule.times)); segments.exterior_expectations=cell(size(schedule.times));
 for t=1:numel(schedule.times)
 
-    % Split at all ideal, drive-start and drive-stop events inside this duration
+    % Split at all ideal, drive-start, and drive-stop events inside this duration
     total=schedule.times(t); starts=schedule.positions(:,t); stops=starts;
     for j=1:numel(events)
         if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
@@ -137,6 +151,7 @@ for t=1:numel(schedule.times)
                         states{pos}=P*states{pos}*P';
                         for a=1:3, expectations(pos,a)=real(trace(states{pos}*ops{a})); end
                     end
+
                 end
             end
         end

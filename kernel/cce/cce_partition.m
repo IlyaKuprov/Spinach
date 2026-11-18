@@ -3,7 +3,8 @@
 %
 %                  partition=cce_partition(model,graph,parameters)
 %
-% Inputs:
+% Parameters:
+%
 %   model, graph - canonical model and bath connectivity.
 %   parameters.cce.partition - native user/coupling/spatial/adaptive policy
 %   (maximum group Hilbert dimension). Spatial mode also requires
@@ -13,6 +14,7 @@
 %   not partition fields.
 %
 % Outputs:
+%
 %   partition - frozen groups and IDs, group-level graph/order metadata, and
 %   pilot/validation diagnostics.
 %
@@ -43,7 +45,7 @@ grumble(model,graph,parameters);
 p=parameters.partition; ids=graph.bath_ids;
 [~,positions]=ismember(ids,model.physical_ids); dims=model.multiplicities(positions);
 
-% Bound dense partition graph, edge candidates and group copies before allocation
+% Bound dense partition graph, edge candidates, and group copies before allocation
 bytes=3*(9*numel(ids)^2+32*numel(ids)*(numel(ids)-1)/2);
 if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
     error('cce_partition:memory',...
@@ -81,8 +83,8 @@ if strcmp(p.mode,'spatial')&&~isempty(ids)
     xyz=model.coordinates_A(positions,:); seeds=1;
     for k=2:p.group_count
         distance=inf(numel(ids),1);
-        for seed=seeds
-            distance=min(distance,sum((xyz-xyz(seed,:)).^2,2));
+        for j=seeds
+            distance=min(distance,sum((xyz-xyz(j,:)).^2,2));
         end
         distance(seeds)=-inf; [~,next]=max(distance); seeds(end+1)=next; %#ok<AGROW>
     end
@@ -90,16 +92,16 @@ if strcmp(p.mode,'spatial')&&~isempty(ids)
     for k=1:p.group_count, groups{k}=ids(seeds(k)); end
     for k=setdiff(1:numel(ids),seeds,'stable')
         [~,order]=sort(sum((xyz(seeds,:)-xyz(k,:)).^2,2)); placed=false;
-        for group=order.'
-            if dimension([groups{group} ids(k)],ids,dims)<=p.max_dimension
-                groups{group}=sort([groups{group} ids(k)]); placed=true; break;
+        for g=order.'
+            if dimension([groups{g} ids(k)],ids,dims)<=p.max_dimension
+                groups{g}=sort([groups{g} ids(k)]); placed=true; break;
             end
         end
         if ~placed, error('cce_partition:capacity','Spatial group capacity is insufficient.'); end
     end
 
     % Accept only strict centroid-objective improvements within the swap budget
-    for round=1:p.max_rounds
+    for r=1:p.max_rounds
         improved=false; old=spatial_objective(groups,ids,xyz);
         for a=1:numel(groups)
             for b=a+1:numel(groups)
@@ -119,7 +121,7 @@ if strcmp(p.mode,'spatial')&&~isempty(ids)
             end
             if improved, break; end
         end
-        diagnostics.rounds=round;
+        diagnostics.rounds=r;
         if ~improved, break; end
     end
     if improved, complete=false; diagnostics.reason='spatial_iteration_ceiling'; end
@@ -141,7 +143,7 @@ if adaptive&&complete
     [objective,errors,used,valid]=patches(groups,p.pilot_configs,0);
     diagnostics.probes=used; diagnostics.pilot_error=errors;
     complete=valid&&objective<=1;
-    for round=1:p.max_rounds
+    for r=1:p.max_rounds
         if complete||~valid, break; end
         best=objective; accepted=false; selected=groups; selected_errors=errors;
         for a=1:numel(groups)
@@ -159,7 +161,7 @@ if adaptive&&complete
             end
             if ~valid, break; end
         end
-        diagnostics.rounds=round;
+        diagnostics.rounds=r;
         if ~valid||~accepted, break; end
         groups=selected; objective=best; errors=selected_errors;
         diagnostics.pilot_error=errors; complete=objective<=1;
@@ -174,6 +176,7 @@ if adaptive&&complete
     else
         diagnostics.reason='patch_tolerance_or_round_probe_dimension_ceiling';
     end
+
 end
 
 % Return canonical groups and expose exhausted validation budgets explicitly
@@ -181,6 +184,7 @@ end
 partition=struct('groups',{groups},'dimensions',cellfun(@(g)dimension(g,ids,dims),groups),...
                  'complete',complete,'diagnostics',diagnostics,'mode',p.mode);
 
+% Evaluate exact patches against the production group expansion
 function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
 
     % Choose the same exact evaluator and group order as production
@@ -200,8 +204,8 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
     end
 
     % Compare every declared patch with the downward-closed group expansion
-    for patch=1:numel(p.patches)
-        sites=p.patches{patch};
+    for n=1:numel(p.patches)
+        sites=p.patches{n};
         if dimension(sites,ids,dims)>p.max_dimension
             valid=false; objective=inf; return;
         end
@@ -234,15 +238,15 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         end
         empty=struct('id',0,'sites',[]); whole=struct('id',1,'sites',sort(sites));
         full=find(arrayfun(@(entry)isequal(sort(entry.sites),sort(sites)),family),1);
-        for spin_config=1:numel(spin_configs)
+        for s=1:numel(spin_configs)
             if used>=p.max_probes, valid=false; objective=inf; return; end
-            used=used+1; state=spin_configs(spin_config);
+            used=used+1; state=spin_configs(s);
             state.weight=1;
             baseline=evaluator(model,empty,state,schedule,evaluation);
             exact=evaluator(model,whole,state,schedule,evaluation);
             records=repmat(baseline,1,numel(family));
-            for cluster_index=1:numel(family)
-                records(cluster_index)=evaluator(model,family(cluster_index),state,schedule,evaluation);
+            for c=1:numel(family)
+                records(c)=evaluator(model,family(c),state,schedule,evaluation);
             end
 
             % Score all times using exact complete patches without auxiliary denominators
@@ -271,16 +275,14 @@ end
 
 end
 
-function value=dimension(sites,ids,dims)
-
 % Measure the exact retained bath Hilbert dimension
+function value=dimension(sites,ids,dims)
 [~,index]=ismember(sites,ids); value=prod(dims(index));
 
 end
 
-function objective=spatial_objective(groups,ids,xyz)
-
 % Sum squared Euclidean distances from each physical group's centroid
+function objective=spatial_objective(groups,ids,xyz)
 objective=0;
 for k=1:numel(groups)
     [~,index]=ismember(groups{k},ids); coordinates=xyz(index,:);
@@ -289,8 +291,8 @@ end
 
 end
 
+% Validate declared group membership and partition bounds
 function grumble(model,graph,parameters)
-
 if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids','multiplicities'}))||...
    ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','pair_norm'}))||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'partition')||...
@@ -325,7 +327,6 @@ if ~isnumeric(graph.pair_norm)||~isreal(graph.pair_norm)||...
    any(~isfinite(graph.pair_norm)|graph.pair_norm<0,'all')
     error('Physical pair norms must be a finite nonnegative square array.');
 end
-
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
     groups=parameters.groups;
     if ~iscell(groups)||~isrow(groups)||any(cellfun(@(g)~isnumeric(g)||...
@@ -335,7 +336,6 @@ if isfield(parameters,'groups')&&~isempty(parameters.groups)
         error('Groups must partition physical bath IDs within capacity.');
     end
 end
-
 if strcmp(p.mode,'spatial')
     if ~all(isfield(p,{'group_count','max_rounds'}))||~integer(p.group_count,0)||...
        p.group_count>numel(ids)||(~isempty(ids)&&p.group_count<1)||...
@@ -346,7 +346,6 @@ if strcmp(p.mode,'spatial')
         error('Spatial grouping requires finite coordinates, group count, and round ceiling.');
     end
 end
-
 if strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive)
     needed={'patch_atol','patch_rtol','max_rounds','max_probes','patches',...
             'pilot_configs','heldout_configs'};
@@ -364,20 +363,17 @@ if strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive)
         end
     end
 end
-
 end
 
-function valid=integer(value,lower)
-
 % Recognise a finite scalar integer at or above the declared lower bound
+function valid=integer(value,lower)
 valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&...
       value>=lower&&mod(value,1)==0;
 
 end
 
-function valid=tolerance(value)
-
 % Recognise a finite nonnegative absolute or relative tolerance
+function valid=tolerance(value)
 valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&value>=0;
 
 end

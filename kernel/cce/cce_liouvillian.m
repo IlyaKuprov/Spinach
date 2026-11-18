@@ -10,17 +10,19 @@
 % observed-diagonal jumps; a jump split across the cluster is refused.
 % Disjoint exterior jumps are omitted only without a frozen field from them;
 % evolving exterior fields are refused, not replaced by a dissipator.
-% meta supplies ordering, dimensions, Hamiltonians and jump records.
+% meta supplies ordering, dimensions, Hamiltonians, and jump records.
 %
-% Inputs:
+% Parameters:
+%
 %   model, sites, spin_config, parameters - prepared cluster inputs and
-%   dissipation.jumps records with ordered support IDs, operator matrix and
+%   dissipation.jumps records with ordered support IDs, operator matrix, and
 %   rate in s^-1.
 %
 % Outputs:
-%   G - dense GKSL generator acting on column-vectorized density/signal
+%
+%   G - dense GKSL generator acting on column-vectorised density/signal
 %   blocks.
-%   meta - tensor order, dimensions, Hamiltonians and included jump records.
+%   meta - tensor order, dimensions, Hamiltonians, and included jump records.
 %
 % See also cce_generators, cce_hamiltonian.
 % Reference: https://doi.org/10.1103/PhysRevLett.132.250401
@@ -29,7 +31,7 @@
 
 function [G,meta]=cce_liouvillian(model,sites,spin_config,parameters)
 
-% Validate dimensions, units and the explicit method
+% Validate dimensions, units, and the explicit method
 grumble(model,sites,spin_config,parameters);
 
 % Bound full physical operators separately from the projected Liouvillian
@@ -131,7 +133,7 @@ meta=struct('physical_ids',ids,'dimension',d,'bath_dimension',db,...
 
 end
 
-% Validate explicit jump supports, ordered matrices and nonnegative rates
+% Validate explicit jump supports, ordered matrices, and nonnegative rates
 function grumble(model,sites,spin_config,parameters)
 if ~isstruct(model)||~isfield(model,'physical_ids')||~isstruct(spin_config)
     error('A prepared model and scalar Hamiltonian spin_config are required.');

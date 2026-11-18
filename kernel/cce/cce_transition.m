@@ -4,7 +4,8 @@
 %
 %     [transition,meta]=cce_transition(spin_system,parameters,assumptions)
 %
-% Inputs:
+% Parameters:
+%
 %   spin_system - canonical create output or a compiled cce_model; tensors
 %                 already use rad/s
 %   parameters  - observed is a row of physical spin IDs; transition.spins
@@ -17,9 +18,10 @@
 %   assumptions - stock assume name or cell row of assume arguments
 %
 % Outputs:
+%
 %   transition  - ordered alpha/beta columns; spins preserves physical IDs
-%   meta        - selector, ordering, energies, signed gap and nearest gaps
-%                 in rad/s, eigenstate residuals and the selected frame
+%   meta        - selector, ordering, energies, signed gap, and nearest gaps
+%                 in rad/s, eigenstate residuals, and the selected frame
 %
 % Only the observed subsystem is diagonalised. Energy-index selection is
 % rejected when either state belongs to an unresolved degenerate manifold;
@@ -71,14 +73,17 @@ if ~native
         indices=indices(:); H=H(indices,indices);
     end
 
-    % Check Hermiticity at the rounding scale of the observed Hamiltonian
 else
+
+    % Reuse the compiled observed subsystem without exterior mean fields
     model.parameters.cce.meanfield='none'; model.formalism='zeeman-hilb';
     config=struct('configuration_id',1,'state_id',1,'weight',1);
     [system,~]=cce_subsystem(model,[],config,[]);
     p=model.parameters; p.cce.approximation='generalized';
     [H,~,~,~]=cce_generators(system,p,[]); H=full(H);
 end
+
+% Check Hermiticity at the rounding scale of the observed Hamiltonian
 tolerance=dimension*eps(max(1,norm(H,'fro')));
 if norm(H-H','fro')>tolerance
     error('cce_transition:hermiticity','The observed Hamiltonian must be Hermitian.');

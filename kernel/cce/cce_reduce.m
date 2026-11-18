@@ -23,7 +23,8 @@
 % uncertainty is zero and every denominator is resolved. Complete bath
 % exact-reference bypass belongs to the native ensemble reduction.
 %
-% Inputs:
+% Parameters:
+%
 %   raw - records with cluster_id, time-by-observable value, logical valid,
 %   and nonnegative abs_error_bound.
 %   clusters - ordered subset-closed records from cce_clusters.
@@ -31,6 +32,7 @@
 %   (default powers), numerics.zero_policy=mask|error (default mask).
 %
 % Outputs:
+%
 %   reduced - values, validity/error/reason arrays, by-order results,
 %   cluster/cumulant and conditioning diagnostics.
 %
@@ -67,10 +69,10 @@ reducer='powers';
 if isfield(parameters,'reducer'), reducer=parameters.reducer; end
 
 % Reduce each prefix independently; powers change with the included family
-for order=0:max_order
+for o=0:max_order
 
     % Compile exact signed powers of this order's downward-closed family
-    active=find([clusters.order]<=order); powers=zeros(1,nc,'int64');
+    active=find([clusters.order]<=o); powers=zeros(1,nc,'int64');
     for k=fliplr(active)
         power=int64(1);
         for j=active(active>k)
@@ -89,25 +91,25 @@ for order=0:max_order
     % Evaluate independent times and observable elements in canonical order
     values=complex(nan(shape)); bounds=inf(shape); masks=false(shape);
     why=repmat({'ok'},shape);
-    for point=1:numel(values)
+    for q=1:numel(values)
 
         % Gather absolute input uncertainties and validity
         z=complex(zeros(1,nc+1)); eta=zeros(1,nc+1); usable=false(1,nc+1);
-        z(1)=baseline.value(point); eta(1)=baseline.abs_error_bound(point);
-        usable(1)=baseline.valid(point);
+        z(1)=baseline.value(q); eta(1)=baseline.abs_error_bound(q);
+        usable(1)=baseline.valid(q);
         for k=active
-            z(k+1)=records(k).value(point); eta(k+1)=records(k).abs_error_bound(point);
-            usable(k+1)=records(k).valid(point);
+            z(k+1)=records(k).value(q); eta(k+1)=records(k).abs_error_bound(q);
+            usable(k+1)=records(k).valid(q);
         end
 
         % Empty-bath/order-zero result is the unmodified observed baseline
         if isempty(active)
-            values(point)=z(1); bounds(point)=eta(1); masks(point)=usable(1);
+            values(q)=z(1); bounds(q)=eta(1); masks(q)=usable(1);
             if ~usable(1)
-                why{point}='raw_invalid';
-            elseif bounds(point)>parameters.numerics.atol+...
-                                 parameters.numerics.rtol*abs(values(point))
-                masks(point)=false; why{point}='error_budget';
+                why{q}='raw_invalid';
+            elseif bounds(q)>parameters.numerics.atol+...
+                             parameters.numerics.rtol*abs(values(q))
+                masks(q)=false; why{q}='error_budget';
             end
             continue
         end
@@ -116,7 +118,7 @@ for order=0:max_order
         if strcmp(parameters.method,'noise')
             terms=[1-sum(double(powers)) double(powers)]; needed=find(terms~=0);
             if any(~usable(needed))
-                why{point}='raw_invalid'; continue
+                why{q}='raw_invalid'; continue
             end
             total=complex(0); correction=complex(0); magnitude=0; uncertainty=0;
             for k=needed
@@ -126,21 +128,21 @@ for order=0:max_order
             end
             operations=8*numel(needed); unit=eps/2;
             if operations*unit>=1
-                why{point}='arithmetic_range'; continue
+                why{q}='arithmetic_range'; continue
             end
-            values(point)=total;
-            bounds(point)=uncertainty+operations*unit/(1-operations*unit)*magnitude;
-            if ~isfinite(total)||~isfinite(bounds(point))
-                why{point}='arithmetic_range'; continue
+            values(q)=total;
+            bounds(q)=uncertainty+operations*unit/(1-operations*unit)*magnitude;
+            if ~isfinite(total)||~isfinite(bounds(q))
+                why{q}='arithmetic_range'; continue
             end
-            masks(point)=true;
+            masks(q)=true;
         else
 
             % Normalisation always requires a resolved nonzero baseline
             if ~usable(1)
-                why{point}='raw_invalid'; continue
+                why{q}='raw_invalid'; continue
             elseif abs(z(1))<=eta(1)
-                why{point}='baseline_zero'; continue
+                why{q}='baseline_zero'; continue
             end
 
             % Normalise once and propagate the quotient uncertainty
@@ -148,7 +150,7 @@ for order=0:max_order
             needed=find(powers~=0);
             if strcmp(reducer,'direct'), needed=active; end
             if any(~usable(needed+1))
-                why{point}='raw_invalid'; continue
+                why{q}='raw_invalid'; continue
             end
             unit=eps/2; gamma=6*unit/(1-6*unit);
             for k=needed
@@ -160,7 +162,7 @@ for order=0:max_order
             if strcmp(reducer,'powers')
                 [total,bound,reason]=power_product(z(1),eta(1),g,ge,powers);
                 if ~strcmp(reason,'ok')
-                    why{point}=reason; continue
+                    why{q}=reason; continue
                 end
             else
 
@@ -185,25 +187,25 @@ for order=0:max_order
                                                       ones(size(active),'int64'));
                 end
                 if ~strcmp(reason,'ok')
-                    why{point}=reason; continue
+                    why{q}=reason; continue
                 end
 
             end
-            values(point)=total; bounds(point)=bound; masks(point)=true;
+            values(q)=total; bounds(q)=bound; masks(q)=true;
 
         end
 
         % Reject estimates exceeding the caller's absolute/relative budget
-        if masks(point)&&bounds(point)>parameters.numerics.atol+...
-                                       parameters.numerics.rtol*abs(values(point))
-            masks(point)=false; why{point}='error_budget';
+        if masks(q)&&bounds(q)>parameters.numerics.atol+...
+                               parameters.numerics.rtol*abs(values(q))
+            masks(q)=false; why{q}='error_budget';
         end
 
     end
 
     % Preserve invalid masks and reason codes, never plausible finite fillers
-    values(~masks)=NaN; by_order(:,:,order+1)=values;
-    errors(:,:,order+1)=bounds; valid(:,:,order+1)=masks; reasons(:,:,order+1)=why;
+    values(~masks)=NaN; by_order(:,:,o+1)=values;
+    errors(:,:,o+1)=bounds; valid(:,:,o+1)=masks; reasons(:,:,o+1)=why;
 
 end
 
@@ -224,7 +226,7 @@ end
 % Repeated stable signed product with data-dependent rounding/error bounds
 function [value,bound,reason]=power_product(base,base_error,z,eta,powers)
 
-% Allocate compensated amplitude, phase and uncertainty accumulators
+% Allocate compensated amplitude, phase, and uncertainty accumulators
 value=NaN; bound=Inf; reason='ok'; indices=find(powers~=0);
 amplitude=log(abs(base)); phase=angle(base); ac=0; pc=0;
 condition=base_error/(abs(base)-base_error); exact_zero=false;
@@ -258,6 +260,7 @@ for k=indices
     pc=(updated-phase)-increment; phase=updated;
     condition=condition+abs(p)*eta(k)/(abs(z(k))-eta(k));
     scale=scale+abs(a)+abs(b); count=count+1;
+
 end
 
 % Exact positive zeros need no logarithm or epsilon replacement
@@ -448,16 +451,16 @@ if ~isempty(complete)
     reduced.by_order_reason(:,:,end)=reduced.reason; return
 end
 value=baseline.value; bound=baseline.abs_error_bound; valid=baseline.valid;
-for order=orders
-    for k=find([clusters.order]==order)
+for o=orders
+    for k=find([clusters.order]==o)
         factor=raw(k+1); bound=abs(value).*factor.factor_abs_error_bound+...
                              abs(factor.factor).*bound+bound.*factor.factor_abs_error_bound;
         value=value.*factor.factor; valid=valid&factor.factor_valid;
     end
-    reduced.by_order(:,:,order+1)=value; reduced.by_order_error(:,:,order+1)=bound;
-    reduced.by_order_valid(:,:,order+1)=valid;
+    reduced.by_order(:,:,o+1)=value; reduced.by_order_error(:,:,o+1)=bound;
+    reduced.by_order_valid(:,:,o+1)=valid;
     reasons=repmat({'ok'},size(valid)); reasons(~valid)={'raw_invalid'};
-    reduced.by_order_reason(:,:,order+1)=reasons;
+    reduced.by_order_reason(:,:,o+1)=reasons;
 end
 reduced.value=value; reduced.abs_error_bound=bound; reduced.valid=valid;
 end

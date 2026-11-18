@@ -13,11 +13,24 @@
 % cache=[] starts a caller-owned single-entry cache, keyed by the entire model,
 % ordered sites and configuration. No process-global or persistent cache exists.
 % cluster_system carries observed-first IDs, mappings, multiplicities, isotope
-% labels, local Pauli matrices, local bath densities and exterior mean fields.
+% labels, local Pauli matrices, local bath densities, and exterior mean fields.
 % formalism is zeeman-hilb or zeeman-liouv; Hilbert dimensions are always explicit.
 % A finite cce.meanfield_radius requires observed and exterior coordinates;
 % exterior sites within that Angstrom distance of any observed spin contribute.
 % Included sites need no geometry for this state-dependent radius selection.
+%
+% Parameters:
+%
+%   model         - canonical physical model returned by cce_compile
+%   sites         - ordered row of retained physical bath IDs
+%   configuration - scalar product-state and ensemble-metadata structure
+%   cache         - empty or the caller-owned cache returned by this service
+%
+% Outputs:
+%
+%   cluster_system - retained tensor ordering, dimensions, product states,
+%                    local operators, and exterior spin expectations
+%   cache          - updated single-entry subsystem cache and hit counters
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -79,6 +92,7 @@ for n=1:numel(bath_ids)
     operators=pauli(d);
     expectations(n,:)=[real(trace(rho*operators.x)) real(trace(rho*operators.y))...
                       real(trace(rho*operators.z))];
+
 end
 if isfield(configuration,'expectations')&&...
    ~close_values(configuration.expectations,expectations,model.numerics)
@@ -89,7 +103,7 @@ end
 [~,local]=ismember(sites,bath_ids);
 cluster_system.bath_rho=densities(local);
 exterior=~ismember(bath_ids,sites); exterior_ids=bath_ids(exterior);
-exterior_expectations=expectations(exterior,:);
+exterior_values=expectations(exterior,:);
 if isfield(configuration,'exterior_ids')
     supplied=configuration.exterior_ids;
     if ~isnumeric(supplied)||~isreal(supplied)||...
@@ -99,7 +113,7 @@ if isfield(configuration,'exterior_ids')
     [present,indices]=ismember(supplied,exterior_ids);
     if ~all(present)||numel(indices)~=numel(exterior_ids)||...
        ~close_values(configuration.exterior_expectations,...
-                     exterior_expectations(indices,:),model.numerics)
+                     exterior_values(indices,:),model.numerics)
         error('cce_subsystem:exterior','Exterior fields must match the common bath configuration.');
     end
 end
@@ -122,10 +136,10 @@ if strcmp(model.parameters.cce.meanfield,'static')
             distance=min(distance,sqrt(sum(delta.^2,2)).');
         end
         keep=distance<=model.parameters.cce.meanfield_radius;
-        exterior_ids=exterior_ids(keep); exterior_expectations=exterior_expectations(keep,:);
+        exterior_ids=exterior_ids(keep); exterior_values=exterior_values(keep,:);
     end
     cluster_system.configuration.exterior_ids=exterior_ids;
-    cluster_system.configuration.exterior_expectations=exterior_expectations;
+    cluster_system.configuration.exterior_expectations=exterior_values;
 end
 
 % Cache only this explicit immutable view; generator caches belong downstream

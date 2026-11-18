@@ -14,6 +14,16 @@
 % train contains name (xy8 or udd), count, axis, and spins. No raw event
 % array, omitted operator angle, or legacy parameter spelling is accepted.
 %
+% Parameters:
+%
+%   parameters - scalar native experiment structure containing drive,
+%                refocusing, or train declarations in the units above
+%
+% Outputs:
+%
+%   events - structure row of finite and ideal pulse events with physical
+%            targets, absolute/fractional placements, and pulse parameters
+%
 % ilya.kuprov@weizmann.ac.il
 
 function events=cce_pulse_events(parameters)
@@ -39,9 +49,10 @@ if isfield(parameters,'drive')
             if isfield(drive,'time')&&numel(drive.time)>1, start=drive.time(k); end
             index=index+1;
             events(index)=struct('type','finite','target',drive.spins,...
-                'placement',placement,'at',start,'duration',drive.duration(k),...
-                'axis',drive.axis,'amplitude',drive.amplitude(k),'detuning',drive.detuning,...
-                'operator',[],'angle',[]);
+                                 'placement',placement,'at',start,...
+                                 'duration',drive.duration(k),'axis',drive.axis,...
+                                 'amplitude',drive.amplitude(k),'detuning',drive.detuning,...
+                                 'operator',[],'angle',[]);
             start=start+drive.duration(k);
         end
     end
@@ -61,7 +72,7 @@ if isfield(parameters,'train')
     end
     for k=1:train.count
         pulses{k}=struct('spins',train.spins,'axis',phases(k),...
-                             'angle',pi,'fraction',fractions(k));
+                         'angle',pi,'fraction',fractions(k));
     end
 end
 
@@ -74,8 +85,8 @@ for k=1:numel(pulses)
     if isfield(pulse,'operator'), operator=pulse.operator;
     else, axis=pulse.axis; angle=pulse.angle; end
     events(finite_count+k)=struct('type','ideal','target',pulse.spins,...
-        'placement',placement,'at',at,'duration',[],'axis',axis,...
-        'amplitude',[],'detuning',[],'operator',operator,'angle',angle);
+                                 'placement',placement,'at',at,'duration',[],'axis',axis,...
+                                 'amplitude',[],'detuning',[],'operator',operator,'angle',angle);
 end
 
 end

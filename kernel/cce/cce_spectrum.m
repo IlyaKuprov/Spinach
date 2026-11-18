@@ -9,12 +9,15 @@
 % weights='trapezoid'/'rectangle'. Positive-time input is extended by
 % C(-t)=conj(C(t)), and therefore asserts stationarity. One-sided output
 % requires a real even correlation and doubles only nonzero frequencies.
+% Evenness and reality are tested using dimensionless residuals separately
+% for each correlation column.
 % Rectangle uses uniform dt at every sample, suitable for DFT Parseval;
-% trapezoid uses endpoint half weights. No window-power renormalization.
+% trapezoid uses endpoint half weights. No window-power renormalisation.
 % Optional spectrum.modulation is a real column on the ORIGINAL time
 % mesh: filter=|integral y(t)exp(+i*omega*t)dt|^2, in seconds squared.
 %
-% Inputs:
+% Parameters:
+%
 %   times - time samples in seconds.
 %   correlation - time-by-observable complex correlations.
 %   parameters.spectrum - frequency_grid (rad/s), convention=exp(+i*omega*t),
@@ -23,6 +26,7 @@
 %   extension additionally requires stationary=true.
 %
 % Outputs:
+%
 %   spectrum - angular-frequency grid, transformed values and declared
 %   convention/quadrature metadata.
 %
@@ -32,7 +36,7 @@
 
 function spectrum=cce_spectrum(times,correlation,parameters)
 
-% Validate the transform convention, dimensional axes and quadrature
+% Validate the transform convention, dimensional axes, and quadrature
 grumble(times,correlation,parameters);
 s=parameters.spectrum; times=times(:); omega=s.frequency_grid(:);
 original_times=times;
@@ -43,7 +47,7 @@ if strcmp(s.time_domain,'positive')
     correlation=[conj(flipud(correlation(2:end,:)));correlation];
 end
 
-% Construct quadrature and an explicitly unnormalized symmetric window
+% Construct quadrature and an explicitly unnormalised symmetric window
 weights=quadrature(times,s.weights); window=ones(size(times));
 if strcmp(s.window,'hann')
     window=(1-cos(2*pi*(times-times(1))/(times(end)-times(1))))/2;
@@ -130,8 +134,6 @@ if strcmp(s.weights,'rectangle')&&...
     error('Rectangle quadrature requires a uniform time grid.');
 end
 if strcmp(s.sidedness,'one-sided')
-
-    % Compare dimensionless residuals separately for each correlation column
     scale=max(abs(correlation),[],1); scale(scale==0)=1;
     scaled=correlation./scale;
     if any(w<0)||any(max(abs(imag(scaled)),[],1)>100*eps)

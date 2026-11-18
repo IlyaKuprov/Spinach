@@ -1,6 +1,8 @@
 # cce_segments
 
-Internal syntax: segments=cce_segments(system,parameters,drift,events).
+[MATLAB source](../../../../../kernel/cce/cce_segments.m)
+
+Internal syntax: `segments=cce_segments(system,parameters,drift,events)`
 
 Compiles experiment-owned events for one native retained subsystem. Physical
 spin order, pulse support order, and simultaneous-event order are retained.

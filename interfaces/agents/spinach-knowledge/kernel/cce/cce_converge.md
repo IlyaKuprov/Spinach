@@ -10,11 +10,11 @@ Supply atol, rtol, and max_work. Sampling ladders require a held-out bath-state 
 
 ## Convergence meaning
 
-Refine cluster order, bath extent, graph cutoff, bath-state samples and time resolution independently while holding other physical choices fixed. Compare time grids only on declared common samples. Use explicit absolute/relative observable tolerances and a bounded evaluation budget. Several successive levels agreeing establishes the requested ladder criterion, not universal physical convergence. Bath-configuration convergence requires independently prepared physical realizations rather than a fabricated configuration generator.
+Refine cluster order, bath extent, graph cutoff, bath-state samples, and time resolution independently while holding other physical choices fixed. Compare time grids only on declared common samples. Use explicit absolute/relative observable tolerances and a bounded evaluation budget. Several successive levels agreeing establishes the requested ladder criterion, not universal physical convergence. Bath-configuration convergence requires independently prepared physical realisations rather than a fabricated configuration generator.
 
 ## Source
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_converge.m)
+[MATLAB source](../../../../../kernel/cce/cce_converge.m)
 
 Order-ladder entries must be numeric, real, finite nonnegative integer scalars. They are validated before finite-bath saturation, which must not turn NaN, infinity, fractional values, or text into a valid order.
 

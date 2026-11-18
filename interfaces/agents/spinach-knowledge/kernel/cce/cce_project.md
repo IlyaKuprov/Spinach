@@ -8,7 +8,7 @@ Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,a
 
 Internal/expert signature: `manifolds=cce_project(model,parameters)`. Engine records are not public experiment parameter structures.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_project.m)
+[MATLAB source](../../../../../kernel/cce/cce_project.m)
 
 ## Purpose
 
@@ -16,28 +16,19 @@ Project an observed-spin system onto two explicit orthogonal states.
 
 ## Behaviour
 
-
-- Computes manifold energies, projectors and spin expectations in observed physical-ID tensor order.
+- Computes manifold energies, projectors, and spin expectations in observed physical-ID tensor order.
 - Optionally constructs second-order susceptibilities in the observed eigenbasis. The correction contracts ordered bath operators and vanishes only when the supplied problem makes it vanish.
 - Second order is off unless enabled; only projected `cce`/`mecce` accept it, and declared gap and overlap tolerances reject unresolved projections.
 
 ## Inputs and outputs
 
-```matlab
-manifolds=cce_project(model,parameters)
-```
-
 **Inputs**
 
 - `model` — prepared observed-spin system model.
-- `parameters.transition.alpha`, `.beta` — normalized orthogonal state vectors. Optional `parameters.second_order.enabled`; when true, `parameters.second_order.gap_tolerance` in rad/s and `overlap_tolerance` are mandatory.
+- `parameters.transition.alpha`, `.beta` — normalised orthogonal state vectors. Optional `parameters.second_order.enabled`; when true, `parameters.second_order.gap_tolerance` in rad/s and `overlap_tolerance` are mandatory.
 
 **Outputs**
 
-- `manifolds` — alpha/beta state, projector, energy, expectations and susceptibility records, with observed-spin system operators and projection metadata.
-
-## References
-
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_project.m)
+- `manifolds` — alpha/beta state, projector, energy, expectations, and susceptibility records, with observed-spin system operators and projection metadata.
 
 Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.

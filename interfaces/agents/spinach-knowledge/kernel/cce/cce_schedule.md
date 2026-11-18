@@ -20,7 +20,7 @@ Master-equation records retain manifold Hamiltonians, physical spin operators, a
 
 Interlaced tasks pass the same evaluator into every conditional recursion. With a complete bath, only the exact full-bath conditional average is propagated; lower-order placeholders are explicitly not evaluated and omitted from the returned raw ledger before concatenation. Master placeholders carry an empty generator field, never fabricated operators. Unavailable prefixes remain masked rather than being presented as convergence evidence. Direct interlacing and independent convergence do not own this checkpoint ledger.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_schedule.m)
+[MATLAB source](../../../../../kernel/cce/cce_schedule.m)
 
 Native finite_drive and refocusing_train preflight counts every retained time-by-segment Hamiltonian, pulse, and exterior expectation before dispatch. This is added to the existing simultaneous-workspace requirement without changing physical task enumeration or batch semantics.
 

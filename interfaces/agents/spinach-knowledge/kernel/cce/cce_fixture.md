@@ -1,6 +1,8 @@
 # cce_fixture
 
-Syntax: [sys,inter,fixture]=cce_fixture(name,revision).
+[MATLAB source](../../../../../kernel/cce/cce_fixture.m)
+
+Syntax: `[sys,inter,fixture]=cce_fixture(name,revision)`
 
 The supported input is ('nv_four_c13','6f7282b6'): an E3 observed spin and four fixed 13C sites at 0.05 T. The immutable physical data derive from MICCoMpy/PyCCE commit d74d3cb683bf3caa07231654314e554f440833b4 (DOI 10.1002/adts.202100254). These identifiers identify a physical dataset, not a transient implementation revision.
 

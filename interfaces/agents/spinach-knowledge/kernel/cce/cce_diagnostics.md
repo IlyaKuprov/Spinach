@@ -8,26 +8,20 @@ Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,a
 
 Internal/expert signature: `diagnostics=cce_diagnostics(model,raw,result,parameters)`. Engine records are not public experiment parameter structures.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_diagnostics.m)
+[MATLAB source](../../../../../kernel/cce/cce_diagnostics.m)
 
 ## Purpose
 
-Report validity, conditioning, sampling and observed-density diagnostics.
+Report validity, conditioning, sampling, and observed-density diagnostics.
 
 ## Behaviour
 
-
-- Constructs per-observable invalid reasons, valid-time masks/fraction and numerical budget checks from result values, masks and error bounds.
-- Reports cluster cost/order information and sample statistics when available; density outputs are checked for trace, Hermiticity and minimum eigenvalue.
+- Constructs per-observable invalid reasons, valid-time masks/fraction, and numerical budget checks from result values, masks, and error bounds.
+- Reports raw-record counts, invalid values, maximum spectral and orthogonality residuals, and supplied sampling standard errors; density outputs are checked for trace, Hermiticity, and minimum eigenvalue.
 - Never clips observables or projects densities to hide failed validity or physicality checks.
-
 - Density-specific diagnostic fields are always present; they are empty when no observed density was requested, and `physicality_checked=false` distinguishes an unavailable check from a passed one.
 
 ## Inputs and outputs
-
-```matlab
-diagnostics=cce_diagnostics(model,raw,result,parameters)
-```
 
 **Inputs**
 
@@ -37,11 +31,10 @@ diagnostics=cce_diagnostics(model,raw,result,parameters)
 
 **Outputs**
 
-- `diagnostics` — numerical/conditioning, cluster, sample and density diagnostic fields.
+- `diagnostics` — numerical validity and budgets, raw-record counts, spectral residuals, sampling uncertainty, and density diagnostic fields.
 
 ## References
 
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_diagnostics.m)
 - [cce_reduce.m](cce_reduce.md)
 
 Native requests pass the resolved `parameters` with `parameters.cce.numerics`. When `parameters.output` is `density`, the reduction’s time-by-vectorised-density values are inspected as square observed-spin density matrices using the compiled model dimensions. The routine never repairs these arrays; all coverage, error-budget, trace, Hermiticity, and minimum-eigenvalue decisions retain their original arithmetic.

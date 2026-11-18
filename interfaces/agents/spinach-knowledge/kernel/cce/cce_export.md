@@ -8,7 +8,7 @@ Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,a
 
 Internal/expert signature: `cce_export(filename,model,result)`. Engine records are not public experiment parameter structures.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_export.m)
+[MATLAB source](../../../../../kernel/cce/cce_export.m)
 
 ## Purpose
 
@@ -16,20 +16,16 @@ Export a complete complex CCE result and its model.
 
 ## Behaviour
 
-- MAT/JSON store a versioned envelope; JSON preserves numeric type, shape, complex components and nonfinite values.
+- MAT/JSON store a versioned envelope; JSON preserves numeric type, shape, complex components, and nonfinite values.
 - CSV writes top-level numeric result fields as field,index,real,imag rows with column-major linear indices.
 - A CSV JSON sidecar at filename.json retains the full result and diagnostics and is the round-trip authority; CSV alone is a human-readable view.
 
 ## Inputs and outputs
 
-```matlab
-cce_export(filename,model,result)
-```
-
 **Inputs**
 
-- `filename` — .mat, .json or .csv destination.
-- `model`, `result` — scalar structures to serialize.
+- `filename` — .mat, .json, or .csv destination.
+- `model`, `result` — scalar structures to serialise.
 
 **Outputs**
 
@@ -37,7 +33,6 @@ cce_export(filename,model,result)
 
 ## References
 
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_export.m)
 - [cce_import.m](cce_import.md)
 
 Character tags retain MATLAB array shape, including nonstandard empty character dimensions. The importer remains compatible with earlier character tags without a shape field.

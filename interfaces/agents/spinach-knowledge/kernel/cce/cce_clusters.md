@@ -8,7 +8,7 @@ Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,a
 
 Internal/expert signature: `clusters=cce_clusters(model,graph,parameters)`. Engine records are not public experiment parameter structures.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_clusters.m)
+[MATLAB source](../../../../../kernel/cce/cce_clusters.m)
 
 ## Purpose
 
@@ -16,18 +16,12 @@ Enumerate a deterministic subset-closed CCE cluster family.
 
 ## Behaviour
 
-- When `numerics.max_memory_bytes` is supplied, graph/frontier growth, closure/sorting copies, decimal family signatures and final cluster/subset metadata are checked before allocation (`cce_clusters:memory`). A cluster-count cap does not substitute for a byte budget; standalone combinatorial calls without `numerics` retain their existing unbudgeted contract.
-
-
+- When `numerics.max_memory_bytes` is supplied, graph/frontier growth, closure/sorting copies, decimal family signatures, and final cluster/subset metadata are checked before allocation (`cce_clusters:memory`). A cluster-count cap does not substitute for a byte budget; standalone combinatorial calls without `numerics` retain their existing unbudgeted contract.
 - Enumerates connected candidate clusters through the requested order; disconnected subsets required by retained clusters are restored for recursive reduction.
 - Applies optional per-order cluster caps and explicit group-cluster selection deterministically, preserving physical-ID and subset bookkeeping.
 - Partition mode expands group clusters into physical sites, so the reported order counts groups, not physical spins.
 
 ## Inputs and outputs
-
-```matlab
-clusters=cce_clusters(model,graph,parameters)
-```
 
 **Inputs**
 
@@ -36,11 +30,10 @@ clusters=cce_clusters(model,graph,parameters)
 
 **Outputs**
 
-- `clusters` — ordered records with stable IDs, physical `sites`, `order`, `groups`, `hilbert_dim`, proper-subcluster references, per-order reduction powers, score, tuple_id and closure_only.
+- `clusters` — ordered records with stable `id`, physical `sites`, `order`, `groups`, full `dimension`, `bath_dimension`, `proper_subsets`, `direct_children`, signed `mobius_power`, `connected_components`, `config_id`, `inclusion_reason`, selection `weight`, and exact `family_id`. `selected_counts`, `actual_counts`, and `cap_overrun` report the closure cost at each order.
 
 ## References
 
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_clusters.m)
 - [cce_graph.m](cce_graph.md)
 - [cce_partition.m](cce_partition.md)
 - [cce_reduce.m](cce_reduce.md)

@@ -6,9 +6,9 @@
 
 ## Conditional averaging
 
-Interlaced sampling changes selected bath assignments on an explicitly constructed conditioning domain while preserving the outer realization elsewhere. The implementation forms maximal conditioning cylinders, removes contained cylinders, enumerates supported basis levels and deduplicates assignment rows. Enumeration is bounded by `parameters.cce.interlaced.max_states` and the resolved memory budget; these limits are explicit rejection thresholds, not silent truncations.
+Interlaced sampling changes selected bath assignments on an explicitly constructed conditioning domain while preserving the outer realisation elsewhere. The implementation forms maximal conditioning cylinders, removes contained cylinders, enumerates supported basis levels, and deduplicates assignment rows. Enumeration is bounded by `parameters.cce.interlaced.max_states` and the resolved memory budget; these limits are explicit rejection thresholds, not silent truncations.
 
-Each assignment is passed to the registered retained-cluster evaluator. Conditional means retain absolute error and validity evidence. For an irreducible cluster, required subset responses are recomputed under the same conditioning domain before denominator formation. Error propagation, denominator-resolution checks and invalid masks accompany the quotient; unresolved factors remain invalid. Per-state nonlinear reduction must precede the outer ensemble average.
+Each assignment is passed to the registered retained-cluster evaluator. Conditional means retain absolute error and validity evidence. For an irreducible cluster, required subset responses are recomputed under the same conditioning domain before denominator formation. Error propagation, denominator-resolution checks, and invalid masks accompany the quotient; unresolved factors remain invalid. Per-state nonlinear reduction must precede the outer ensemble average.
 
 With `raw_only=true`, the service returns the conditional physical raw average instead of a recursively divided factor. This is an engine control, not an additional public experiment. The returned `kind` distinguishes irreducible and exact full-bath records; `assignment_count` records conditional assignments.
 
@@ -16,7 +16,7 @@ With `raw_only=true`, the service returns the conditional physical raw average i
 
 `clexpn` rejects interlaced `noise_correlation`: connected noise uses ordinary ensemble moment averaging. Checkpoint ownership remains with the native scheduler; the interlaced evaluator returns raw records rather than publishing checkpoint files itself. The registered evaluator, not a method-name dispatch or an inferred callback signature, determines physical propagation.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_interlace.m)
+[MATLAB source](../../../../../kernel/cce/cce_interlace.m)
 
 ## Native reference validation
 

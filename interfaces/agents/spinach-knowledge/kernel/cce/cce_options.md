@@ -8,31 +8,27 @@ Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,a
 
 Internal/expert signature: `[parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions)`. Engine records are not public experiment parameter structures.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_options.m)
+[MATLAB source](../../../../../kernel/cce/cce_options.m)
 
 ## Purpose
 
 Validate native clexpn input ownership and resolve nonphysical defaults, with native experiment and algorithm ownership.
 
-## Syntax
-
-`[parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions)`
-
 ## Contract
 
-- All four inputs are required. The canonical system comes from create; its tensors are already in rad/s. No tensor, time, pump frequency or jump rate is converted by this function.
-- Required parameters are observed (distinct physical spin-ID row) and times (nonnegative strictly increasing row in seconds). A transition (ordered spins and ms/levels/explicit alpha-beta selector) is required for projected evolution; generalized experiments with an explicit physical state need not supply one. spins denotes isotope channel names, not site IDs. The explicit fourth argument owns assumptions. Transition resolution occurs during compilation, not in this validator; the context exposes the compiled states and frame-dependent metadata in its policy diagnostics.
+- All four inputs are required. The canonical system comes from create; its tensors are already in rad/s. No tensor, time, pump frequency, or jump rate is converted by this function.
+- Required parameters are observed (distinct physical spin-ID row) and times (nonnegative strictly increasing row in seconds). A transition (ordered spins and ms/levels/explicit alpha-beta selector) is required for projected evolution; generalised experiments with an explicit physical state need not supply one. spins denotes isotope channel names, not site IDs. The explicit fourth argument owns assumptions. Transition resolution occurs during compilation, not in this validator; the context exposes the compiled states and frame-dependent metadata in its policy diagnostics.
 - Experiment-owned public controls are preparation or the mutually exclusive physical rho0, coil, output, normalized, nloops, drive, refocusing, train, pump, bath_jumps, noise, and spectrum. Raw sequence events are removed from the supported public interface; sequence records consumed by lower-level propagation are experiment-compiled internal data. Detailed experiment validation is still required; a function handle alone does not declare supported generators or experiments.
 - Approximation and ensemble controls live under cce, never in old top-level method/observed_spins/bath_spins/graph/numerics fields. Unknown top-level and declared nested-container fields are rejected. Reserved sampling/run/diagnostics fields are not accepted.
-- Defaults are generalized evolution; all non-observed physical spins as the bath; complete graph; mixed_product density; no mean field; after_expansion averaging; powers reducer; auto backend; standard expansion, or partition if groups are supplied; retain_raw=false; second_order.enabled=false; double precision and zero_policy=mask. The default zero-angle orientation is reported.
+- Defaults are generalised evolution; all non-observed physical spins as the bath; complete graph; mixed_product density; no mean field; after_expansion averaging; powers reducer; auto backend; standard expansion, or partition if groups are supplied; retain_raw=false; second_order.enabled=false; double precision and zero_policy=mask. The default zero-angle orientation is reported.
 - order remains empty until a context convergence policy resolves it. Missing numerical tolerances and memory limits are flagged, not replaced by guessed constants. policy records every inserted default and these unresolved decisions. The experiment owns additive versus multiplicative algebra; powers/direct is the reducer implementation choice, not that algebra.
-- Explicit approximation is projected or generalized. Expansion controls preserve standard/partition/disjoint/disjoint_inter; static mean fields may use deterministic product densities or sampled/interlaced states; meanfield_radius is rejected unless the mean field is static. Groups partition selected physical bath IDs. Sampling requires basis, probabilities, samples and seed; explicit uniform declarations are accepted, otherwise cell rows follow bath-ID order. Densities are Hermitian, positive and trace one; validation never normalizes them.
-- Bath jumps require explicit support, operator and nonnegative rate in inverse seconds. Named L+/L-/Lx/Ly/Lz jumps have one physical-spin support; matrix jumps match the ordered support dimension. No jump rate/direction or physical population is invented.
+- Explicit approximation is `projected` or `generalized`. Expansion controls preserve standard/partition/disjoint/disjoint_inter; static mean fields may use deterministic product densities or sampled/interlaced states; meanfield_radius is rejected unless the mean field is static. Groups partition selected physical bath IDs. Sampling requires basis, probabilities, samples, and seed; explicit uniform declarations are accepted, otherwise cell rows follow bath-ID order. Densities are Hermitian, positive, and trace one; validation never normalises them.
+- Bath jumps require explicit support, operator, and nonnegative rate in inverse seconds. Named L+/L-/Lx/Ly/Lz jumps have one physical-spin support; matrix jumps match the ordered support dimension. No jump rate/direction or physical population is invented.
 - Pump controls specify center/halfwidth with explicit Hz or rad/s units, fraction, allow_empty, and optional open/closed boundary. Optional sites and isotope-species cell rows intersect the selected bath; absent filters mean that selected bath. No frequency conversion occurs here; policy.pump_frequency_units records the declared input units for the experiment-owned conversion. Nonzero second-order projection requires projected evolution and explicit gap/overlap criteria.
 
 The context and registered experiment capabilities jointly enforce this native input contract.
 
-Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalized dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
+Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalised dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
 Transition eigensystem construction belongs to compilation, after native options validation. `cce_options` does not construct the observed Hamiltonian or return resolved transition metadata. The context still exposes the compiled transition and metadata in its policy diagnostics.
 
 ## Array-free fluctuation descriptors
@@ -48,11 +44,11 @@ Descriptors and explicit matrix terms are mutually exclusive. Unknown fields,
 non-Hermitian labels, observed IDs, duplicate IDs, and non-real coefficients
 are rejected. Connected ensemble and Fourier conventions remain explicit.
 
-parameters.drive is owned by finite_drive (also admitted during internal cce_compile validation); it is rejected for other experiments. The experiment validates every descriptor field.
+parameters.drive is owned by finite_drive (also admitted during internal cce_compile and cce_generators validation); it is rejected for other experiments. The experiment validates every descriptor field.
 
 ## Parallel task ceiling
 
-parameters.cce.parallel.max_tasks is an optional finite positive integer. It caps simultaneously scheduled batch tasks, not the total physical cluster/state task count. It combines with batch_size by taking their minimum; parallel.mode remains serial, clusters or states.
+parameters.cce.parallel.max_tasks is an optional finite positive integer. It caps simultaneously scheduled batch tasks, not the total physical cluster/state task count. It combines with batch_size by taking their minimum; parallel.mode remains serial, clusters, or states.
 
 The refocusing descriptor belongs to hahn_echo and its direct compiler/generator validation. Its physical matrix, support, and placement are checked by the experiment. Passing it to free_evolution is rejected rather than silently ignored.
 

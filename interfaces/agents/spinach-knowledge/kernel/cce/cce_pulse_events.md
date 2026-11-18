@@ -1,6 +1,8 @@
 # cce_pulse_events
 
-Internal syntax: events=cce_pulse_events(parameters).
+[MATLAB source](../../../../../kernel/cce/cce_pulse_events.m)
+
+Internal syntax: `events=cce_pulse_events(parameters)`
 
 Compiles finite_drive and refocusing_train physical declarations into an internal
 ordered event array. Drive units are rad/s and seconds; row amplitudes and

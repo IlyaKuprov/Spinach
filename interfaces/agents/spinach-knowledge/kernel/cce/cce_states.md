@@ -8,7 +8,7 @@ Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,a
 
 Internal/expert signature: `ensemble=cce_states(model,parameters)`. Engine records are not public experiment parameter structures.
 
-[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_states.m)
+[MATLAB source](../../../../../kernel/cce/cce_states.m)
 
 ## Purpose
 
@@ -16,18 +16,12 @@ Compile observed-spin density matrices and product-bath states with stable physi
 
 ## Behaviour
 
-- `numerics.max_memory_bytes` is checked before allocating the sample-count-scaled configuration and assignment arrays. The bound includes local density matrices, expectations, weights, IDs and measured record metadata; exceeding it raises `cce_states:memory`.
-
-
+- `numerics.max_memory_bytes` is checked before allocating the sample-count-scaled configuration and assignment arrays. The bound includes local density matrices, expectations, weights, IDs, and measured record metadata; exceeding it raises `cce_states:memory`.
 - Supports maximally mixed product states, explicit single-site density matrices, sampled product states, and interlaced sampled spin_configs.
 - Uses local Threefry streams with global state IDs as substreams; it does not change the global random stream.
-- Checks state normalization, Hermiticity and positivity. With no explicit observed density, projected methods use the alpha/beta superposition while generalized methods require `rho0`.
+- Checks state normalisation, Hermiticity, and positivity. With no explicit observed density, projected methods use the alpha/beta superposition while generalised methods require `rho0`.
 
 ## Inputs and outputs
-
-```matlab
-ensemble=cce_states(model,parameters)
-```
 
 **Inputs**
 
@@ -36,11 +30,10 @@ ensemble=cce_states(model,parameters)
 
 **Outputs**
 
-- `ensemble` — observed density, bath IDs, spin_configs, weights, assignments, mode, configuration ID and state IDs. Each spin_config carries the same exterior assignment for all its clusters.
+- `ensemble` — observed density, bath IDs, spin_configs, weights, assignments, mode, configuration ID, and state IDs. Each spin_config carries the same exterior assignment for all its clusters.
 
 ## References
 
-- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/cce/cce_states.m)
 - [cce_interlace.m](cce_interlace.md)
 - [Method reference](https://doi.org/10.1103/PhysRevB.79.115320)
 

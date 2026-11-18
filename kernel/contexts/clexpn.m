@@ -12,10 +12,23 @@
 %
 % answer is the experiment's natural numeric output, without a legacy result
 % wrapper. diagnostics includes raw cluster responses, reduction, resolved
-% policy, physical ordering and elapsed time. This closed-system stage uses
+% policy, physical ordering, and elapsed time. This closed-system stage uses
 % multiplicative reduction; density and additive noise are separate contracts.
 % For noise_correlation, parameters.spectrum requests cce_spectrum after the
 % completed ensemble reduction; the result is diagnostics.spectrum.
+%
+% Parameters:
+%
+%   spin_system    - native Spinach system returned by create
+%   pulse_sequence - registered five-argument experiment function handle
+%   parameters     - experiment parameters and nested cce algorithm controls
+%   assumptions    - explicit Spinach Hamiltonian assumption string
+%
+% Outputs:
+%
+%   answer      - experiment output on its declared time/observable axes
+%   diagnostics - physical ordering, cluster records, reduction, resolved
+%                 policy, ensemble, and elapsed execution time
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -42,7 +55,6 @@ end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&~contract.density_reduction
     error('clexpn:density','Density requires a registered density output contract.');
 end
-
 
 % Derive default numerical controls from precision and available host memory
 numerics=parameters.cce.numerics;
@@ -93,6 +105,7 @@ if isfield(numerics,'propagator')
     end
 end
 
+% Use the supplied finite bath when no expansion order was declared
 if isempty(parameters.cce.order)
     parameters.cce.order=numel(model.bath_ids);
     policy.defaults{end+1}='parameters.cce.order';
@@ -142,7 +155,7 @@ diagnostics.physical_ids=model.physical_ids; diagnostics.observed_ids=model.obse
 diagnostics.bath_ids=model.bath_ids; diagnostics.ensemble=ensemble;
 if isfield(parameters,'spectrum')
     diagnostics.spectrum=cce_spectrum(parameters.times,answer,...
-                                      struct('spectrum',parameters.spectrum));
+                                     struct('spectrum',parameters.spectrum));
 end
 diagnostics.elapsed_seconds=toc(started);
 

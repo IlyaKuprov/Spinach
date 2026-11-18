@@ -8,7 +8,7 @@
 %   spin_system     - Spinach system returned by create
 %   task            - descriptor returned by context_task(@clexpn,...)
 %   parameters.grid - powder grid name, or scalar structure with equally
-%                     long real finite alphas, betas, gammas and weights vectors;
+%                     long real finite alphas, betas, gammas, and weights vectors;
 %                     angles are radians, weights nonnegative with positive sum
 %
 % Outputs:
@@ -22,8 +22,8 @@
 % their observed-only references before inclusion-exclusion, across both
 % orientations and spin configurations; it requires identical cluster families
 % at every orientation. Each orientation still constructs its own generators,
-% transition selectors and graph. Zero-weight orientations are omitted.
-% Deferred grid weights are normalized. Nested parameters.orientation
+% transition selectors, and graph. Zero-weight orientations are omitted.
+% Deferred grid weights are normalised. Nested parameters.orientation
 % is replaced; all other experiment parameters belong to the deferred task.
 % Orientations run serially; cluster/configuration parallelism may own the
 % existing pool. Inside an outer worker, nested CCE scheduling is serial.
@@ -52,7 +52,7 @@ end
 % Keep parallel ownership with an outer worker rather than starting a nested pool
 if ~isempty(getCurrentTask())
     [task.parameters,~]=cce_options(spin_system,task.parameters,...
-                                    task.pulse_sequence,task.assumptions);
+                                   task.pulse_sequence,task.assumptions);
     task.parameters.cce.parallel.mode='serial';
 end
 
@@ -62,7 +62,7 @@ for n=1:count
     nested=task.parameters;
     nested.orientation=[grid.alphas(n) grid.betas(n) grid.gammas(n)];
     [values{n},orientations{n}]=task.context(spin_system,...
-                           task.pulse_sequence,nested,task.assumptions);
+                                           task.pulse_sequence,nested,task.assumptions);
 end
 
 % Select the prescribed ordering of orientational and cluster reductions
@@ -96,7 +96,7 @@ if strcmp(parameters.cce.averaging,'internal_then_expansion')
         for n=1:count
             for k=1:samples
                 state_values(:,:,k)=state_values(:,:,k)+grid.weights(n)*...
-                              orientations{n}.raw{k}(complete+1).value;
+                                      orientations{n}.raw{k}(complete+1).value;
             end
         end
         reduction.sampling_standard_error=std(state_values,0,3)/sqrt(samples);
@@ -172,7 +172,7 @@ if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'grid')||..
 end
 end
 
-% Validate and normalize the same Euler-angle quadrature used by powder
+% Validate and normalise the same Euler-angle quadrature used by powder
 function grid=check_grid(grid)
 fields={'alphas','betas','gammas','weights'};
 if ~isstruct(grid)||~isscalar(grid)||~all(isfield(grid,fields))||...

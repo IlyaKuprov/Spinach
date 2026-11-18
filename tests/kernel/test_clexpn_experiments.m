@@ -379,6 +379,7 @@ for events={struct('type','finite'),struct('type','ideal'),struct([]),[]}
         clexpn(system,@free_evolution,rejected,'labframe');
     catch err
         failed=strcmp(err.identifier,'cce_options:sequence');
+
     end
     result=test_true(result,'Free evolution rejects raw events',failed,...
                      'Use finite_drive, refocusing_train, or a named echo experiment.');

@@ -164,6 +164,7 @@ for n=1:numel(parameters.times)
         else, value=trace(coil{k}'*rho); end
         if meta.normalized, value=value/reference(k); end
         E(n,k)=value;
+
     end
 
 end
@@ -228,6 +229,7 @@ for n=1:numel(parameters.times)
                 ua=pair{2}*ua; ub=pair{1}*ub;
             end
             previous=fractions(j);
+
         end
         duration=(1-previous)*time;
         left=(va.*exp(-1i*duration*ea).')*va';
@@ -241,6 +243,7 @@ for n=1:numel(parameters.times)
     operations=28*db^3; gamma=operations*eps/(1-operations*eps);
     bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+12*orthogonality+...
               gamma*(1+time*H.hamiltonian_norm);
+
 end
 if ~meta.normalized, E=E*reference; bounds=bounds*abs(reference); end
 

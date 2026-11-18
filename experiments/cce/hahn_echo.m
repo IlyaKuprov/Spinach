@@ -239,6 +239,7 @@ for n=1:numel(parameters.times)
         else, value=trace(coil{k}'*rho); end
         if meta.normalized, value=value/reference(k); end
         E(n,k)=value;
+
     end
 
 end
@@ -309,6 +310,7 @@ for n=1:numel(parameters.times)
     operations=20*db^3; gamma=operations*eps/(1-operations*eps);
     bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+8*orthogonality+...
               gamma*(1+time*H.hamiltonian_norm);
+
 end
 
 % A selected-transition detector scales only unnormalised responses
@@ -416,6 +418,7 @@ for n=1:count
 
         end
     end
+
 end
 
 % Keep generator and propagation evidence alongside the natural response

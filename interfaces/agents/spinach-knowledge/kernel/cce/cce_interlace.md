@@ -27,3 +27,5 @@ The conditioning contract uses cce.interlaced.max_states. Returned assignments, 
 A direct native interlacing request rejects cce.checkpoint, for both writes and resumes, before constructing its conditioning distribution. Interlaced calculations do not own an ordinary raw-task checkpoint ledger.
 
 All six arguments are mandatory; the service accepts native ensemble records and an explicit evaluator only. Its local validator checks reference indices, required native records, and checkpoint ownership before conditional enumeration.
+
+The local entry validator checks the state budget and the common reference density/assignment before recursive conditional evaluation. The recursion changes conditioning cylinders but retains that same validated reference.

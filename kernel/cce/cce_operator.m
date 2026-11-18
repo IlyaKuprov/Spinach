@@ -45,15 +45,9 @@ for n=1:numel(operators)
             ids=cluster_system.physical_ids;
         else
             ids=cluster_system.physical_ids(strcmp(cluster_system.isotopes,ids));
-            if isempty(ids), error('cce_operator:spins','No retained spin has this isotope.'); end
         end
     end
-    if ~isnumeric(ids)||~isreal(ids)||isempty(ids)||~isrow(ids)||...
-       numel(unique(ids))~=numel(ids)||any(~ismember(ids,cluster_system.physical_ids))
-        error('cce_operator:spins','Select distinct retained physical IDs.');
-    end
     position=find(strcmp(labels,operators{n}),1);
-    if isempty(position), error('cce_operator:label','Unsupported operator descriptor.'); end
     term=sparse(d,d);
     for id=ids
 
@@ -83,11 +77,29 @@ if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
    ~ismember(system.formalism,{'zeeman-hilb','zeeman-liouv'})
     error('cce_operator:system','Use a supported cce_subsystem view.');
 end
-if ischar(operators)&&isrow(operators), return; end
+if ischar(operators)&&isrow(operators), operators={operators}; spins={spins}; end
 if ~iscell(operators)||~isrow(operators)||isempty(operators)||...
    ~all(cellfun(@(label)ischar(label)&&isrow(label),operators))||...
    ~iscell(spins)||~isequal(size(operators),size(spins))
     error('cce_operator:descriptor','Supply a label or matching cell rows of labels and spin selections.');
+end
+for n=1:numel(operators)
+    ids=spins{n};
+    if ischar(ids)
+        if strcmp(ids,'all')
+            ids=system.physical_ids;
+        else
+            ids=system.physical_ids(strcmp(system.isotopes,ids));
+            if isempty(ids), error('cce_operator:spins','No retained spin has this isotope.'); end
+        end
+    end
+    if ~isnumeric(ids)||~isreal(ids)||isempty(ids)||~isrow(ids)||...
+       numel(unique(ids))~=numel(ids)||any(~ismember(ids,system.physical_ids))
+        error('cce_operator:spins','Select distinct retained physical IDs.');
+    end
+    if ~ismember(operators{n},{'E','Lx','Ly','Lz','L+','L-'})
+        error('cce_operator:label','Unsupported operator descriptor.');
+    end
 end
 end
 

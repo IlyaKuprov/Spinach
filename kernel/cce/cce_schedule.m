@@ -41,9 +41,6 @@ grumble(model,clusters,ensemble,schedule,parameters,evaluator);
 options=parameters.cce; ns=numel(ensemble.spin_config); nc=numel(clusters)+1;
 mode='serial'; workers=1; batch_size=1;
 if isfield(options,'parallel'), mode=options.parallel.mode; end
-if ~ismember(mode,{'serial','clusters','states'})
-    error('cce_schedule:parallel','Choose serial, clusters or states parallelism.');
-end
 if ~strcmp(mode,'serial')
     pool=gcp('nocreate');
     if isempty(pool)||~isfield(model.spin_system.sys,'parallel')||...
@@ -55,15 +52,8 @@ end
 if isfield(options,'parallel')&&isfield(options.parallel,'batch_size')
     batch_size=options.parallel.batch_size;
 end
-if ~isscalar(batch_size)||~isfinite(batch_size)||batch_size<1||batch_size~=fix(batch_size)
-    error('cce_schedule:batch','Batch size must be a finite positive integer.');
-end
 if isfield(options,'parallel')&&isfield(options.parallel,'max_tasks')
     limit=options.parallel.max_tasks;
-    if ~isnumeric(limit)||~isreal(limit)||~isscalar(limit)||...
-       ~isfinite(limit)||limit<1||limit~=fix(limit)
-        error('parallel.max_tasks must be a positive integer.');
-    end
     batch_size=min(batch_size,limit);
 end
 components=1;
@@ -133,10 +123,6 @@ if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_byt
     error('cce_schedule:memory','Raw ledger and simultaneous dense storage exceed memory budget.');
 end
 model.clusters=clusters;
-if strcmp(options.bath_state.mode,'interlaced')&&...
-   (~strcmp(options.bath_state.mode,'interlaced')||~isfield(options,'interlaced'))
-    error('cce_schedule:interlaced','Interlaced expansion needs sampled states and an enumeration budget.');
-end
 
 % Hash physical and experiment inputs, not checkpoint filenames or resume switches
 payload=struct('model',model,'clusters',clusters,'ensemble',ensemble,...
@@ -258,6 +244,28 @@ if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'spin_system','multip
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
    ~isa(evaluator,'function_handle')
     error('cce_schedule:input','Native model, ensemble, schedule, parameters and evaluator are required.');
+end
+mode='serial';
+if isfield(parameters.cce,'parallel'), mode=parameters.cce.parallel.mode; end
+if ~ismember(mode,{'serial','clusters','states'})
+    error('cce_schedule:parallel','Choose serial, clusters or states parallelism.');
+end
+if isfield(parameters.cce,'parallel')&&isfield(parameters.cce.parallel,'batch_size')
+    batch_size=parameters.cce.parallel.batch_size;
+    if ~isscalar(batch_size)||~isfinite(batch_size)||batch_size<1||batch_size~=fix(batch_size)
+        error('cce_schedule:batch','Batch size must be a finite positive integer.');
+    end
+end
+if isfield(parameters.cce,'parallel')&&isfield(parameters.cce.parallel,'max_tasks')
+    limit=parameters.cce.parallel.max_tasks;
+    if ~isnumeric(limit)||~isreal(limit)||~isscalar(limit)||...
+       ~isfinite(limit)||limit<1||limit~=fix(limit)
+        error('parallel.max_tasks must be a positive integer.');
+    end
+end
+if strcmp(parameters.cce.bath_state.mode,'interlaced')&&...
+   ~isfield(parameters.cce,'interlaced')
+    error('cce_schedule:interlaced','Interlaced expansion needs sampled states and an enumeration budget.');
 end
 end
 

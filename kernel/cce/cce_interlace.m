@@ -49,31 +49,9 @@ end
 % Form the conditional average and its separately retained irreducible factor
 function raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
 
-% Check the explicit state budget before conditional enumeration
+% Select the validated state budget and common reference assignment
 spec=parameters.cce.interlaced;
-if ~isfield(spec,'max_states')||~isscalar(spec.max_states)||~isfinite(spec.max_states)||...
-   spec.max_states<1||spec.max_states~=fix(spec.max_states)
-    error('cce_interlace:budget','An explicit positive integer state budget is required.');
-end
 reference=ensemble.spin_config(spec.reference_state);
-
-% Reject a density inconsistent with the sampled reference assignment
-if ~isequal(reference.bath_ids,model.bath_ids)||...
-   numel(reference.assignment)~=numel(model.bath_ids)
-    error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
-end
-for j=1:numel(model.bath_ids)
-    dimension=model.multiplicities(model.bath_ids(j)); index=reference.assignment(j);
-    if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
-        error('cce:spin_config','Interlaced reference assignments must select local basis states.');
-    end
-    vector=ensemble.bases{j}(:,index);
-    if ~isequal(size(reference.bath_rho{j}),[dimension dimension])||...
-       norm(reference.bath_rho{j}-vector*vector','fro')>dimension^2*eps
-        error('cce:spin_config',...
-              'Interlaced reference bath_rho must agree with its basis assignment; use explicit_product for mixed states.');
-    end
-end
 
 % Resolve the supplied cylinders or the selected supercluster family
 if isfield(spec,'condition_sites')
@@ -223,6 +201,27 @@ if ~isstruct(spec)||~all(isfield(spec,{'reference_state','max_states'}))||...
    ~isfinite(spec.reference_state)||spec.reference_state<1||...
    spec.reference_state~=fix(spec.reference_state)||spec.reference_state>numel(ensemble.spin_config)
     error('cce_interlace:options','A valid reference_state index is required.');
+end
+if ~isfield(spec,'max_states')||~isscalar(spec.max_states)||~isfinite(spec.max_states)||...
+   spec.max_states<1||spec.max_states~=fix(spec.max_states)
+    error('cce_interlace:budget','An explicit positive integer state budget is required.');
+end
+reference=ensemble.spin_config(spec.reference_state);
+if ~isequal(reference.bath_ids,model.bath_ids)||...
+   numel(reference.assignment)~=numel(model.bath_ids)
+    error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
+end
+for j=1:numel(model.bath_ids)
+    dimension=model.multiplicities(model.bath_ids(j)); index=reference.assignment(j);
+    if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
+        error('cce:spin_config','Interlaced reference assignments must select local basis states.');
+    end
+    vector=ensemble.bases{j}(:,index);
+    if ~isequal(size(reference.bath_rho{j}),[dimension dimension])||...
+       norm(reference.bath_rho{j}-vector*vector','fro')>dimension^2*eps
+        error('cce:spin_config',...
+              'Interlaced reference bath_rho must agree with its basis assignment; use explicit_product for mixed states.');
+    end
 end
 end
 

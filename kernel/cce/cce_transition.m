@@ -33,14 +33,14 @@
 
 function [transition,meta]=cce_transition(spin_system,parameters,assumptions)
 
+% Check the selection before constructing the observed subsystem
+grumble(spin_system,parameters,assumptions);
+
 % A compiled model reuses the retained generator; ordinary callers use stock
 model=[];
 if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
     model=spin_system; spin_system=model.spin_system;
 end
-
-% Check the selection before constructing the observed subsystem
-grumble(spin_system,parameters,assumptions);
 
 % Preserve the caller's random stream across stock subsystem construction
 rng_state=rng; rng_restore=onCleanup(@()rng(rng_state));
@@ -143,6 +143,9 @@ end
 
 % Validate physical spin IDs and exactly one descriptive transition selector
 function grumble(spin_system,p,assumptions)
+if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
+    spin_system=spin_system.spin_system;
+end
 if ~isstruct(p)||~isscalar(p)||~all(isfield(p,{'observed','transition'}))
     error('cce_transition:inputs','parameters.observed and transition are required.');
 end

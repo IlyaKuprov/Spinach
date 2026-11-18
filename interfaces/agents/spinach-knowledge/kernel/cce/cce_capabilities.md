@@ -40,3 +40,5 @@ refocusing_train is an explicitly registered generalised Hilbert experiment with
 Observable output without an explicit coil has one selected-transition detector; memory preflight counts a cell receiver only when supplied. Checkpoint capability versions also distinguish native backend selection and physical projected echo detection, so incompatible raw tasks are not reused.
 
 Hahn and bath-pumped Hahn capability versions distinguish the fixed physical receiver from stored historical spin-manifold overlaps, rejecting checkpoints from the preceding convention.
+
+Handle type and registry membership are validated together before the contract is constructed; evaluator callbacks retain their external five-argument contract.

@@ -24,11 +24,6 @@ function contract=cce_capabilities(pulse_sequence)
 
 % Require an actual registered function handle
 grumble(pulse_sequence);
-registered={@free_evolution,@finite_drive,@refocusing_train,@hahn_echo,...
-            @cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
-if ~any(cellfun(@(sequence)isequal(sequence,pulse_sequence),registered))
-    error('cce_capabilities:unregistered','Experiment is not registered for clexpn.');
-end
 
 % These experiments explicitly support conventional and projected generators
 contract.pulse_sequence=pulse_sequence;
@@ -159,6 +154,11 @@ end
 function grumble(pulse_sequence)
 if ~isa(pulse_sequence,'function_handle')
     error('cce_capabilities:handle','pulse_sequence must be a function handle.');
+end
+registered={@free_evolution,@finite_drive,@refocusing_train,@hahn_echo,...
+            @cpmg_echo,@bath_pumped_hahn,@cce_eseem,@noise_correlation};
+if ~any(cellfun(@(sequence)isequal(sequence,pulse_sequence),registered))
+    error('cce_capabilities:unregistered','Experiment is not registered for clexpn.');
 end
 end
 

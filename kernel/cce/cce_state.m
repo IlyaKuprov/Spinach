@@ -43,13 +43,6 @@ else
     for n=1:numel(ids)
         d=cluster_system.multiplicities(n); local=states{order(n)};
         if isvector(local)&&numel(local)==d, local=diag(local); end
-        tolerance=numerics.atol+numerics.rtol*norm(local,'fro');
-        if ~isnumeric(local)||~isequal(size(local),[d d])||...
-           any(~isfinite(local),'all')||norm(local-local','fro')>tolerance||...
-           abs(trace(local)-1)>tolerance||...
-           min(real(eig(full((local+local')/2))))<-tolerance
-            error('cce_state:density','Supply positive, Hermitian, trace-one local density matrices.');
-        end
         if 16*(size(rho,1)*d)^2>numerics.max_memory_bytes
             error('cce_state:memory','Requested density exceeds the memory budget.');
         end
@@ -70,10 +63,43 @@ if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
    ~ismember(system.formalism,{'zeeman-hilb','zeeman-liouv'})
     error('cce_state:system','Use a supported cce_subsystem view.');
 end
-if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states))), return; end
+if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
+    if ischar(states), states={states}; spins={spins}; end
+    if ~isrow(states)||isempty(states)||~all(cellfun(@isrow,states))||...
+       ~iscell(spins)||~isequal(size(states),size(spins))
+        error('cce_state:descriptor','Supply a label or matching cell rows of labels and spin selections.');
+    end
+    for n=1:numel(states)
+        if ~ismember(states{n},{'E','Lx','Ly','Lz','L+','L-'})
+            error('cce_state:descriptor','Unsupported operator descriptor.');
+        end
+        ids=spins{n};
+        if ischar(ids)
+            if strcmp(ids,'all'), ids=system.physical_ids;
+            else, ids=system.physical_ids(strcmp(system.isotopes,ids)); end
+        end
+        if ~isnumeric(ids)||~isreal(ids)||isempty(ids)||~isrow(ids)||...
+           numel(unique(ids))~=numel(ids)||any(~ismember(ids,system.physical_ids))
+            error('cce_state:descriptor','Select distinct retained physical IDs.');
+        end
+    end
+    return
+end
 if ~iscell(states)||~isrow(states)||~isnumeric(spins)||~isrow(spins)||...
    numel(states)~=numel(spins)||~isequal(sort(spins),sort(system.physical_ids))
     error('cce_state:descriptor','Explicit states must specify every retained physical spin once.');
+end
+[~,order]=ismember(system.physical_ids,spins); numerics=system.model.numerics;
+for n=1:numel(system.physical_ids)
+    d=system.multiplicities(n); local=states{order(n)};
+    if isvector(local)&&numel(local)==d, local=diag(local); end
+    tolerance=numerics.atol+numerics.rtol*norm(local,'fro');
+    if ~isnumeric(local)||~isequal(size(local),[d d])||...
+       any(~isfinite(local),'all')||norm(local-local','fro')>tolerance||...
+       abs(trace(local)-1)>tolerance||...
+       min(real(eig(full((local+local')/2))))<-tolerance
+        error('cce_state:density','Supply positive, Hermitian, trace-one local density matrices.');
+    end
 end
 end
 

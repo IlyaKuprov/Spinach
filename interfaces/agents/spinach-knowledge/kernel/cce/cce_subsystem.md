@@ -21,3 +21,5 @@ Explicit configurations give bath_ids and bath_rho for the entire selected bath,
 The explicit single-entry cache stores an exact full-model/ordered-sites/configuration signature, the immutable view, and hit/miss counters. Changes to tensors, assumptions, formalism, site order, or configuration invalidate it. There is no persistent cache. Generator services own their later numerical caches.
 
 For static mean fields, a finite parameters.cce.meanfield_radius requires finite coordinates for observed and exterior spins once the product configuration is bound. Retain exterior spins whose minimum distance to any observed spin is at most the radius in Angstrom. Included-cluster geometry is irrelevant to this selection. An absent or infinite radius remains unbounded, and compilation alone does not require geometry.
+
+Explicit configuration density shapes, positivity, and normalisation are checked at entry before consulting the cache. Agreement of supplied expectations and exterior fields with computed density expectations remains a computed-domain consistency test.

@@ -25,3 +25,5 @@ Interlaced tasks pass the same evaluator into every conditional recursion. With 
 Native finite_drive and refocusing_train preflight counts every retained time-by-segment Hamiltonian, pulse, and exterior expectation before dispatch. This is added to the existing simultaneous-workspace requirement without changing physical task enumeration or batch semantics.
 
 Checkpoint identities omit `cce.numerics.max_memory_bytes` from the hashed parameter/model copies; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, experiment, and capability revision remain bound to the ledger.
+
+Caller-selected parallel mode, batch caps, and the interlaced enumeration declaration are checked before task bookkeeping. Existing-pool availability and calculated resident storage remain execution-time checks.

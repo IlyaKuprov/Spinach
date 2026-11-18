@@ -74,21 +74,11 @@ elseif strcmp(state.mode,'explicit_product')
 else
     error('cce_subsystem:configuration','Sampling requires explicit bath density matrices.');
 end
-if ~iscell(densities)||(~isempty(densities)&&~isrow(densities))||...
-   numel(densities)~=numel(bath_ids)
-    error('cce_subsystem:density','Supply one density matrix per bath ID.');
-end
 expectations=zeros(numel(bath_ids),3);
 for n=1:numel(bath_ids)
 
-    % Validate positivity and normalisation on each small local density only
+    % Compute physical Cartesian expectations from each validated local density
     d=model.multiplicities(bath_ids(n)); rho=densities{n};
-    tolerance=model.numerics.atol+model.numerics.rtol*norm(rho,'fro');
-    if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...
-       norm(rho-rho','fro')>tolerance||abs(trace(rho)-1)>tolerance||...
-       min(real(eig(full((rho+rho')/2))))<-tolerance
-        error('cce_subsystem:density','Bath densities must be positive, Hermitian and trace one.');
-    end
     operators=pauli(d);
     expectations(n,:)=[real(trace(rho*operators.x)) real(trace(rho*operators.y))...
                       real(trace(rho*operators.z))];
@@ -106,10 +96,6 @@ exterior=~ismember(bath_ids,sites); exterior_ids=bath_ids(exterior);
 exterior_values=expectations(exterior,:);
 if isfield(configuration,'exterior_ids')
     supplied=configuration.exterior_ids;
-    if ~isnumeric(supplied)||~isreal(supplied)||...
-       (~isempty(supplied)&&~isrow(supplied))||numel(unique(supplied))~=numel(supplied)
-        error('cce_subsystem:exterior','Exterior IDs must be a distinct physical-ID row.');
-    end
     [present,indices]=ismember(supplied,exterior_ids);
     if ~all(present)||numel(indices)~=numel(exterior_ids)||...
        ~close_values(configuration.exterior_expectations,...
@@ -195,6 +181,31 @@ end
 if ~isempty(cache)&&(~isstruct(cache)||~isscalar(cache)||...
    ~all(isfield(cache,{'signature','cluster_system','hits','misses'})))
     error('cce_subsystem:cache','cache must be empty or returned by this service.');
+end
+if isfield(configuration,'bath_rho')
+    bath_ids=configuration.bath_ids; densities=configuration.bath_rho;
+    if ~iscell(densities)||(~isempty(densities)&&~isrow(densities))||...
+       numel(densities)~=numel(bath_ids)
+        error('cce_subsystem:density','Supply one density matrix per bath ID.');
+    end
+    for n=1:numel(bath_ids)
+        d=model.multiplicities(bath_ids(n)); rho=densities{n};
+        tolerance=model.numerics.atol+model.numerics.rtol*norm(rho,'fro');
+        if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...
+           norm(rho-rho','fro')>tolerance||abs(trace(rho)-1)>tolerance||...
+           min(real(eig(full((rho+rho')/2))))<-tolerance
+            error('cce_subsystem:density','Bath densities must be positive, Hermitian and trace one.');
+        end
+    end
+elseif ismember(model.parameters.cce.bath_state.mode,{'sampled','interlaced'})
+    error('cce_subsystem:configuration','Sampling requires explicit bath density matrices.');
+end
+if isfield(configuration,'exterior_ids')
+    supplied=configuration.exterior_ids;
+    if ~isnumeric(supplied)||~isreal(supplied)||...
+       (~isempty(supplied)&&~isrow(supplied))||numel(unique(supplied))~=numel(supplied)
+        error('cce_subsystem:exterior','Exterior IDs must be a distinct physical-ID row.');
+    end
 end
 end
 

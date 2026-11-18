@@ -12,7 +12,7 @@ Design a finite-duration heteronuclear coherence-transfer pulse from proton tran
 
 ## Physical / mathematical content
 
-The model is a two-spin 1H-13C system at 14.1 T. Both isotropic chemical shifts are set to 0 ppm, and the scalar coupling is 140 Hz. The NMR drift Hamiltonian is built from this system. The initial density operator is Lx on spin 1 (1H), and the target is Lx on spin 2 (13C); each is normalised. The fixed transfer time is T = 1/J, where J is the specified coupling.
+The model is a two-spin 1H-13C system at 14.1 T. Both isotropic chemical shifts are set to 0 ppm, and the scalar coupling is 140 Hz. The NMR drift Hamiltonian is built from this system. The initial density operator is Lx on spin 1 (1H), and the target is Lx on spin 2 (13C); each is normalised. The fixed transfer time is `T=1/J`, where J is the specified coupling.
 
 ## Numerical / algorithmic content
 

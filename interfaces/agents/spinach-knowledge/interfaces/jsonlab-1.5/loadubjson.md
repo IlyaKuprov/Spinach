@@ -4,7 +4,7 @@ This source is absent from the current distribution. The following historical de
 
 - MATLAB source: `interfaces/jsonlab-1.5/loadubjson.m` (source removed)
 - Related documentation: [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=Main_Page)
-- Signature: `data = loadubjson(fname,varargin)`
+- Signature: `data=loadubjson(fname,varargin)`
 
 ## Contract
 

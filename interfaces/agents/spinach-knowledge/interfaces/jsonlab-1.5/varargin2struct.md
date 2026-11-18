@@ -10,4 +10,4 @@ Each name/value key is lowercased before assignment; its following value is copi
 
 A name must be a MATLAB character vector with a following value; a dangling name, a non-character/non-struct item, or a struct array that cannot be merged raises an error. This helper does not validate option meanings, normalise values, or infer units. The result is an options struct only; it does not apply the options to a caller.
 
-The vendored source identifies Qianqian Fang as author and gives a BSD license (see `LICENSE_BSD.txt`).
+The vendored source identifies Qianqian Fang as author and gives a BSD licence (see `LICENSE_BSD.txt`).

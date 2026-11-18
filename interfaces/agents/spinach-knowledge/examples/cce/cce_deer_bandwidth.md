@@ -8,4 +8,4 @@ The observed spin is physical site 1, with transition ms=[0.5 -0.5]. The pump se
 
 The default no-mean-field product-density ensemble omits a selected exterior spin from each retained marginal cluster, including the empty cluster. Static conditioned exterior pumping is explicitly unsupported. Changing the spectral window to select no spins removes the bath rotation when allow_empty=true.
 
-The first output is the natural complex echo array, and the second contains native reduction, ensemble and raw numerical diagnostics. test_cce_examples checks the result against direct three-spin density-matrix propagation; test_clexpn_context checks the analytic one-bath-spin response and pump selector validation.
+The first output is the natural complex echo array, and the second contains native reduction, ensemble, and raw numerical diagnostics. test_cce_examples checks the result against direct three-spin density-matrix propagation; test_clexpn_context checks the analytic one-bath-spin response and pump selector validation.

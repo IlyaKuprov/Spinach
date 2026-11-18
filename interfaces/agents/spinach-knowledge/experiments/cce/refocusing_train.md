@@ -2,7 +2,7 @@
 
 Syntax: [answer,aux]=refocusing_train(spin_system,parameters,H,R,K).
 
-Ideal generalized Hilbert-space refocusing with explicit preparation/detection
+Ideal generalised Hilbert-space refocusing with explicit preparation/detection
 following free_evolution. Supply either a refocusing cell row of descriptors
 (spins, integrated Hermitian operator or axis/angle, and time or fraction), or
 train with name, count, axis, and spins. XY8 has literal xyxyyxyx phases and

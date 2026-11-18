@@ -13,12 +13,12 @@ Observations may occur before, during, or after a pulse; propagation stops at ea
 Optional refocusing is a cell row of ideal-pulse descriptors: spins, either
 an integrated Hermitian operator or axis and angle, and either time (seconds)
 or fraction of the observation time. Coincident pulses keep declaration order.
-This mixed ideal/finite path requires generalized Hilbert dynamics. Pure finite
-drives retain the existing generalized master-equation path. A one-site exterior
+This mixed ideal/finite path requires generalised Hilbert dynamics. Pure finite
+drives retain the existing generalised master-equation path. A one-site exterior
 pulse is inactive without mean fields; finite exterior excitation with static
 mean fields and arbitrary exterior operator rotations are refused.
 
-Preparation, detection, normalization, density layout and dissipative generators
+Preparation, detection, normalisation, density layout, and dissipative generators
 follow free_evolution. Projected generators are unsupported. Retained bath drift
 stays active throughout the pulse. The Hilbert-space finite-control path uses
 segmentwise expm transport and its existing arithmetic bound; it does not invoke

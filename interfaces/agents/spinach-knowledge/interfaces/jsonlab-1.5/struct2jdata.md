@@ -12,4 +12,4 @@ For a one-element input, the converted value is returned directly. For inputs wi
 
 The source's example describes a sparse double array with `_ArraySize_=[2 3]`, `_ArrayIsSparse_=1`, and `_ArrayData_` as the encoded data field. The source example is documentation, not a claim that it was executed. The source uses JSONLab's escaped MATLAB field names in its lookups; provide data in the representation produced by the corresponding JSONLab loader.
 
-The vendored source identifies Qianqian Fang as author and gives a BSD license (see `LICENSE_BSD.txt`).
+The vendored source identifies Qianqian Fang as author and gives a BSD licence (see `LICENSE_BSD.txt`).

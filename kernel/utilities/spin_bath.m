@@ -266,6 +266,16 @@ for n=1:numel(names)
     end
 end
 
+% Leave new sites empty in native giant-spin coefficient and Euler tables
+if ~isempty(species)&&isfield(inter,'giant')&&all(isfield(inter.giant,{'coeff','euler'}))
+    for field={'coeff','euler'}
+        table=inter.giant.(field{1});
+        if ~isvector(table), table=table(:); end
+        table{end+numel(species)}=[];
+        inter.giant.(field{1})=table;
+    end
+end
+
 % Keep candidate labels and physical indices distinct after occupancy draws
 bath.spins=count+(1:numel(species));
 bath.spin_groups=cell(size(bath.groups));

@@ -19,3 +19,5 @@ bath.ids and bath.groups retain original candidate-site labels after occupancy a
 If neither Zeeman nor susceptibility input is present, introducing a generated Zeeman table preserves create's magnet-frequency default for pre-existing electrons using its free-electron g value. An explicitly empty Zeeman declaration remains distinct and is not replaced; scalar, eigenvalue/Euler, and matrix inputs retain their entries.
 
 Tensor-free appended electrons also retain the standalone magnet-frequency and unit dipolar-scaling defaults when an existing Zeeman or susceptibility declaration disables create's global fallback. Only the new electron slots receive the free-electron g tensor; existing empty, scalar, eigenvalue/Euler, and matrix declarations remain unchanged, and explicitly supplied zero bath tensors remain zero.
+
+When `inter.giant` is supplied, its native `coeff` and `euler` tables gain one empty entry per appended physical spin. Existing site entries are unchanged; `create` still rotates the supplied coefficients and converts Hz to rad/s. An absent giant-spin declaration remains absent.

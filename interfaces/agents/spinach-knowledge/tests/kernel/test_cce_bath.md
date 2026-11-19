@@ -53,3 +53,5 @@ result=test_cce_bath()
 Uses `spin_bath(sys,inter,specification)` with `sys.magnet` owning the magnetic field and row-vector isotope labels. All lattice, occupancy, covariance, tensor, candidate-ID, and exclusion assertions remain.
 
 Appended-bath regressions compare both the original and added Zeeman tensors with independently created systems across absent, explicitly empty, scalar, eigenvalue/Euler, matrix, units-only, and susceptibility-only declarations. The tensor-free added electron must retain its standalone splitting and dipolar scaling, whereas an explicitly zero local tensor remains zero.
+
+The giant-spin regression appends one and three nuclei to a centre with a tilted rank-two term. It compares the raw coefficient row and Euler column, including nested vectors and empty sites, and compares the compiled terms with the original centre. It also checks that an absent giant-spin declaration stays absent.

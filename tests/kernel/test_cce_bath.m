@@ -302,6 +302,29 @@ result=test_true(result,'Explicit appended zero g tensor retained',...
                  nnz(appended.inter.zeeman.matrix{3})==0&&nnz(appended.inter.zeeman.ddscal{3})==0,...
                  'A supplied zero tensor remains distinct from an omitted tensor.');
 
+% Absence of a giant-spin declaration retains the stock no-term default
+result=test_true(result,'Absent giant-spin declaration stays absent',...
+                 ~isfield(output,'giant')&&all(cellfun(@isempty,appended.inter.giant.coeff)),...
+                 'Adding a bath does not introduce a giant-spin model.');
+
+% Append nuclei to an electron with a tilted rank-two giant-spin interaction
+native.isotopes={'E3','13C'}; input=base;
+input.giant.coeff={{[0 0 0],[0;0;37;0;0]},[]};
+input.giant.euler={{[0 0 0],[0.2 0.4 0.7]};{}};
+original=create(native,input); spec=struct('mode','explicit','isotopes',{{'1H'}});
+for n=[1 3]
+    spec.coordinates_A=[zeros(n,2) (1:n)'*20+20];
+    [augmented,output]=spin_bath(native,input,spec);
+    result=test_true(result,sprintf('Native giant-spin tables after %d additions',n),...
+                     isequal(output.giant.coeff,[input.giant.coeff cell(1,n)])&&...
+                     isequal(output.giant.euler,[input.giant.euler;cell(n,1)]),...
+                     'Old coefficient and Euler entries retain their values and shapes; new slots are empty.');
+    appended=create(augmented,output);
+    result=test_true(result,sprintf('Compiled giant-spin terms after %d additions',n),...
+                     isequal(appended.inter.giant.coeff,[original.inter.giant.coeff;cell(n,1)]),...
+                     'The rotated centre interaction is unchanged and the added nuclei have no giant terms.');
+end
+
 end
 
 

@@ -43,4 +43,4 @@ Hahn and bath-pumped Hahn capability versions distinguish the fixed physical rec
 
 Handle type and registry membership are validated together before the contract is constructed; evaluator callbacks retain their external five-argument contract.
 
-CPMG and ESEEM checkpoint versions reject raw records predating their accumulated propagation-error estimates.
+Every registered experiment must supply its own absolute numerical estimate; the evaluator does not substitute zeros for missing evidence. Checkpoint capability versions distinguish the propagation diagnostics of free evolution, Hahn and bath-pumped Hahn, CPMG, ESEEM, and dissipative noise.

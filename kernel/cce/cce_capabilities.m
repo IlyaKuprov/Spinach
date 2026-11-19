@@ -34,8 +34,9 @@ contract.outputs={'signal','observable'};
 contract.evaluator=@evaluate; contract.version=2;
 if isequal(pulse_sequence,@hahn_echo)||isequal(pulse_sequence,@free_evolution)||...
    isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train), contract.version=4; end
-if isequal(pulse_sequence,@hahn_echo), contract.version=7; end
-if isequal(pulse_sequence,@bath_pumped_hahn), contract.version=4; end
+if isequal(pulse_sequence,@hahn_echo), contract.version=8; end
+if isequal(pulse_sequence,@bath_pumped_hahn), contract.version=5; end
+if isequal(pulse_sequence,@free_evolution), contract.version=5; end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
@@ -115,12 +116,9 @@ pulse_sequence=schedule.pulse_sequence;
 
 % Preserve the experiment's natural numeric layout in the scheduler record
 raw.cluster_id=cluster.id; raw.value=answer;
-raw.abs_error_bound=zeros(size(answer)); raw.valid=isfinite(answer);
+raw.abs_error_bound=aux.abs_error_bound; raw.valid=isfinite(answer);
 raw.weight=configuration.weight;
 if isfield(parameters.cce_aux,'generator'), raw.generator=parameters.cce_aux.generator; end
-if isfield(aux,'abs_error_bound')
-    raw.abs_error_bound=aux.abs_error_bound;
-end
 if isfield(aux,'eigen_residual')
     raw.eigen_residual=aux.eigen_residual;
     raw.orthogonality_residual=aux.orthogonality_residual;
@@ -140,7 +138,7 @@ end
 % Retain unreduced noise moments and their validity evidence
 if isfield(aux,'moment')
     raw.moment=aux.moment; raw.mean_time=aux.mean_time; raw.mean_zero=aux.mean_zero;
-    raw.abs_error_bound=aux.abs_error_bound; raw.valid=aux.valid;
+    raw.valid=aux.valid;
 end
 
 end

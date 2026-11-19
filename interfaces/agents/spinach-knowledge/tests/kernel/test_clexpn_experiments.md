@@ -26,3 +26,5 @@ Fixed-receiver Hahn regressions compare complete complex amplitudes with indepen
 Nonzero bath relaxation checks projected master echoes with manifold-interchanging and preserving rotations. Bath pumping constructs its rotation in Hilbert space even when the state is propagated in Liouville space.
 
 CPMG and ESEEM full-bath regressions compare each receiver’s accumulated estimate to an independent unitary norm calculation. They distinguish zero elapsed time from positive-time numerical budget failure in both Zeeman representations and in projected and generalised propagation.
+
+Non-spectral Hahn and bath-pumped Hahn tests check strict full-bath budgets, coincident and projected pulse arithmetic, complex scaled receivers, and the partial-trace scale for density output. An independent amplitude-damping calculation checks Frobenius gain and the two interval norms for projected and generalised bath-pumped echoes.

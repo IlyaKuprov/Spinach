@@ -48,6 +48,9 @@
 % direct segment exponentials. Exterior explicit operator pulses remain refused.
 % aux.pulse_time and aux.pulse_applied record sample-specific control timing.
 % Optional aux contains spectral/error diagnostics for coherent projected echoes.
+% The interval fallback estimates free propagation and numerical pulse actions,
+% before readout rounding. For density output each partial-trace component
+% has Frobenius sensitivity sqrt(bath_dimension).
 %
 % Generalised unitary Zeeman-Hilbert echoes retain observed density matrices,
 % spectral residuals, and absolute forward-error bounds in aux. The response
@@ -470,11 +473,16 @@ if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
     aux.pulse_time=positions; aux.pulse_applied=parameters.times>0&positions<=parameters.times; return
 end
 
+% Convert Frobenius state errors to each detected component
+scale=cellfun(@(x)norm(x,'fro'),coil(:).')./abs(meta.normalization_divisor);
+if density, scale=sqrt(db); end
+aux.abs_error_bound=zeros(size(E)); aux.error_bound_kind='floating_point_estimate';
+
 % At zero elapsed time no control is applied, matching the reference signal
 for n=1:numel(parameters.times)
 
     % Propagate and detect the current observation time
-    rho=rho0; previous=0; swapped=false;
+    rho=rho0; previous=0; swapped=false; state_error=0;
     if parameters.times(n)>0
         for j=1:numel(fractions)
 
@@ -487,10 +495,14 @@ for n=1:numel(parameters.times)
                 end
             end
             duration=(fractions(j)-previous)*parameters.times(n);
-            rho=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+            [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+            state_error=state_error+estimate;
+
+            % A branch swap is exact; a two-sided density rotation incurs roundoff
             if projected
                 swapped=~swapped;
             else
+                state_error=state_error+16*(dc*db)^3*eps*norm(rho,'fro');
                 rho=reshape(rho,dc*db,dc*db); rho=rotation*rho*rotation';
                 if strcmp(spin_system.formalism,'zeeman-liouv'), rho=rho(:); end
             end
@@ -505,7 +517,9 @@ for n=1:numel(parameters.times)
             segment.dissipator=H.swap_matrix*conj(H.dissipator)*H.swap_matrix';
         end
     end
-    rho=cce_evolution(spin_system,segment,[],rho,(1-previous)*parameters.times(n),1,'final');
+    duration=(1-previous)*parameters.times(n);
+    [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+    aux.abs_error_bound(n,:)=(state_error+estimate)*scale;
 
     % Restore the detected spin-manifold coherence after an odd inversion count
     if projected&&swapped, rho=reshape(reshape(rho,db,db)',db^2,1); end

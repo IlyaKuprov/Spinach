@@ -41,3 +41,5 @@ Caller-supplied parameters.sequence is rejected, including empty arrays. Use fin
 Checkpoint capability versions distinguish the fixed physical receiver; regenerate records produced under the preceding spin-manifold-overlap convention.
 
 Projected coherent, generalised Hilbert, and master-equation propagation are explicit branches in the experiment body. The physical pulse remains fixed across direct segment propagation; receiver conventions and arithmetic bounds are unchanged.
+
+The interval fallback accumulates free-evolution and two-sided density-rotation roundoff. An exact projected branch exchange costs no arithmetic; zero elapsed time skips the pulse. Each observable uses its retained receiver Frobenius norm and actual normalisation divisor. For a reduced density, each partial-trace component instead has sensitivity `sqrt(bath_dimension)`. These are propagation estimates, not preparation or readout error bounds.

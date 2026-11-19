@@ -506,17 +506,23 @@ q.transition=struct('spins',1,'ms',[0.5 -0.5]);
 q.rho0=[0.5 -0.4i;0.4i 0.5]; detector=3*exp(0.37i)*[0 1;0 0];
 q.cce.order=1; q.cce.graph.mode='complete';
 q.cce.numerics=struct('atol',1e-30,'rtol',1e-30,'max_memory_bytes',1e8);
-for sequence={@cpmg_echo,@cce_eseem}
+for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
 
     % Count the nonzero free intervals separated by ideal inversions
     intervals=2;
     if isequal(sequence{1},@cpmg_echo), intervals=q.nloops+1; end
+    hahn=isequal(sequence{1},@hahn_echo); pumped=isequal(sequence{1},@bath_pumped_hahn);
+    formalisms={'zeeman-hilb','zeeman-liouv'};
+    if hahn, formalisms={'zeeman-hilb'}; end
+    if hahn||pumped
+        q.pump=struct('center',11,'halfwidth',0,'units','rad/s','fraction',0.5,'allow_empty',false);
+    end
     for approximation={'projected','generalized'}
 
         % Generalised detection supports independently scaled complex receivers
         q.cce.approximation=approximation{1}; q.coil=detector;
         if strcmp(approximation{1},'generalized'), q.coil={detector;2i*detector}; end
-        for formalism={'zeeman-hilb','zeeman-liouv'}
+        for formalism=formalisms
 
             % Compare the segment sum with the norm-preserving closed-system estimate
             q.cce.basis.formalism=formalism{1};
@@ -544,7 +550,13 @@ for sequence={@cpmg_echo,@cce_eseem}
                 end
                 weights=cellfun(@(x)norm(x,'fro'),coils(:).');
                 if normalised, weights=weights./abs(reference); end
-                expected=scale*(intervals+q.times(2)*frequency)*norm(rho,'fro')*weights;
+                pulse_cost=0;
+                if hahn||pumped
+                    dim=retained.dimension; products=1+pumped;
+                    if isstruct(H), dim=retained.bath_dimension; products=pumped; end
+                    pulse_cost=products*16*dim^3*eps;
+                end
+                expected=(scale*(intervals+q.times(2)*frequency)+pulse_cost)*norm(rho,'fro')*weights;
                 label=sprintf('%s %s %s normalised=%d',func2str(sequence{1}),...
                               approximation{1},formalism{1},normalised);
                 result=test_close(result,['Echo segment estimates ' label],...
@@ -562,6 +574,40 @@ for sequence={@cpmg_echo,@cce_eseem}
     end
 
 end
+
+% A relaxing bath can amplify Frobenius error without amplifying trace norm
+sys.isotopes={'1H','13C'}; system=create(sys,struct()); q.cce.basis.formalism='zeeman-liouv';
+q.pump.center=0; q.times=[0 1]; q.bath_jumps=struct('support',2,'operator','L+','rate',4);
+q.normalized=false; q.coil=detector; q.output='signal';
+for approximation={'projected','generalized'}
+
+    % Compare local errors against the analytic polarisation of an initially mixed bath
+    q.cce.approximation=approximation{1}; model=cce_compile(system,q,'labframe');
+    model.formalism='zeeman-liouv'; [retained,~]=cce_subsystem(model,2,struct(),[]);
+    [H,R,K,local]=cce_generators(retained,model.parameters,[]);
+    [~,aux]=bath_pumped_hahn(retained,local,H,R,K);
+    if strcmp(approximation{1},'projected')
+        dim=2; initial=abs(q.rho0(1,2)); products=1;
+    else
+        dim=4; initial=norm(q.rho0,'fro'); products=2;
+    end
+    half=exp(-q.bath_jumps.rate/2)/2; before=initial/sqrt(2);
+    during=initial*norm([1-half half]); propagation=64*eps*dim^2*(1+q.bath_jumps.rate);
+    expected=sqrt(dim)*sqrt(2)*norm(detector,'fro')*...
+             (propagation*(before+during)+products*16*dim^3*eps*during);
+    result=test_close(result,['Relaxing bath-pump estimate ' approximation{1}],...
+                      aux.abs_error_bound(2)/expected,1,0,5e-14,...
+                      'Both half intervals, simultaneous pulse products, and the channel gain are retained.');
+
+end
+
+% Each partial-trace component has the same Frobenius sensitivity
+q=rmfield(q,{'bath_jumps','coil'}); q.cce.basis.formalism='zeeman-hilb'; q.output='density';
+[~,d]=clexpn(system,@hahn_echo,q,'labframe');
+expected=sqrt(2)*3*16*4^3*eps*norm(kron(q.rho0,eye(2)/2),'fro');
+result=test_close(result,'Interval Hahn partial-trace estimate',...
+                  d.raw{1}(end).abs_error_bound(2,:)/expected,ones(1,4),0,5e-14,...
+                  'The two free intervals and the observed inversion contribute before partial tracing.');
 
 end
 

@@ -39,7 +39,11 @@
 % (inclusive, the native default). A zero-width open window selects nothing.
 % aux.selected_sites records the full physical selection before cluster pruning;
 % aux.boundary_rule records the interval convention. Spectral/error diagnostics
-% are also retained for coherent projected echoes.
+% are also retained for coherent projected echoes. On the interval path,
+% aux.abs_error_bound estimates free propagation and numerical pulse actions,
+% not preparation or readout rounding. For GKSL evolution, the remaining
+% channels contract trace norm, so converting each local Frobenius error to
+% trace norm costs at most sqrt(d), also for an embedded d-by-d coherence.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -200,11 +204,21 @@ end
 if projected, pump_operator=pump_operator(1:db,1:db); end
 pump_rotation=expm(-1i*pi*pump_operator);
 
+% Convert Frobenius state errors to each detected component
+scale=cellfun(@(x)norm(x,'fro'),coil(:).')./abs(meta.normalization_divisor);
+if projected, pulse_dim=db; else, pulse_dim=dc*db; end
+
+% Bound the Frobenius gain of all subsequent trace-norm-contractive channels
+if (projected&&nnz(H.dissipator)>0)||(~projected&&(nnz(R)>0||nnz(K)>0))
+    scale=sqrt(pulse_dim)*scale;
+end
+aux.abs_error_bound=zeros(size(E)); aux.error_bound_kind='floating_point_estimate';
+
 % At zero elapsed time no control is applied, matching the reference signal
 for n=1:numel(parameters.times)
 
     % Propagate and detect the current observation time
-    rho=rho0; previous=0; swapped=false;
+    rho=rho0; previous=0; swapped=false; state_error=0;
     if parameters.times(n)>0
         for j=1:numel(fractions)
 
@@ -212,7 +226,13 @@ for n=1:numel(parameters.times)
             segment=generator;
             if projected&&swapped, segment.left=H.right; segment.right=H.left; end
             duration=(fractions(j)-previous)*parameters.times(n);
-            rho=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+            [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+            state_error=state_error+estimate;
+
+            % Charge the two-sided pulse product, but not a projected branch relabelling
+            if (pulse_kind(j)==1&&~projected)||(pulse_kind(j)==2&&~isempty(ids))
+                state_error=state_error+16*pulse_dim^3*eps*norm(rho,'fro');
+            end
             if pulse_kind(j)==1
                 if projected
                     swapped=~swapped;
@@ -234,7 +254,9 @@ for n=1:numel(parameters.times)
     end
     segment=generator;
     if projected&&swapped, segment.left=H.right; segment.right=H.left; end
-    rho=cce_evolution(spin_system,segment,[],rho,(1-previous)*parameters.times(n),1,'final');
+    duration=(1-previous)*parameters.times(n);
+    [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
+    aux.abs_error_bound(n,:)=(state_error+estimate)*scale;
 
     % Restore the detected spin-manifold coherence after an odd inversion count
     if projected&&swapped, rho=reshape(reshape(rho,db,db)',db^2,1); end

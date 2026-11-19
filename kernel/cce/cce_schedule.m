@@ -199,6 +199,7 @@ filename='';
 if isfield(options,'checkpoint')
     filename=options.checkpoint.file;
     if isfield(options.checkpoint,'resume')&&options.checkpoint.resume
+        state.physical=physical;
         state=cce_checkpoint(filename,'read',state);
     elseif isfile(filename)
         error('cce_schedule:exists','Explicitly resume an existing checkpoint or choose another filename.');

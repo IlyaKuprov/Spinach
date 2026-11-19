@@ -41,6 +41,20 @@ if strcmp(action,'read')
         error('cce_checkpoint:schema','Missing checkpoint state.');
     end
     state=cce_checkpoint(filename,'validate',loaded.state);
+
+    % A grid node and a direct crystal can declare identical fields in different orders
+    if isfield(expected,'physical')&&~strcmp(state.identity.parameters,expected.identity.parameters)
+        physical=expected.physical;
+        names=fieldnames(state.payload.parameters);
+        if isequal(sort(names),sort(fieldnames(physical.parameters)))
+            physical.parameters=orderfields(physical.parameters,names);
+            physical.model.parameters=orderfields(physical.model.parameters,names);
+            expected.identity.parameters=md5_hash(physical.parameters);
+            expected.identity.model=md5_hash(physical.model);
+        end
+    end
+
+    % Reuse records only when all physical hashes and task identifiers match
     if ~isequaln(state.identity,expected.identity)||~isequaln(state.task_ids,expected.task_ids)
         error('cce_checkpoint:identity','Checkpoint identity or task list differs.');
     end

@@ -42,3 +42,5 @@ Native calls use free_evolution and hahn_echo with the original complex phase, t
 Independent full-density exponentials also check absolute refocusing before, at, and after its timestamp for both eig and expm generalised propagation. The direct interval path applies its rotation only when that sample includes the pulse.
 
 The absolute-time Hahn reference uses the fixed physical receiver: only samples containing the observed-spin inversion interchange the detected coherence. Both the analytic spin-manifold expression and independent full-density propagation verify the complex signal before, at, and after the pulse.
+
+The projected FID test also uses a complex non-Hermitian coil and a preparation with imaginary coherence. With and without normalisation, it checks the signal against independent conditional exponentials and the absolute propagation estimate against the one-spin formula in units of machine epsilon. A complete retained bath remains valid when the positive-time estimates exceed the requested numerical budget.

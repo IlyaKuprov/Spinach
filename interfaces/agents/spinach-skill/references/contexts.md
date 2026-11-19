@@ -519,6 +519,8 @@ Physical tensors remain canonical `create` data. Preparation, detector, transiti
 
 The default approximation is `generalized`. Projected calculations require an explicit observed transition; arbitrary finite drives and observed-density output require generalised evolution. Dissipative capability is registered for free evolution, Hahn echo, and finite drive, not every experiment. Native `bath_jumps` declare ordered support, operator, and rate; conventional dissipation uses retained Liouville space, while projected branches use an explicit conditional representation. Exchange is not supported. The observation compiler returns the actual initial detector reference, and the experiment applies normalisation once.
 
+For a projected coherent `@free_evolution` signal, an explicit `parameters.coil` must be proportional to the selected transition detector. Its reported floating-point propagation estimate includes the receiver magnitude and, for normalised signals, division by the magnitude of the initial signal. A valid full-bath result need not meet the requested numerical budget.
+
 `diagnostics` contains validity, numerical and sampling uncertainty, conditioning, policy, convergence, and execution evidence. Invalid values are not repaired with arbitrary denominator floors. The `cce.averaging` setting selects reduction before ensemble averaging or raw-record averaging before reduction; additive noise correlation and multiplicative coherence use distinct declared algebras. Omitted cluster order includes the selected bath, but does not establish convergence in bath extent, graph selection, or state sampling.
 
 ### Orientation composition

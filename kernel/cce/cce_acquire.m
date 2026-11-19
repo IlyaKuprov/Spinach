@@ -9,6 +9,8 @@
 % to true for signals. output is signal, observable, or density; density output
 % is the column-vectorised observed density, one row per elapsed time.
 % Optional aux retains coherent spectral residuals and absolute error bounds.
+% Coherent projected FIDs with an explicit receiver scale the state error
+% estimate by its Hilbert-Schmidt norm and the applied reference divisor.
 % Finite Hilbert controls use segmentwise expm and preserve the original
 % 16*d^3*eps*sum(1+abs(dt)*norm(H,2)) arithmetic bound, including the initial
 % zero-duration interval.
@@ -173,6 +175,13 @@ if projected_me
     end
 end
 
+% Convert projected bath-coherence errors to trace-detector units
+if isstruct(H)&&~projected_me
+    scale=norm(coil,'fro')/abs(meta.normalization_divisor);
+    aux.abs_error_bound=zeros(size(answer));
+    aux.error_bound_kind='floating_point_estimate';
+end
+
 % Preserve the stock density action and its arithmetic estimate
 if liouville||driven_liouville
     if liouville
@@ -249,7 +258,8 @@ for n=1:numel(parameters.times)
             rho=step(engine,action,rho0,parameters.times(n));
         end
     elseif isempty(events)
-        rho=cce_evolution(spin_system,generator,[],rho0,parameters.times(n),1,'final');
+        [rho,bound]=cce_evolution(spin_system,generator,[],rho0,parameters.times(n),1,'final');
+        aux.abs_error_bound(n)=bound*scale;
     else
         if segmented
             rho=rho0; scale=0;

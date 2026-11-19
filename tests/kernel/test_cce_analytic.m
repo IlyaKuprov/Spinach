@@ -45,6 +45,32 @@ for k=1:numel(p.times)
 end
 result=test_close(result,'complex FID',fid,reference,1e-11,1e-11,'Independent analytic or dense reference.');
 
+% Detect one complex projected coherence with and without reference division
+q=p; samples=[1 4 9]; q.times=p.times(samples);
+q.rho0=[0.5 -0.5i;0.5i 0.5]; q.coil=(2-3i)*[0 1;0 0];
+initial=trace(q.coil'*q.rho0); q.cce.numerics.atol=1e-30; q.cce.numerics.rtol=1e-30;
+frequency=norm(ha+(phase/2)*eye(2),1)+norm(hb-(phase/2)*eye(2),1);
+for normalised=[false true]
+
+    % Compare the signal and receiver-scaled roundoff against the one-spin formulae
+    q.normalized=normalised; factor=initial;
+    if normalised, factor=1; end
+    [signal,d]=clexpn(spin_system,@free_evolution,q,'labframe');
+    model=cce_compile(spin_system,d.parameters,'labframe');
+    check=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
+    expected=16*2^3*abs(factor)*((q.times(:)>0)+q.times(:)*frequency);
+    result=test_close(result,'Projected explicit receiver FID',signal,...
+                      factor*reference(samples),1e-12,1e-12,'Complex Hilbert-Schmidt detection.');
+    result=test_close(result,'Projected receiver estimate in epsilon units',...
+                      d.raw{1}(end).abs_error_bound/eps,expected,0,1e-12,...
+                      'The mixed bath and trace detector have reciprocal Frobenius norms.');
+    result=test_true(result,'Projected full bath remains valid above strict budget',...
+                     all(check.valid)&&isequal(check.numerical_budget_met,[true;false;false])&&...
+                     isequal(d.reduction.abs_error_bound,d.raw{1}(end).abs_error_bound),...
+                     'Only zero elapsed time requires no propagation.');
+
+end
+
 % Evaluate the exact single-spin Hahn formula for two non-collinear fields
 echo=clexpn(spin_system,@hahn_echo,p,'labframe'); a=[transverse/2 0 omega+longitudinal/2];
 b=[-transverse/2 0 omega-longitudinal/2];

@@ -1,6 +1,6 @@
 # kernel/contexts/powder.m
 
-[MATLAB source](../../../../../kernel/contexts/powder.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=powder.m)
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/contexts/powder.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=powder.m)
 
 ## Contract
 
@@ -30,16 +30,3 @@ This context rejects a function handle returned by `kinetics` with `Spinach:powd
 `parameters.grid` also accepts a scalar structure containing `alphas`, `betas`, `gammas`, and `weights`. These must be non-empty, finite, real numeric vectors with equal element counts; angles are in radians. Row and column vectors are accepted. Weights are used exactly as supplied, without normalisation or a positivity restriction. This permits orientation selection and non-isotropic quadrature. The character-grid path retains its existing behaviour.
 
 The supplied grid is returned as `sph_grid`.
-
-## Deferred native contexts
-
-```matlab
-task=context_task(@clexpn,@hahn_echo,parameters,'labframe');
-parameters.grid=struct('alphas',[0 0],'betas',[0 pi/2],...
-                       'gammas',[0 0],'weights',[1 1]);
-[answer,sph_grid,diagnostics]=powder(spin_system,task,parameters,'labframe');
-```
-
-The descriptor branch dispatches to orientation_average before defaults, basis, or full-system generators. The descriptor branch returns its normalised Euler quadrature as the second output; the optional third output carries nested diagnostics. On the ordinary function-handle branch the third output is empty, and supplied quadrature weights are used without renormalisation. Outer assumptions must equal the descriptor's assumptions. See orientation_average for both averaging orders and explicit-grid validation.
-
-Deferred descriptors and agreement of outer and nested assumptions are checked locally before orientation_average is called. The ordinary powder defaults and pulse-sequence path are unchanged.

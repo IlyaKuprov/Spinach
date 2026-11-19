@@ -41,7 +41,7 @@ fields it understands and errors on whatever is left.
 | `sys.magnet` | real scalar | Mandatory. Magnetic induction in tesla. Zero is legal (zero-field work). |
 | `sys.labels` | cell array of strings, same length as `sys.isotopes` | Optional text labels; printed in diagnostics and resolved to indices by `idxof`. |
 | `sys.output` | `'hush'`, `'console'`, or a file name | Destination of the console report. Default is the console. |
-| `sys.scratch` | directory path | Scratch directory; defaults to `<root>/scratch`, created if absent. With cache hygiene enabled, a fresh cache still gets a write check and an expiry scan; only stale entries go to cleanup. |
+| `sys.scratch` | directory path | Scratch directory; defaults to `<root>/scratch`, created if absent. |
 | `sys.disable` | cell array of strings | Switches off internal algorithms. |
 | `sys.enable` | cell array of strings | Switches on optional algorithms. |
 | `sys.tols` | structure | Overrides numerical cut-offs. |
@@ -749,7 +749,7 @@ Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` fo
 
 Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalised dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
 
-For a pinned NV numerical dataset, cce_fixture('nv_four_c13','6f7282b6') returns sys/inter physical data and source metadata with the original grid. Its full hyperfine tensors are not automatically projected; no transition, bath state, cluster order, or resource policy is selected. Coordinates remain metadata because all dipoles are explicit. See the CCE recipe for the fixture and orientation-composition contracts.
+For a pinned NV numerical dataset, cce_fixture('nv_four_c13','6f7282b6') returns sys/inter physical data and source metadata with the original grid. Its full hyperfine tensors are not automatically projected; no transition, bath state, cluster order, or resource policy is selected. Coordinates remain metadata because all dipoles are explicit. See the CCE recipe for the fixture and native orientation-grid contract.
 
 Public clexpn preparation uses transition, preparation or rho0, and detection uses the selected transition or coil. The direct cce_observation service also accepts detection and receiver_phase; do not pass those service-only fields to clexpn. Put a public receiver phase in the complex coil. Pulse descriptors belong to hahn_echo, finite_drive, or refocusing_train; old sequence/name/event-array input is removed from the supported public interface. Spectrum options may request post-processing after the completed correlation; analysis options belong only to cce_analyse.
 

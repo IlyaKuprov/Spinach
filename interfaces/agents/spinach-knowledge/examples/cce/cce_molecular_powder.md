@@ -4,7 +4,7 @@
 [answer,diagnostics]=cce_molecular_powder();
 ```
 
-Illustrative molecular Hahn echo of an electron and two deuterons. The example creates the physical system, declares a generalised second-order clexpn calculation and transverse electron preparation, binds the named hahn_echo experiment with context_task, and calls powder. No full-bath basis, explicit state or detector, pulse-event array, transition vector or manual orientation loop is assembled.
+Illustrative molecular Hahn echo of an electron and two deuterons. `clexpn` evaluates `@hahn_echo` at the three explicitly weighted orientations in `parameters.grid`, using independent cluster-local generators. The three axes illustrate tensor rotation, not powder convergence.
 
 The three orientations are (0,0,0), (0,pi/2,0), (pi/2,pi/2,0), with equal weights. The 41-point time mesh spans 0 to 200 microseconds. This is a small illustration, not a converged powder grid or a published-material reproduction.
 

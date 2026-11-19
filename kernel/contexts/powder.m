@@ -1,16 +1,16 @@
-% Static powder interface to pulse sequences. Generates a Liouvillian
-% superoperator, the initial state, the coil state, then passes them
+% Static powder interface to pulse sequences. Generates a Liouvillian 
+% superoperator, the initial state, the coil state, then passes them 
 % on to the pulse sequence function. Syntax:
 %
-%      [answer,sph_grid,diagnostics]=powder(spin_system,pulse_sequence,...
-%                                           parameters,assumptions)
+%      [answer,sph_grid]=powder(spin_system,pulse_sequence,...
+%                               parameters,assumptions)
 %
 % Parameters:
 %
 %   pulse_sequence     - pulse sequence function handle. See the
 %                        experiments directory for the list of
 %                        pulse sequences that ship with Spinach.
-%
+%  
 %   parameters.spins   - a cell array giving the spins that the
 %                        pulse sequence works on, in the order
 %                        of channels, e.g. {'1H','13C'}
@@ -18,15 +18,11 @@
 %   parameters.offset  - a cell array giving transmitter offsets
 %                        in Hz on each of the spins listed in
 %                        parameters.spins
-%
-%   parameters.grid    - name of the spherical averaging grid
+% 
+%   parameters.grid    - name of the spherical averaging grid 
 %                        file (see the grids directory in the
-%                        kernel). Alternatively, a scalar structure with
-%                        alphas, betas, gammas (radians), and weights:
-%                        non-empty real finite numeric vectors of equal
-%                        length. Weights are used without normalisation;
-%                        row and column vectors are both accepted.
-%
+%                        kernel).
+% 
 %   parameters.rframes - rotating frame specification, e.g.
 %                        {{'13C',2},{'14N,3}} requests second
 %                        order rotating frame transformation
@@ -36,18 +32,24 @@
 %                        this option is used, the assumptions
 %                        on the respective spins should be
 %                        laboratory frame.
+%                         Alternatively, a scalar structure with
+%                         alphas, betas, gammas (radians), and
+%                         weights: non-empty real finite numeric
+%                         vectors of equal length. Weights
+%                         are used without normalisation; row and
+%                         column vectors are both accepted.
 %
 %   parameters.needs   - a cell array of strings specifying ad-
 %                        ditional information required by the
 %                        sequence:
-%
+% 
 %                        'zeeman_op' - Zeeman part of the Hami-
 %                        ltonian in the laboratory frame, to be
 %                        placed into parameters.hzeeman and sent
 %                        to the pulse sequence
 %
 %                        'iso_eq' - thermal equilibrium is com-
-%                        computed using the isotropic part of
+%                        computed using the isotropic part of 
 %                        the Hamiltonian, and sent to the pulse
 %                        sequence via parameters.rho0
 %
@@ -59,7 +61,7 @@
 %   parameters.rho0    - initial state; may be a function handle
 %                        that depends on the three Euler angles
 %                        in ZYZ active convention
-%
+%  
 %   parameters.serial  - if set to true, disables automatic pa-
 %                        rallelisation
 %
@@ -69,32 +71,21 @@
 %
 %   parameters.*       - additional subfields may be required by
 %                        the pulse sequence - check its documen-
-%                        tation page
-%
+%                        tation page 
+% 
 %   assumptions        - context-specific assumptions ('nmr', 'epr',
 %                        'labframe', etc.) - see the pulse sequence
 %                        header for information on this setting.
 %
-% A context_task(@clexpn,...) descriptor may replace pulse_sequence. This
-% branch accepts parameters.grid as a grid name or an explicit structure
-% with alphas, betas, gammas, weights vectors; all experiment parameters reside
-% in the task. No full-system basis or generators are constructed. The
-% optional third output contains orientation_average diagnostics; it is
-% empty on the ordinary pulse-sequence branch. Assumptions must match the
-% descriptor. See orientation_average for averaging-order semantics.
-%
 % Outputs:
 %
-%   answer    - powder average of whatever it is that the pulse
+%   answer    - powder average of whatever it is that the pulse 
 %               sequence returns; if parameters.sum_up is set to
 %               false, a cell array of outputs at each orienta-
 %               tion is returned
 %
-%   sph_grid -  powder averaging grid data structure with three
+%   sph_grid -  powder averaging grid data structure with three 
 %               Euler angles and weights for each point
-%
-%   diagnostics - orientation-resolved diagnostics for a deferred task;
-%                 empty for an ordinary pulse sequence
 %
 % Note: THIS IS FOR STATIC POWDERS - use singlerot for MAS simulations.
 %
@@ -114,20 +105,11 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=powder.m>
 
-function [answer,sph_grid,diagnostics]=powder(spin_system,pulse_sequence,...
-                                              parameters,assumptions)
-
-% Dispatch deferred contexts before defaults, basis or generator construction
-diagnostics=[];
-if isstruct(pulse_sequence)
-    grumble(spin_system,pulse_sequence,parameters,assumptions);
-    [answer,diagnostics]=orientation_average(spin_system,pulse_sequence,parameters);
-    sph_grid=diagnostics.grid;
-    return
-end
+function [answer,sph_grid]=powder(spin_system,pulse_sequence,...
+                                  parameters,assumptions)
 
 % Show the banner
-banner(spin_system,'sequence_banner');
+banner(spin_system,'sequence_banner'); 
 
 % Set common defaults
 parameters=defaults(spin_system,parameters);
@@ -141,29 +123,29 @@ report(spin_system,'building the Liouvillian...');
 % Get the lab frame Zeeman operator if needed
 if ismember('zeeman_op',parameters.needs)
 
-    % Isotropic + anisotropic basis, for assembly later
+    % Isotropic + anisotropic basis, for assembly later 
     report(spin_system,'building the lab frame Zeeman operator...');
     [ZI,ZQ]=hamiltonian(assume(spin_system,'labframe','zeeman'));
 
 else
 
     % Work around the parfor bug
-    ZI=[]; ZQ=[];
+    ZI=[]; ZQ=[]; 
 
 end
 
 % Get the lab frame Hamiltonian if needed
 if ismember('iso_eq',parameters.needs)
-
+    
     % Isotropic part of the lab frame Hamiltonian
     report(spin_system,'building the lab frame Hamiltonian...');
-    HL=hamiltonian(assume(spin_system,'labframe'),'left');
+    HL=hamiltonian(assume(spin_system,'labframe'),'left'); 
 
     % Compute thermal equilibrium here
     parameters.rho0=equilibrium(spin_system,HL); QL=[];
 
 elseif ismember('aniso_eq',parameters.needs)
-
+    
     % Isotropic + anisotropic part, for thermal equilibrium later
     report(spin_system,'building the lab frame Hamiltonian...');
     [HL,QL]=hamiltonian(assume(spin_system,'labframe'),'left');
@@ -171,7 +153,7 @@ elseif ismember('aniso_eq',parameters.needs)
 else
 
     % Work around the parfor bug
-    HL=[]; QL=[];
+    HL=[]; QL=[]; 
 
 end
 
@@ -212,9 +194,9 @@ if ischar(parameters.grid)
 else
     sph_grid=parameters.grid;
 end
-
+           
 % Assign local variables
-alphas=sph_grid.alphas; betas=sph_grid.betas;
+alphas=sph_grid.alphas; betas=sph_grid.betas; 
 gammas=sph_grid.gammas; weights=sph_grid.weights;
 n_orients=numel(weights);
 
@@ -223,12 +205,12 @@ ans_array=cell(n_orients,1);
 
 % Decide the parallelisation strategy
 if isfield(parameters,'serial')&&parameters.serial
-
+       
     % Serial execution at this level with a warning to the console
     nworkers=0; report(spin_system,'WARNING: powder grid parallelisation is turned off.');
-
+    
 else
-
+    
     % Parallel execution
     nworkers=min([poolsize n_orients]);
 
@@ -257,29 +239,29 @@ function parfor_progr()
     orients_done=orients_done+1; last_message=toc-last_toc;
     if (last_message>5)||(orients_done==n_orients)
         report(ss_prev,[num2str(orients_done) '/' num2str(n_orients) ' orientations done, ' ...
-                        num2str(orients_done/toc) ' orientations per second.']);
+                        num2str(orients_done/toc) ' orientations per second.']); 
         last_toc=toc;
     end
 end
 
 % Parallel powder averaging loop
 parfor (n=1:n_orients,nworkers)
-
+    
     % Localise parameter array
     localpar=parameters;
 
     % Pass the current orientation to the pulse sequence
     localpar.current_angles=[alphas(n) betas(n) gammas(n)];
-
+    
     % Assemble the full Hamiltonian at the current orientation
     H=I+orientation(Q,[alphas(n) betas(n) gammas(n)]); H=(H+H')/2;
-
+    
     % Get the lab frame Zeeman operator at the current orientation
     if ismember('zeeman_op',parameters.needs)
         Z=ZI+orientation(ZQ,[alphas(n) betas(n) gammas(n)]);
         localpar.hzeeman=(Z+Z')/2;
     end
-
+    
     % Compute initial state at the current orientation
     if ismember('aniso_eq',parameters.needs)
 
@@ -292,25 +274,25 @@ parfor (n=1:n_orients,nworkers)
         rho_init=parameters.rho0; localpar.rho0=rho_init(alphas(n),betas(n),gammas(n));
 
     end
-
+    
     % Apply rotating frames
     for k=1:numel(localpar.rframes)
         H=rotframe(spin_system,C{k},H,localpar.rframes{k}{1},...
-                   localpar.rframes{k}{2}); %#ok<PFBNS>
+                                      localpar.rframes{k}{2}); %#ok<PFBNS>
     end
-
+    
     % Get the relaxation superoperator at the current orientation
     R=relaxation(spin_system,[alphas(n) betas(n) gammas(n)]);
-
+    
     % Report to the user
     report(spin_system,'running the pulse sequence...');
-
+    
     % Run the simulation (it might return a structure)
     ans_array{n}=pulse_sequence(spin_system,localpar,H,R,K); %#ok<PFBNS>
 
     % Report parfor progress
     if do_diag, send(DQ,n); end
-
+    
 end
 
 % Unsilence the output
@@ -318,24 +300,24 @@ spin_system.sys.output=prev_setting;
 
 % Decide the return array
 if parameters.sum_up
-
+    
     % Return weighted sum
     answer=sph_grid.weights(1)*ans_array{1};
     for n=2:numel(ans_array)
         answer=answer+sph_grid.weights(n)*ans_array{n};
     end
-
+    
     % Inform the user
     report(spin_system,'returning powder averaged pulse sequence output...');
-
+    
 else
-
+    
     % Return components
     answer=ans_array;
-
+    
     % Inform the user
     report(spin_system,'returning pulse sequence outputs at each orientation...');
-
+    
 end
 
 % Parfor performance
@@ -376,24 +358,8 @@ end
 
 % Consistency checking
 function grumble(spin_system,pulse_sequence,parameters,assumptions)
-if isstruct(pulse_sequence)
-    if ~isscalar(pulse_sequence)||~all(isfield(pulse_sequence,{'context','pulse_sequence','parameters','assumptions'}))||...
-       ~isa(pulse_sequence.context,'function_handle')||~isequal(pulse_sequence.context,@clexpn)||...
-       ~isa(pulse_sequence.pulse_sequence,'function_handle')||...
-       ~isstruct(pulse_sequence.parameters)||~isscalar(pulse_sequence.parameters)
-        error('powder:task','Supply a deferred clexpn experiment descriptor.');
-    end
-    if ~ischar(assumptions)||~isrow(assumptions)||...
-       ~isequal(assumptions,pulse_sequence.assumptions)
-        error('powder:assumptions','Outer and deferred context assumptions must agree.');
-    end
-    if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'comp')||...
-       ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'grid')||...
-       ~(isstruct(parameters.grid)||(ischar(parameters.grid)&&isrow(parameters.grid)&&~isempty(parameters.grid)))
-        error('powder:task','Supply a Spinach system and deferred quadrature parameters.');
-    end
-    return
-end
+
+% Spherical grid
 if ~isfield(parameters,'grid')
     error('spherical averaging grid must be specified in parameters.grid variable.');
 elseif isempty(parameters.grid)
@@ -403,12 +369,18 @@ elseif isstruct(parameters.grid)
 elseif ~ischar(parameters.grid)
     error('parameters.grid variable must be a character string or a spherical grid structure.');
 end
+
+% Pulse sequence
 if ~isa(pulse_sequence,'function_handle')
     error('pulse_sequence argument must be a function handle.');
 end
+
+% Assumptions
 if ~ischar(assumptions)
     error('assumptions argument must be a character string.');
 end
+
+% Active spins
 if ~isfield(parameters,'spins')
     error('working spins must be specified in parameters.spins field.');
 elseif isempty(parameters.spins)
@@ -420,6 +392,8 @@ elseif ~all(cellfun(@ischar,parameters.spins))
 elseif any(~ismember(parameters.spins,spin_system.comp.isotopes))
     error('parameters.spins refers to a spin that is not present in the system.');
 end
+
+% Offsets
 if isempty(parameters.offset)
     error('parameters.offset variable cannot be empty.');
 elseif ~isnumeric(parameters.offset)
@@ -429,6 +403,8 @@ elseif ~isfield(parameters,'spins')
 elseif numel(parameters.offset)~=numel(parameters.spins)
     error('parameters.offset variable must have the same number of elements as parameters.spins.');
 end
+
+% Rotating frame transformations
 if ~isfield(parameters,'rframes')
     error('parameters.rframes variable must be specified.');
 elseif ~iscell(parameters.rframes)
@@ -451,6 +427,8 @@ for n=1:numel(parameters.rframes)
         error('the second part of each element of parameters.rframes must be a number.');
     end
 end
+
+% Additional needs
 if isfield(parameters,'needs')
     if (~iscell(parameters.needs))||any(~cellfun(@ischar,parameters.needs(:)))
         error('parameters.needs must be a cell array of character strings.');
@@ -468,6 +446,7 @@ if isfield(parameters,'needs')
         end
     end
 end
+
 end
 
 % Do not confuse altruism with kindness. The irreducible primary of

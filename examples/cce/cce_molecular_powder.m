@@ -55,10 +55,9 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
                                'max_memory_bytes',2^28);
 
 % Average complete Hahn echo expansions over the quadrature
-task=context_task(@clexpn,@hahn_echo,parameters,'labframe');
 parameters.grid=struct('alphas',[0 0 pi/2],'betas',[0 pi/2 pi/2],...
                        'gammas',[0 0 0],'weights',ones(3,1)/3);
-[answer,~,diagnostics]=powder(spin_system,task,parameters,'labframe');
+[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Plot the projected complex signal
 kfigure();

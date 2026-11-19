@@ -525,7 +525,7 @@ For a projected coherent `@free_evolution` signal, an explicit `parameters.coil`
 
 ### Orientation composition
 
-For one orientation, set parameters.orientation. Build task=context_task(@clexpn,pulse_sequence,parameters,assumptions) and pass it to orientation_average(spin_system,task,outer). outer.grid is a shipped grid filename or a structure with alphas, betas, gammas (radians), and weights; positive weights are normalised. powder(spin_system,task,outer,assumptions) accepts the same descriptor, requires matching assumptions, and returns its grid second and native diagnostics third. Neither route constructs a full-bath basis. The ordinary five-argument pulse-sequence path is unchanged.
+For one orientation, set `parameters.orientation` to a radian Euler triple. For a quadrature, supply `parameters.grid` as a shipped grid name or an explicit structure containing `alphas`, `betas`, `gammas` and `weights`. Call `clexpn(spin_system,pulse_sequence,parameters,assumptions)` directly in both cases. Set `parameters.sum_up=false` to return individual responses instead of the weighted signal. `parameters.cce.averaging` distinguishes reducing each orientation before averaging from averaging matching raw cluster records before reduction.
 
 Each orientation runs independent complete dynamics. The task's cce.averaging selects expansion-first averaging or raw-record averaging before expansion with a common cluster family; the observed-only reference participates in both. Hamiltonians are never averaged. Orientations are serial; nested cluster/configuration scheduling may use the existing pool, but becomes serial inside an outer worker.
 

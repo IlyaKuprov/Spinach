@@ -1,9 +1,11 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m
 
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
 > Historical Spinach variant, not the article’s capped waveform: SNSA is a soft RF spillout penalty rather than the published hard amplitude limit. For a source-deposited and independently propagated broadband inversion pulse, use [BIBOP](../Kobzar_JMR_2004/bebop_bibop_profiles.md).
 
 - Signature: `bb_inversion_pulse()`
-- Source: [examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m)
+- Source: `examples/optimal_control/case_studies/Tosner_JMR_2009/bb_inversion_pulse.m` (source removed)
 
 ## Purpose
 
@@ -17,4 +19,4 @@ The design has 600 time slices of 1 microsecond each, for a total duration of 60
 
 ## Verification observable
 
-After optimisation, the script rescales the two waveform channels to physical angular-frequency controls and simulates the pulse at 201 offsets from -100 to +100 kHz. At each offset it evaluates -real(Sz' * rho_f), the inversion transfer relative to the normalised initial state, and plots that profile. The wider verification grid is distinct from the +/-50 kHz optimisation ensemble. The source defines this evaluation but supplies no numerical profile values in the page; no performance result or experimental validation is asserted here.
+After optimisation, the script rescales the two waveform channels to physical angular-frequency controls and simulates the pulse at 201 offsets from -100 to +100 kHz. At each offset it evaluates `-real(Sz'*rho_f)`, the inversion transfer relative to the normalised initial state, and plots that profile. The wider verification grid is distinct from the +/-50 kHz optimisation ensemble. The source defines this evaluation but supplies no numerical profile values in the page; no performance result or experimental validation is asserted here.

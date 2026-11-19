@@ -73,3 +73,7 @@ Address reviewer findings on the actual current head and revalidate affected
 behaviour; a review of an earlier commit is not a review of later changes.
 Follow the repository and user review/merge policy; opening a PR does not
 authorise merging it.
+
+## Cluster-expansion contract checks
+
+Read `cce_capabilities` for supported experiment handles and representations, `cce_options` for public field ownership, and `tests/lib/test_manifest.m` for registered test IDs. Retained internal engine records are not alternative public parameter forms. Preserve physical IDs, complex receiver convention, total elapsed time, both ensemble/reduction orders, and numerical validity/error channels when changing this boundary. Test a new public-field rejection at `clexpn`, not only at a low-level service. Use the existing source-matched regression notes rather than creating a knowledge copy of the test registry.

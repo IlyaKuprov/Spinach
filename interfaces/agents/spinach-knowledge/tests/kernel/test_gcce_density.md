@@ -8,7 +8,7 @@ Baseline zeros mask truncated ratios and full order bypasses them.
 
 ## Native interface
 
-Uses native `clexpn` density arrays (one column-major vectorised density per time row) and separate reduction diagnostics. Trace, Hermiticity, and minimum eigenvalue are computed directly without repairing the densities. A direct reducer probe disables the full-order bypass to retain the undefined-ratio masking assertion. Sampling checks inspect native physical configurations, including deterministic probabilities and unchanged global RNG.
+Uses native `clexpn` density arrays (one column-major vectorised density per time row) and separate reduction diagnostics. Trace, Hermiticity, and minimum eigenvalue are computed directly without repairing the densities. A direct reducer probe disables the full-order bypass to retain the undefined-ratio masking assertion. A radius-selected singleton reproduces its raw density, including the exact zeros at zero duration. Reversing the excluded spin reverses the transverse coherence via its static mean field; admitting that site at the radius boundary restores the genuinely truncated mask at order one. Sampling checks inspect native physical configurations, including deterministic probabilities and unchanged global RNG.
 
 ## Behaviour
 

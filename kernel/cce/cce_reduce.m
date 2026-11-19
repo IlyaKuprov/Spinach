@@ -21,7 +21,9 @@
 % Powers use deterministic compensated log-amplitude and phase sums;
 % exact zeros with strictly positive powers are valid if their supplied
 % uncertainty is zero and every denominator is resolved. Complete bath
-% exact-reference bypass belongs to the native ensemble reduction.
+% exact-reference bypass belongs to the native ensemble reduction. Native
+% cce.bath_spins is the graph-selected domain; complete_record indexes the
+% corresponding raw record, or is empty if the family is truncated.
 %
 % Parameters:
 %
@@ -83,7 +85,11 @@ if isfield(parameters,'cce')
         end
     end
 
-    % Retain unaveraged samples for the exact full-bath uncertainty
+    % Locate the exact record on the selected domain, including the empty bath
+    bath=sort(options.bath_spins(:)); sites=[{[]} {clusters.sites}];
+    complete=find(cellfun(@(ids)isequal(sort(ids(:)),bath),sites),1);
+    interlaced=strcmp(options.bath_state.mode,'interlaced');
+    if interlaced&&any([raw{1}.full_bath]), complete=find([raw{1}.full_bath],1); end
     sampling_error=[];
 
     % The internal-first estimator includes the observed-spin-only reference
@@ -100,32 +106,30 @@ if isfield(parameters,'cce')
             end
         end
         sampling_error=NaN(size(records(1).value));
-        complete=find(arrayfun(@(item)isequal(sort(item.sites),...
-                                             sort(options.bath_spins)),clusters),1);
         if ~isempty(complete)&&~(additive&&isfield(parameters,'noise')&&parameters.noise.connected)
             values=[];
-            for n=1:count, values=cat(3,values,raw{n}(complete+1).value); end
+            for n=1:count, values=cat(3,values,raw{n}(complete).value); end
             sampling_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(count*(count-1)));
         end
         raw={records}; weights=1; count=1;
     end
 
     % Interlaced records already contain parent-conditioned irreducible factors
-    if strcmp(options.bath_state.mode,'interlaced')
-        parts=cell(1,count);
-        for n=1:count, parts{n}=interlaced_product(raw{n},clusters,selection); end
-    else
-        parts=cell(1,count);
-        for n=1:count
+    parts=cell(1,count);
+    for n=1:count
+        if interlaced
+            parts{n}=interlaced_product(raw{n},clusters,selection);
+        else
             parts{n}=cce_reduce(raw{n},clusters,selection);
-            complete=find(arrayfun(@(item)isequal(sort(item.sites),sort(options.bath_spins)),clusters),1);
-            if ~isempty(complete)
-                exact=raw{n}(complete+1); parts{n}.value=exact.value;
-                parts{n}.valid=exact.valid; parts{n}.abs_error_bound=exact.abs_error_bound;
-                parts{n}.by_order(:,:,end)=exact.value;
-                parts{n}.by_order_valid(:,:,end)=exact.valid;
-                parts{n}.by_order_error(:,:,end)=exact.abs_error_bound;
-            end
+        end
+        if ~isempty(complete)
+            exact=raw{n}(complete); parts{n}.value=exact.value;
+            parts{n}.valid=exact.valid; parts{n}.abs_error_bound=exact.abs_error_bound;
+            parts{n}.by_order(:,:,end)=exact.value;
+            parts{n}.by_order_valid(:,:,end)=exact.valid;
+            parts{n}.by_order_error(:,:,end)=exact.abs_error_bound;
+            parts{n}.reason(:)={'ok'}; parts{n}.reason(~exact.valid)={'raw_invalid'};
+            parts{n}.by_order_reason(:,:,end)=parts{n}.reason;
         end
     end
     reduced=parts{1}; reduced.value(:)=0; reduced.abs_error_bound(:)=0;
@@ -153,8 +157,7 @@ if isfield(parameters,'cce')
 
     % A finite exact reference remains valid even above the requested error budget
     reduced.valid=reduced.valid&isfinite(reduced.value);
-    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(options.bath_spins)),clusters));
-    if ~complete
+    if isempty(complete)
         reduced.valid=reduced.valid&reduced.abs_error_bound<=options.numerics.atol+...
                                   options.numerics.rtol*abs(reduced.value);
     end
@@ -168,7 +171,7 @@ if isfield(parameters,'cce')
     if strcmp(options.numerics.zero_policy,'error')&&any(~reduced.valid,'all')
         error('cce_reduce:unresolved','The native expansion contains unresolved output elements.');
     end
-    reduced.samples=parts; reduced.weights=weights;
+    reduced.samples=parts; reduced.weights=weights; reduced.complete_record=complete;
     reduced.sampling_standard_error=zeros(size(reduced.value));
     if strcmp(options.bath_state.mode,'sampled')
         reduced.sampling_standard_error(:)=NaN;

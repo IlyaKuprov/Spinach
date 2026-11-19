@@ -190,7 +190,10 @@ schedule.pulse_sequence=pulse_sequence; schedule.contract=contract;
 
 % Scheduler calls the registered evaluator, which calls the five-argument experiment
 raw=cce_schedule(model,clusters,ensemble,schedule,parameters,contract.evaluator);
-reduced=cce_reduce(raw,clusters,parameters); answer=reduced.value;
+
+% Test completeness on the graph domain without trimming the exterior state
+request=parameters; request.cce.bath_spins=graph.bath_ids;
+reduced=cce_reduce(raw,clusters,request); answer=reduced.value;
 
 % Keep diagnostics separate from the natural sequence output
 diagnostics.raw=raw; diagnostics.clusters=clusters; diagnostics.graph=graph;

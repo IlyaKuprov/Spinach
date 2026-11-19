@@ -90,20 +90,20 @@ if strcmp(parameters.cce.averaging,'internal_then_expansion')
         end
         raw=[raw records]; %#ok<AGROW>
     end
-    reduction=cce_reduce(raw,orientations{1}.clusters,parameters);
+    request=parameters; request.cce.bath_spins=orientations{1}.graph.bath_ids;
+    reduction=cce_reduce(raw,orientations{1}.clusters,request);
 
     % Quadrature nodes sharing a spin draw are not independent statistical samples
     reduction.sampling_standard_error=orientations{1}.reduction.sampling_standard_error;
     samples=numel(orientations{1}.raw);
-    complete=find(arrayfun(@(item)isequal(sort(item.sites),...
-                                        sort(parameters.cce.bath_spins)),orientations{1}.clusters),1);
+    complete=reduction.complete_record;
     if strcmp(parameters.cce.bath_state.mode,'sampled')&&samples>1&&...
        ~isempty(complete)&&~(isfield(parameters,'noise')&&parameters.noise.connected)
         state_values=zeros([size(reduction.value) samples]);
         for n=1:count
             for k=1:samples
                 state_values(:,:,k)=state_values(:,:,k)+grid.weights(n)*...
-                                      orientations{n}.raw{k}(complete+1).value;
+                                      orientations{n}.raw{k}(complete).value;
             end
         end
         reduction.sampling_standard_error=std(state_values,0,3)/sqrt(samples);

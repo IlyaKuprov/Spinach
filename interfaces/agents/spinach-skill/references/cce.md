@@ -59,7 +59,7 @@ Spinach input frequencies are in Hz; canonical tensors after `create` are alread
 
 ## Cluster algebra and advanced state treatment
 
-The family is downward closed: every proper subset needed by the recurrence is present. The empty-bath response is the observed-system baseline, not an invented unit signal. Multiplicative irreducible factors divide each raw response by its proper-subset contributions, with propagated uncertainty and conditioning checks. Small unresolved denominators are not replaced by epsilon. A complete physical full-bath family uses the exact full-cluster response where the reducer contract permits it.
+The family is downward closed: every proper subset needed by the recurrence is present. The empty-bath response is the observed-system baseline, not an invented unit signal. Multiplicative irreducible factors divide each raw response by its proper-subset contributions, with propagated uncertainty and conditioning checks. Small unresolved denominators are not replaced by epsilon. A cluster spanning all `diagnostics.graph.bath_ids` supplies the exact response of the radius-selected bath, without dividing by baseline zeros. Excluded sites remain in the bath configuration and can still contribute to the exterior mean field; this is not exact evolution of the unpruned bath.
 
 Generalised observables and density matrices require entrywise handling with the declared observed dimension and detector. A non-informative density entry remains invalid rather than being replaced by a population from another cluster. Noise correlation uses additive inclusion-exclusion, never multiplicative coherence division. The requested reduction algebra comes from the registered experiment.
 

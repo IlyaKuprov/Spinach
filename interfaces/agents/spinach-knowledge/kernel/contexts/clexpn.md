@@ -39,6 +39,6 @@ A projected request is rejected before subsystem construction when its registere
 
 The native input boundary rejects parameters.sequence, including empty arrays. Finite, fractional, overlapping, and partially observed controls belong to finite_drive; ideal trains belong to refocusing_train. No raw-event parameter adapter is provided.
 
-The optional cce.bath_radius is forwarded to graph selection. It retains bath sites within the stated Angstrom distance of any observed spin, including the boundary; diagnostics.graph reports retained and omitted physical IDs. This bath-domain cutoff is distinct from the graph edge radius.
+The optional cce.bath_radius is forwarded to graph selection. It retains bath sites within the stated Angstrom distance of any observed spin, including the boundary; diagnostics.graph reports retained and omitted physical IDs. This bath-domain cutoff is distinct from the graph edge radius. A cluster containing every radius-selected site supplies the exact response for that selected model. Omitted sites remain in the physical configuration and can contribute to a static exterior mean field.
 
 An incomplete partition is rejected with `clexpn:partition` before its candidate groups are installed or production tasks are scheduled. Pilot/held-out failure and exhausted probe, capacity, or iteration budgets therefore cannot return an ordinary numeric answer, even for a one-output call. Completed partitions preserve their production grouping and diagnostics.

@@ -59,6 +59,24 @@ result=test_true(result,'elementwise baseline zeros masked',any(~ratio_reduced.v
 result=test_true(result,'raw density retained',all(isfinite(records{1}(2).value),'all'),...
                  'Masking factors does not destroy direct raw density information.');
 
+% Select one bath spin but retain the polarised exterior in the static field
+sys.isotopes{3}='1H'; inter.zeeman.matrix{3}=zeros(3); inter.coupling.matrix=cell(3);
+spatial=create(sys,inter); spatial.inter.coordinates={[0 0 0],[1 0 0],[10 0 0]};
+spatial.inter.coupling.matrix{1,2}=diag([4 0 2]);
+spatial.inter.coupling.matrix{1,3}=[0 0 0;0 0 0;14 0 0];
+radius=p; radius.cce.bath_spins=[2 3]; radius.cce.bath_radius=2;
+radius.cce.bath_state=struct('mode','explicit_product','rho',{{eye(2)/2,diag([1 0])}});
+radius.cce.meanfield='static'; [up,retained]=clexpn(spatial,@free_evolution,radius,'labframe');
+result=test_close(result,'Complete radius-selected density',up,retained.raw{1}(2).value,0,0,...
+                  'Every element, including exact initial zeros, comes from the retained cluster.');
+radius.cce.bath_state.rho{2}=diag([0 1]); down=clexpn(spatial,@free_evolution,radius,'labframe');
+result=test_true(result,'Radius-excluded exterior field',imag(up(end,2))*imag(down(end,2))<0,...
+                 'Reversing only the excluded spin reverses the observed transverse coherence.');
+radius.cce.bath_radius=10; [~,incomplete]=clexpn(spatial,@free_evolution,radius,'labframe');
+result=test_true(result,'Incomplete radius-selected density',...
+                 isequal(incomplete.graph.bath_ids,[2 3])&&~any(incomplete.reduction.valid(1,2:4)),...
+                 'Two retained sites with no joint cluster still have undefined zero-baseline ratios.');
+
 % Reject nonpositive densities and unresolved initial scalar normalisation
 bad=p; bad.rho0=diag([1.1 -0.1]); caught=false;
 try

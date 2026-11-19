@@ -61,6 +61,30 @@ state=loaded.state;
 result=test_true(result,'completed bitmap',all(state.completed),...
                  'All sixteen tasks are marked complete after resume.');
 
+% Only a retained physical orientation contributes to its grid checkpoint
+quadrature=rmfield(p,'orientation');
+quadrature.grid=struct('alphas',[1 0],'betas',[1 0],'gammas',[1 0],'weights',[0 3]);
+[written,grid_data]=clexpn(spin_system,@free_evolution,quadrature,'labframe');
+result=test_close(result,'Single-crystal to grid restart',written,uninterrupted,0,0,...
+                  'A single retained Euler point can resume its direct crystal checkpoint.');
+quadrature.grid.betas(1)=0.2;
+quadrature.grid.weights(2)=7;
+replayed=clexpn(spin_system,@free_evolution,quadrature,'labframe');
+result=test_true(result,'Single-node checkpoint records',isequal(grid_data.grid_indices,2)&&...
+                 isequaln(grid_data.orientations{1}.raw,uninterrupted_data.raw),...
+                 'The grid node and direct crystal have identical physical records.');
+result=test_close(result,'Single-node checkpoint replay',replayed,written,0,0,...
+                  'Changing a discarded node and the relative weight preserves the grid ledger.');
+quadrature.grid.betas(2)=0.2;
+refused=false;
+try
+    clexpn(spin_system,@free_evolution,quadrature,'labframe');
+catch exception
+    refused=strcmp(exception.identifier,'cce_checkpoint:identity');
+end
+result=test_true(result,'Retained orientation checkpoint identity',refused,...
+                 'A different physical rotation must not resume the previous orientation.');
+
 % Resource availability must not invalidate an otherwise identical physical ledger
 resized=p;
 resized.cce.numerics.max_memory_bytes=2*p.cce.numerics.max_memory_bytes;

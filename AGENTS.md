@@ -68,7 +68,9 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **General Formatting:** When in doubt about formatting, mimic the existing code. Refer to functions in the `kernel` and `experiments` folders for the correct style and structure if unsure.
 
-* **Paragraph spacing:** Each logically distinct code stage must be preceded and followed by a blank line and must have a comment line as its first line. In <start> ... <end> type code structures, the starting statement must be followed by a blank line and the final `end` must be preceded by a blank line.   
+* **Paragraph spacing:** Each logically distinct code stage must be preceded and followed by a blank line and must have a comment line as its first line. In <start> ... <end> type code structures, the starting statement must be followed by a blank line and the final `end` must be preceded by a blank line.
+
+* **Semicolon ends the line:** When writing new code, a new line after a semicolon is mandatory.
 
 ### Comments and Function Headers
 

@@ -13,7 +13,8 @@ function result=test_cce_analysis()
 % Fit a complex signal through its explicitly selected magnitude envelope
 result=new_test_result('kernel/cce_analysis','CCE decay diagnostics',...
                        'Synthetic windows, fit assumptions and invalid/oscillatory refusal.');
-t=linspace(0,2,101)'; envelope=0.8*exp(-(t/0.7).^1.6);
+t=linspace(0,2,101)';
+envelope=0.8*exp(-(t/0.7).^1.6);
 r=struct('times',t,'value',envelope.*exp(4i*t),'valid',true(size(t)));
 p.analysis=struct('fit',true,'observable',1,'envelope','magnitude',...
                   'model','stretched_exponential','interval',[0.1 1.8],...
@@ -26,20 +27,28 @@ result=test_true(result,'C7 contract check',isequal(a.value,r.value)&&isequal(a.
 result=test_true(result,'C7 contract check',isequal(size(a.fit.confidence_interval),[3 2]),'Declared confidence procedure recorded.');
 
 % Confirm fit-off default and refusal to hide an invalid sample
-idle=cce_analyse(r,struct()); result=test_true(result,'C7 contract check',strcmp(idle.status,'not_requested'),'Fitting is opt-in.');
-r.valid(20)=false; invalid=cce_analyse(r,p);
+idle=cce_analyse(r,struct());
+result=test_true(result,'C7 contract check',strcmp(idle.status,'not_requested'),'Fitting is opt-in.');
+r.valid(20)=false;
+invalid=cce_analyse(r,p);
 result=test_true(result,'C7 contract check',strcmp(invalid.status,'invalid_window')&&~isempty(invalid.warnings),...
                  'Invalid samples are not silently removed from the fitting window.');
 
 % Refuse an oscillatory real curve rather than inventing a relaxation time
-r.valid(:)=true; r.value=exp(-t).*(1+0.3*cos(20*t)); p.analysis.envelope='real';
+r.valid(:)=true;
+r.value=exp(-t).*(1+0.3*cos(20*t));
+p.analysis.envelope='real';
 oscillatory=cce_analyse(r,p);
 result=test_true(result,'C7 contract check',strcmp(oscillatory.status,'not_decay')&&~isempty(oscillatory.warnings),...
                  'Oscillatory windows require an explicit valid envelope.');
 
 % Native algorithm fields are unrelated to explicit post-processing
-native=p; native.analysis.envelope='magnitude'; native.cce=struct('order',1,'approximation','generalized');
-native.observed=1; native.times=t; native.analysis.weights=ones(size(t));
+native=p;
+native.analysis.envelope='magnitude';
+native.cce=struct('order',1,'approximation','generalized');
+native.observed=1;
+native.times=t;
+native.analysis.weights=ones(size(t));
 native_data=struct('times',t,'value',envelope.*exp(4i*t),'valid',true(size(t)));
 actual=cce_analyse(native_data,native);
 result=test_close(result,'Native parameters preserve fitted values',...
@@ -48,7 +57,9 @@ result=test_close(result,'Native parameters preserve fitted values',...
                   'Algorithm policy does not alter standalone decay analysis.');
 
 % Reject misspelled analysis options without a driver-level validator
-invalid=p; invalid.analysis.weigths=ones(size(r.times)); rejected=false;
+invalid=p;
+invalid.analysis.weigths=ones(size(r.times));
+rejected=false;
 try
     cce_analyse(r,invalid);
 catch exception

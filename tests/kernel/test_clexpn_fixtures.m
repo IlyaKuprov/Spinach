@@ -44,7 +44,8 @@ result=test_true(result,'Projection remains explicit',...
 % Compare every bath dipole against its source constants and displacement
 for j=1:4
     for k=j+1:4
-        r=(fixture.coordinates(k,:)-fixture.coordinates(j,:))*1e-10; u=r/norm(r);
+        r=(fixture.coordinates(k,:)-fixture.coordinates(j,:))*1e-10;
+        u=r/norm(r);
         angular=1e-7*1.054571817e-34*(6.7282853242747445*1e7)^2/norm(r)^3;
         expected=angular*(eye(3)-3*(u.'*u))/(2*pi);
         result=test_close(result,'Pinned bath dipole',inter.coupling.matrix{j+1,k+1},...
@@ -53,7 +54,8 @@ for j=1:4
 end
 
 % Caller edits cannot mutate the next returned physical dataset
-original=inter.coupling.matrix{1,2}; inter.coupling.matrix{1,2}(:)=0;
+original=inter.coupling.matrix{1,2};
+inter.coupling.matrix{1,2}(:)=0;
 [~,fresh,again]=cce_fixture('nv_four_c13','6f7282b6');
 result=test_close(result,'Independent fixture returns',fresh.coupling.matrix{1,2},original,0,0,...
                   'A caller chooses its projection without modifying the source fixture.');

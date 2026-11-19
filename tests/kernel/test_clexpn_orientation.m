@@ -14,19 +14,26 @@ function result=test_clexpn_orientation()
 % A small anisotropic system needs no global basis for either averaging order
 result=new_test_result('kernel/clexpn_orientation','Deferred CCE powder',...
                        'Independent orientation dynamics and explicit averaging order.');
-sys.magnet=0.01; sys.isotopes={'E','2H','2H'};
-sys.output='hush'; sys.parallel={'local',1};
-inter.zeeman.scalar={0,0,0}; inter.coupling.matrix=cell(3);
+sys.magnet=0.01;
+sys.isotopes={'E','2H','2H'};
+sys.output='hush';
+sys.parallel={'local',1};
+inter.zeeman.scalar={0,0,0};
+inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([1e5 1e5 4e5]);
 inter.coupling.matrix{1,3}=diag([2e4 2e4 8e4]);
 inter.coupling.matrix{2,2}=diag([-1 -1 2])*2e5;
 spin_system=create(sys,inter);
-p.observed=1; p.transition=struct('spins',1,'ms',[0.5 -0.5]);
-p.preparation='transverse'; p.times=[0 13e-6 41e-6];
+p.observed=1;
+p.transition=struct('spins',1,'ms',[0.5 -0.5]);
+p.preparation='transverse';
+p.times=[0 13e-6 41e-6];
 p.cce=struct('bath_spins',2:3,'order',1,'approximation','generalized');
-p.cce.graph.mode='complete'; p.cce.numerics=struct('atol',1e-6,'rtol',1e-6);
+p.cce.graph.mode='complete';
+p.cce.numerics=struct('atol',1e-6,'rtol',1e-6);
 grid=struct('alphas',[0 0],'betas',[0 pi/2],'gammas',[0 0],'weights',[1 3]);
-outer=struct('grid',grid); task=context_task(@clexpn,@hahn_echo,p,'labframe');
+outer=struct('grid',grid);
+task=context_task(@clexpn,@hahn_echo,p,'labframe');
 [after,diagnostics]=orientation_average(spin_system,task,outer);
 [via_powder,sph_grid,powder_diagnostics]=powder(spin_system,task,outer,'labframe');
 result=test_close(result,'Deferred powder dispatch',via_powder,after,0,0,...
@@ -39,7 +46,8 @@ result=test_true(result,'Powder quadrature contract',...
 % Expansion-first averaging equals independently completed orientations
 expected=zeros(size(after));
 for n=1:2
-    local=p; local.orientation=[grid.alphas(n) grid.betas(n) grid.gammas(n)];
+    local=p;
+    local.orientation=[grid.alphas(n) grid.betas(n) grid.gammas(n)];
     [current,evidence]=clexpn(spin_system,@hahn_echo,local,'labframe');
     result=test_close(result,'Orientation-resolved signal',diagnostics.values{n},current,0,0,...
                       'Each orientation retains the independently calculated complex amplitude.');
@@ -56,7 +64,8 @@ result=test_close(result,'Expansion before powder average',after,expected,0,0,..
                   'Every orientation has its own dynamics and cluster expansion.');
 
 % Cluster parallelism preserves each complete orientation and uses the existing pool
-parallel_task=task; parallel_task.parameters.cce.parallel.mode='clusters';
+parallel_task=task;
+parallel_task.parameters.cce.parallel.mode='clusters';
 [parallel_answer,parallel_data]=orientation_average(spin_system,parallel_task,outer);
 result=test_close(result,'Parallel orientation signal',parallel_answer,after,0,0,...
                   'Serial and cluster-parallel composition have identical gather order.');
@@ -80,9 +89,11 @@ result=test_true(result,'Nested-worker suppression',...
                  'Only the already existing outer pool owns workers.');
 
 % Rotating an anisotropic Zeeman tensor changes the physical pump selection
-selected_system=spin_system; selected_system.inter.zeeman.matrix{2}=diag([500 500 1000]);
-pumped=p; pumped.pump=struct('sites',2,'center',1000,'halfwidth',100,...
-                            'units','rad/s','fraction',0.25,'allow_empty',true);
+selected_system=spin_system;
+selected_system.inter.zeeman.matrix{2}=diag([500 500 1000]);
+pumped=p;
+pumped.pump=struct('sites',2,'center',1000,'halfwidth',100,...
+                   'units','rad/s','fraction',0.25,'allow_empty',true);
 pump_task=context_task(@clexpn,@bath_pumped_hahn,pumped,'labframe');
 [~,pump_data]=orientation_average(selected_system,pump_task,outer);
 selected=cell(1,2);
@@ -104,7 +115,8 @@ result=test_true(result,'Orientation-dependent pump selection',...
 p.cce.averaging='internal_then_expansion';
 task=context_task(@clexpn,@hahn_echo,p,'labframe');
 [before,internal]=orientation_average(spin_system,task,outer);
-records=diagnostics.orientations{1}.raw{1}; averaged=zeros(numel(p.times),numel(records));
+records=diagnostics.orientations{1}.raw{1};
+averaged=zeros(numel(p.times),numel(records));
 for n=1:2
     records=diagnostics.orientations{n}.raw{1};
     for k=1:numel(records)
@@ -151,13 +163,15 @@ result=test_close(result,'Internal spin and powder average',internal_sampled,exp
                   'Both quadrature and spin-state weights precede inclusion-exclusion.');
 
 % Integer quadratures are promoted before normalisation, not rounded as integers
-integer_grid=grid; integer_grid.weights=uint8([1 3]);
+integer_grid=grid;
+integer_grid.weights=uint8([1 3]);
 [integer_answer,~]=orientation_average(spin_system,task,struct('grid',integer_grid));
 result=test_close(result,'Integer quadrature weights',integer_answer,internal_sampled,0,0,...
                   'Numeric quadrature inputs are normalized in double precision.');
 
 % Named grids use the same kernel/grids lookup and field names as powder
-named=task; named.parameters.times=0;
+named=task;
+named.parameters.times=0;
 named.parameters.cce=rmfield(named.parameters.cce,'bath_state');
 [named_answer,named_diagnostics]=orientation_average(spin_system,named,...
                                   struct('grid','icos_2ang_12pts.mat'));
@@ -167,22 +181,28 @@ result=test_true(result,'Named powder grid size',numel(named_diagnostics.grid.we
                  'The installed quadrature is not replaced by a hidden grid.');
 
 % A zero-weight orientation does not run a second physical calculation
-outer.grid.weights=[1 0]; [single,one]=orientation_average(spin_system,task,outer);
+outer.grid.weights=[1 0];
+[single,one]=orientation_average(spin_system,task,outer);
 result=test_close(result,'Zero quadrature weight',single,one.orientations{1}.reduction.value,0,0,...
                   'Zero-measure orientations are omitted without changing the response.');
 
 % Single stochastic draws remain unavailable through both averaging orders
-request=task.parameters; request.cce.order=1;
+request=task.parameters;
+request.cce.order=1;
 request.cce.interlaced=struct('reference_state',1,'max_states',9);
-probe_grid=grid; probe_grid.betas=[0 0];
+probe_grid=grid;
+probe_grid.betas=[0 0];
 for mode={'sampled','interlaced'}
     request.cce.bath_state=struct('mode',mode{1},'samples',1,'seed',19,...
                                   'basis','uniform','probabilities','uniform');
     for averaging={'after_expansion','internal_then_expansion'}
-        if strcmp(mode{1},'interlaced')&&strcmp(averaging{1},'internal_then_expansion'), continue; end
+        if strcmp(mode{1},'interlaced')&&strcmp(averaging{1},'internal_then_expansion')
+            continue;
+        end
         request.cce.averaging=averaging{1};
         local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
-        saved_rng=rng; saved_task=local_task;
+        saved_rng=rng;
+        saved_task=local_task;
         [~,single_draw]=orientation_average(spin_system,local_task,struct('grid',probe_grid));
         result=test_true(result,'Unavailable single-draw uncertainty',...
                          all(isnan(single_draw.reduction.sampling_standard_error),'all'),...
@@ -195,7 +215,8 @@ for mode={'sampled','interlaced'}
 end
 
 % A complete bath still counts independent spin draws rather than quadrature nodes
-request.cce.order=2; request.cce.averaging='internal_then_expansion';
+request.cce.order=2;
+request.cce.averaging='internal_then_expansion';
 for count=[1 4]
     request.cce.bath_state=struct('mode','sampled','samples',count,'seed',19,...
                                   'basis','uniform','probabilities','uniform');
@@ -222,7 +243,8 @@ for count=[1 4]
 end
 
 % Complete interlacing preserves per-order reason shapes during diagnostic merging
-request.cce.averaging='after_expansion'; request.cce.bath_state.mode='interlaced';
+request.cce.averaging='after_expansion';
+request.cce.bath_state.mode='interlaced';
 request.cce.bath_state.samples=1;
 local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
 [~,complete]=orientation_average(spin_system,local_task,struct('grid',probe_grid));
@@ -233,11 +255,14 @@ result=test_true(result,'Complete interlaced orientation diagnostics',...
                  'Exact full-bath interlacing has zero sampling error and aligned diagnostic arrays.');
 
 % A shared ledger is rejected before any nested calculation writes a checkpoint
-request.cce=rmfield(request.cce,'bath_state'); request.cce.order=1;
-checkpoint=[tempname '.mat']; request.cce.checkpoint=struct('file',checkpoint,'resume',false);
+request.cce=rmfield(request.cce,'bath_state');
+request.cce.order=1;
+checkpoint=[tempname '.mat'];
+request.cce.checkpoint=struct('file',checkpoint,'resume',false);
 for resume=[false true]
     request.cce.checkpoint.resume=resume;
-    local_task=context_task(@clexpn,@hahn_echo,request,'labframe'); refused=false;
+    local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
+    refused=false;
     try
         orientation_average(spin_system,local_task,struct('grid',grid));
     catch exception
@@ -248,7 +273,8 @@ for resume=[false true]
 end
 request.cce.checkpoint.resume=false;
 local_task=context_task(@clexpn,@hahn_echo,request,'labframe');
-one_grid=grid; one_grid.weights=[1 0];
+one_grid=grid;
+one_grid.weights=[1 0];
 [written,~]=orientation_average(spin_system,local_task,struct('grid',one_grid));
 cleanup=onCleanup(@()delete(checkpoint));
 local_task.parameters.cce.checkpoint.resume=true;
@@ -257,9 +283,11 @@ result=test_close(result,'Single-orientation checkpoint resume',resumed,written,
                   'Zero-weight nodes do not prevent a single physical ledger from being resumed.');
 
 % The ordinary five-argument pulse-sequence branch retains its grid contract
-bas.formalism='zeeman-hilb'; bas.approximation={'none'};
+bas.formalism='zeeman-hilb';
+bas.approximation={'none'};
 full_system=basis(spin_system,bas);
-ordinary_parameters=struct('grid',grid); ordinary_parameters.spins={'E'};
+ordinary_parameters=struct('grid',grid);
+ordinary_parameters.spins={'E'};
 [ordinary,ordinary_grid,ordinary_diagnostics]=powder(full_system,@(~,~,~,~,~)1,...
                                                   ordinary_parameters,'labframe');
 result=test_close(result,'Ordinary powder pulse sequence',ordinary,sum(grid.weights),2e-15,0,...
@@ -271,9 +299,12 @@ result=test_true(result,'Ordinary powder outputs',isempty(ordinary_diagnostics)&
 % Every new public field is validated before numerical evaluation
 invalid={rmfield(task,'context'),task,task,task,task,task,task,task};
 inputs=repmat({struct('grid',grid)},size(invalid));
-invalid{2}.context=@powder; invalid{3}.pulse_sequence=1;
-invalid{4}.parameters=[]; invalid{5}.assumptions=1;
-inputs{6}.grid.weights=[-1 2]; inputs{7}.grid.betas=[0 NaN];
+invalid{2}.context=@powder;
+invalid{3}.pulse_sequence=1;
+invalid{4}.parameters=[];
+invalid{5}.assumptions=1;
+inputs{6}.grid.weights=[-1 2];
+inputs{7}.grid.betas=[0 NaN];
 inputs{8}.grid.gammas=0;
 for n=1:numel(invalid)
     rejected=false;

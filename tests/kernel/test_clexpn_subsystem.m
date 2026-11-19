@@ -14,7 +14,9 @@ function result=test_clexpn_subsystem()
 % State the physical domains and deterministic mixed-multiplicity fixture
 result=new_test_result('kernel/clexpn_subsystem','Native CCE subsystems',...
                        'Canonical units, retained ordering, states and cache ownership.');
-sys.isotopes={'E3','14N','13C'}; sys.magnet=0.035; sys.output='hush';
+sys.isotopes={'E3','14N','13C'};
+sys.magnet=0.035;
+sys.output='hush';
 inter.zeeman.matrix={diag([2.01 2.02 2.03]),diag([4 2 -3]),diag([1 -2 4])};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=[11 3 -2;4 17 5;7 -6 23];
@@ -22,9 +24,13 @@ inter.coupling.matrix{2,3}=[2 -1 3;4 5 1;-2 6 8];
 inter.coupling.matrix{1,3}=diag([1 2 3]);
 inter.coupling.matrix{2,2}=diag([-4 -4 8]);
 inter.coordinates={[0 0 0],[1 0 0],[2 0 0]};
-system=create(sys,inter); parameters.observed=[3 1]; parameters.times=[0 1e-6];
-parameters.orientation=[0.3 0.7 0.2]; parameters.cce.bath_spins=2;
-parameters.cce.groups={2}; parameters.cce.backend='direct';
+system=create(sys,inter);
+parameters.observed=[3 1];
+parameters.times=[0 1e-6];
+parameters.orientation=[0.3 0.7 0.2];
+parameters.cce.bath_spins=2;
+parameters.cce.groups={2};
+parameters.cce.backend='direct';
 parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
 model=cce_compile(system,parameters,'labframe');
 [cluster,cache]=cce_subsystem(model,2,struct(),[]);
@@ -62,7 +68,8 @@ result=test_true(result,'Empty bath retains observed space',...
 [again,cache]=cce_subsystem(model,2,struct(),cache);
 result=test_true(result,'Exact cache hit',isequaln(cluster,again)&&cache.hits==1,...
                  'An unchanged request must reuse the same immutable view.');
-changed=model; changed.formalism='zeeman-liouv';
+changed=model;
+changed.formalism='zeeman-liouv';
 [again,cache]=cce_subsystem(changed,2,struct(),cache);
 result=test_true(result,'Representation invalidates cache',cache.misses==2&&...
                  strcmp(again.formalism,'zeeman-liouv'),'Representation belongs in the signature.');
@@ -76,10 +83,14 @@ result=test_true(result,'Physical model invalidates cache',cache.misses==4,...
                  'Canonical model changes must never retain an old cache entry.');
 
 % Nonuniform populations and exterior fields share one bath configuration
-parameters.observed=1; parameters.cce.bath_spins=[3 2]; parameters.cce.groups={[3 2]};
-parameters.cce.meanfield='static'; parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
+parameters.observed=1;
+parameters.cce.bath_spins=[3 2];
+parameters.cce.groups={[3 2]};
+parameters.cce.meanfield='static';
+parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
 model=cce_compile(system,parameters,'labframe');
-configuration.bath_ids=[2 3]; configuration.bath_rho={diag([0.2 0.3 0.5]),diag([0.8 0.2])};
+configuration.bath_ids=[2 3];
+configuration.bath_rho={diag([0.2 0.3 0.5]),diag([0.8 0.2])};
 [cluster,cache]=cce_subsystem(model,2,configuration,[]);
 result=test_close(result,'Nonuniform local bath density',cluster.bath_rho{1},...
                   diag([0.2 0.3 0.5]),0,0,...
@@ -96,10 +107,15 @@ result=test_close(result,'Changed exterior field',...
                   'The canonical physical representation must agree with the independent reference.');
 
 % A scalar coupling has one Hz-to-angular-frequency conversion
-clear sys inter parameters
-sys.isotopes={'1H','13C'}; sys.magnet=0; sys.output='hush';
-inter.zeeman.scalar={0,0}; inter.coupling.scalar={0,137;0,0};
-system=create(sys,inter); parameters.observed=1; parameters.times=0;
+clear sys inter parameters;
+sys.isotopes={'1H','13C'};
+sys.magnet=0;
+sys.output='hush';
+inter.zeeman.scalar={0,0};
+inter.coupling.scalar={0,137;0,0};
+system=create(sys,inter);
+parameters.observed=1;
+parameters.times=0;
 parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
 model=cce_compile(system,parameters,'labframe');
 H=cce_hamiltonian(model,2,struct());
@@ -116,8 +132,10 @@ result=test_close(result,'Resolved transition projector',...
 hilbert_hash=model.source_hash;
 
 % Explicit representations remove stale whole-system basis arrays
-bas.formalism='zeeman-liouv'; bas.approximation={'none'};
-system=basis(system,bas); parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
+bas.formalism='zeeman-liouv';
+bas.approximation={'none'};
+system=basis(system,bas);
+parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
 model=cce_compile(system,parameters,'labframe');
 result=test_true(result,'Carry representation without stale basis',...
                  strcmp(model.formalism,'zeeman-liouv')&&~isfield(model.spin_system,'bas')&&...
@@ -132,7 +150,8 @@ catch
     rejected=true;
 end
 result=test_true(result,'Duplicate physical site rejected',rejected,'Ownership must be unique.');
-configuration=struct('bath_ids',2,'bath_rho',{{diag([1.1 -0.1])}}); rejected=false;
+configuration=struct('bath_ids',2,'bath_rho',{{diag([1.1 -0.1])}});
+rejected=false;
 try
     cce_subsystem(model,2,configuration,[]);
 catch

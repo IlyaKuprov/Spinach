@@ -14,16 +14,25 @@ function result=test_clexpn_observation()
 % Use complex observed preparation and a non-Hermitian transition detector
 result=new_test_result('kernel/clexpn_observation','Native CCE observation',...
                        'Preparation, non-Hermitian detection and actual reference.');
-sys.isotopes={'1H','13C'}; sys.magnet=0; sys.output='hush'; sys.disable={'hygiene'};
-spin_system=create(sys,struct()); p.observed=1; p.times=[0 0.013];
-p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]); p.cce.order=1;
+sys.isotopes={'1H','13C'};
+sys.magnet=0;
+sys.output='hush';
+sys.disable={'hygiene'};
+spin_system=create(sys,struct());
+p.observed=1;
+p.times=[0 0.013];
+p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
+p.cce.order=1;
 p.cce.numerics.max_memory_bytes=2^26;
-p.cce.numerics.atol=1e-12; p.cce.numerics.rtol=1e-10;
+p.cce.numerics.atol=1e-12;
+p.cce.numerics.rtol=1e-10;
 [p,~]=cce_options(spin_system,p,@sin,{'labframe'});
 model=cce_compile(spin_system,p,{'labframe'});
 [cluster,~]=cce_subsystem(model,2,struct(),[]);
-p.rho0=[0.5,0.2+0.1i;0.2-0.1i,0.5]; p.coil=[0 1;0 0];
-p.receiver_phase=0.37; p.normalized=true;
+p.rho0=[0.5,0.2+0.1i;0.2-0.1i,0.5];
+p.coil=[0 1;0 0];
+p.receiver_phase=0.37;
+p.normalized=true;
 [rho,coil,reference,meta]=cce_observation(cluster,p);
 expected=exp(-1i*p.receiver_phase)*(0.2+0.1i);
 result=test_close(result,'Complex actual reference',reference,expected,2e-16,2e-15,...
@@ -36,7 +45,8 @@ result=test_close(result,'Physical density trace',trace(rho),1,2e-15,0,...
                   'The bath product is trace-normalised.');
 
 % Multiple complex detectors preserve time-by-detector orientation
-p.normalized=false; p.coil={p.coil,[0 -1i;1i 0]/2};
+p.normalized=false;
+p.coil={p.coil,[0 -1i;1i 0]/2};
 [rho,coils,reference,meta]=cce_observation(cluster,p);
 [H,~,~,~,~]=cce_generators(cluster,p,[]);
 signal=cce_evolution(cluster,H,coils,rho,0,2,'observable');
@@ -56,7 +66,8 @@ result=test_close(result,'Non-Hermitian descriptor',coil,kron([0 1;0 0],eye(2)),
                   'The raising detector is not silently conjugated or made Hermitian.');
 result=test_close(result,'Descriptor reference',reference,0.5,0,0,...
                   'The actual initial signal supplies the normalization reference.');
-liouv=cluster; liouv.formalism='zeeman-liouv';
+liouv=cluster;
+liouv.formalism='zeeman-liouv';
 [vector,detector,~,~]=cce_observation(liouv,spec);
 result=test_close(result,'Liouville preparation vectorisation',vector,rho(:),0,0,...
                   'Preparation is vectorised column-major.');
@@ -64,7 +75,9 @@ result=test_close(result,'Liouville coil vectorisation',detector,coil(:),0,0,...
                   'The detector uses the same column-major convention.');
 
 % Projected blocks agree with full-space transition detection before scaling
-projected=p; projected.coil=projected.coil{1}; projected.cce.approximation='projected';
+projected=p;
+projected.coil=projected.coil{1};
+projected.cce.approximation='projected';
 [block,detector,reference,meta]=cce_observation(cluster,projected);
 result=test_close(result,'Projected actual detected reference',detector'*block,reference,2e-16,2e-15,...
                   'Projected propagation carries the actual prepared coherence amplitude.');
@@ -72,9 +85,13 @@ result=test_true(result,'Output orientation declared',strcmp(meta.output_orienta
                  'Experiments can rely on an explicit observation orientation.');
 
 % Isotope descriptors exclude matching bath spins from the observed-only view
-same_sys=sys; same_sys.isotopes={'E','E'}; same=create(same_sys,struct());
+same_sys=sys;
+same_sys.isotopes={'E','E'};
+same=create(same_sys,struct());
 selected=rmfield(p,{'rho0','coil','receiver_phase'});
-selected.observed=2; selected.transition.spins=2; selected.cce.bath_spins=1;
+selected.observed=2;
+selected.transition.spins=2;
+selected.cce.bath_spins=1;
 selected.preparation=struct('states','Lx','spins','E');
 [selected,~]=cce_options(same,selected,@free_evolution,'labframe');
 same_model=cce_compile(same,selected,'labframe');
@@ -90,19 +107,25 @@ result=test_close(result,'Observed-only isotope detection',coil,...
                   'The observation service resolves the observed physical IDs only.');
 result=test_close(result,'Isotope descriptor reference',reference,0.5,0,0,...
                   'Isotope and physical-ID selection have the same reference.');
-selected=rmfield(selected,'detection'); selected.normalized=true;
+selected=rmfield(selected,'detection');
+selected.normalized=true;
 actual=clexpn(same,@free_evolution,selected,'labframe');
 result=test_close(result,'Public isotope preparation',actual,ones(numel(selected.times),1),0,0,...
                   'Both the empty and retained-bath tasks accept the observed isotope descriptor.');
 
 % Ambiguous normalisation and unsupported projected observables fail explicitly
-bad=p; bad.rho0=eye(2)/2; bad.coil=[0 1;0 0]; bad.normalized=true;
+bad=p;
+bad.rho0=eye(2)/2;
+bad.coil=[0 1;0 0];
+bad.normalized=true;
 result=test_true(result,'Vanishing reference rejected',rejects(@()cce_observation(cluster,bad)),...
                  'A zero initial detected signal cannot be a normalization divisor.');
-bad=projected; bad.coil=eye(2);
+bad=projected;
+bad.coil=eye(2);
 result=test_true(result,'Projected population detector rejected',rejects(@()cce_observation(cluster,bad)),...
                  'A projected coherence block cannot produce a population observable.');
-bad=spec; bad.preparation='thermal';
+bad=spec;
+bad.preparation='thermal';
 result=test_true(result,'Unknown preparation rejected',rejects(@()cce_observation(cluster,bad)),...
                  'No unimplemented preparation is replaced by a guessed state.');
 

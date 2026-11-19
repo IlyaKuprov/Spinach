@@ -15,12 +15,17 @@ result=new_test_result('kernel/cce_units','CCE canonical units',...
                        'Check signed Zeeman, scalar, dipolar and ordered-cell units.');
 
 % Define explicit model choices without invoking an interaction conversion twice
-parameters.observed=1; parameters.cce.bath_spins=2;
-parameters.times=0; parameters.orientation=[0 0 0];
+parameters.observed=1;
+parameters.cce.bath_spins=2;
+parameters.times=0;
+parameters.orientation=[0 0 0];
 parameters.cce.interaction_cutoff=Inf;
 parameters.cce.numerics=struct('atol',1e-7,'rtol',1e-12,'max_memory_bytes',1e8);
-sys.isotopes={'1H','13C'}; sys.magnet=0; sys.output='hush';
-inter.zeeman.scalar={0,0}; inter.coupling.scalar={0,137;0,0};
+sys.isotopes={'1H','13C'};
+sys.magnet=0;
+sys.output='hush';
+inter.zeeman.scalar={0,0};
+inter.coupling.scalar={0,137;0,0};
 
 % Compare scalar Hz conversion with the explicit singlet/triplet matrix
 system=create(sys,inter);
@@ -45,8 +50,9 @@ result=test_close(result,'dipole SI units',...
                   H,reference,0,2e-7,'Independent gamma/hbar formula and Angstrom conversion.');
 
 % Check one full ordered cell versus two transposed half cells
-system=model.spin_system; tensor=system.inter.coupling.matrix{1,2}+...
-                                  system.inter.coupling.matrix{2,1}.';
+system=model.spin_system;
+tensor=system.inter.coupling.matrix{1,2}+...
+        system.inter.coupling.matrix{2,1}.';
 system.inter.coupling.matrix{1,2}=tensor;
 system.inter.coupling.matrix{2,1}=zeros(3);
 one=cce_hamiltonian(cce_compile(system,parameters,'labframe'),2,struct());
@@ -55,11 +61,16 @@ result=test_close(result,'ordered half cells',...
 
 % Check the nuclear Zeeman sign and a nonzero electron field independently
 for isotope={'1H','E'}
-    sys.isotopes=isotope; sys.magnet=0.07;
+    sys.isotopes=isotope;
+    sys.magnet=0.07;
     parameters.cce.bath_spins=[];
     model=cce_compile(create(sys,struct()),parameters,'labframe');
     [H,meta]=cce_hamiltonian(model,[],struct());
-    if strcmp(isotope{1},'1H'), gamma=267.52218744e6; else, gamma=-1.76085963023e11; end
+    if strcmp(isotope{1},'1H')
+        gamma=267.52218744e6;
+    else
+        gamma=-1.76085963023e11;
+    end
     reference=-gamma*sys.magnet*diag([1/2 -1/2]);
     result=test_close(result,[isotope{1} ' signed Zeeman'],...
                   H,reference,0,2e-7,'Independent signed gyromagnetic ratio.');
@@ -68,7 +79,8 @@ for isotope={'1H','E'}
 end
 
 % Reject unknown physical choices rather than silently accepting a typo
-parameters.unrecognised=1; rejected=false;
+parameters.unrecognised=1;
+rejected=false;
 try
     cce_options(model.spin_system,parameters,@free_evolution,'labframe');
 catch

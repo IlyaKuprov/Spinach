@@ -30,12 +30,15 @@ this_file=[mfilename('fullpath') '.m'];
 root=fileparts(fileparts(fileparts(this_file)));
 [status,listing]=system(sprintf('git -C "%s" ls-files -- "*.m"',root));
 assert(status==0,'The tracked-source inventory could not be read.');
-files=strsplit(strtrim(listing),newline); offenders={};
+files=strsplit(strtrim(listing),newline);
+offenders={};
 names=['(?:' strjoin(retired,'|') ')'];
 pattern=['(?<![\w.])' names '\s*\(|@\s*' names '(?!\w)'];
 for n=1:numel(files)
     filename=fullfile(root,files{n});
-    if strcmp(filename,this_file), continue; end
+    if strcmp(filename,this_file)
+        continue;
+    end
     source=strip_text(fileread(filename));
     source=regexprep(source,'\.\.\.[^\r\n]*','');
     if ~isempty(regexp(source,pattern,'once'))
@@ -67,10 +70,16 @@ result=test_true(result,'Transpose does not hide a call',...
                  'An executable call after a transpose must still be found.');
 
 % Every retired parameter path is rejected by the native input boundary
-sys.isotopes={'1H','13C'}; sys.magnet=0; sys.output='hush';
-sys.parallel={'processes',1}; sys.disable={'hygiene'};
-inter.zeeman.matrix={zeros(3),zeros(3)}; spin_system=create(sys,inter);
-p.observed=1; p.times=[0 0.1]; p.transition=struct('spins',1,'ms',[0.5 -0.5]);
+sys.isotopes={'1H','13C'};
+sys.magnet=0;
+sys.output='hush';
+sys.parallel={'processes',1};
+sys.disable={'hygiene'};
+inter.zeeman.matrix={zeros(3),zeros(3)};
+spin_system=create(sys,inter);
+p.observed=1;
+p.times=[0 0.1];
+p.transition=struct('spins',1,'ms',[0.5 -0.5]);
 p.cce=struct('approximation','generalized','order',1);
 p.cce.numerics=struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',2^28);
 paths={'bath_state.temperature',...
@@ -105,7 +114,8 @@ paths={'bath_state.temperature',...
        'cce.clusters',...
        'pump.enabled'};
 for n=1:numel(paths)
-    names=strsplit(paths{n},'.'); request=p;
+    names=strsplit(paths{n},'.');
+    request=p;
     request=setfield(request,names{:},1);
     rejected=false;
     try
@@ -122,13 +132,16 @@ end
 model=cce_compile(spin_system,p,'labframe');
 [cluster,~]=cce_subsystem(model,2,struct(),[]);
 [H,R,K,p]=cce_generators(cluster,p,[]);
-p.nloops=1; p.drive=struct('spins',1,'axis','x','amplitude',1,'detuning',0,'duration',0.1);
+p.nloops=1;
+p.drive=struct('spins',1,'axis','x','amplitude',1,'detuning',0,'duration',0.1);
 p.refocusing={struct('spins',1,'axis','x','angle',pi,'fraction',0.5)};
 experiments={@free_evolution,@finite_drive,@refocusing_train,@hahn_echo,...
              @cpmg_echo,@cce_eseem,@bath_pumped_hahn,@noise_correlation};
 for n=1:numel(experiments)
     for value={[],struct([]),struct('type','finite'),struct('type','ideal')}
-        request=p; request.sequence=value{1}; rejected=false;
+        request=p;
+        request.sequence=value{1};
+        rejected=false;
         try
             experiments{n}(cluster,request,H,R,K);
         catch exception
@@ -153,29 +166,37 @@ while n<=numel(source)
     % A line comment ends at the next line boundary
     if source(n)=='%'
         last=find(source(n:end)==newline,1);
-        if isempty(last), last=numel(source)-n+2; end
-        source(n:n+last-2)=' '; n=n+last-1;
-        continue
+        if isempty(last)
+            last=numel(source)-n+2;
+        end
+        source(n:n+last-2)=' ';
+        n=n+last-1;
+        continue;
     end
 
     % A quote after an adjacent expression token denotes transposition
     quote=source(n);
     if quote==char(39)&&n>1&&...
        ~isempty(regexp(source(n-1),'[\w)\]}.''"]','once'))
-        n=n+1; continue
+        n=n+1;
+        continue;
     end
     if quote==char(39)||quote=='"'
-        first=n; n=n+1;
+        first=n;
+        n=n+1;
         while n<=numel(source)
             if source(n)==quote
                 if n<numel(source)&&source(n+1)==quote
-                    n=n+2; continue
+                    n=n+2;
+                    continue;
                 end
-                n=n+1; break
+                n=n+1;
+                break;
             end
             n=n+1;
         end
-        source(first:n-1)=' '; source(n-1)='0';
+        source(first:n-1)=' ';
+        source(n-1)='0';
     else
         n=n+1;
     end

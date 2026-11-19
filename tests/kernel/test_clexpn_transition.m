@@ -26,7 +26,8 @@ result=test_close(result,'Native angular-frequency gap',meta.gap,...
                     -spin('14N')*sys.magnet,1e-8,1e-14,'Analytic native angular-frequency gap.');
 
 % Preserve caller order for unlike observed spins
-p.observed=[2 1]; p.transition=struct('spins',[2 1],'ms',[0.5 -0.5;0 1]);
+p.observed=[2 1];
+p.transition=struct('spins',[2 1],'ms',[0.5 -0.5;0 1]);
 [transition,meta]=cce_transition(system,p,'labframe');
 result=test_true(result,'Ordered multi-spin magnetic states',...
                  isequal(transition.alpha,kron([1;0],[0;1;0]))&&...
@@ -37,7 +38,8 @@ result=test_close(result,'Ordered two-spin energy gap',meta.gap,...
                     (spin('1H')-spin('14N'))*sys.magnet,1e-7,1e-14,'Analytic native angular-frequency gap.');
 
 % Energy levels select ascending energies with deterministic eigenvector phase
-p.observed=2; p.transition=struct('spins',2,'levels',[1 2]);
+p.observed=2;
+p.transition=struct('spins',2,'levels',[1 2]);
 [a,meta]=cce_transition(system,p,'labframe');
 [b,~]=cce_transition(system,p,'labframe');
 result=test_true(result,'Energy order and repeatable phase',...
@@ -47,7 +49,9 @@ result=test_close(result,'Eigenstate angular gap',meta.gap,spin('1H')*sys.magnet
                     1e-7,1e-14,'Analytic native angular-frequency gap.');
 
 % Reject unresolved zero-field energy indices instead of choosing an axis
-sys.magnet=0; zero=create(sys,struct()); rejected=false;
+sys.magnet=0;
+zero=create(sys,struct());
+rejected=false;
 try
     cce_transition(zero,p,'labframe');
 catch exception
@@ -63,14 +67,22 @@ result=test_true(result,'Explicit states resolve the physical choice',...
 
 % Validate selector ownership, allowed quantum numbers, shapes, and populations
 invalid=cell(1,8);
-invalid{1}=p; invalid{1}.transition.extra=true;
-invalid{2}=p; invalid{2}.transition.spins=1;
-invalid{3}=p; invalid{3}.transition.alpha=[2;0];
-invalid{4}=p; invalid{4}.transition.ms=[0.5 -0.5];
-invalid{5}=p; invalid{5}.transition=struct('spins',2,'ms',[1 0]);
-invalid{6}=p; invalid{6}.transition=struct('spins',2,'levels',[1 1]);
-invalid{7}=p; invalid{7}.transition=struct('spins',2,'ms',[0.5; -0.5]);
-invalid{8}=p; invalid{8}.orientation=[0 0 NaN];
+invalid{1}=p;
+invalid{1}.transition.extra=true;
+invalid{2}=p;
+invalid{2}.transition.spins=1;
+invalid{3}=p;
+invalid{3}.transition.alpha=[2;0];
+invalid{4}=p;
+invalid{4}.transition.ms=[0.5 -0.5];
+invalid{5}=p;
+invalid{5}.transition=struct('spins',2,'ms',[1 0]);
+invalid{6}=p;
+invalid{6}.transition=struct('spins',2,'levels',[1 1]);
+invalid{7}=p;
+invalid{7}.transition=struct('spins',2,'ms',[0.5; -0.5]);
+invalid{8}=p;
+invalid{8}.orientation=[0 0 NaN];
 for k=1:numel(invalid)
     rejected=false;
     try
@@ -86,7 +98,9 @@ end
 spec=struct('mode','explicit','isotopes',{{'13C'}},'coordinates_A',[0 0 0],...
             'tensors_Hz',diag([100 200 300]));
 [native,inter]=spin_bath(struct('magnet',1),struct(),spec);
-native.output='hush'; native.disable={'hygiene'}; native.parallel={'local',1};
+native.output='hush';
+native.disable={'hygiene'};
+native.parallel={'local',1};
 anisotropic=create(native,inter);
 selection=struct('observed',1,'transition',struct('spins',1,'levels',[1 2]),...
                  'orientation',[0 pi/4 0]);

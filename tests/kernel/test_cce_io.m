@@ -13,7 +13,9 @@ function result=test_cce_io()
 % Make isolated temporary files and standard harness output
 result=new_test_result('kernel/cce_io','CCE input and output',...
                        'Complex shape/type round trips, scalar/tensor units and cubes.');
-folder=tempname; mkdir(folder); cleanup=onCleanup(@()rmdir(folder,'s'));
+folder=tempname;
+mkdir(folder);
+cleanup=onCleanup(@()rmdir(folder,'s'));
 original=struct('value',[1+2i NaN;3-4i Inf],'validity',logical([1 0;1 0]),...
                 'diagnostics',struct('bounds',[eps 2*eps],'reason',{{'valid','zero'}}),...
                 'empty',zeros(0,2),'tensor',reshape(1:24,2,3,4),...
@@ -22,7 +24,8 @@ original=struct('value',[1+2i NaN;3-4i Inf],'validity',logical([1 0;1 0]),...
 % Test each versioned representation, including its complete diagnostics
 original.integer_extremes={intmin('int64'),intmax('int64'),intmax('uint64')};
 for format={'mat','json','csv'}
-    file=fullfile(folder,['result.' format{1}]); model=struct('coordinates_A',[1 2 3]);
+    file=fullfile(folder,['result.' format{1}]);
+    model=struct('coordinates_A',[1 2 3]);
     cce_export(file,model,original);
     restored=cce_import(file,format{1},struct());
     result=test_true(result,['Exact complex round trip: ' format{1}],isequaln(original,restored.result)&&isequaln(model,restored.model),['Exact complex round trip: ' format{1}]);
@@ -30,13 +33,18 @@ end
 
 % Preserve all empty container and numeric shapes in the tagged JSON envelope
 empty_model=struct('observed',{{}},'empty_struct',struct([]));
-empty_model.manifolds=cell(0,2); empty_model.no_fields=repmat(struct(),2,1);
-empty_model.values=zeros(2,0,3); empty_model.flags=false(0,2);
-empty_model.integers=zeros(0,2,'uint64'); empty_model.strings=strings(0,2);
+empty_model.manifolds=cell(0,2);
+empty_model.no_fields=repmat(struct(),2,1);
+empty_model.values=zeros(2,0,3);
+empty_model.flags=false(0,2);
+empty_model.integers=zeros(0,2,'uint64');
+empty_model.strings=strings(0,2);
 empty_model.characters=repmat('a',0,2);
-empty_model.text=''; empty_model.nested={cell(0,1),[],struct('value',{{}})};
+empty_model.text='';
+empty_model.nested={cell(0,1),[],struct('value',{{}})};
 for extension={'mat','json','csv'}
-    filename=fullfile(folder,['empty.' extension{1}]); cce_export(filename,empty_model,struct());
+    filename=fullfile(folder,['empty.' extension{1}]);
+    cce_export(filename,empty_model,struct());
     recovered=false;
     try
         payload=cce_import(filename,extension{1},struct());
@@ -48,7 +56,8 @@ for extension={'mat','json','csv'}
 end
 
 % Compare each decoded field to identify any empty-shape loss
-filename=fullfile(folder,'empty.json'); payload=struct('model',struct());
+filename=fullfile(folder,'empty.json');
+payload=struct('model',struct());
 try
     payload=cce_import(filename,'json',struct());
 catch
@@ -60,22 +69,29 @@ for name=fieldnames(empty_model).'
 end
 
 % Verify declared coordinate units and active Cartesian rotations
-file=fullfile(folder,'sites.xyz'); put(file,sprintf('2\nexplicit isotope labels\n1H 0.1 0.2 0.3\n13C 0.4 0.5 0.6\n'));
+file=fullfile(folder,'sites.xyz');
+put(file,sprintf('2\nexplicit isotope labels\n1H 0.1 0.2 0.3\n13C 0.4 0.5 0.6\n'));
 u=struct('length','nm','frame','molecular','rotation',[0 -1 0;1 0 0;0 0 1]);
 data=cce_import(file,'xyz',u);
 result=test_close(result,'XYZ units and active rotation',data.coordinates_A,[-2 1 3;-5 4 6],1e-14,1e-14,'XYZ units and active rotation');
 
 % Compare scalar and full tensor couplings under independent unit conversions
-file=fullfile(folder,'scalar.csv'); put(file,sprintf('1,2,2\n'));
-u=struct('tensor','MHz','frame','lab'); data=cce_import(file,'tensor',u);
+file=fullfile(folder,'scalar.csv');
+put(file,sprintf('1,2,2\n'));
+u=struct('tensor','MHz','frame','lab');
+data=cce_import(file,'tensor',u);
 result=test_close(result,'Scalar frequency is isotropic tensor',data.pairs_Hz.tensor,2e6*eye(3),0,0,'Scalar frequency is isotropic tensor');
-put(file,sprintf('1,2,1,2,3,4,5,6,7,8,9\n')); u.tensor='rad/s';
+put(file,sprintf('1,2,1,2,3,4,5,6,7,8,9\n'));
+u.tensor='rad/s';
 data=cce_import(file,'tensor',u);
 result=test_close(result,'Row-major tensor and angular frequency',data.pairs_Hz.tensor,[1 2 3;4 5 6;7 8 9]/(2*pi),1e-15,1e-15,'Row-major tensor and angular frequency');
-u.tensor='G'; u.gyro_rad_s_T=2*pi*1e6; put(file,sprintf('1,2,2\n'));
+u.tensor='G';
+u.gyro_rad_s_T=2*pi*1e6;
+put(file,sprintf('1,2,2\n'));
 data=cce_import(file,'tensor',u);
 result=test_close(result,'Field units require an explicit gyro',data.pairs_Hz.tensor,200*eye(3),1e-12,1e-14,'Field units require an explicit gyro');
-u=rmfield(u,'gyro_rad_s_T'); rejected=false;
+u=rmfield(u,'gyro_rad_s_T');
+rejected=false;
 try
     cce_import(file,'tensor',u);
 catch
@@ -92,7 +108,8 @@ result=test_close(result,'Cube z-fastest order',squeeze(data.density),[1 2;3 4],
 result=test_close(result,'Cube explicit bohr conversion',data.voxel_vectors_A,0.529177210544*eye(3),0,0,'Cube explicit bohr conversion');
 
 % Compare independently declared scalar and Cartesian tensor units
-file=fullfile(folder,'scalar.csv'); put(file,sprintf('id1,id2,value\n1,2,2.5\n'));
+file=fullfile(folder,'scalar.csv');
+put(file,sprintf('id1,id2,value\n1,2,2.5\n'));
 a=cce_import(file,'tensor',struct('tensor','kHz','frame','lab'));
 result=test_close(result,'Scalar kHz tensor',a.pairs_Hz.tensor,2500*eye(3),0,0,...
                   'A scalar frequency is an isotropic Cartesian tensor.');
@@ -101,7 +118,8 @@ result=test_close(result,'Angular to cyclic frequency',a.pairs_Hz.tensor,...
                   2.5*eye(3)/(2*pi),eps,eps,'Angular frequencies cross the native Hz boundary.');
 
 % Preserve explicit labels and SI coordinates through tabular import
-file=fullfile(folder,'sites.csv'); put(file,sprintf('id,isotope,x,y,z\n17,13C,1e-10,2e-10,3e-10\n'));
+file=fullfile(folder,'sites.csv');
+put(file,sprintf('id,isotope,x,y,z\n17,13C,1e-10,2e-10,3e-10\n'));
 a=cce_import(file,'csv',struct('length','m','frame','lab'));
 result=test_close(result,'CSV SI coordinate boundary',a.coordinates_A,[1 2 3],4*eps,4*eps,...
                   'Metres convert once into Angstrom.');
@@ -127,10 +145,16 @@ result=test_true(result,'Unsupported export refused',rejected,'Fixed signature i
 disp('CCE IO: MAT/JSON/CSV round trips exact; tensor and voxel conversions passed.');
 
 % Round-trip actual native diagnostics and registered deferred experiment contracts
-sys.isotopes={'13C','13C'}; sys.magnet=0; sys.output='hush';
-sys.disable={'hygiene'}; sys.parallel={'processes',1};
-inter.zeeman.matrix={zeros(3),zeros(3)}; system=create(sys,inter);
-p.observed=1; p.times=[0 0.001]; p.cce.order=1;
+sys.isotopes={'13C','13C'};
+sys.magnet=0;
+sys.output='hush';
+sys.disable={'hygiene'};
+sys.parallel={'processes',1};
+inter.zeeman.matrix={zeros(3),zeros(3)};
+system=create(sys,inter);
+p.observed=1;
+p.times=[0 0.001];
+p.cce.order=1;
 p.transition=struct('spins',1,'ms',[0.5 -0.5]);
 p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^26);
 [answer,details]=clexpn(system,@free_evolution,p,'labframe');
@@ -142,7 +166,8 @@ native=struct('answer',answer,'diagnostics',details,...
               'strings',["value" missing],...
               'literal_contract',struct('pulse_sequence','description','evaluator',17));
 for format={'mat','json','csv'}
-    file=fullfile(folder,['native.' format{1}]); cce_export(file,struct(),native);
+    file=fullfile(folder,['native.' format{1}]);
+    cce_export(file,struct(),native);
     restored=cce_import(file,format{1},struct());
     result=test_true(result,['Native contracts round trip: ' format{1}],...
                      isequaln(restored.result,native)&&issparse(restored.result.sparse_data)&&...
@@ -167,7 +192,9 @@ end
 function put(file,content)
 
 % Write a bounded test input and close it immediately
-fid=fopen(file,'w'); cleanup=onCleanup(@()fclose(fid)); fwrite(fid,content,'char');
+fid=fopen(file,'w');
+cleanup=onCleanup(@()fclose(fid));
+fwrite(fid,content,'char');
 
 end
 

@@ -13,8 +13,10 @@
 function [answer,diagnostics]=cce_molecular_powder()
 
 % Magnet and isotopes
-sys.magnet=0.01; sys.isotopes={'E','2H','2H'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0.01;
+sys.isotopes={'E','2H','2H'};
+sys.output='hush';
+sys.parallel={'local',1};
 
 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
 inter.coordinates={[0 0 0];[1.45 0 0];[-0.725 1.2557 0]};
@@ -44,8 +46,10 @@ parameters.preparation='transverse';
 parameters.times=linspace(0,200e-6,41);
 
 % Cluster expansion controls
-parameters.cce.bath_spins=2:3; parameters.cce.order=2;
-parameters.cce.approximation='generalized'; parameters.cce.basis=bas;
+parameters.cce.bath_spins=2:3;
+parameters.cce.order=2;
+parameters.cce.approximation='generalized';
+parameters.cce.basis=bas;
 parameters.cce.graph=struct('mode','complete');
 parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
                                'max_memory_bytes',2^28);
@@ -57,11 +61,13 @@ parameters.grid=struct('alphas',[0 0 pi/2],'betas',[0 pi/2 pi/2],...
 [answer,~,diagnostics]=powder(spin_system,task,parameters,'labframe');
 
 % Plot the projected complex signal
-kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
+kfigure();
+plot(1e6*parameters.times,real(answer),'b-',...
+     1e6*parameters.times,imag(answer),'r--');
 xlabel('total echo time / microseconds');
 ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary'); kgrid();
+legend('real','imaginary');
+kgrid();
 
 end
 

@@ -13,8 +13,10 @@
 function [answer,diagnostics]=gcce_votpp()
 
 % Magnet and isotopes; zero electron g isolates the model energy scales
-sys.magnet=0; sys.isotopes={'E','51V','1H'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0;
+sys.isotopes={'E','51V','1H'};
+sys.output='hush';
+sys.parallel={'local',1};
 inter.zeeman.matrix=repmat({zeros(3)},1,3);
 inter.coupling.matrix=cell(3);
 
@@ -44,8 +46,11 @@ spin_system=create(sys,inter);
 
 % Plot populations in the observed tensor-product order
 populations=real(answer(:,1:sqrt(size(answer,2))+1:end));
-kfigure(); plot(1e6*parameters.times,populations);
-xlabel('time / microseconds'); ylabel('observed populations'); kgrid();
+kfigure();
+plot(1e6*parameters.times,populations);
+xlabel('time / microseconds');
+ylabel('observed populations');
+kgrid();
 
 end
 

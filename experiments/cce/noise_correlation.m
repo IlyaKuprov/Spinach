@@ -42,8 +42,11 @@ function [A,aux]=noise_correlation(spin_system,parameters,H,R,K)
 grumble(spin_system,parameters,H,R,K);
 
 % Check the dense operator and time-series memory budget
-noise=parameters.noise; obs_dim=spin_system.observed_dimension;
-bath_dim=spin_system.bath_dimension; dimension=obs_dim*bath_dim; ids=spin_system.physical_ids;
+noise=parameters.noise;
+obs_dim=spin_system.observed_dimension;
+bath_dim=spin_system.bath_dimension;
+dimension=obs_dim*bath_dim;
+ids=spin_system.physical_ids;
 bytes=16*(8*dimension^2+8*bath_dim^4+4*numel(parameters.times));
 if bytes>parameters.cce.numerics.max_memory_bytes
     error('noise_correlation:memory',...
@@ -51,14 +54,19 @@ if bytes>parameters.cce.numerics.max_memory_bytes
 end
 
 % Form the product bath density and the retained fluctuation operator
-B=zeros(dimension); density=1;
-for j=1:numel(spin_system.bath_rho), density=kron(density,spin_system.bath_rho{j}); end
+B=zeros(dimension);
+density=1;
+for j=1:numel(spin_system.bath_rho)
+    density=kron(density,spin_system.bath_rho{j});
+end
 if isfield(noise,'terms')
     for term=reshape(noise.terms,1,[])
 
         % Embed each supported physical fluctuation term
         overlap=ismember(term.support,ids);
-        if ~any(overlap), continue; end
+        if ~any(overlap)
+            continue;
+        end
         if ~all(overlap)
             error('noise_correlation:support',...
                   'A fluctuation support is split by this cluster.');
@@ -67,7 +75,8 @@ if isfield(noise,'terms')
 
     end
 else
-    local=spin_system; local.formalism='zeeman-hilb';
+    local=spin_system;
+    local.formalism='zeeman-hilb';
     for descriptor=reshape(noise.descriptors,1,[])
 
         % Restrict the named spin sum to this retained cluster
@@ -82,9 +91,13 @@ end
 B=B(1:bath_dim,1:bath_dim);
 
 % Construct the declared bath Hamiltonian without tracing an observed transition
-system=spin_system; system.formalism='zeeman-hilb';
-local=parameters; local.cce.approximation='generalized';
-if isfield(local,'bath_jumps'), local=rmfield(local,'bath_jumps'); end
+system=spin_system;
+system.formalism='zeeman-hilb';
+local=parameters;
+local.cce.approximation='generalized';
+if isfield(local,'bath_jumps')
+    local=rmfield(local,'bath_jumps');
+end
 [ham,~,~]=cce_generators(system,local,[]);
 if strcmp(noise.manifold,'bath_only')
     ham=reshape(full(ham),[bath_dim obs_dim bath_dim obs_dim]);
@@ -98,8 +111,13 @@ else
               'A selected noise manifold requires an observed transition.');
     end
     transition=system.model.transition;
-    if strcmp(noise.manifold,'alpha'), vector=transition.alpha; else, vector=transition.beta; end
-    projector=kron(vector,eye(bath_dim)); bath_ham=projector'*ham*projector;
+    if strcmp(noise.manifold,'alpha')
+        vector=transition.alpha;
+    else
+        vector=transition.beta;
+    end
+    projector=kron(vector,eye(bath_dim));
+    bath_ham=projector'*ham*projector;
     if norm(ham*projector-projector*bath_ham,'fro')>dimension*eps*max(1,norm(ham,'fro'))
         error('noise_correlation:manifold','The fixed noise manifold is not invariant.');
     end
@@ -109,12 +127,16 @@ end
 loss=zeros(bath_dim^2);
 if ~isempty(R)&&any(R,'all')
     slots=reshape(1:dimension^2,dimension,dimension);
-    slots=slots(1:bath_dim,1:bath_dim); loss=R(slots(:),slots(:));
+    slots=slots(1:bath_dim,1:bath_dim);
+    loss=R(slots(:),slots(:));
 end
 
 % Allocate the raw moments and arithmetic error bounds
-n_times=numel(parameters.times); moment=complex(zeros(n_times,1)); mean_time=moment;
-mean_zero=trace(B*density); bound=zeros(n_times,1);
+n_times=numel(parameters.times);
+moment=complex(zeros(n_times,1));
+mean_time=moment;
+mean_zero=trace(B*density);
+bound=zeros(n_times,1);
 if ~any(loss,'all')
 
     % Preserve the Hilbert-space arithmetic and its unitary round-off estimate
@@ -123,7 +145,8 @@ if ~any(loss,'all')
 
         % Evaluate the ordered or symmetrised Heisenberg moment
         U=vectors*diag(exp(-1i*energies*parameters.times(n)))*vectors';
-        evolved=U'*B*U; moment(n)=trace(evolved*B*density);
+        evolved=U'*B*U;
+        moment(n)=trace(evolved*B*density);
         if strcmp(noise.ordering,'symmetrized')
             moment(n)=(moment(n)+trace(B*evolved*density))/2;
         end
@@ -137,16 +160,22 @@ else
     % Dissipative correlations use the full bath Liouville generator
     L=kron(eye(bath_dim),bath_ham)-kron(bath_ham.',eye(bath_dim))+1i*loss;
     initial=B*density;
-    if strcmp(noise.ordering,'symmetrized'), initial=(initial+density*B)/2; end
+    if strcmp(noise.ordering,'symmetrized')
+        initial=(initial+density*B)/2;
+    end
 
     % Scale source formation and trace contraction in the Hilbert-Schmidt norm
-    roundoff=64*eps*numel(B); detector=norm(B,'fro'); purity_norm=norm(density,'fro');
-    source_norm=norm(initial,'fro'); initial_error=roundoff*detector*purity_norm;
+    roundoff=64*eps*numel(B);
+    detector=norm(B,'fro');
+    purity_norm=norm(density,'fro');
+    source_norm=norm(initial,'fro');
+    initial_error=roundoff*detector*purity_norm;
     frequency=norm(L,1);
     for n=1:n_times
 
         % Propagate the correlation source and the bath density
-        time=parameters.times(n); propagator=expm(-1i*L*time);
+        time=parameters.times(n);
+        propagator=expm(-1i*L*time);
         moment(n)=trace(B*reshape(propagator*initial(:),bath_dim,bath_dim));
         mean_time(n)=trace(B*reshape(propagator*density(:),bath_dim,bath_dim));
 
@@ -169,7 +198,9 @@ end
 
 % Preserve the raw moments before any connected subtraction
 A=moment;
-if noise.connected, A=A-mean_time*mean_zero; end
+if noise.connected
+    A=A-mean_time*mean_zero;
+end
 aux=struct('moment',moment,'mean_time',mean_time,'mean_zero',mean_zero,...
            'ordering',noise.ordering,'connected',noise.connected,...
            'valid',isfinite(A),'abs_error_bound',bound);
@@ -180,13 +211,16 @@ end
 function A=embed(local,support,ids,dims)
 
 % Tensor the local operator with the complementary identity
-[~,positions]=ismember(support,ids); rest=setdiff(1:numel(ids),positions,'stable');
-order=[positions rest]; A=kron(local,eye(prod(dims(rest))));
+[~,positions]=ismember(support,ids);
+rest=setdiff(1:numel(ids),positions,'stable');
+order=[positions rest];
+A=kron(local,eye(prod(dims(rest))));
 if numel(ids)>1
 
     % Restore the physical spin order on both tensor indices
     tensor=reshape(A,[fliplr(dims(order)) fliplr(dims(order))]);
-    inverse=zeros(size(order)); inverse(order)=1:numel(order);
+    inverse=zeros(size(order));
+    inverse(order)=1:numel(order);
     permutation=numel(ids)+1-fliplr(inverse);
     A=reshape(permute(tensor,[permutation numel(ids)+permutation]),...
               prod(dims),prod(dims));

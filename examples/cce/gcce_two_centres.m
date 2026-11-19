@@ -14,8 +14,10 @@
 function [answer,diagnostics]=gcce_two_centres()
 
 % Magnet and isotopes; zero electron g isolates the model energy scales
-sys.magnet=0; sys.isotopes={'E','E','13C','13C'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0;
+sys.isotopes={'E','E','13C','13C'};
+sys.output='hush';
+sys.parallel={'local',1};
 inter.zeeman.matrix=repmat({zeros(3)},1,4);
 inter.coupling.matrix=cell(4);
 
@@ -45,8 +47,11 @@ spin_system=create(sys,inter);
 
 % Plot the physical observed-spin response
 populations=real(answer(:,1:sqrt(size(answer,2))+1:end));
-kfigure(); plot(1e6*parameters.times,populations);
-xlabel('time / microseconds'); ylabel('observed populations'); kgrid();
+kfigure();
+plot(1e6*parameters.times,populations);
+xlabel('time / microseconds');
+ylabel('observed populations');
+kgrid();
 
 end
 

@@ -14,8 +14,10 @@
 function [answer,diagnostics]=cce_polarized_bath()
 
 % Standard Spinach magnet, isotope list, and illustrative Hz tensors
-sys.magnet=0.01; sys.isotopes={'E','1H','1H'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0.01;
+sys.isotopes={'E','1H','1H'};
+sys.output='hush';
+sys.parallel={'local',1};
 inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
@@ -43,10 +45,12 @@ spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Plot the physical observed-spin response
-kfigure(); plot(1e6*parameters.times,real(answer),'b-');
+kfigure();
+plot(1e6*parameters.times,real(answer),'b-');
 xlabel('total echo time / microseconds');
 ylabel('normalised echo amplitude E(2τ)');
-legend('64 sampled states'); kgrid();
+legend('64 sampled states');
+kgrid();
 
 end
 

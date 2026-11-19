@@ -13,8 +13,10 @@
 function [answer,diagnostics]=gcce_finite_drive()
 
 % Magnet and isotopes; zero electron g isolates the model energy scales
-sys.magnet=0; sys.isotopes={'E','13C'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0;
+sys.isotopes={'E','13C'};
+sys.output='hush';
+sys.parallel={'local',1};
 inter.zeeman.matrix=repmat({zeros(3)},1,2);
 inter.coupling.matrix=cell(2);
 
@@ -30,12 +32,15 @@ bas.formalism='zeeman-hilb';
 % Experiment parameters
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
-parameters.preparation='transition'; parameters.output='density';
+parameters.preparation='transition';
+parameters.output='density';
 parameters.times=[0 linspace(20e-6,200e-6,30)];
 parameters.drive=struct('spins',1,'axis','x','amplitude',4e4,...
                         'detuning',0,'duration',20e-6);
-parameters.cce.bath_spins=2; parameters.cce.approximation='generalized';
-parameters.cce.order=1; parameters.cce.basis=bas;
+parameters.cce.bath_spins=2;
+parameters.cce.approximation='generalized';
+parameters.cce.order=1;
+parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
                                'max_memory_bytes',2^28);
 
@@ -44,8 +49,11 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
 
 % Plot observed-spin populations
 populations=real(answer(:,1:sqrt(size(answer,2))+1:end));
-kfigure(); plot(1e6*parameters.times,populations);
-xlabel('time / microseconds'); ylabel('observed populations'); kgrid();
+kfigure();
+plot(1e6*parameters.times,populations);
+xlabel('time / microseconds');
+ylabel('observed populations');
+kgrid();
 
 end
 

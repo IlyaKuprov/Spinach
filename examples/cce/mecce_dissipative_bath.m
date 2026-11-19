@@ -13,8 +13,10 @@
 function [answer,diagnostics]=mecce_dissipative_bath()
 
 % Standard Spinach system and anisotropic hyperfine tensor in Hz
-sys.magnet=0; sys.isotopes={'E','13C'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0;
+sys.isotopes={'E','13C'};
+sys.output='hush';
+sys.parallel={'local',1};
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=diag([1100 900 2200]);
@@ -39,8 +41,11 @@ spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@free_evolution,parameters,'labframe');
 
 % Plot the physical observed-spin response
-kfigure(); plot(1e6*parameters.times,real(answer(:,3)),'b-');
-xlabel('time / microseconds'); ylabel('observed signal'); kgrid();
+kfigure();
+plot(1e6*parameters.times,real(answer(:,3)),'b-');
+xlabel('time / microseconds');
+ylabel('observed signal');
+kgrid();
 
 end
 

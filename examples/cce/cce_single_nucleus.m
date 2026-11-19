@@ -13,11 +13,14 @@
 function [answer,diagnostics]=cce_single_nucleus()
 
 % Magnet and isotopes
-sys.magnet=0.01; sys.isotopes={'E3','13C'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0.01;
+sys.isotopes={'E3','13C'};
+sys.output='hush';
+sys.parallel={'local',1};
 
 % Nuclear Zeeman frequency and projected hyperfine components, rad/s
-omega=-spin('13C')*sys.magnet; apar=0.3*abs(omega);
+omega=-spin('13C')*sys.magnet;
+apar=0.3*abs(omega);
 aper=0.6*abs(omega);
 
 % Standard Spinach tensors: electron g, nuclear ppm, and coupling Hz
@@ -26,16 +29,20 @@ inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=[0 0 aper;0 0 0;0 0 apar]/(2*pi);
 
 % Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb';
+bas.approximation='none';
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 
 % Projected transition and total echo times in seconds
-parameters.observed=1; parameters.cce.bath_spins=2;
-parameters.transition.spins=1; parameters.transition.ms=[0 1];
+parameters.observed=1;
+parameters.cce.bath_spins=2;
+parameters.transition.spins=1;
+parameters.transition.ms=[0 1];
 parameters.times=linspace(0,8*pi/abs(omega),101);
-parameters.cce.order=1; parameters.cce.approximation='projected';
+parameters.cce.order=1;
+parameters.cce.approximation='projected';
 parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
@@ -46,11 +53,13 @@ parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,...
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Plot the measured complex echo amplitude
-kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
+kfigure();
+plot(1e6*parameters.times,real(answer),'b-',...
+     1e6*parameters.times,imag(answer),'r--');
 xlabel('total echo time / microseconds');
 ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary'); kgrid();
+legend('real','imaginary');
+kgrid();
 
 end
 

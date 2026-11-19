@@ -13,8 +13,10 @@
 function [answer,diagnostics]=cce_deer_bandwidth()
 
 % Magnet and isotopes
-sys.magnet=0.01; sys.isotopes={'E','E','E'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0.01;
+sys.isotopes={'E','E','E'};
+sys.output='hush';
+sys.parallel={'local',1};
 
 % Toy coordinates in Angstrom and zero electron g tensors
 inter.coordinates={[0 0 0];[25 0 0];[0 35 0]};
@@ -33,9 +35,11 @@ inter=rmfield(inter,'coordinates');
 spin_system=create(sys,inter);
 
 % Experiment parameters and retained bath order
-parameters.observed=1; parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
+parameters.observed=1;
+parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
 parameters.times=linspace(0,200e-6,41);
-parameters.cce.approximation='projected'; parameters.cce.order=2;
+parameters.cce.approximation='projected';
+parameters.cce.order=2;
 parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
                                'max_memory_bytes',2^28);
 parameters.pump=struct('sites',2,'center',0,'halfwidth',1e5,...
@@ -45,11 +49,13 @@ parameters.pump=struct('sites',2,'center',0,'halfwidth',1e5,...
 [answer,diagnostics]=clexpn(spin_system,@bath_pumped_hahn,parameters,'labframe');
 
 % Plot the projected complex signal
-kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
+kfigure();
+plot(1e6*parameters.times,real(answer),'b-',...
+     1e6*parameters.times,imag(answer),'r--');
 xlabel('total echo time / microseconds');
 ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary'); kgrid();
+legend('real','imaginary');
+kgrid();
 
 end
 

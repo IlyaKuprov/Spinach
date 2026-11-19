@@ -13,8 +13,10 @@
 function [answer,diagnostics]=pcce_electron_layer()
 
 % Magnet and isotopes
-sys.magnet=0.01; sys.isotopes={'E','E','E','E'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0.01;
+sys.isotopes={'E','E','E','E'};
+sys.output='hush';
+sys.parallel={'local',1};
 
 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
 inter.coordinates={[0 0 0];[20 0 0];[21 0 0];[0 30 0]};
@@ -32,7 +34,9 @@ inter.coupling.matrix{3,4}=diag([300 300 -600]);
 for n=2:numel(sys.isotopes)
 
     % Remove transverse observed-spin coupling components
-    if ~isempty(inter.coupling.matrix{1,n}), inter.coupling.matrix{1,n}(:,1:2)=0; end
+    if ~isempty(inter.coupling.matrix{1,n})
+        inter.coupling.matrix{1,n}(:,1:2)=0;
+    end
 
 end
 
@@ -40,33 +44,40 @@ end
 inter=rmfield(inter,'coordinates');
 
 % Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb';
+bas.approximation='none';
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
 
 % Projected transition and total echo times in seconds
-parameters.observed=1; parameters.cce.bath_spins=2:4;
-parameters.transition.spins=1; parameters.transition.ms=[1/2 -1/2];
+parameters.observed=1;
+parameters.cce.bath_spins=2:4;
+parameters.transition.spins=1;
+parameters.transition.ms=[1/2 -1/2];
 parameters.times=linspace(0,200e-6,41);
-parameters.cce.order=2; parameters.cce.approximation='projected';
+parameters.cce.order=2;
+parameters.cce.approximation='projected';
 parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-5,'rtol',1e-5,...
                                'max_memory_bytes',2^28);
-parameters.cce.expansion='partition'; parameters.cce.groups={[2 3],4};
+parameters.cce.expansion='partition';
+parameters.cce.groups={[2 3],4};
 parameters.cce.partition=struct('mode','user','max_dimension',4);
 
 % Execute the named Hahn experiment through the cluster context
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Plot the measured complex echo amplitude
-kfigure(); plot(1e6*parameters.times,real(answer),'b-',...
-                1e6*parameters.times,imag(answer),'r--');
+kfigure();
+plot(1e6*parameters.times,real(answer),'b-',...
+     1e6*parameters.times,imag(answer),'r--');
 xlabel('total echo time / microseconds');
 ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary'); kgrid();
+legend('real','imaginary');
+kgrid();
 
 end
 

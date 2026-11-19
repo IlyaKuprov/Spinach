@@ -13,8 +13,10 @@
 function [answer,diagnostics]=cce_sip_donor()
 
 % Magnet and isotopes
-sys.magnet=0.01; sys.isotopes={'E','29Si','29Si'};
-sys.output='hush'; sys.parallel={'local',1};
+sys.magnet=0.01;
+sys.isotopes={'E','29Si','29Si'};
+sys.output='hush';
+sys.parallel={'local',1};
 
 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
 inter.coordinates={[0 0 0];[8 4 0];[12 2 4]};
@@ -22,7 +24,8 @@ inter.zeeman.matrix=repmat({zeros(3)},1,3);
 inter.coupling.matrix=cell(3);
 
 % Explicit illustrative hyperfine and bath coupling tensors in Hz
-radius=25; valley_wavevector=0.85*2*pi/5.43;
+radius=25;
+valley_wavevector=0.85*2*pi/5.43;
 for n=2:3
 
     % Hydrogenic envelope and six-valley interference, illustrative scale
@@ -42,13 +45,17 @@ inter.coupling.matrix{2,3}=diag([200 200 -400]);
 inter=rmfield(inter,'coordinates');
 
 % Basis policy for retained clusters
-bas.formalism='zeeman-hilb'; bas.approximation='none';
+bas.formalism='zeeman-hilb';
+bas.approximation='none';
 
 % Projected transition and total echo times in seconds
-parameters.observed=1; parameters.cce.bath_spins=2:3;
-parameters.transition.spins=1; parameters.transition.ms=[1/2 -1/2];
+parameters.observed=1;
+parameters.cce.bath_spins=2:3;
+parameters.transition.spins=1;
+parameters.transition.ms=[1/2 -1/2];
 parameters.times=linspace(0,200e-6,41);
-parameters.cce.order=2; parameters.cce.approximation='projected';
+parameters.cce.order=2;
+parameters.cce.approximation='projected';
 parameters.cce.graph=struct('mode','complete');
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
@@ -60,11 +67,13 @@ spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Plot the complex echo amplitude
-figure(); plot(1e6*parameters.times,real(answer),'b-',...
-               1e6*parameters.times,imag(answer),'r--');
+figure();
+plot(1e6*parameters.times,real(answer),'b-',...
+     1e6*parameters.times,imag(answer),'r--');
 xlabel('total echo time / microseconds');
 ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary'); kgrid();
+legend('real','imaginary');
+kgrid();
 
 end
 

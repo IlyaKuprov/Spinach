@@ -61,7 +61,9 @@
 function [E,aux]=hahn_echo(spin_system,parameters,H,R,K)
 
 % Set the declared signal normalisation default
-if ~isfield(parameters,'normalized'), parameters.normalized=true; end
+if ~isfield(parameters,'normalized')
+    parameters.normalized=true;
+end
 
 % Validate the experiment inputs
 grumble(spin_system,parameters,H,R,K);
@@ -70,45 +72,71 @@ grumble(spin_system,parameters,H,R,K);
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
 if density
     parameters.normalized=false;
-    if ~isfield(parameters,'coil'), parameters.coil=eye(spin_system.observed_dimension); end
+    if ~isfield(parameters,'coil')
+        parameters.coil=eye(spin_system.observed_dimension);
+    end
 end
 [rho0,coil,reference,meta]=cce_observation(spin_system,parameters);
-if ~iscell(coil), coil={coil}; end
-projected=isstruct(H); E=complex(zeros(numel(parameters.times),numel(reference)));
+if ~iscell(coil)
+    coil={coil};
+end
+projected=isstruct(H);
+E=complex(zeros(numel(parameters.times),numel(reference)));
 aux=struct();
 
 % Conjugate the prepared coherence, but leave the detector and reference fixed
 inverted=0;
 if projected
     detector=coil{1}(1);
-    if detector~=0, inverted=conj(reference/conj(detector))*conj(detector); end
-    if meta.normalized, inverted=inverted/reference; end
+    if detector~=0
+        inverted=conj(reference/conj(detector))*conj(detector);
+    end
+    if meta.normalized
+        inverted=inverted/reference;
+    end
 end
 if density
-    if projected, error('hahn_echo:density','Projected blocks do not define an observed density.'); end
+    if projected
+        error('hahn_echo:density','Projected blocks do not define an observed density.');
+    end
     E=complex(zeros(numel(parameters.times),spin_system.observed_dimension^2));
 end
-if projected, generator=H; else, generator=H+1i*R+1i*K; end
+if projected
+    generator=H;
+else
+    generator=H+1i*R+1i*K;
+end
 
 % Build ideal observed-spin transition pulses without a global bath basis
-model=spin_system.model; dc=spin_system.observed_dimension;
+model=spin_system.model;
+dc=spin_system.observed_dimension;
 db=spin_system.bath_dimension;
 if ~isfield(model,'transition')
     error('hahn_echo:transition','An explicit transition is required for ideal refocusing.');
 end
-a=model.transition.alpha; b=model.transition.beta;
+a=model.transition.alpha;
+b=model.transition.beta;
 rotation=expm(-1i*pi*kron((a*b'+b*a')/2,eye(db)));
-positions=parameters.times/2; h_after=H;
+positions=parameters.times/2;
+h_after=H;
 if isfield(parameters,'refocusing')
     pulse=parameters.refocusing;
-    if isfield(pulse,'fraction'), positions=pulse.fraction*parameters.times;
-    else, positions=repmat(pulse.time,size(parameters.times)); end
+    if isfield(pulse,'fraction')
+        positions=pulse.fraction*parameters.times;
+    else
+        positions=repmat(pulse.time,size(parameters.times));
+    end
     if isfield(pulse,'axis')
         if strcmp(parameters.cce.meanfield,'static')&&any(ismember(pulse.spins,model.bath_ids))
             parameters.cce.numerics.propagator='expm';
         end
-        axis=pulse.axis; if ischar(axis), axis=double('xyz'==axis); end
-        generator=zeros(dc*db); local=spin_system; local.formalism='zeeman-hilb';
+        axis=pulse.axis;
+        if ischar(axis)
+            axis=double('xyz'==axis);
+        end
+        generator=zeros(dc*db);
+        local=spin_system;
+        local.formalism='zeeman-hilb';
         for id=intersect(pulse.spins,spin_system.physical_ids,'stable')
 
             % Accumulate the retained physical-spin contribution
@@ -131,7 +159,8 @@ if isfield(parameters,'refocusing')
             for id=exterior
 
                 % Rotate the exterior product density
-                index=find(configuration.bath_ids==id,1); operators=pauli(model.multiplicities(id));
+                index=find(configuration.bath_ids==id,1);
+                operators=pauli(model.multiplicities(id));
                 rotation=expm(-1i*pulse.angle*(axis(1)*operators.x+axis(2)*operators.y+axis(3)*operators.z));
                 configuration.bath_rho{index}=rotation*configuration.bath_rho{index}*rotation';
 
@@ -166,19 +195,29 @@ if projected&&~density&&isempty(H.dissipator)&&...
     % Resolve the branch spectra once, not once per observation time
     [va,ea]=eig(full((H.left+H.left')/2),'vector');
     [vb,eb]=eig(full((H.right+H.right')/2),'vector');
-    ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
-    oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
-    residual=max(ra,rb); orthogonality=max(oa,ob); db=spin_system.bath_dimension;
+    ra=norm(H.left*va-va.*ea.','fro');
+    rb=norm(H.right*vb-vb.*eb.','fro');
+    oa=norm(va'*va-eye(size(H.left)),'fro');
+    ob=norm(vb'*vb-eye(size(H.right)),'fro');
+    residual=max(ra,rb);
+    orthogonality=max(oa,ob);
+    db=spin_system.bath_dimension;
 
     % Resolve whether the physical pulse preserves or interchanges the manifolds
     transition=spin_system.model.transition;
-    pa=kron(transition.alpha,eye(db)); pb=kron(transition.beta,eye(db));
-    aa=pa'*rotation*pa; ab=pa'*rotation*pb; ba=pb'*rotation*pa; bb=pb'*rotation*pb;
+    pa=kron(transition.alpha,eye(db));
+    pb=kron(transition.beta,eye(db));
+    aa=pa'*rotation*pa;
+    ab=pa'*rotation*pb;
+    ba=pb'*rotation*pa;
+    bb=pb'*rotation*pb;
     tolerance=spin_system.dimension^3*eps;
     if norm(aa,'fro')+norm(bb,'fro')<=tolerance
-        swap=true; pair={ba,ab};
+        swap=true;
+        pair={ba,ab};
     elseif norm(ab,'fro')+norm(ba,'fro')<=tolerance
-        swap=false; pair={aa,bb};
+        swap=false;
+        pair={aa,bb};
     else
         error('hahn_echo:manifolds','The pulse must preserve or interchange the selected spin manifolds.');
     end
@@ -197,31 +236,48 @@ if projected&&~density&&isempty(H.dissipator)&&...
     end
 
     % Keep the branch-product order and zero-time convention explicit
-    E=complex(zeros(numel(parameters.times),1)); bounds=zeros(size(E));
+    E=complex(zeros(numel(parameters.times),1));
+    bounds=zeros(size(E));
     for n=1:numel(parameters.times)
 
         % Propagate and detect the current observation time
-        time=parameters.times(n); swapped=false;
+        time=parameters.times(n);
+        swapped=false;
         if time==0
             value=trace(rho_b);
         else
-            ua=eye(db); ub=eye(db); previous=0;
+            ua=eye(db);
+            ub=eye(db);
+            previous=0;
             if positions(n)<=time
                 dt=positions(n);
                 ua=((va.*exp(-1i*dt*ea).')*va')*ua;
                 ub=((vb.*exp(-1i*dt*eb).')*vb')*ub;
-                ua=pair{1}*ua; ub=pair{2}*ub; swapped=swap; previous=dt;
+                ua=pair{1}*ua;
+                ub=pair{2}*ub;
+                swapped=swap;
+                previous=dt;
             end
             dt=time-previous;
-            left=(va.*exp(-1i*dt*ea).')*va'; right=(vb.*exp(-1i*dt*eb).')*vb';
-            if swapped, ua=right*ua; ub=left*ub;
-            else, ua=left*ua; ub=right*ub; end
+            left=(va.*exp(-1i*dt*ea).')*va';
+            right=(vb.*exp(-1i*dt*eb).')*vb';
+            if swapped
+                ua=right*ua;
+                ub=left*ub;
+            else
+                ua=left*ua;
+                ub=right*ub;
+            end
             value=trace(ua*rho_b*ub');
         end
-        if swapped, value=conj(value)*inverted;
-        elseif ~meta.normalized, value=value*reference; end
+        if swapped
+            value=conj(value)*inverted;
+        elseif ~meta.normalized
+            value=value*reference;
+        end
         E(n)=value;
-        operations=20*db^3; gamma=operations*eps/(1-operations*eps);
+        operations=20*db^3;
+        gamma=operations*eps/(1-operations*eps);
         bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+8*orthogonality+...
                   gamma*(1+time*H.hamiltonian_norm);
 
@@ -238,25 +294,39 @@ if projected&&~density&&isempty(H.dissipator)&&...
                'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
                'backend',parameters.cce_aux.backend);
 
-    aux.pulse_time=positions; aux.pulse_applied=parameters.times>0&positions<=parameters.times; return
+    aux.pulse_time=positions;
+    aux.pulse_applied=parameters.times>0&positions<=parameters.times;
+    return
 end
 
 % Keep ideal master-equation propagation on the native stock action path
 if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipator))
 
     % Preserve column-major density ordering and the Spinach generator sign
-    dc=spin_system.observed_dimension; db=spin_system.bath_dimension; projected=isstruct(H);
+    dc=spin_system.observed_dimension;
+    db=spin_system.bath_dimension;
+    projected=isstruct(H);
     if projected
         G=-1i*(kron(eye(db),H.left)-kron(H.right.',eye(db)));
-        if ~isempty(H.dissipator), G=G+H.dissipator; end
-        flip=reshape(1:db^2,db,db).'; flip=flip(:); alternate=conj(G(flip,flip));
-        a=kron(spin_system.model.transition.alpha,eye(db)); b=kron(spin_system.model.transition.beta,eye(db));
-        aa=a'*rotation*a; ab=a'*rotation*b; ba=b'*rotation*a; bb=b'*rotation*b;
+        if ~isempty(H.dissipator)
+            G=G+H.dissipator;
+        end
+        flip=reshape(1:db^2,db,db).';
+        flip=flip(:);
+        alternate=conj(G(flip,flip));
+        a=kron(spin_system.model.transition.alpha,eye(db));
+        b=kron(spin_system.model.transition.beta,eye(db));
+        aa=a'*rotation*a;
+        ab=a'*rotation*b;
+        ba=b'*rotation*a;
+        bb=b'*rotation*b;
         tolerance=100*eps*spin_system.dimension;
         if norm(ab,'fro')+norm(ba,'fro')<tolerance
-            pair={aa,bb}; swapped=false;
+            pair={aa,bb};
+            swapped=false;
         elseif norm(aa,'fro')+norm(bb,'fro')<tolerance
-            pair={ba,ab}; swapped=true;
+            pair={ba,ab};
+            swapped=true;
         else
             error('hahn_echo:manifolds','The pulse must preserve or interchange the selected spin manifolds.');
         end
@@ -265,25 +335,39 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
             error('hahn_echo:manifolds','The pulse must not leak outside the selected spin manifolds.');
         end
         rho0=1;
-        for state=spin_system.bath_rho, rho0=kron(rho0,state{1}); end
-        rho0=rho0(:); E=complex(zeros(numel(parameters.times),1));
+        for state=spin_system.bath_rho
+            rho0=kron(rho0,state{1});
+        end
+        rho0=rho0(:);
+        E=complex(zeros(numel(parameters.times),1));
     else
         G=-1i*H+R+K;
-        if ~isfield(parameters,'bath_jumps')||isempty(parameters.bath_jumps), G=sparse(G); end
+        if ~isfield(parameters,'bath_jumps')||isempty(parameters.bath_jumps)
+            G=sparse(G);
+        end
         E=complex(zeros(numel(parameters.times),numel(meta.normalization_divisor)));
-        if density, E=complex(zeros(numel(parameters.times),dc^2)); end
+        if density
+            E=complex(zeros(numel(parameters.times),dc^2));
+        end
     end
 
     % Select the stock action propagator engine
-    engine=spin_system.model.spin_system; engine.bas.formalism='sphten-liouv'; engine.tols.prop_chop=0;
+    engine=spin_system.model.spin_system;
+    engine.bas.formalism='sphten-liouv';
+    engine.tols.prop_chop=0;
     aux.density=complex(zeros(dc,dc,numel(parameters.times)));
-    if projected, aux.density=[]; end
+    if projected
+        aux.density=[];
+    end
 
     % Use the same stock exponential action on both sides of the ideal rotation
     for n=1:numel(parameters.times)
 
         % Propagate and detect the current observation time
-        time=parameters.times(n); vector=rho0; generator=G; previous=0;
+        time=parameters.times(n);
+        vector=rho0;
+        generator=G;
+        previous=0;
         if time>0&&positions(n)<=time
             previous=positions(n);
             if isfield(parameters.cce.numerics,'propagator')&&strcmp(parameters.cce.numerics.propagator,'stock')
@@ -292,10 +376,14 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
                 vector=step(engine,1i*G,vector,previous);
             end
             if projected
-                rho=reshape(vector,db,db); rho=pair{1}*rho*pair{2}';
-                if swapped, generator=alternate; end
+                rho=reshape(vector,db,db);
+                rho=pair{1}*rho*pair{2}';
+                if swapped
+                    generator=alternate;
+                end
             else
-                rho=reshape(vector,dc*db,dc*db); rho=rotation*rho*rotation';
+                rho=reshape(vector,dc*db,dc*db);
+                rho=rotation*rho*rotation';
             end
             vector=rho(:);
         end
@@ -312,7 +400,8 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
                 E(n)=E(n)*meta.initial_signal;
             end
         else
-            rho=reshape(vector,dc*db,dc*db); observed=complex(zeros(dc));
+            rho=reshape(vector,dc*db,dc*db);
+            observed=complex(zeros(dc));
             for a=1:dc
 
                 % Trace over bath states for each observed-spin row
@@ -334,7 +423,8 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
                 for k=1:numel(coil)
 
                     % Evaluate the fixed physical receiver
-                    detector=reshape(coil{k},dc*db,dc*db); detector=detector(1:db:end,1:db:end);
+                    detector=reshape(coil{k},dc*db,dc*db);
+                    detector=detector(1:db:end,1:db:end);
                     E(n,k)=trace(detector'*observed)/meta.normalization_divisor(k);
 
                 end
@@ -350,7 +440,8 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
             for k=1:numel(coil)
 
                 % Evaluate the fixed physical receiver
-                detector=reshape(coil{k},dc*db,dc*db); scale(k)=norm(detector(1:db:end,1:db:end),2);
+                detector=reshape(coil{k},dc*db,dc*db);
+                scale(k)=norm(detector(1:db:end,1:db:end),2);
 
             end
         end
@@ -361,7 +452,9 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
     aux.abs_error_bound=(64*eps*size(G,1)*(1+norm(G,1)*parameters.times(:)))*scale;
     aux.error_bound_kind='floating_point_estimate';
 
-    aux.pulse_time=positions; aux.pulse_applied=parameters.times>0&positions<=parameters.times; return
+    aux.pulse_time=positions;
+    aux.pulse_applied=parameters.times>0&positions<=parameters.times;
+    return
 end
 fractions=0.5;
 
@@ -374,38 +467,60 @@ if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
     direct=isfield(parameters.cce.numerics,'propagator')&&...
            strcmp(parameters.cce.numerics.propagator,'expm');
     if ~direct
-        H=(H+H')/2; [vectors,energies]=eig(full(H),'vector'); energies=real(energies);
+        H=(H+H')/2;
+        [vectors,energies]=eig(full(H),'vector');
+        energies=real(energies);
         residual=norm(H*vectors-vectors.*energies.','fro');
         orthogonality=norm(vectors'*vectors-eye(size(H)),'fro');
     end
-    dc=spin_system.observed_dimension; db=spin_system.bath_dimension; count=numel(parameters.times);
+    dc=spin_system.observed_dimension;
+    db=spin_system.bath_dimension;
+    count=numel(parameters.times);
     detectors=cellfun(@(x)x(1:db:end,1:db:end),coil,'UniformOutput',false);
     E=complex(zeros(count,numel(meta.normalization_divisor)));
-    if density, E=complex(zeros(count,dc^2)); end
-    aux.density=complex(zeros(dc,dc,count)); bounds=zeros(size(E));
+    if density
+        E=complex(zeros(count,dc^2));
+    end
+    aux.density=complex(zeros(dc,dc,count));
+    bounds=zeros(size(E));
 
     % Spectral and detector norms are constant over the requested time mesh
-    operations=20*size(H,1)^3; gamma=operations*eps/(1-operations*eps);
-    hnorm=norm(H,'fro'); hbound=parameters.cce_aux.roundoff_bound;
+    operations=20*size(H,1)^3;
+    gamma=operations*eps/(1-operations*eps);
+    hnorm=norm(H,'fro');
+    hbound=parameters.cce_aux.roundoff_bound;
     detector_norms=cellfun(@(x)norm(x,2),detectors);
-    if ~isfield(parameters,'coil')&&~isfield(parameters,'detection'), detector_norms=1; end
+    if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
+        detector_norms=1;
+    end
     divisors=meta.normalization_divisor;
 
     % Compose both free intervals and the physical pi rotation in time order
     for n=1:count
 
         % Propagate and detect the current observation time
-        time=parameters.times(n); evolution_matrix=eye(size(H));
+        time=parameters.times(n);
+        evolution_matrix=eye(size(H));
         if direct
-            rho=rho0; durations=0; scale=0;
-            if time>0&&positions(n)<=time, durations=[0 positions(n) time-positions(n)];
-            elseif time>0, durations=[0 time]; end
+            rho=rho0;
+            durations=0;
+            scale=0;
+            if time>0&&positions(n)<=time
+                durations=[0 positions(n) time-positions(n)];
+            elseif time>0
+                durations=[0 time];
+            end
             for k=1:numel(durations)
 
                 % Apply the next free interval and physical rotation
                 segment_rotation=eye(size(H));
-                if k==2&&positions(n)<=time, segment_rotation=rotation; end
-                segment=H; if k==3, segment=h_after; end
+                if k==2&&positions(n)<=time
+                    segment_rotation=rotation;
+                end
+                segment=H;
+                if k==3
+                    segment=h_after;
+                end
                 evolution_matrix=segment_rotation*expm(-1i*durations(k)*segment);
                 rho=evolution_matrix*rho*evolution_matrix';
                 scale=scale+1+abs(durations(k))*norm(full(segment),2);
@@ -416,7 +531,9 @@ if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
                 previous=0;
                 if positions(n)<=time
                     free=(vectors.*exp(-1i*energies*positions(n)).')*vectors';
-                    evolution_matrix=free*evolution_matrix; evolution_matrix=rotation*evolution_matrix; previous=positions(n);
+                    evolution_matrix=free*evolution_matrix;
+                    evolution_matrix=rotation*evolution_matrix;
+                    previous=positions(n);
                 end
                 free=(vectors.*exp(-1i*energies*(time-previous)).')*vectors';
                 evolution_matrix=free*evolution_matrix;
@@ -427,7 +544,8 @@ if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
         for k=1:db
 
             % Trace over matching bath-state indices
-            indices=k:db:dc*db; observed=observed+rho(indices,indices);
+            indices=k:db:dc*db;
+            observed=observed+rho(indices,indices);
 
         end
         aux.density(:,:,n)=observed;
@@ -438,7 +556,9 @@ if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
                 E(n)=exp(-1i*meta.receiver_phase)*(meta.transition.alpha'*...
                      observed*meta.transition.beta)/divisors;
             else
-                for k=1:numel(detectors), E(n,k)=trace(detectors{k}'*observed)/divisors(k); end
+                for k=1:numel(detectors)
+                    E(n,k)=trace(detectors{k}'*observed)/divisors(k);
+                end
             end
         end
 
@@ -465,31 +585,41 @@ if ~projected&&strcmp(spin_system.formalism,'zeeman-hilb')&&...
     % Keep generator and propagation evidence alongside the natural response
     aux.abs_error_bound=bounds;
     if ~direct
-        aux.eigen_residual=residual; aux.orthogonality_residual=orthogonality;
+        aux.eigen_residual=residual;
+        aux.orthogonality_residual=orthogonality;
         aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
         aux.backend=parameters.cce_aux.backend;
     end
 
-    aux.pulse_time=positions; aux.pulse_applied=parameters.times>0&positions<=parameters.times; return
+    aux.pulse_time=positions;
+    aux.pulse_applied=parameters.times>0&positions<=parameters.times;
+    return
 end
 
 % Convert Frobenius state errors to each detected component
 scale=cellfun(@(x)norm(x,'fro'),coil(:).')./abs(meta.normalization_divisor);
-if density, scale=sqrt(db); end
-aux.abs_error_bound=zeros(size(E)); aux.error_bound_kind='floating_point_estimate';
+if density
+    scale=sqrt(db);
+end
+aux.abs_error_bound=zeros(size(E));
+aux.error_bound_kind='floating_point_estimate';
 
 % At zero elapsed time no control is applied, matching the reference signal
 for n=1:numel(parameters.times)
 
     % Propagate and detect the current observation time
-    rho=rho0; previous=0; swapped=false; state_error=0;
+    rho=rho0;
+    previous=0;
+    swapped=false;
+    state_error=0;
     if parameters.times(n)>0
         for j=1:numel(fractions)
 
             % Apply the next free interval and physical rotation
             segment=generator;
             if projected&&swapped
-                segment.left=H.right; segment.right=H.left;
+                segment.left=H.right;
+                segment.right=H.left;
                 if ~isempty(H.dissipator)
                     segment.dissipator=H.swap_matrix*conj(H.dissipator)*H.swap_matrix';
                 end
@@ -503,8 +633,11 @@ for n=1:numel(parameters.times)
                 swapped=~swapped;
             else
                 state_error=state_error+16*(dc*db)^3*eps*norm(rho,'fro');
-                rho=reshape(rho,dc*db,dc*db); rho=rotation*rho*rotation';
-                if strcmp(spin_system.formalism,'zeeman-liouv'), rho=rho(:); end
+                rho=reshape(rho,dc*db,dc*db);
+                rho=rotation*rho*rotation';
+                if strcmp(spin_system.formalism,'zeeman-liouv')
+                    rho=rho(:);
+                end
             end
             previous=fractions(j);
 
@@ -512,7 +645,8 @@ for n=1:numel(parameters.times)
     end
     segment=generator;
     if projected&&swapped
-        segment.left=H.right; segment.right=H.left;
+        segment.left=H.right;
+        segment.right=H.left;
         if ~isempty(H.dissipator)
             segment.dissipator=H.swap_matrix*conj(H.dissipator)*H.swap_matrix';
         end
@@ -522,9 +656,12 @@ for n=1:numel(parameters.times)
     aux.abs_error_bound(n,:)=(state_error+estimate)*scale;
 
     % Restore the detected spin-manifold coherence after an odd inversion count
-    if projected&&swapped, rho=reshape(reshape(rho,db,db)',db^2,1); end
+    if projected&&swapped
+        rho=reshape(reshape(rho,db,db)',db^2,1);
+    end
     if density
-        rho=reshape(rho,dc*db,dc*db); observed=complex(zeros(dc));
+        rho=reshape(rho,dc*db,dc*db);
+        observed=complex(zeros(dc));
         for a=1:dc
 
             % Trace over bath states for each observed-spin row
@@ -536,14 +673,20 @@ for n=1:numel(parameters.times)
             end
 
         end
-        E(n,:)=reshape(observed,1,[]); continue
+        E(n,:)=reshape(observed,1,[]);
+        continue
     end
     for k=1:numel(coil)
 
         % Evaluate the fixed physical receiver
-        if isvector(rho), value=coil{k}'*rho;
-        else, value=trace(coil{k}'*rho); end
-        if meta.normalized, value=value/reference(k); end
+        if isvector(rho)
+            value=coil{k}'*rho;
+        else
+            value=trace(coil{k}'*rho);
+        end
+        if meta.normalized
+            value=value/reference(k);
+        end
         E(n,k)=value;
 
     end
@@ -590,15 +733,22 @@ if isfield(parameters,'refocusing')
     end
     if isfield(pulse,'axis')
         axis=pulse.axis;
-        if ischar(axis)&&ismember(axis,{'x','y','z'}), axis=double('xyz'==axis); end
+        if ischar(axis)&&ismember(axis,{'x','y','z'})
+            axis=double('xyz'==axis);
+        end
         if ~isnumeric(axis)||~isreal(axis)||~isequal(size(axis),[1 3])||...
            any(~isfinite(axis))||abs(norm(axis)-1)>3*eps||...
            ~isnumeric(pulse.angle)||~isreal(pulse.angle)||~isscalar(pulse.angle)||~isfinite(pulse.angle)
             error('hahn_echo:refocusing','Supply a unit Cartesian axis and finite real rotation angle.');
         end
     end
-    if isfield(pulse,'fraction'), position=pulse.fraction; upper=1;
-    else, position=pulse.time; upper=Inf; end
+    if isfield(pulse,'fraction')
+        position=pulse.fraction;
+        upper=1;
+    else
+        position=pulse.time;
+        upper=Inf;
+    end
     if ~isnumeric(position)||~isreal(position)||~isscalar(position)||...
        ~isfinite(position)||position<0||position>upper
         error('hahn_echo:refocusing','Use a fraction in [0,1] or nonnegative time in seconds.');

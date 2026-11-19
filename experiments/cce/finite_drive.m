@@ -84,7 +84,9 @@ if isfield(parameters,'drive')
             error('cce_pulse_events:spins','Drive spins must be distinct positive physical identifiers.');
         end
         axis=drive.axis;
-        if ischar(axis)&&ismember(axis,{'x','y','z'}), axis=double('xyz'==axis); end
+        if ischar(axis)&&ismember(axis,{'x','y','z'})
+            axis=double('xyz'==axis);
+        end
         if ~isnumeric(axis)||~isreal(axis)||~isequal(size(axis),[1 3])||...
            any(~isfinite(axis))||abs(norm(axis)-1)>3*eps
             error('cce_pulse_events:axis','A drive axis is x, y, z, or a unit three-vector.');

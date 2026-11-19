@@ -70,7 +70,7 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **Paragraph spacing:** Each logically distinct code stage must be preceded and followed by a blank line and must have a comment line as its first line. In <start> ... <end> type code structures, the starting statement must be followed by a blank line and the final `end` must be preceded by a blank line.
 
-* **Semicolon ends the line:** When writing new code, a new line after a semicolon is mandatory.
+* **Semicolon ends the line:** When writing new code, a new line after a semicolon is mandatory. An exception is data plotting blocks, where one-word commands like `kgrid` may be placed after a semicolon that terminates the preceding command to get more compact and visually elegant code. 
 
 ### Comments and Function Headers
 

@@ -1,0 +1,1111 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=2.4cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\setlength{\emergencystretch}{3em}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{braket}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{microtype}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\lstset{basicstyle=\small\ttfamily,
+        keywordstyle=\color{blue!60!black},
+        commentstyle=\color{green!40!black},
+        stringstyle=\color{purple!60!black},
+        language=Matlab,
+        breaklines=true,
+        columns=fullflexible,
+        keepspaces=true,
+        frame=single,
+        rulecolor=\color{black!30},
+        xleftmargin=1em,
+        xrightmargin=1em}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\Tr}{\operatorname{Tr}}
+\newcommand{\op}[1]{\hat{#1}}
+\newcommand{\sop}[1]{\hat{\hat{#1}}}
+
+
+\title{\textbf{The Spinach Cluster Correlation Expansion Module}\\[2mm]
+       \Large User Manual}
+\author{Talos}
+\date{19 November 2026 \\[1mm] \normalsize Spinach source revision \texttt{7ce4cdba}}
+\begin{document}
+\maketitle
+\noindent This manual is for magnetic resonance users who want to calculate a coherence, an echo, a reduced density matrix or a noise correlation in a finite spin bath. For a first calculation, start with Section~\ref{sec:start}. Use Sections~\ref{sec:physics} and~\ref{sec:numerics} to decide what approximation that calculation makes, and Section~\ref{sec:reference} to check a field, a unit or an output convention.
+\tableofcontents
+\clearpage
+%===============================================================
+\section{Physics and mathematics of the cluster-correlation expansion}
+\label{sec:physics}
+%===============================================================
+
+\subsection{The spin system and the measured signal}
+
+Consider an electron spin whose Hahn echo is modulated by neighbouring
+nuclei. One nucleus can modulate the echo by precessing about different
+axes in the two electron spin manifolds. Two nuclei can also exchange
+polarisation during the echo. The first effect is present in a one-nucleus
+calculation; only the part of the two-nucleus response that the two
+one-nucleus calculations cannot explain is a pair correlation. The
+cluster-correlation expansion (CCE) makes precisely this distinction at
+successively higher orders~\cite{cce-theory-yang08}.
+
+Let $O$ be the observed spin system (not necessarily one spin), and let
+$C$ be a subset of the bath. On every cluster, Spinach retains \emph{all}
+of $O$ and propagates the experiment on $O\otimes C$. For an initially
+uncorrelated observed system and product bath, the initial state and the
+unnormalised detected signal are
+\begin{equation}
+  \rho_{OC}(0)=\rho_O(0)\otimes\!\bigotimes_{j\in C}\rho_j,\qquad
+  s_C(t)=e^{-i\phi}\Tr_O\!\left[D^\dagger\Tr_C\rho_{OC}(t)\right].
+  \label{eq:cce-theory-receiver}
+\end{equation}
+Here $D$ is the observed-spin detector, and $\phi$ is the receiver phase
+in radians. The product ordering of $O$ follows \code{parameters.observed};
+its entries are physical spin numbers, not positions in a cluster. For a
+transition $\alpha,\beta$, the usual preparation is
+$(|\alpha\rangle+|\beta\rangle)/\sqrt{2}$ and
+$D=|\alpha\rangle\langle\beta|$. With zero receiver phase the initial
+signal is $1/2$, not 1. Normalised signal acquisition divides by the
+\emph{actual complex initial detection} $s_C(0)$; a detector orthogonal
+to the preparation cannot be normalised this way. Select unnormalised
+acquisition if the absolute signal or receiver phase is wanted. A
+normalised signal and a density matrix are different outputs.
+
+The candidate bath is \code{cce.bath\_spins} (by default the spins not in
+$O$). A spatial selection may further restrict which sites can belong to
+$C$. By default sites outside $C$ do not evolve or act on the retained
+system. With \code{meanfield='static'}, their declared one-spin
+expectations instead produce a field: a pair interaction
+$\sum_{ab} A_{ij}^{ab} I_i^a I_j^b$ contributes
+$\sum_{ab} A_{ij}^{ab} I_i^a\langle I_j^b\rangle$ when $i$ is retained
+and $j$ is exterior. This includes exterior sites in the candidate bath
+outside the cluster-selection radius, subject to the separate mean-field
+radius. A completely mixed spin gives zero field, not a random classical
+field. A sampled pure spin need not. The observed-only calculation
+($C=\varnothing$) uses the same exterior-state convention as the clusters.
+
+\subsection{Conditional and generalised evolution}
+
+For pure dephasing, the observed transition labels two invariant
+manifolds of the retained Hamiltonian $H$ (in rad/s). Write
+$V_m=|m\rangle\otimes\mathbf{1}_C$ and $H_m=V_m^\dagger H V_m$ for
+$m=\alpha,\beta$. Invariance means $HV_m=V_mH_m$, not merely that
+$\alpha$ and $\beta$ diagonalise the isolated observed spin. The bath
+coherence block $X=V_\alpha^\dagger\rho_{OC}V_\beta$ then obeys
+\begin{equation}
+  \dot X=-i(H_\alpha X-XH_\beta),\qquad
+  X(t)=e^{-iH_\alpha t}X(0)e^{+iH_\beta t},\qquad
+  X(0)=\langle\alpha|\rho_O(0)|\beta\rangle\rho_C.
+  \label{eq:cce-theory-branches}
+\end{equation}
+The selected receiver measures $e^{-i\phi}\Tr_C X$. Even if $H_\alpha$
+and $H_\beta$ do not commute, population transfer between observed
+states is absent. Thus an anisotropic \emph{conditional bath field} is
+compatible with projection; an observed-spin flip-flop taking the state
+out of either manifold is not. \code{cce.approximation='projected'}
+checks invariance rather than silently deleting such couplings. An
+optional coherent second-order model retains virtual transitions through
+other isolated observed levels, with denominators $E_m-E_n$ and explicit
+gap and overlap tests. It is a perturbative Hamiltonian, not a remedy for
+a near degeneracy or real population transfer.
+
+Generalised CCE (gCCE, \code{'generalized'}) instead propagates
+$\rho_{OC}$ with $H$ and traces out $C$ only at detection. Use it if a
+transverse coupling mixes observed states, if a finite pulse drives those
+states, or if the observable is a population or a reduced density rather
+than the selected coherence. This is the distinction that matters, for
+example, in calculations near an avoided crossing~\cite{cce-theory-onizhuk21}.
+The \emph{cluster order} specifies the bath correlations included; it
+cannot restore discarded observed-spin levels in a projected model.
+
+\subsection{Dissipative clusters}
+
+A second, independent decision is whether the retained cluster evolves
+unitarily. For declared Markovian jumps $J_r$ at rates $\gamma_r$
+(in $\mathrm{s}^{-1}$), generalised master-equation CCE propagates
+\begin{equation}
+ \dot\rho=-i[H,\rho]+\sum_r\gamma_r\!\left(
+ J_r\rho J_r^\dagger-\tfrac12\{J_r^\dagger J_r,\rho\}\right).
+ \label{eq:cce-theory-lindblad}
+\end{equation}
+In Spinach's column-vectorised convention this is $\dot v=-iLv$ with
+$L=\sop H+iR+iK$, $R$ the dissipator and $K=0$ here. A positive rate is
+not inserted as a negative imaginary Hamiltonian shift. A jump is a
+physical specification, not a decay constant inferred from the signal;
+coherent bath motion and bath relaxation can act together~\cite{cce-theory-onizhuk24}.
+An active correlated bath jump cannot be split between retained and
+omitted sites: put its entire bath support in one group. Nor can an active exterior
+jump be represented by a frozen field on that site.
+
+If $H$, $J_r$, and the corresponding loss operators preserve both
+manifolds, a projected master equation propagates only $X$. In
+Eq.~\eqref{eq:cce-theory-branches} one adds, for each jump,
+\begin{equation}
+ \gamma_r\left(J_{r\alpha}XJ_{r\beta}^{\dagger}
+ -\tfrac12 J_{r\alpha}^{\dagger}J_{r\alpha}X
+ -\tfrac12 X J_{r\beta}^{\dagger}J_{r\beta}\right),\qquad
+ J_{rm}=V_m^\dagger J_rV_m.
+ \label{eq:cce-theory-proj-jump}
+\end{equation}
+This is a two-sided evolution of a coherence: its trace need not be
+conserved and it is not a positive density. Use generalised Liouville
+space for jumps transferring observed populations. Not every experiment
+admits jumps; Section~\ref{sec:reference} gives the compatibility rules.
+
+\subsection{Refocusing and acquisition}
+
+\code{parameters.times} contains \emph{total elapsed sequence times} in
+seconds. For the default Hahn experiment a point at $t$ has two free
+intervals of length $t/2$, not two intervals of length $t$. For CPMG the
+$n$th of $N$ ideal inversions is at $(2n-1)t/(2N)$. At $t=0$ these echo
+experiments report the prepared signal without applying a pulse. Finite
+rectangular or piecewise drives instead retain the drift (and compatible
+relaxation) during each driven interval; a sample may fall inside a
+pulse. These are physically different acquisitions.
+
+An ideal transition-selective $\pi_x$ pulse interchanges the two
+manifolds. In the fixed physical receiver of Eq.~\eqref{eq:cce-theory-receiver},
+the block immediately after that pulse is $X^\dagger$, not $X$; this
+adjoint includes the complex prepared coherence. For example, at positive
+elapsed time with zero drift, an applied inversion takes the unnormalised signal from
+$e^{-i\phi}x$ to $e^{-i\phi}x^*$ for $x=\langle\alpha|\rho_O|\beta\rangle$.
+Conjugating the \emph{detected signal} would conjugate the receiver too.
+Branch bookkeeping during an echo gives the same physics only if the
+physical block is restored at detection after an odd interchange. Compare
+complex signals when checking a sequence: magnitudes cannot diagnose this
+error. For generalised density acquisition the result is instead one row
+per time, containing the column-vectorised $\Tr_C\rho_{OC}$, without
+receiver normalisation.
+
+\subsection{Irreducible factors and the selected-bath reference}
+
+Let $E_C$ denote one complex output element at one time after the chosen
+acquisition, and $E_\varnothing$ the corresponding observed-only
+experiment \emph{at that time}. This baseline is not the initial
+detection used for receiver normalisation. For a family $\mathcal F$
+of nonempty clusters containing all their nonempty subsets, the
+multiplicative expansion is~\cite{cce-theory-yang08}
+\begin{equation}
+ F_C=E_C/E_\varnothing,\qquad
+ k_C=\frac{F_C}{\prod_{\varnothing\ne S\subsetneq C} k_S},\qquad
+ E_{\mathcal F}=E_\varnothing\prod_{C\in\mathcal F}k_C.
+ \label{eq:cce-theory-recursion}
+\end{equation}
+For two isolated subproblems that factorise, $F_{12}=F_1 F_2$ and
+$k_{12}=1$. In general the pair term corrects their product; it is not
+another copy of the raw two-spin signal. For an empty family the answer
+is simply $E_\varnothing$. The same algebra acts element by element on
+supported density outputs: at truncated order it does not guarantee
+Hermiticity, positivity, or unit trace.
+
+Two cases must not be confused. In a truncated expansion a baseline or
+required denominator indistinguishable from zero leaves a ratio
+unresolved. Spinach returns a validity mask, or stops under the error
+policy; it does not insert a small number. Conversely, if a raw cluster
+contains \emph{every site in the graph-selected bath}, its response is
+already the answer for that finite cluster model. Spinach uses that raw
+record at the final order, without requiring smaller-cluster quotients to
+exist. A true zero in that record is a perfectly good observation. The
+empty selected bath has the same direct reference. Lower orders may
+still be invalid. This bypass removes cluster truncation on the selected
+domain, not projection, exterior-field, sampling, orientation, or
+Hamiltonian modelling errors.
+
+\subsection{Where to average, and when to add}
+
+An unpolarised bath is a product of $\mathbf{1}_j/(2I_j+1)$; an explicit
+product supplies each local density. Neither requires Monte Carlo.
+Sampling instead draws a whole product assignment in the declared local
+bases and uses it consistently across clusters. The order of averaging
+matters~\cite{cce-theory-yang09}. If $\mathcal R$ denotes
+Eq.~\eqref{eq:cce-theory-recursion} and $s$ labels a state, then
+\begin{equation}
+ \sum_s w_s\,\mathcal R(\{E_{C,s}\})\quad\hbox{and}\quad
+ \mathcal R\!\left(\left\{\sum_s w_s E_{C,s}\right\}\right)
+ \label{eq:cce-theory-averaging}
+\end{equation}
+are respectively \code{after\_expansion} (the default) and
+\code{internal\_then\_expansion}. Both include $C=\varnothing$;
+they need not agree at truncated order because products and ratios are
+nonlinear. The same choice applies to a summed orientation grid. Only
+the internal-first choice requires the same physical cluster family at
+every node. Interlaced averaging is a different estimator: vary selected
+sites about a common reference assignment, average the parent and its
+subsets over the same conditioning event, and multiply the resulting
+irreducible factors once~\cite{cce-theory-witzel12}. It is not a way of
+filling failed samples in an ordinary average.
+
+A bath autocorrelation is neither a coherence nor a ratio. For a Hermitian
+fluctuation operator $B$, the ordered moment is
+$M(t)=\langle B(t)B(0)\rangle$; symmetrised ordering uses half the mean
+anticommutator. A connected correlation subtracts
+$\langle B(t)\rangle\langle B(0)\rangle$ with the means taken over the
+relevant ensemble. Subtracting a product of means separately within each
+spin-state draw would lose the covariance of those means. The native
+noise experiment uses additive inclusion--exclusion:
+\begin{equation}
+ a_C=E_C-E_\varnothing-\sum_{\varnothing\ne S\subsetneq C}a_S,
+ \qquad E_{\mathcal F}=E_\varnothing+\sum_{C\in\mathcal F}a_C .
+ \label{eq:cce-theory-additive}
+\end{equation}
+Here zero is an ordinary contribution, not a singular denominator. The
+output has squared operator units; a requested spectrum is formed from
+the completed correlation, not separately from each irreducible term.
+
+%===============================================================
+\section{Numerical implementation in Spinach}
+\label{sec:numerics}
+%===============================================================
+
+\subsection{What the graph selects}
+
+Three cuts that look similar have different consequences. The physical
+\code{cce.interaction\_cutoff} removes pair couplings beyond a distance
+(in \AA) from the Hamiltonian itself. The \code{cce.bath\_radius}
+selects bath \emph{sites} within the stated distance of at least one
+observed site. The cluster graph selects \emph{combinations} of those
+sites. Removing a graph edge does not delete that interaction from a
+retained cluster Hamiltonian. Conversely, including an edge cannot
+restore a coupling removed from the Hamiltonian.
+
+A complete graph makes no connectivity approximation. A distance graph
+joins pairs separated by at most \code{cce.graph.radius} (\AA); a
+coupling graph joins positive scores at or above
+\code{cce.graph.threshold}. Its ordinary score is the spectral norm of
+the two-spin operator $\sum_{ab}A_{ij}^{ab} I_i^a I_j^b$ (rad/s), not
+the largest Cartesian tensor entry. A resonance score reduces this norm
+by $\sqrt{1+(\Delta_{ij}/\Delta_0)^2}$ in the denominator, using the
+declared frequency mismatch and scale. Explicit adjacency is useful when
+the investigator knows which groups to connect. A graph based only on
+bath--bath couplings is especially risky in gCCE: two nuclei with no
+mutual coupling can exchange polarisation via the same observed spin.
+The default protection adds edges between bath sites attached to the
+joint observed system in generalised dynamics and in second-order
+projection. Disabling that protection with \code{graph.approximate=true}
+is a further approximation, not a change of Hamiltonian.
+
+The vertices of the expansion are single spins unless the bath is
+partitioned. For groups, one physical edge between members connects the
+two groups. Starting with single vertices, Spinach grows connected sets
+one neighbour at a time, sorts the vertex IDs, and removes duplicates.
+It then adds every nonempty subset needed by the recursion, whether or
+not that subset is connected. For a path $a$--$b$--$c$, retaining the
+triple therefore adds the disconnected pair $ac$. No factorisation of
+$ac$ is assumed. Cluster records are ordered by number of groups and then
+by group IDs; their \code{sites} field gives the corresponding physical
+spin IDs. With two nuclei per group, order two can contain four nuclei.
+
+\subsection{Estimate the cost before increasing the order}
+
+For $G$ groups, a complete graph through order $p\le G$ requires
+\begin{equation}
+ N_{\rm raw}=1+\sum_{k=1}^{p}\binom{G}{k}
+ \label{eq:cce-numerics-count}
+\end{equation}
+raw cluster responses per ordinary bath assignment and orientation; the
+one is the observed-only reference. For example, twenty single-site
+groups require 211 responses through order two and 1351 through order
+three. Sparse connectivity can lower this count. It does not bound the
+dimension of one expensive cluster. Conversely, combining strongly
+interacting sites in one group can move their correlation to a lower
+order without making their Hilbert space any smaller. If order is
+omitted, the ordinary expansion targets the full supplied bath, not an
+automatically converged low order.
+
+For a cluster $C$, let $d_b=\prod_{j\in C}(2I_j+1)$ and let $d_o$ be
+the observed Hilbert dimension. A retained Hilbert Hamiltonian has
+$d^2$ entries with $d=d_o d_b$; a dense eigendecomposition costs of
+order $d^3$ operations. Conditional evolution uses two $d_b$-dimensional
+spectra rather than one $d$-dimensional spectrum, but Spinach still
+constructs the retained Hamiltonian before projection. A generalised
+master equation acts on $d^2$ components and a single dense Liouvillian
+has $d^4$ entries. The corresponding projected coherence superoperator
+has $d_b^4$ entries. For one observed spin-$1/2$ and four spin-$1/2$
+bath sites, $d=32$: one dense complex-double $1024\times1024$
+superoperator alone occupies 16\,MiB, before work arrays, time records,
+or other concurrent clusters. These are size estimates, not timings.
+Spinach checks family storage, retained records, and simultaneous
+propagation workspaces against \code{max\_memory\_bytes}; reducing the
+number of concurrent tasks may help with workspace, but not with a
+single cluster that is too large. Interlacing adds the cost of explicitly
+enumerating the allowed product assignments for each conditioning event.
+
+\subsection{Propagation and reduction}
+
+For coherent free induction, Spinach diagonalises a retained Hermitian
+Hamiltonian once (two for conditional propagation), then evaluates the
+phases at each requested time. The default generalised Hilbert Hahn
+calculation also reuses the spectrum. Direct segment exponentials are
+available for that echo; finite drives split the propagation where the
+Hamiltonian changes. Dissipative evolution retains a Liouville generator
+rather than diagonalising it as a Hermitian Hamiltonian. A denser
+acquisition grid therefore need not make the signal at an existing time
+more accurate: in a static FID it merely samples more of the same
+function. It can, however, reveal an echo minimum or a spectral component
+missed between samples.
+
+The \code{direct} reducer forms Eq.~\eqref{eq:cce-theory-recursion} in
+subset order. The default \code{powers} reducer first collects the
+integer power of each normalised raw response. For the retained nonempty
+family, in descending order of size,
+\begin{equation}
+ p_C=1-\sum_{S\in\mathcal F:\,C\subsetneq S}p_S,\qquad
+ E_{\mathcal F}=E_\varnothing\prod_{C\in\mathcal F}F_C^{p_C}.
+ \label{eq:cce-numerics-powers}
+\end{equation}
+In the path example, stop at connected pairs $ab$ and $bc$. The result
+is $E_\varnothing F_{ab}F_{bc}/F_b$: the singletons $a$ and $c$ have
+cancelled, but the shared site $b$ really is a denominator. Powers are
+recomputed for each order. Compensated sums of $p_C\log|F_C|$ and
+$p_C\arg F_C$ avoid large intermediate products and preserve complex
+phase without unwrapping the time series. A zero-power term is not
+needed; a negative-power term whose uncertainty includes zero is
+unresolved. An exact positive-power zero with zero uncertainty can give
+a valid zero only after all required denominators have been resolved.
+Taking absolute values first or clipping small responses changes the
+calculation.
+
+\subsection{Which error is being tested?}
+
+Keep four questions separate when interpreting a decay or a modulation:
+\begin{description}
+\item[Arithmetic.] Is the response numerically resolved? Check
+\code{diagnostics.reduction.valid}, its per-order counterpart, and
+\code{abs\_error\_bound}. The last is an \emph{absolute numerical
+error quantity}; depending on the sequence it incorporates spectral
+residuals, Hamiltonian roundoff, or a floating-point propagation
+estimate, and the reducer propagates the supplied uncertainties. It is
+not a bound on omitted correlations. For a truncated result the
+numerical test uses $a_{\rm num}+r_{\rm num}|E|$. For the finite
+complete record, validity describes the raw finite output, even when the
+numerical budget is not met; \code{cce\_diagnostics} checks the budget
+separately. An invalid mask or \code{NaN} must not become zero, or be
+dropped before fitting. For density output inspect trace, Hermiticity,
+and minimum eigenvalue; no projection onto physical densities is made.
+\item[Bath and cluster truncation.] Does the requested \emph{complex}
+observable change when the order rises, the graph threshold falls, the
+graph radius grows, or more physical sites are included? Vary one at a
+time. Compare over the whole requested time interval, not only at its
+start where all normalised curves may coincide. At small size, a full
+selected bath or an independent dense propagation supplies a reference.
+Agreement for a two-spin patch does not certify the rest of the bath.
+\item[Ensemble and material.] For equal-weight independent state draws
+and expansion before averaging, the standard error at a point is
+$[\sum_s |E_s-\bar E|^2/(N(N-1))]^{1/2}$ when $N>1$. A missing
+estimate, for example for a truncated internally averaged nonlinear
+estimator, is not zero sampling error. Use a held-out seed. Spin-state
+sampling at fixed coordinates does not test structural disorder: compare
+separate physical bath realisations if isotope occupancy or positions
+are uncertain. Likewise check the orientation quadrature independently
+when a powder average matters.
+\item[Time mesh and physics.] Compare nested time meshes and inspect
+new points, especially before taking a Fourier transform. Test the
+Hamiltonian assumptions, transition projection, static exterior, and
+postulated jumps against the experiment; a higher cluster order does
+not test them. In particular, passing a numerical tolerance does not
+identify a fitted decay constant as a microscopic $T_1$ or $T_2$.
+\end{description}
+
+For a single orientation \code{cce\_converge} compares a stated
+baseline independently with each requested refinement. Its elementwise
+comparison on common times is
+\begin{equation}
+ |E_b-E_j|+\eta_b+\eta_j\ \le\ a+r\max(|E_b|,|E_j|),
+ \label{eq:cce-numerics-budget}
+\end{equation}
+where $\eta$ is the reported numerical uncertainty and $a,r$ are the
+\emph{convergence} tolerances. Both calculations must pass the numerical
+and physicality audit with complete coverage. The sampling standard
+errors are reported separately, not added to the left-hand side. A time
+ladder must retain old points exactly; agreement there does not test
+what an interpolant would do between them. A sample-count ladder also
+requires a check with a different seed.
+
+For example, take a mixed bath with two independent nuclei coupled only
+by $S_z A_j I_{jz}$ to an observed spin. The conditional propagators
+factorise, so order one already gives the full projected FID (where the
+reduction is defined). Add a bath flip-flop interaction with unequal
+$A_j$: a joint pair calculation now tests what the singleton product
+missed. A baseline at order one is not vindicated because orders two
+and three agree on a two-spin bath; the latter are the same full-order
+calculation. The controller returns the original baseline, with
+\code{converged}, \code{not\_converged}, or \code{limit\_reached} in
+the diagnostics. Only the first means that all the \emph{declared finite
+comparisons} passed; none is a general error theorem.
+
+\section{Spinach cluster expansion module architecture}\label{sec:architecture}
+\subsection{The boundary between the model and the experiment}
+A CCE calculation has three owners. The Spinach system defines \emph{what is in the sample}: isotope identities, field, positions and interaction tensors. The experiment defines \emph{what is done and measured}: for instance, a Hahn echo and its receiver. The cluster context defines \emph{which subsystems approximate that measurement}. Changing the maximum cluster order should not silently change the receiver. Changing the pulse sequence should not require re-entering the spin system.
+
+The public call is
+\begin{lstlisting}
+[answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions);
+\end{lstlisting}
+Here \lstinline|spin_system| is the result of \lstinline|create(sys,inter)|. Do not construct a basis for the whole bath merely to enter this context. \lstinline|pulse_sequence| is a registered experiment handle, such as \lstinline|@hahn_echo|. The experiment receives its cluster generators from the context; it is not a callback for wrapping an arbitrary full-system simulation. Start from the call in Section~\ref{sec:start}, not from a direct call to a generator builder. The first output is the measured quantity; the second is evidence about how it was obtained.
+
+\subsection{From physical spin numbers to cluster records}
+\begin{enumerate}
+\item \textbf{Resolve the request.} The context checks experiment capabilities and resolves defaults before expensive work. The observed spins and transition or explicit preparation and detection refer to physical spin IDs. Bath indices must also refer to the original Spinach system, not a renumbered list of selected sites.
+\item \textbf{Construct the ensemble.} In a sampled calculation the assignments are made before the orientation loop. Two orientations of the same sampled bath are not two independent samples. For a specified single orientation, calculation proceeds directly to one crystallite.
+\item \textbf{Select a family.} At each orientation the compiler reads the spin model; the graph and cluster routines select a family on physical bath IDs. A bath-radius cutoff selects sites; an edge cutoff decides which pairs are neighbours. They answer different questions. An omitted site may still contribute an assigned exterior mean field. A cluster that contains every retained site is complete for that selected model, not automatically for the physical sample.
+\item \textbf{Calculate the experiment.} The scheduler supplies each selected subsystem and state to the registered evaluator. The generator machinery builds operators for that cluster, including the observed degrees of freedom where required. This is where the exponential cost of large individual clusters enters, even if only a small fraction of the full bath is selected.
+\item \textbf{Reduce and report.} Raw records and the observed-only reference enter the contraction appropriate to the observable. The context returns a signal, density or correlation as requested, with validity flags, errors and intermediate orders in the diagnostics. For a correlation with a requested spectrum, the spectrum is a diagnostic output, not a replacement for the time-domain correlation.
+\end{enumerate}
+
+\subsection{One crystal, a weighted powder, or the individual orientations}
+Use \lstinline|parameters.orientation| for one Euler triple in radians and \lstinline|parameters.grid| for a quadrature, not both. A grid may be a Spinach grid name or an explicit structure with fields \lstinline|alphas|, \lstinline|betas|, \lstinline|gammas|, and \lstinline|weights|. The context normalises positive weights and skips zero-weight entries. It does not average Hamiltonians. There is no outer context to call: each retained orientation has its own cluster generators and the receiver stays fixed.
+
+With \lstinline|parameters.sum_up=false|, a grid calculation returns a column cell array of \emph{unweighted}, completed orientation signals. Find the original index of element $j$ in \lstinline|diagnostics.grid_indices(j)|; the weight for that retained entry is in \lstinline|diagnostics.grid.weights(j)|. An unsummed grid has no combined reduction. Without a grid, even a single orientation has an ordinary numeric answer. Thus a one-node grid and a single-crystal request may have the same physics but, if the grid is unsummed, different MATLAB return types. A summed grid reduces in the order selected by \lstinline|parameters.cce.averaging| (Section~\ref{sec:numerics}); one cannot recover the internal-first estimator by taking a weighted sum of already reduced orientation signals.
+
+\subsection{Where to look when the answer is surprising}
+\begin{description}
+\item[Zero or undefined echo.] Check the observed transition, initial coherence, coil and normalisation reference first. Inspect the corresponding element of the reduction's validity mask and its reason. A forbidden or ill-conditioned division is not evidence that the spin physically lost all coherence. Do not replace masked points by zeros before comparing orders.
+\item[Order looks converged, but the model is not.] Inspect the graph, retained bath IDs and clusters, then enlarge the selection or vary the grouping. Agreement between successive orders on a small selected bath says nothing about omitted sites. Increase the number of independently drawn states separately from increasing cluster order.
+\item[Restart or averaging refused.] A checkpoint on a grid requires exactly one positive-weight node. A multi-node internal-first calculation requires matching physical cluster families, not merely the same number of clusters. Inspect the one-orientation diagnostics to identify a differing physical site or cluster. Changing the estimator to evade a refusal changes the calculation.
+\item[Memory refusal.] Inspect the size and multiplicity of the largest retained cluster, whether the observed spins are included explicitly, and whether the evolution is in Hilbert or Liouville space. Reducing the number of simultaneous workers can lower the peak cost; it does not make a single oversized cluster smaller.
+\end{description}
+
+\subsection{Which supplied example should I open?}
+The files below are in \lstinline|examples/cce/|. Call a file by its basename after adding the examples directory to the MATLAB path. These are small, inspectable calculations, not converged material simulations. In particular, a three-node powder illustrates tensor rotation; it is not a generally adequate integration grid.
+\begin{longtable}{@{}p{0.36\linewidth}p{0.58\linewidth}@{}}
+\toprule Example & What to inspect \\ \midrule\endfirsthead
+\toprule Example (continued) & What to inspect \\ \midrule\endhead
+\texttt{cce\_single\_nucleus} & Analytic one-nucleus modulation of a projected echo; a first check on times and couplings. \\
+\texttt{cce\_nv\_diamond} & Fixed-receiver NV echo on pinned inputs; inspect the imaginary as well as the real quadrature. \\
+\texttt{cce\_molecular\_powder} & A direct native grid call for two deuterons with anisotropic interactions. \\
+\texttt{cce\_deer\_bandwidth} & Selection of a pumped bath site by a finite spectral window. \\
+\texttt{cce\_noise\_spectrum} & Ordered time-domain correlation and the consequences of a finite observation window. \\
+\texttt{cce\_polarized\_bath} & Polarisation and sampling of a product-state nuclear bath. \\
+\texttt{cce\_hbn\_quadrupoles} & Explicit quadrupolar tensors in a planar high-spin bath. \\
+\texttt{cce\_methyl\_molecular} & Grouping a three-proton motif with coherent cyclic exchange. \\
+\texttt{cce\_p1\_electron\_bath} & An electron bath with a nitrogen hyperfine group. \\
+\texttt{cce\_erbium\_cawo4} & Anisotropic tungsten couplings around an effective central electron. \\
+\texttt{cce\_sic\_divacancy} & Different nuclear species in a divacancy-like environment. \\
+\texttt{cce\_sip\_donor} & Site-dependent contact terms and valley interference in a silicon donor model. \\
+\texttt{gcce\_finite\_drive} & A finite spin-lock drive propagated with the coupled drift. \\
+\texttt{gcce\_highspin\_siv} & Explicit spin-3/2 dynamics in a vacancy-like environment. \\
+\texttt{gcce\_sic\_clock} & A low-field transition where transverse zero-field splitting matters. \\
+\texttt{gcce\_two\_centres} & A joint observed subsystem and its reduced density matrix. \\
+\texttt{gcce\_votpp} & An electron and vanadium nucleus in the observed subsystem. \\
+\texttt{mecce\_dissipative\_bath} & A relaxing bath spin and a small-system master-equation reference. \\
+\texttt{pcce\_electron\_layer} & A strongly coupled electron pair treated as a group. \\
+\bottomrule\end{longtable}
+
+\section{Getting started: the echo of one nucleus}\label{sec:start}
+
+Calculate a Hahn echo from a spin-one electron coupled to a single $^{13}$C nucleus. The nucleus precesses about different axes in the two electron spin states. A midpoint inversion therefore does not undo all of the nuclear evolution; the echo amplitude oscillates even though neither spin relaxes. This is a useful first calculation because a closed expression predicts the entire time trace.
+
+\subsection{Start MATLAB and specify the spin system}
+Start a fresh MATLAB session (R2026b or later) with the Spinach distribution root as the current folder. The following commands install the Spinach path for this session and check which context and sequence will run. Both paths must belong to the same distribution. The remaining blocks may be saved in a script or pasted successively at the prompt.
+\begin{lstlisting}
+restoredefaultpath();
+fix_path('add');
+which clexpn -all
+which hahn_echo -all
+\end{lstlisting}
+
+Put the following blocks, in order, in one script, \code{first\_echo.m}. Use spin 1 for the electron and spin 2 for the nucleus. \code{'E3'} specifies multiplicity three, not spin quantum number three. The field is in tesla. Setting the electron $g$ matrix to zero deliberately removes its Zeeman term in this model; zero nuclear chemical shift leaves the bare nuclear Larmor frequency in place. Enter the hyperfine matrix in Hz, not rad~s$^{-1}$. Its off-diagonal component is in the indicated ordered cell and Cartesian position: transposing this matrix changes the model.
+\begin{lstlisting}
+% One carbon nucleus modulates a spin-one Hahn echo
+
+% Specify the magnet, isotopes, and worker pool
+sys.magnet=0.01;
+sys.isotopes={'E3','13C'};
+sys.parallel={'processes',1};
+sys.scratch=tempname;
+mkdir(sys.scratch);
+
+% Set the two hyperfine components in angular frequency units
+omega=-spin('13C')*sys.magnet;
+apar=0.3*abs(omega);
+aper=0.6*abs(omega);
+
+% Supply zero electron g, zero nuclear shift, and a coupling in Hz
+inter.zeeman.matrix={zeros(3),zeros(3)};
+inter.coupling.matrix=cell(2);
+inter.coupling.matrix{1,2}=[0 0 aper;0 0 0;0 0 apar]/(2*pi);
+spin_system=create(sys,inter);
+\end{lstlisting}
+
+\code{create} reads the physical spin system and reports the Zeeman and coupling tensors. There are no coordinates: the hyperfine tensor above is the interaction, not a correction to a point-dipole term. The notices about missing coordinates, giant-spin terms, and relaxation are therefore consistent with the chosen model. The requested one-worker process pool is for Spinach housekeeping; it does not set the CCE order. Do \emph{not} call \code{basis(spin\_system,bas)} on the parent bath. Specify the formalism inside \code{parameters.cce.basis}; the context builds a basis only for each retained subsystem.
+
+\subsection{Select the experiment and acquire the echo}
+Project onto the $m_S=0,+1$ electron states at the default crystal orientation. These manifolds are invariant for this Hamiltonian; population transfer between them is excluded by the model itself. The selected transition prepares their equal superposition and detects its normalised coherence. The nucleus starts in $\mathbf{1}/2$. Order one includes the whole specified bath here because there is only one bath site. In \code{hahn\_echo}, each entry of \code{times} is the \emph{total} duration $T=2\tau$, in seconds; the ideal transition-selective $\pi_x$ pulse falls at $T/2$.
+\begin{lstlisting}
+% Select the physical spins and total echo times in seconds
+parameters.observed=1;
+parameters.transition=struct('spins',1,'ms',[0 1]);
+parameters.times=linspace(0,8*pi/abs(omega),101);
+parameters.cce.bath_spins=2;
+parameters.cce.order=1;
+parameters.cce.approximation='projected';
+parameters.cce.basis.formalism='zeeman-hilb';
+parameters.cce.graph.mode='complete';
+parameters.cce.bath_state.mode='mixed_product';
+parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
+                               'max_memory_bytes',2^28);
+
+% Calculate the echo of the selected transition
+[echo,details]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+\end{lstlisting}
+
+\code{echo} is a $101\times1$ complex array, not a structure. \code{details.clusters} describes the single retained nuclear cluster; \code{details.raw\{1\}} contains two records for the chosen bath state: the observed-only response and the observed-plus-nucleus response. \code{details.reduction.valid} indexes the times at which the reduction was defined. The field \code{abs\_error\_bound} of \code{details.reduction} reports the numerical error from propagation and reduction. Compare that field to the requested pointwise budget; it is not an estimate of missing bath spins.
+
+\subsection{Check the trace before changing the model}
+Let $\omega=-\gamma_{\rm C}B_0$, $\omega_1=[(\omega+A_\parallel)^2+A_\perp^2]^{1/2}$. The nuclear precession vectors are $(0,0,\omega)$ and $(A_\perp,0,\omega+A_\parallel)$. Taking the mixed-state trace of the two spin-half rotations in opposite orders gives
+\begin{equation}
+E(T)=1-2\frac{A_\perp^2}{\omega_1^2}
+\sin^2\!\left(\frac{\omega T}{4}\right)
+\sin^2\!\left(\frac{\omega_1 T}{4}\right).
+\end{equation}
+The quarter in the arguments is important: each free interval lasts $T/2$, and the spin-half propagator contains the rotation half-angle. Compare the complex amplitude directly, without taking its magnitude first.
+\begin{lstlisting}
+% Compare the complex result with the analytic echo
+omega1=hypot(omega+apar,aper);
+time=parameters.times(:);
+reference=1-2*(aper/omega1)^2*sin(omega*time/4).^2.*sin(omega1*time/4).^2;
+fprintf('Valid: %d/%d; max |echo-reference|: %.3g\n',...
+        nnz(details.reduction.valid),numel(echo),max(abs(echo-reference)));
+
+% Plot the modulation and its quadrature companion
+kfigure();
+plot(1e6*time,real(echo),'b-',1e6*time,imag(echo),'r--');
+kxlabel('Total echo time / microseconds');
+kylabel('Normalised echo amplitude');
+klegend('Real','Imaginary');
+kgrid();
+\end{lstlisting}
+
+In a double-precision run the printed line was \code{Valid: 101/101; max |echo-reference|: 7.77e-16}. The blue real component starts at unity, reaches its lowest sampled value, $0.15980$, at $9.713~\mu\mathrm{s}$, and returns to unity at $37.356~\mu\mathrm{s}$. The red imaginary component stays within $1.2\times10^{-16}$ of zero. The largest reported numerical error bound was $4.74\times10^{-9}$, below the requested absolute tolerance. Round-off can change the last digits. A dip followed by recovery here is coherent nuclear modulation, not an irreversible $T_2$ decay. As a physical check, setting $A_\perp=0$ makes the conditional axes collinear and the formula predicts a flat echo. The shipped counterpart is \code{examples/cce/cce\_single\_nucleus.m}.
+
+\section{Advanced user manual}\label{sec:advanced}
+
+Each recipe below changes a specified calculation, rather than relying on undocumented workspace variables. Run \code{first\_echo.m} from Section~\ref{sec:start} once. The recipes copy its \code{parameters}, so the one-nucleus baseline remains available. Only the sampled-bath recipe needs a further prerequisite: run the preceding two-nucleus order comparison first.
+
+\subsection{Compare a single crystal and a weighted orientation grid}
+A crystal uses \code{parameters.orientation}, a $1\times3$ Euler-angle row in radians, or the default \code{[0 0 0]}. For a powder supply \code{grid} \emph{instead}: a Spinach grid name or a structure containing Euler angles and weights. The anisotropic hyperfine tensor in the quick start does not preserve the fixed electron manifolds at every orientation. Switch to \code{'generalized'} so that rotations which mix electron states are propagated, not projected away.
+\begin{lstlisting}
+% Explore crystal orientations of the first_echo spin system
+
+% Keep two unequal weights and omit the middle node
+powder=parameters;
+powder.cce.approximation='generalized';
+powder.grid=struct('alphas',[0 0 0],'betas',[0 pi/4 pi/2],...
+                   'gammas',[0 0 0],'weights',[1 0 3]);
+powder.sum_up=false;
+[nodes,grid_info]=clexpn(spin_system,@hahn_echo,powder,'labframe');
+
+% Reconstruct the summed complex signal from the unweighted columns
+weights=grid_info.grid.weights;
+manual_sum=weights(1)*nodes{1}+weights(2)*nodes{2};
+powder.sum_up=true;
+powder_echo=clexpn(spin_system,@hahn_echo,powder,'labframe');
+fprintf('Weighted-sum difference: %.3g\n',max(abs(manual_sum-powder_echo)));
+\end{lstlisting}
+Here the returned index column is $[1,3]^{\mathsf T}$ and the corresponding weights are $[0.25,0.75]^{\mathsf T}$. With \code{sum\_up=false}, \code{nodes\{1\}} and \code{nodes\{2\}} are the \emph{unweighted} complex echoes at those two nodes, not at original nodes 1 and 2. The first reproduces the quick-start orientation. The maximum difference between orientations was $0.929$; the difference between the manual sum and the default summed result was zero in this run. Sum the complex amplitudes before taking a real part for display or a magnitude for analysis. Two directions demonstrate the interface, not a converged powder. For a molecular example with deuterium quadrupoles, see \code{cce\_molecular\_powder.m} in \code{examples/cce/}.
+
+\subsection{Replace an ideal echo by a finite pulse}
+An ideal Hahn pulse interchanges two states instantaneously. To ask what a real pulse does \emph{during} the drive, use \code{@finite\_drive}, a generalised propagator, and a density output. This example starts the electron in its $m_S=+1$ state and drives the physical electron about $x$, not just the selected two-state subspace. It samples before, during, at the end of, and after the four-microsecond pulse.
+\begin{lstlisting}
+% Replace the ideal echo in first_echo by a rectangular observed-spin drive
+
+% Use generalised evolution and ask for the observed density
+pulse=parameters;
+pulse.cce.approximation='generalized';
+pulse.output='density';
+pulse.rho0=diag([1 0 0]);
+pulse.times=[0 2e-6 4e-6 8e-6];
+pulse.drive=struct('spins',1,'axis','x','amplitude',2*pi*25e3,...
+                   'detuning',0,'duration',4e-6);
+[density,drive_info]=clexpn(spin_system,@finite_drive,pulse,'labframe');
+
+% Recover the final three-by-three density in Spinach's observed basis
+rho=reshape(density(end,:),3,3);
+disp(real(diag(rho)).');
+\end{lstlisting}
+The four rows are observation times. Each row is the column-vectorised $3\times3$ observed density; its diagonal contains the three populations in descending $m_S$ order. At $8~\mu\mathrm{s}$ these were $0.82764$, $0.16422$, and $0.00815$. Drift remains active during the rectangular pulse; multiplying a separately computed free evolution by an ideal flip is not this calculation. Supply amplitude and detuning in rad~s$^{-1}$, duration in seconds. For successive slices supply equal-length row vectors of amplitudes and durations. Use \code{gcce\_finite\_drive.m} for the spin-half electron version.
+
+For ideal pulses choose the sequence that expresses the experiment. \code{@cpmg\_echo} takes \code{parameters.nloops} (a positive pulse count); \code{@refocusing\_train} takes explicit ideal pulses or an XY8/UDD train in closed generalised Hilbert evolution. For a frequency-selective bath inversion, use \code{@bath\_pumped\_hahn}: \code{cce\_deer\_bandwidth.m} shows how to specify a pump centre, half-width, frequency units, and placement. A field called \code{parameters.sequence}, even an empty one, is not a substitute for these native declarations.
+
+\subsection{Decide whether the next cluster order matters}
+Increasing the order for a single nucleus cannot reveal a missing pair. Add a second $^{13}$C with a weaker central coupling and an explicit mutual coupling to the first nucleus. Changes to \code{sys} or \code{inter} require a new \code{create} call; changes to the CCE order alone do not.
+\begin{lstlisting}
+% Resolve the effect of a second, coupled bath nucleus in first_echo
+
+% Enlarge the physical model with a weaker hyperfine and a bath pair
+pair_sys=sys;
+pair_sys.isotopes{3}='13C';
+pair_inter=inter;
+pair_inter.zeeman.matrix{3}=zeros(3);
+pair_inter.coupling.matrix{1,3}=inter.coupling.matrix{1,2}/2;
+pair_inter.coupling.matrix{2,3}=diag([1 1 -2])*5e3;
+pair_inter.coupling.matrix{3,3}=[];
+pair_system=create(pair_sys,pair_inter);
+
+% Compare the singleton baseline with the complete two-site cluster
+trial=parameters;
+trial.cce.bath_spins=[2 3];
+ladder=struct('field','cce.order','values',{{1,2}});
+trial.cce.convergence=struct('ladders',ladder,'atol',1e-4,...
+                             'rtol',1e-4,'max_work',2);
+[~,order_info]=cce_converge(pair_system,trial,@hahn_echo,'labframe');
+comparison=order_info.convergence_report.comparisons;
+fprintf('%s: max |change| = %.5g\n',order_info.convergence,comparison.difference);
+\end{lstlisting}
+This comparison returned \code{not\_converged}: on the same valid time points, adding the pair changed the normalised echo by as much as $0.13075$. Retain order two for this particular finite bath. \code{cce\_converge} returns the \emph{original baseline}, not the most expensive refinement. It compares each trial against that baseline using the declared tolerances and the numerical errors. \code{max\_work} counts full context evaluations, including the baseline; \code{limit\_reached} means the requested checks did not all run.
+
+For a larger bath test order, bath extent, graph cutoff, and sampling separately; refining all at once does not identify which approximation mattered. Start each ladder with the actual value in the baseline. A time ladder must contain every previous time exactly; agreement at the common points does not exclude a missed oscillation between them. Use a denser trace to inspect extrema and any quantity inferred from the sampled signal.
+
+\subsection{Polarise the bath and compare the order of averaging}
+Use the \code{pair\_system} just built, but keep only singleton clusters. In each draw a site has probabilities $(0.8,0.2)$ in the default local Zeeman basis. The string \code{'uniform'} in \code{basis} selects that basis; it does \emph{not} override the probabilities. A static mean field lets the omitted partner contribute its spin expectation to each retained Hamiltonian. An unpolarised, exactly mixed spin has zero Cartesian mean; a fixed product-state draw need not.
+\begin{lstlisting}
+% Sample a polarised two-site bath using the physical model from echo_order
+
+% Keep the singleton clusters and use product states for the exterior
+sampled=parameters;
+sampled.cce.bath_spins=[2 3];
+sampled.cce.meanfield='static';
+sampled.cce.bath_state=struct('mode','sampled','basis','uniform',...
+                              'probabilities',{{[0.8 0.2],[0.8 0.2]}},...
+                              'samples',16,'seed',8800);
+sampled.cce.averaging='after_expansion';
+[external,state_info]=clexpn(pair_system,@hahn_echo,sampled,'labframe');
+
+% Compare averaging raw records before reducing the same draws
+sampled.cce.averaging='internal_then_expansion';
+internal=clexpn(pair_system,@hahn_echo,sampled,'labframe');
+fprintf('Max |change of averaging order|: %.4g\n',max(abs(internal-external)));
+\end{lstlisting}
+With the same seed and 16 draws, the maximum absolute difference between the two calculations was $0.02659$. The default \code{'after\_expansion'} reduces each draw, then averages its completed echo. \code{'internal\_then\_expansion'} instead averages the cluster signals and observed-only references before reducing. Products and divisions generally do not commute with averaging. On an orientation grid the same distinction applies to quadrature nodes; the internal route requires identical physical cluster families. Changing the grid does not redraw the bath for each node.
+
+Inspect \code{state\_info.reduction.sampling\_standard\_error}: its maximum here was $0.06685$, not an order-truncation error and not evidence that 16 samples suffice. Repeat at increasing sample counts and with a different seed; a sample-count ladder in \code{cce\_converge} requires a held-out seed override. To prescribe a product density without Monte Carlo noise, use \code{'explicit\_product'} with \code{rho} cells in \code{bath\_spins} order. The shipped \code{cce\_polarized\_bath.m} illustrates sampled polarisation in a two-proton model.
+
+\subsection{Introduce a dissipative bath without fitting a decay constant}
+Compare two otherwise identical signals with and without a local raising jump on site 2. Use \code{'zeeman-liouv'} for the retained Liouville spaces and \code{'generalized'} to keep the observed density. Jump support is a \emph{physical} spin ID; the rate below is in s$^{-1}$, not Hz to be multiplied by $2\pi$.
+\begin{lstlisting}
+% Introduce one local raising jump into the free evolution of first_echo
+
+% Request a density matrix rather than a normalised signal
+relax=parameters;
+relax.cce.approximation='generalized';
+relax.cce.basis.formalism='zeeman-liouv';
+relax.output='density';
+relax.bath_jumps=struct('support',2,'operator','L+','rate',3e4);
+[open_density,loss_info]=clexpn(spin_system,@free_evolution,relax,'labframe');
+
+% Compare with the identical coherent model, using the same representation
+relax=rmfield(relax,'bath_jumps');
+closed_density=clexpn(spin_system,@free_evolution,relax,'labframe');
+fprintf('Max density-element change: %.4g\n',max(abs(open_density-closed_density),[],'all'));
+\end{lstlisting}
+Across this time grid the largest absolute change in a density element was $0.1249$. The observed density retained unit trace in the run. Examine the trace, Hermiticity, and eigenvalues of recovered density matrices before interpreting a truncated calculation as populations. A user-supplied raising rate describes the bath channel: it does not specify the electron $1/T_1$. The shipped \code{mecce\_dissipative\_bath.m} is a corresponding spin-half example.
+
+\subsection{Calculate a bath correlation and its spectrum}
+To measure fluctuations rather than electron coherence, declare the bath operator, its ordering, and the Hamiltonian under which it fluctuates. In this model \code{'bath\_only'} traces out the electron in the Hamiltonian; its linear hyperfine contribution has zero electron trace. The remaining generator is the nuclear Zeeman term. For the mixed spin-half state, $C(t)=\langle I_x(t)I_x(0)\rangle=\cos(\omega t)/4$. No normalisation to unity is appropriate.
+\begin{lstlisting}
+% Measure transverse nuclear noise instead of the echo in first_echo
+
+% Measure a bath-only connected correlation in the mixed nuclear state
+noise=parameters;
+noise.cce.approximation='generalized';
+noise.noise.descriptors=struct('operators','Lx','spins',2,'coefficient',1);
+noise.noise.ordering='ordered';
+noise.noise.connected=true;
+noise.noise.manifold='bath_only';
+
+% Transform a stationary time record to its two-sided angular spectrum
+noise.spectrum=struct('frequency_grid',linspace(-2*abs(omega),2*abs(omega),81),...
+                      'convention','exp(+i*omega*t)','sidedness','two-sided',...
+                      'window','hann','time_domain','positive',...
+                      'weights','trapezoid','stationary',true);
+[correlation,noise_info]=clexpn(spin_system,@noise_correlation,noise,'labframe');
+fprintf('Max correlation error: %.3g\n',max(abs(correlation-cos(omega*time)/4)));
+\end{lstlisting}
+The first return is the correlation versus lag, with $C(0)=0.25$; the largest deviation from the cosine was $2.78\times10^{-17}$. The spectrum is in \code{noise\_info.spectrum}, not the first return. Its peaks lie near $\pm|\omega|$; \code{omega} there is in rad~s$^{-1}$ and \code{frequency\_hz} is in Hz. The Hann window and finite acquisition determine the line shape; its width here is not a relaxation rate. Positive-time extension uses the declared stationarity and $C(-t)=C(t)^*$. Connected correlations subtract the \emph{ensemble} means; subtracting each sample's means before averaging gives a different quantity. See \code{cce\_noise\_spectrum.m} for the longer acquisition and plotting commands.
+
+\subsection{Choose a task axis and restart a calculation}
+Set \code{sys.parallel} \emph{before} \code{create} to size the pool; use \code{parameters.cce.parallel.mode} to choose serial, cluster, or bath-state scheduling. Do not start a separate pool. The following is a restart demonstration on one worker, not a speed comparison.
+\begin{lstlisting}
+% Resume one crystallite of first_echo from a private checkpoint
+
+% Write raw task records to a new file in the private scratch folder
+restart=parameters;
+restart.cce.parallel=struct('mode','clusters','batch_size',1);
+restart.cce.checkpoint=struct('file',[tempname(sys.scratch) '.mat'],...
+                              'resume',false);
+original=clexpn(spin_system,@hahn_echo,restart,'labframe');
+
+% Reuse completed records with the same physical and numerical inputs
+restart.cce.checkpoint.resume=true;
+recovered=clexpn(spin_system,@hahn_echo,restart,'labframe');
+fprintf('Checkpoint replay difference: %.3g\n',max(abs(original-recovered)));
+\end{lstlisting}
+The replay difference was zero. For an actual interruption, retain the filename and rerun the \emph{same} request with \code{resume=true}; do not generate another name with \code{tempname}. Use a persistent writable directory if temporary storage may be purged. Changing the sampled time grid and trying to reuse this file was rejected with \code{cce\_checkpoint:identity}. Use a new file for changed physics, samples, or experiment settings. Checkpoints require one retained orientation, and are incompatible with interlacing and independent convergence ladders. For simultaneous jobs use different checkpoint files.
+
+\section{Complete function and option reference}
+\label{sec:reference}
+
+\subsection{Calling the context and choosing an experiment}
+Pass a system returned by \code{create}, a registered experiment handle, a scalar \code{parameters} structure, and a Spinach interaction-assumption name (a character row). A full-bath basis is not needed. In the tables, names in the left column are relative to the indicated structure; literal character values are printed in typewriter face without quotation marks. Use MATLAB logical scalars for flags unless noted otherwise.
+
+\begin{lstlisting}
+% Run the experiment on the supplied finite bath
+[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+\end{lstlisting}
+
+Let $T$ be the number of elapsed times, $B$ the number of selected bath spins, $d_o$ the product of observed-spin multiplicities, and $d_C$ the product of bath multiplicities in retained cluster $C$ (empty product one). In Hilbert space the generalised density is $(d_o d_C)\times(d_o d_C)$, whereas a projected coherence block is $d_C\times d_C$. A Liouville-space generator acting on an $n\times n$ matrix has size $n^2\times n^2$. Spin order is the supplied observed order followed by retained bath sites; local product states use descending $m$. These are dimensions of a \emph{cluster}, not of the full supplied bath.
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Experiment handle & Observed quantity and supported choices\\
+\midrule\endfirsthead
+\toprule
+Experiment handle & Observed quantity and supported choices\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{@free\_evolution} & Free signal or observable, or generalised density. Generalised or projected; explicit jumps allowed. No pulse descriptors.\\
+\code{@hahn\_echo} & Selected-transition echo, default ideal $\pi_x$ at $t/2$. Optional replacement \code{refocusing} pulse. Generalised or projected; explicit jumps allowed. Density output is generalised only.\\
+\code{@cpmg\_echo} & Selected-transition echo. \code{nloops} ideal $\pi_x$ pulses at $(2k-1)t/(2\,\code{nloops})$. Generalised or projected; no jumps or density output.\\
+\code{@cce\_eseem} & Two-pulse ESEEM: transverse transition preparation and midpoint inversion. Generalised or projected; no jumps or density output.\\
+\code{@bath\_pumped\_hahn} & Hahn echo plus an ideal bath inversion at a declared time fraction. Requires \code{pump} and a selected observed transition; generalised or projected; no jumps or density output.\\
+\code{@finite\_drive} & Rectangular or piecewise finite observed-spin drive, optionally with ideal pulses. Generalised only; signals, observables, or density. A drive alone permits dissipative propagation; mixing ideal and finite controls requires closed Hilbert dynamics.\\
+\code{@refocusing\_train} & Explicit ideal pulses or a named XY8/Uhrig train. Closed generalised Zeeman Hilbert space only. Signals, observables, or density.\\
+\code{@noise\_correlation} & Bath autocorrelation, $T\times1$ in squared fluctuation units. Generalised generators and additive reduction, not a selected-coherence quotient. Bath-only jumps allowed; no interlacing. Optional Fourier transform is returned separately.\\
+\end{longtable}
+\endgroup
+
+\subsection{Experiment inputs: \code{parameters}}
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field & What to supply; default or dependency\\
+\midrule\endfirsthead
+\toprule
+Field & What to supply; default or dependency\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{observed} & Required. Nonempty row of distinct physical spin IDs (one-based indices in the system). Not an isotope channel.\\
+\code{times} & Required. Nonempty $1\times T$ row of finite, nonnegative, strictly increasing seconds. For echoes each entry is the total sequence duration, not the interpulse delay.\\
+\code{transition} & Required for projected propagation and the selected-transition echoes. Set \code{transition.spins} equal to \code{observed}, including its order. Choose exactly one selector below. The same selector is resolved in each orientation's observed Hamiltonian.\\
+\code{transition.ms} & Number of observed spins by two: the first column lists the local $m$ values for $\alpha$, the second for $\beta$. Choose two distinct product states.\\
+\code{transition.levels} & Two distinct one-based indices in a $1\times2$ row; label $\alpha$ then $\beta$ in the ascending-energy eigensystem. An unresolved degenerate level needs explicit states, not an arbitrary eigenvector index.\\
+\code{transition.alpha}, \code{transition.beta} & Explicit orthonormal $d_o\times1$ columns. Their order and relative phase define the selected coherence.\\
+\code{rho0}, \code{preparation} & Alternatives. \code{rho0} is a finite Hermitian, positive semidefinite, unit-trace $d_o\times d_o$ observed density. With a selected transition, the default is the equal, in-phase superposition. \code{transition} requests it explicitly; \code{transverse} prepares the $+x$ state of one spin-$\tfrac12$. A scalar descriptor with \code{states} and \code{spins} uses the retained state constructor; for physical product preparations supply one density or population vector per observed spin.\\
+\code{coil} & Finite observed $d_o\times d_o$ detector, or a cell vector of such detectors; default $\lvert\alpha\rangle\langle\beta\rvert$ when a transition is selected. Projected propagation requires one compatible detector. Without a transition specify preparation and detection for an observed signal.\\
+\code{output}, \code{normalized} & Signal by default; \code{observable} for detected components, \code{density} only on the listed generalised paths, \code{correlation} for noise. Signals default to \code{normalized=true}: divide each channel by its actual initial detected reference; a vanishing divisor is refused. Density output does not use receiver normalisation.\\
+\code{spins}, \code{nloops} & \code{spins}, if supplied, is a cell row of isotope-channel names; it does not select observed or bath sites. \code{nloops} is a positive integer required by CPMG.\\
+\code{orientation} & One $1\times3$ finite real Euler-angle row in radians; default \code{[0 0 0]} without a grid. Do not also supply \code{grid}.\\
+\code{grid} & Native Spinach grid filename (character row in \code{kernel/grids}) or scalar structure with \code{alphas}, \code{betas}, \code{gammas} (radians), and \code{weights}. All four are nonempty, equal-length finite real vectors. Weights are nonnegative with finite positive sum.\\
+\code{sum\_up} & On a grid: logical or numeric 0/1; default true. Zero weights are omitted, positive weights normalised. True returns the weighted result; false a column cell of unweighted node results in input order. Without a grid the answer is numeric regardless of this flag.\\
+\code{cce} & Optional scalar structure of approximation, bath, selection, ensemble, and numerical controls; see below. \code{drive}, \code{refocusing}, \code{train}, \code{pump}, \code{bath\_jumps}, \code{noise}, and \code{spectrum} belong beside it, not inside it.\\
+\end{longtable}
+\endgroup
+The usual signal is a complex $T\times N_{\rm det}$ matrix. Density output is $T\times d_o^2$, with MATLAB column-major vectorisation: reconstruct time point $k$ with \code{reshape(answer(k,:),d\_o,d\_o)}. Normalised signals are dimensionless; a raw detected observable keeps its detector and preparation scale. A masked entry is not a physical zero.
+
+\subsection{Pulse and dissipation descriptors}
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field of \code{parameters} & Shape, units, and restrictions\\
+\midrule\endfirsthead
+\toprule
+Field of \code{parameters} & Shape, units, and restrictions\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{refocusing} & Hahn: one scalar structure replacing the default inversion. Train or finite drive: a cell row of ideal-pulse structures. In each, \code{spins} gives the ordered physical support. Choose \code{operator} (Hermitian integrated rotation generator on that support) or \code{axis} and \code{angle} (radians); choose \code{time} (nonnegative seconds) or \code{fraction} (0 to 1 of each elapsed time). Pulses past the current endpoint are omitted.\\
+\code{refocusing} targets & Cartesian axes are \code{x}, \code{y}, \code{z}, or a unit $1\times3$ real row. Do not mix observed and bath targets in a Hahn descriptor. A projected pulse must preserve or interchange the two manifolds. For a frozen exterior spin, only a supported Cartesian update may change the ensuing mean field; an arbitrary exterior matrix rotation is not supported.\\
+\code{train} & For \code{refocusing\_train} supply this scalar structure \emph{instead of} explicit pulses. \code{name} is \code{xy8} or \code{udd}; \code{count} a positive integer; \code{spins} the target ID row; \code{axis} one of \code{x}, \code{y}, \code{z}. XY8 requires a multiple of eight and uses its own XY phases. Uhrig uses the declared axis and fractions $\sin^2[\pi k/(2\,\code{count}+2)]$.\\
+\code{drive} & Nonempty structure row. Each entry requires \code{spins} (distinct observed IDs), \code{axis} as above, finite real \code{amplitude} row (rad/s), matching positive \code{duration} row (s), and finite real scalar \code{detuning} (rad/s). Free drift remains active.\\
+\code{drive} starts & Absent: start at zero, then place slices consecutively. \code{time} is a nonnegative start (s) or matching nondecreasing row of explicit starts; slices can overlap. Instead \code{fraction} sets the start of a single slice at that fraction of each elapsed time, $0\le f\le1$; its duration is still in seconds.\\
+\code{pump} & Required for bath-pumped Hahn. \code{center} is a finite signed axial bath Zeeman frequency; \code{halfwidth} is finite and nonnegative; \code{units} must be \code{Hz} or \code{rad/s}. \code{fraction} is the pulse \emph{time} fraction in $[0,1]$, not the proportion of spins inverted. \code{allow\_empty} is a required logical flag.\\
+\code{pump} selection & Optional \code{sites} (bath-ID row) and \code{species} (cell row of isotope names) intersect the candidates. \code{boundary} is \code{closed} (default, inclusive) or \code{open} (strict). Non-axial fields are refused; a pumped exterior spin cannot remain a static mean field.\\
+\code{bath\_jumps} & Optional structure array. Each entry requires \code{support} (ordered observed/bath ID row), \code{operator} (finite square matrix of support-product dimension, or one of \code{L+}, \code{L-}, \code{Lx}, \code{Ly}, \code{Lz} on one spin), and finite \code{rate} $\ge0$ in s$^{-1}$. Omission means no explicit jump, not an inferred relaxation rate.\\
+\code{bath\_jumps} support & A nonzero correlated jump cannot straddle a retained cluster: group its support. An active jump cannot drive a frozen exterior mean field. Projected jumps and their loss terms must preserve each manifold; noise accepts bath support only. Use \code{zeeman-liouv} for generalised jumps.\\
+\end{longtable}
+\endgroup
+
+\subsection{Correlation and spectrum: \code{parameters.noise} and \code{parameters.spectrum}}
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field (relative to \code{parameters}) & Meaning; no implicit spectral conventions\\
+\midrule\endfirsthead
+\toprule
+Field (relative to \code{parameters}) & Meaning; no implicit spectral conventions\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{noise.ordering}, \code{noise.connected} & Required. \code{ordered} or \code{symmetrized} for the quantum product; logical \code{connected} requests subtraction of first moments. Ensemble centring uses moments, not independently centred single-draw correlations.\\
+\code{noise.manifold} & Required: \code{bath\_only}, \code{alpha}, or \code{beta}. A fixed observed manifold requires a selected, invariant state; this does not make the context's \code{approximation} projected.\\
+\code{noise.terms} & Use terms \emph{or} descriptors. Each term has \code{support} (ordered bath IDs) and a finite Hermitian \code{operator} square matrix on that support. The calculation restricts the specified terms to each cluster.\\
+\code{noise.descriptors} & Nonempty structure vector. Each descriptor has \code{operators} (one of \code{Lx}, \code{Ly}, \code{Lz}, \code{E}), \code{spins} (distinct bath-ID row), and a finite real scalar \code{coefficient} in fluctuation units. It denotes the scaled \emph{sum} over those sites, not a product.\\
+\code{spectrum} & Optional for noise only. To transform, give at least two time points and specify all six choices below. The primary answer remains the correlation.\\
+\code{spectrum.frequency\_grid} & Nonempty, finite, strictly increasing real angular-frequency vector (rad/s). \code{convention} must be the character row \code{exp(+i*omega*t)}.\\
+\code{spectrum.sidedness} & \code{two-sided} or \code{one-sided}. One-sided output requires a real even correlation and nonnegative frequencies; only positive-frequency entries are doubled.\\
+\code{spectrum.time\_domain} & \code{positive} extends a series beginning at zero using $C(-t)=C(t)^*$ and requires scalar logical \code{stationary=true}; \code{full} uses the supplied mesh without extension. For a signed mesh use the standalone transform rather than passing negative experiment times.\\
+\code{spectrum.window}, \code{spectrum.weights} & \code{none} or \code{hann} (no implicit window-power normalisation); \code{trapezoid} or \code{rectangle} (uniform mesh for rectangle). Output units are correlation units times seconds.\\
+\code{spectrum.modulation} & Optional finite real vector on the original time mesh; returns a separate squared filter transform in s$^2$, not an inferred decoherence rate.\\
+\end{longtable}
+\endgroup
+
+\subsection{Approximation and selection: \code{parameters.cce}}
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field & Accepted values, default, and physical effect\\
+\midrule\endfirsthead
+\toprule
+Field & Accepted values, default, and physical effect\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{approximation} & \code{generalized} (default): keep the observed spins in every cluster. \code{projected}: propagate the selected coherence between two conditional branches. Ordinary projection requires invariant manifolds; it is not a model of population transfer.\\
+\code{bath\_spins} & Distinct physical IDs in a row, disjoint from \code{observed}; empty is allowed. Default: all other spins. Site-indexed state and graph arrays must use this order.\\
+\code{order} & Integer 0 through $B$; zero selects just the observed reference. Missing or \code{[]} resolves in \code{clexpn} to $B$, not to an automatically converged order. The cluster family is still restricted by the graph and groups. For a large bath set an order deliberately.\\
+\code{expansion}, \code{groups} & \code{standard} by default, or \code{partition} by default when \code{groups} is supplied. Groups are a nonempty cell row of nonempty bath-ID rows partitioning the bath exactly once. Order counts groups when present. \code{disjoint} forces single groups; \code{disjoint\_inter} allows pairs of groups. Nonstandard expansions need groups or a \code{partition} policy.\\
+\code{bath\_radius} & Default unlimited. Nonnegative radius in \AA{} from the nearest observed site; restricts candidate bath sites, not the definition of their exterior state. Finite radius needs coordinates.\\
+\code{interaction\_cutoff} & Default \code{Inf}. Nonnegative \emph{distance} in \AA{}; removes pair couplings beyond this separation during model compilation. A finite cutoff needs coordinates for coupled pairs. It is not the graph's coupling threshold.\\
+\code{meanfield}, \code{meanfield\_radius} & \code{none} (default) or \code{static}. The latter uses exterior product-state expectation values; optional nonnegative radius in \AA{} limits exterior sites by distance to the nearest observed site (default unlimited). Finite radius needs geometry. This is not an evolving exterior bath.\\
+\code{averaging} & \code{after\_expansion} (default) averages completed state expansions; \code{internal\_then\_expansion} averages cluster records, including the observed reference, first. On a summed grid the same choice controls node averaging. Internal node averaging requires identical physical bath order and cluster family; draws are shared across nodes.\\
+\code{reducer} & \code{powers} (default) evaluates integer powers of raw cluster factors; \code{direct} explicitly forms subset quotients. Noise uses additive inclusion--exclusion. A complete record on the selected domain supersedes the reconstructed final order; it does not certify the bath or time mesh.\\
+\code{backend} & \code{auto} (default) chooses the direct Cartesian Hamiltonian in its supported domain, otherwise the stock retained-system constructor. \code{direct} refuses unsupported input; \code{stock} requests the stock path. Direct assumption names are \code{labframe}, \code{nmr}, \code{esr}, \code{deer}, and \code{deer-zz}, excluding giant-spin spherical terms and spin--boson terms. This switch does not select a time propagator.\\
+\code{basis.formalism} & \code{zeeman-hilb} or \code{zeeman-liouv}, subject to the experiment. From plain \code{create} output the default is Hilbert without jumps and Liouville with nonempty jumps; an existing complete Zeeman formalism may be carried by the system. \code{basis.approximation} is admitted by the option schema but does not select a reduced basis here.\\
+\code{second\_order.enabled} & Logical, false by default. True requests a projected virtual-level correction from the isolated observed eigensystem. Explicit \code{gap\_tolerance} (rad/s) and \code{overlap\_tolerance} (dimensionless allowed loss of squared state overlap) required; use a positive gap threshold and overlap tolerance in $[0,1)$. Both are finite, nonnegative; dissipative virtual-state corrections are unsupported.\\
+\code{retain\_raw} & Logical, default false. Do not rely on this field to save memory: the context returns the scheduler's raw records in single-node diagnostics regardless.\\
+\end{longtable}
+\endgroup
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field of \code{parameters.cce.graph} & Graph construction (not Hamiltonian pruning)\\
+\midrule\endfirsthead
+\toprule
+Field of \code{parameters.cce.graph} & Graph construction (not Hamiltonian pruning)\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{mode} & Default \code{complete} if \code{graph} is omitted. Otherwise specify \code{complete}, \code{distance}, \code{coupling}, or \code{explicit}. Matrices below are $B\times B$ in input bath order before radius restriction.\\
+\code{radius}, \code{threshold} & \code{distance} requires nonnegative \code{radius} (\AA{}, finite coordinates); keep pairs at or inside it. \code{coupling} requires nonnegative \code{threshold}; keep strictly positive scores at or above it. For coupling-norm or resonance scores the threshold is in rad/s; supplied scores define their own scale.\\
+\code{adjacency} & Required for \code{explicit}: sparse logical, symmetric, zero diagonal. Mediated or noise-support edges can still enter the effective graph.\\
+\code{score} & \code{coupling\_norm} by default: spectral norm of the pair interaction operator in rad/s. \code{resonance} attenuates this norm by $1/\sqrt{1+(\Delta/\Delta_0)^2}$; \code{supplied} uses \code{scores}.\\
+\code{mismatch}, \code{mismatch\_scale} & Required for \code{resonance}: finite real matrix $\Delta$ with symmetric absolute values, and finite positive scalar $\Delta_0$, both rad/s.\\
+\code{scores}, \code{approximate} & \code{scores} for \code{supplied}: finite real symmetric nonnegative matrix. \code{approximate} is logical, default false. True permits omission of observed-mediated links otherwise restored for generalised or second-order projected propagation. Noise has its own support edges.\\
+\end{longtable}
+\endgroup
+
+\subsection{Bath state, conditional averages, and groups}
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field of \code{parameters.cce.bath\_state} & Supply in \code{bath\_spins} order\\
+\midrule\endfirsthead
+\toprule
+Field of \code{parameters.cce.bath\_state} & Supply in \code{bath\_spins} order\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{mode} & \code{mixed\_product} (default): $\mathbf{1}/d$ on each spin of multiplicity $d$. \code{explicit\_product}: declared local densities. \code{sampled} or \code{interlaced}: sampled product assignments. No optical preparation, isotope occupancy, or bath polarisation is inferred.\\
+\code{rho} & \code{explicit\_product} only; $1\times B$ cell, each entry a finite $d\times d$ Hermitian, positive semidefinite, unit-trace matrix. Not a joint correlated bath density.\\
+\code{basis}, \code{probabilities} & Both required for sampled/interlaced states. Each independently is \code{uniform} or a $1\times B$ cell. For \code{basis}, \code{uniform} means the identity basis; otherwise give $d\times d$ unitary matrices with basis states in columns. For \code{probabilities}, \code{uniform} means equal populations; otherwise give normalised nonnegative $1\times d$ real rows.\\
+\code{samples}, \code{seed} & Both required for those two modes: positive integer number of equal-weight draws, and integer seed in $[0,2^{32}-1]$. These are spin-state draws on a fixed geometry, not independent baths.\\
+\code{configuration\_id} & Optional positive integer, default 1; labels the structural configuration and offsets local spin-state random substreams. It does not generate a geometry.\\
+\end{longtable}
+\endgroup
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field of \code{parameters.cce.interlaced} & Conditional enumeration (only with the corresponding bath state)\\
+\midrule\endfirsthead
+\toprule
+Field of \code{parameters.cce.interlaced} & Conditional enumeration (only with the corresponding bath state)\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{max\_states} & Required positive integer bounding enumeration of the conditioning sets. Use \code{after\_expansion}; this is a multiplicative conditional-factor construction, not additive noise. No shared checkpoint.\\
+\code{condition\_sites} & Optional cell of bath-ID sets. Otherwise derive conditioning sets from retained superclusters. Subset denominators must use the parent's conditioning distribution.\\
+\code{reference\_state}, \code{raw\_only} & Service controls: the scheduler assigns the reference index for each sampled state. \code{raw\_only} (normally absent/false) suppresses factor construction for internal conditional averages; leave it unset in a context request.\\
+\end{longtable}
+\endgroup
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field of \code{parameters.cce.partition} & Group construction and optional local refinement\\
+\midrule\endfirsthead
+\toprule
+Field of \code{parameters.cce.partition} & Group construction and optional local refinement\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{mode}, \code{max\_dimension} & Required together for a partition policy. \code{user} starts from the supplied groups or singletons; \code{coupling} merges by intergroup coupling norm; \code{spatial} uses positions; \code{adaptive} refines by exact-patch comparisons. \code{max\_dimension} is a positive integer limit on the \emph{product of multiplicities} per group, not the number of spins.\\
+\code{group\_count}, \code{max\_rounds} & Spatial mode needs finite bath coordinates, the desired integer count (1 through the number of retained bath sites for a nonempty bath), and a positive integer round ceiling.\\
+\code{adaptive}, \code{patches} & Optional logical \code{adaptive=true} adds patch refinement to the chosen initial grouping. For any adaptive request supply a nonempty cell of nonempty distinct bath-ID rows (\code{patches}), the controls below, and \code{max\_rounds}. No implicit patches.\\
+\code{patch\_atol}, \code{patch\_rtol} & Finite nonnegative absolute (observable units) and relative (dimensionless) acceptance tolerances for exact-patch comparisons.\\
+\code{pilot\_configs}, \code{heldout\_configs} & Nonempty arrays of explicit spin-configuration structures for group selection and held-out assessment, respectively. They specify the bath IDs and local densities for the evaluations; they are not numbers of random draws.\\
+\code{max\_probes} & Positive integer probe ceiling for adaptation. The context requires the returned partition to be complete; patch success refers to the named patches, not the whole bath.\\
+\end{longtable}
+\endgroup
+
+\subsection{Execution, tolerances, and convergence}
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field (relative to \code{parameters.cce}) & Controls and defaults\\
+\midrule\endfirsthead
+\toprule
+Field (relative to \code{parameters.cce}) & Controls and defaults\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{numerics.atol}, \code{numerics.rtol} & Absolute tolerance in output units and relative tolerance, both finite, nonnegative and not both zero. Each defaults in \code{clexpn} to \code{sqrt(eps)} for double precision. Arithmetic screening uses $a+r\lvert y\rvert$; these are not convergence criteria on omitted clusters.\\
+\code{numerics.zero\_policy} & \code{mask} (default): retain validity and reasons per element. \code{error}: reject an unresolved final result. There is no zero-floor option for a small denominator.\\
+\code{numerics.precision} & \code{double} only; no single-precision or GPU option.\\
+\code{numerics.max\_memory\_bytes} & Positive finite byte budget; context default is half the reported free host memory rounded down. Preflight covers retained records and concurrent workspace estimates. Setting a larger budget does not create more RAM.\\
+\code{numerics.propagator} & Optional representation-compatible preference: \code{eig} in Hilbert space; additionally \code{expm} for generalised Hilbert Hahn. In \code{zeeman-liouv} the explicit choice is \code{stock}. Omission uses the experiment's own propagation path, not a universal dense exponential.\\
+\code{parallel.mode} & Without \code{parallel}, serial. Otherwise specify \code{serial}, \code{clusters}, or \code{states}. Parallel modes require the existing pool configured via \code{sys.parallel} before \code{create}. Grid nodes are evaluated serially; when a grid runs inside a pool task, its inner cluster/state scheduler is serial.\\
+\code{parallel.batch\_size}, \code{parallel.max\_tasks} & Optional positive integers. Batch size defaults to one in serial or to the pool size in parallel. \code{max\_tasks} caps the batch size; it does not cap the total number of clusters evaluated.\\
+\code{checkpoint.file}, \code{checkpoint.resume} & No checkpoint by default. Nonempty character filename; optional logical \code{resume} (default false) to continue a compatible ledger. An existing file is not silently overwritten. One positive-weight orientation only; neither interlacing nor independent convergence runs may share this ledger.\\
+\end{longtable}
+\endgroup
+Use \code{cce\_converge} rather than relying on omitted \code{order} or handing a \code{convergence} field to \code{clexpn}. The convergence wrapper reads the raw records and masks of a \emph{single orientation}; use separate orientation calls for its ladders. It returns the original baseline answer, not the most expensive trial.
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Field of \code{parameters.cce.convergence} & Required refinements and acceptance\\
+\midrule\endfirsthead
+\toprule
+Field of \code{parameters.cce.convergence} & Required refinements and acceptance\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{ladders} & Nonempty structure array of \code{field} and \code{values}. One ladder per field; a cell of at least two explicit values, first exactly equal to the baseline. Each trial changes one field and is compared with the baseline on shared times.\\
+\code{ladders.field} & Character path: \code{cce.order}, \code{cce.bath\_spins}, \code{cce.graph.threshold}, \code{cce.graph.radius}, \code{cce.bath\_state.samples}, or \code{times}. Each time refinement must contain every preceding time exactly; no interpolation.\\
+\code{atol}, \code{rtol}, \code{max\_work} & Required finite nonnegative observable absolute and relative tolerances, not both zero; positive integer cap on complete context evaluations, baseline included.\\
+\code{checks} & Optional cell of scalar override structures. A sampling-count ladder requires a distinct seed check. Supply the full replacement bath-state block in that override. \code{require\_independent} is not accepted by the convergence driver; declare actual checks instead.\\
+\end{longtable}
+\endgroup
+
+\subsection{Reading the returned diagnostics}
+Start with the validity mask for the result you intend to plot or fit. Check the order and sampling information separately: an arithmetically resolved echo can still change when another shell of nuclei is included.
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Single-orientation field & Interpretation\\
+\midrule\endfirsthead
+\toprule
+Single-orientation field & Interpretation\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{parameters}, \code{policy}, \code{contract} & Resolved input, default decisions and units, and registered experiment capabilities. When a transition is present, \code{policy.transition} and \code{policy.transition\_meta} retain the vectors and selector/frame information. For constructed partitions inspect \code{policy.partition}.\\
+\code{physical\_ids}, \code{observed\_ids}, \code{bath\_ids} & Full physical ordering, observed order, and selected input bath order. \code{graph.bath\_ids} is the post-selection graph order; \code{graph.omitted\_bath\_ids} distinguishes radius omissions from absent spins.\\
+\code{graph}, \code{clusters} & Effective adjacency, scores, pair norms and mediated links; ordered cluster records with \code{id}, \code{sites}, \code{groups}, \code{order}, \code{dimension}, \code{proper\_subsets}, and signed \code{mobius\_power}. Graph adjacency alone does not list all required subsets.\\
+\code{ensemble}, \code{raw} & \code{ensemble.spin\_config} records bath IDs, local densities, assignments and state weights. \code{raw} is a cell per state, each with observed-only record first (\code{cluster\_id=0}), then cluster records. Examine each record's \code{value}, \code{valid}, and \code{abs\_error\_bound} together. Optional fields depend on propagation; noise records include \code{moment}, \code{mean\_time}, and \code{mean\_zero}.\\
+\code{reduction} & \code{value}, \code{valid}, \code{reason}, and \code{abs\_error\_bound} have the output shape. The last is propagated numerical uncertainty, not the physical error of a finite CCE. An ensemble-level failure may be labelled \code{ensemble\_invalid}; inspect the corresponding state's reasons for unresolved denominators or exhausted error budgets.\\
+\code{reduction} by order & \code{orders} labels the third axis of \code{by\_order}, \code{by\_order\_error}, \code{by\_order\_valid}, and \code{by\_order\_reason}; index 1 is order zero. An interlaced full-bath shortcut may leave lower orders \code{not\_evaluated}, not zero. \code{complete\_record} identifies a raw record spanning the selected domain, if present.\\
+\code{reduction} ensemble & \code{samples} and \code{weights} describe the reduction parts; with internal-first averaging a part can already be pooled. \code{sampling\_standard\_error} is an elementwise estimate when available. \code{NaN} is unavailable; a deterministic zero says nothing about bath-size or order error.\\
+\code{spectrum}, \code{elapsed\_seconds} & Optional transform provides \code{omega} (rad/s), \code{frequency\_hz}, \code{value} (frequency by channel), time weights, and optional \code{filter}. Elapsed wall time is in seconds.\\
+\end{longtable}
+\endgroup
+On a grid, \code{diagnostics.grid} holds retained angles and weights, and \code{grid\_indices} gives their original one-based indices. \code{values} and \code{orientations} are matching column cells of unweighted node answers and single-node diagnostics. Only a summed grid has a top-level \code{reduction} (and top-level \code{spectrum} if requested); per-node raw data are in \code{orientations} even for a one-node grid. 
+
+The convergence driver returns its status in \code{convergence}: \code{converged}, \code{not\_converged}, or \code{limit\_reached}. Inspect \code{convergence\_report} for comparisons and work, and \code{input\_parameters} for the original request.
+
+\subsection{Utilities and specialised calls}
+Use \code{clexpn} and the registered handles for simulations. The following separate interfaces construct inputs, assess computed data, or move data between programs. An analysis or import specification is \emph{not} a field to pass through \code{clexpn}.
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Function & Arguments in call order; result\\
+\midrule\endfirsthead
+\toprule
+Function & Arguments in call order; result\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{spin\_bath} & \code{(sys,inter,specification)} returns augmented \code{sys}, \code{inter}, and bath metadata before \code{create}. Explicit, lattice, or seeded random geometry; coordinates and cell vectors in \AA{}, pair tensors in Hz. Use \code{bath.spins} and \code{bath.spin\_groups} for physical indices; \code{bath.ids} are candidate-site labels.\\
+\code{cce\_fixture} & \code{('nv\_four\_c13','6f7282b6')} returns \code{sys}, \code{inter}, and four-carbon fixture metadata. Pair tensors are in Hz and already supplied; fixture coordinates are metadata, not an instruction to add dipoles again.\\
+\code{cce\_capabilities} & \code{(pulse\_sequence)} returns the registered output, representation, projection, jump, and reduction contract; an arbitrary five-argument function handle does not register a new experiment.\\
+\code{cce\_converge} & \code{(spin\_system,parameters,pulse\_sequence,assumptions)} returns baseline answer and finite-ladder diagnostics. Note the argument order differs from \code{clexpn}.\\
+\code{cce\_spectrum} & \code{(times,correlation,parameters)} transforms a finite $T$-row correlation on a strictly increasing time vector, using \code{parameters.spectrum} above. Returns a structure, not just transformed values.\\
+\code{cce\_analyse} & \code{(result,parameters)} requires \code{result.times}, \code{value}, and matching logical \code{valid}. Omit \code{analysis} for no fit. Otherwise \code{analysis.fit} is logical. For a fit, choose the observable column, \code{envelope} (\code{magnitude}/\code{real}), \code{model} (\code{exponential}/\code{stretched\_exponential}), \code{interval} in seconds, a positive \code{weights} vector on all times, \code{confidence} (\code{none}/\code{linearized}), and \code{confidence\_level} in $(0,1)$. Inspect returned status and warnings; an envelope fit does not establish a relaxation mechanism.\\
+\code{cce\_export} & \code{(filename,model,result)} writes scalar structures to MAT or JSON; CSV is a real/imaginary table with a JSON sidecar carrying the complete record. Keep the sidecar for reimport.\\
+\code{cce\_import} & \code{(filename,format,units)} reads \code{mat}, \code{json}, \code{csv}, \code{xyz}, \code{tensor}, or \code{cube}. For external geometry specify \code{length} (\code{angstrom}, \code{nm}, \code{m}, \code{bohr}) and \code{frame}; tensor units are \code{Hz}, \code{kHz}, \code{MHz}, \code{rad/s}, \code{T}, \code{mT}, or \code{G} (\code{gyro\_rad\_s\_T} for field units). Optional proper \code{rotation} maps input to lab axes. External spin/tensor data are canonicalised to \AA{} and Hz, not the rad/s of compiled tensors.\\
+\end{longtable}
+\endgroup
+
+\subsection{Kernel service directory}
+These are the remaining functions in \code{kernel/cce}. Their arguments include compiled models, retained subsystems, raw-record arrays, or evaluator callbacks produced upstream. Their field names describe those objects; they do not extend the public \code{parameters} vocabulary. For instance \code{receiver\_phase} and \code{detection} in the observation service are not top-level context options.
+
+\begingroup\small
+\begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
+\toprule
+Service & Role inside the calculation\\
+\midrule\endfirsthead
+\toprule
+Service & Role inside the calculation\\
+\midrule\endhead
+\midrule\endfoot
+\bottomrule\endlastfoot
+\code{cce\_options} & Check native option ownership, apply declared defaults, and record unresolved numerical policy; experiment validators still apply.\\
+\code{cce\_compile} & Apply interaction assumptions, rotate canonical tensors, and retain physical IDs and model metadata for a single orientation.\\
+\code{cce\_transition} & Resolve magnetic-quantum-number, energy-level, or explicit-state selectors in observed order; report gaps and eigenstate residuals.\\
+\code{cce\_graph} & Build the physical bath graph and scores, retaining mediated or required noise support independently of nominal pair adjacency.\\
+\code{cce\_partition} & Build capacity-limited composite groups and report pilot and held-out patch diagnostics for adaptive policies.\\
+\code{cce\_clusters} & Enumerate cluster candidates, complete required subsets, and index physical sites, dimensions, and subset powers.\\
+\code{cce\_subsystem} & Construct the observed-plus-retained view, local angular momenta, product bath density, and exterior expectations.\\
+\code{cce\_hamiltonian} & Construct a retained Hilbert Hamiltonian and backend metadata for a physical site list and exterior configuration.\\
+\code{cce\_generators} & Build the retained experiment's $H,R,K$ or tagged projected branch generators, embedding explicitly supported jumps.\\
+\code{cce\_project} & Specialised projection service: turn two supplied vectors into manifold projectors, expectations, and optional susceptibility. The native generator constructs its own conditional branches.\\
+\code{cce\_operator} & Embed local spin operators by ID or channel; a selection sums sites, matching cell rows form ordered products. Returns a Hilbert matrix or commutation superoperator.\\
+\code{cce\_state} & Build retained spin-density operators or a product of declared physical local densities/populations in the chosen representation.\\
+\code{cce\_observation} & Prepare the retained state, detector(s), and actual initial reference; distinguish Hilbert density from projected bath coherence.\\
+\code{cce\_pulse\_events} & Expand finite slices and explicit or named ideal trains into events with absolute or fractional timing.\\
+\code{cce\_segments} & Split elapsed time at pulse boundaries, maintain drift and simultaneous drives, and account for supported exterior pulse updates.\\
+\code{cce\_acquire} & Common acquisition for free evolution, finite drive, and ideal trains; returns experiment-layout data and retained propagation diagnostics.\\
+\code{cce\_evolution} & Propagate a retained density or branch coherence; supports final state, trajectory, observable, or summed states, without receiver normalisation.\\
+\code{cce\_schedule} & Dispatch indexed state/cluster evaluations in bounded batches; return records in reduction order, including the empty cluster.\\
+\code{cce\_checkpoint} & Read/write compatible checkpoint state with task identities, completion bitmap, stored raw records, and integrity checks.\\
+\code{cce\_interlace} & Evaluate conditional state sums and parent-consistent subset factors with a bounded number of assignments.\\
+\code{cce\_reduce} & Combine raw records and the empty reference, retaining elementwise and by-order values, arithmetic budgets, masks, and reasons.\\
+\code{cce\_diagnostics} & Separate audit of a model, raw cell, reduction result, and parameters. Reports time coverage, numerical budget, and (for density) trace, Hermiticity, and minimum eigenvalue without repair. This is not the structure automatically returned by \code{clexpn}.\\
+\end{longtable}
+\endgroup
+
+\begin{thebibliography}{99}
+\bibitem{cce-theory-yang08}
+W.~Yang and R.-B.~Liu, \emph{Quantum many-body theory of qubit decoherence in a finite-size spin bath}, Phys.~Rev.~B \textbf{78} (2008) 085315. \href{https://doi.org/10.1103/PhysRevB.78.085315}{doi:10.1103/PhysRevB.78.085315}.
+
+\bibitem{cce-theory-onizhuk21}
+M.~Onizhuk, K.C.~Miao, J.P.~Blanton, H.~Ma, C.P.~Anderson, A.~Bourassa, D.D.~Awschalom, and G.~Galli, \emph{Probing the coherence of solid-state qubits at avoided crossings}, PRX Quantum \textbf{2} (2021) 010311. \href{https://doi.org/10.1103/PRXQuantum.2.010311}{doi:10.1103/PRXQuantum.2.010311}.
+
+\bibitem{cce-theory-onizhuk24}
+M.~Onizhuk, Y.-X.~Wang, J.~Nagura, A.A.~Clerk, and G.~Galli, \emph{Understanding central spin decoherence due to interacting dissipative spin baths}, Phys.~Rev.~Lett.\ \textbf{132} (2024) 250401. \href{https://doi.org/10.1103/PhysRevLett.132.250401}{doi:10.1103/PhysRevLett.132.250401}.
+
+\bibitem{cce-theory-yang09}
+W.~Yang and R.-B.~Liu, \emph{Quantum many-body theory of qubit decoherence in a finite-size spin bath. II. Ensemble dynamics}, Phys.~Rev.~B \textbf{79} (2009) 115320. \href{https://doi.org/10.1103/PhysRevB.79.115320}{doi:10.1103/PhysRevB.79.115320}.
+
+\bibitem{cce-theory-witzel12}
+W.M.~Witzel, M.S.~Carroll, \L.~Cywi\'nski, and S.~Das Sarma, \emph{Quantum decoherence of the central spin in a sparse system of dipolar coupled spins}, Phys.~Rev.~B \textbf{86} (2012) 035452. \href{https://doi.org/10.1103/PhysRevB.86.035452}{doi:10.1103/PhysRevB.86.035452}.
+
+\end{thebibliography}
+
+\end{document}

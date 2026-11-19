@@ -523,9 +523,9 @@ For a projected coherent `@free_evolution` signal, an explicit `parameters.coil`
 
 `diagnostics` contains validity, numerical and sampling uncertainty, conditioning, policy, convergence, and execution evidence. Invalid values are not repaired with arbitrary denominator floors. The `cce.averaging` setting selects reduction before ensemble averaging or raw-record averaging before reduction; additive noise correlation and multiplicative coherence use distinct declared algebras. Omitted cluster order includes the selected bath, but does not establish convergence in bath extent, graph selection, or state sampling.
 
-### Orientation composition
+### Orientation grids
 
-For one orientation, set `parameters.orientation` to a radian Euler triple. For a quadrature, supply `parameters.grid` as a shipped grid name or an explicit structure containing `alphas`, `betas`, `gammas` and `weights`. Call `clexpn(spin_system,pulse_sequence,parameters,assumptions)` directly in both cases. Set `parameters.sum_up=false` to return individual responses instead of the weighted signal. `parameters.cce.averaging` distinguishes reducing each orientation before averaging from averaging matching raw cluster records before reduction.
+For one orientation, set `parameters.orientation` to a radian Euler triple. For a quadrature, supply `parameters.grid` as a shipped grid name or an explicit structure containing `alphas`, `betas`, `gammas` and `weights`. Call `clexpn(spin_system,pulse_sequence,parameters,assumptions)` directly in both cases. Set `parameters.sum_up=false` to return a column cell array of unweighted responses in input order. Zero-weight nodes are skipped; `diagnostics.grid_indices` maps each response to its original grid entry. `parameters.cce.averaging` distinguishes reducing each orientation before averaging from averaging matching raw cluster records before reduction.
 
 Each orientation runs independent complete dynamics. The task's cce.averaging selects expansion-first averaging or raw-record averaging before expansion with a common cluster family; the observed-only reference participates in both. Hamiltonians are never averaged. Orientations are serial; nested cluster/configuration scheduling may use the existing pool, but becomes serial inside an outer worker.
 

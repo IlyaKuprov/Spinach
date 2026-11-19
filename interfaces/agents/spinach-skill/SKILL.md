@@ -195,7 +195,7 @@ Observation owns preparation/detection descriptors, physical-ID ordering, receiv
 
 ## Native context and closed-system experiments
 
-Use clexpn for the native context and experiments/cce for free_evolution, hahn_echo, cpmg_echo, bath_pumped_hahn, cce_eseem, finite_drive, refocusing_train, and noise_correlation. The context returns a natural numeric array; diagnostics are optional second output. Read references/cce.md for supported representations and experiments.
+Use clexpn for the native context and experiments/cce for free_evolution, hahn_echo, cpmg_echo, bath_pumped_hahn, cce_eseem, finite_drive, refocusing_train, and noise_correlation. The context returns a numeric result, or a column cell array for an unaveraged grid; diagnostics are the optional second output. Read references/cce.md for supported representations and experiments.
 
 For pinned finite-bath inputs and native single-orientation or grid calculations, see [Cluster correlation expansions](references/cce.md).
 

@@ -53,7 +53,7 @@ end
 if isequal(pulse_sequence,@noise_correlation)
     contract.projected=false; contract.dissipative=true;
     contract.reduction='additive'; contract.outputs={'correlation'};
-    contract.evaluator=@evaluate_noise; contract.version=3;
+    contract.evaluator=@evaluate_noise; contract.version=4;
     contract.auxiliary={'moment','mean_time','mean_zero','valid','abs_error_bound'};
 end
 

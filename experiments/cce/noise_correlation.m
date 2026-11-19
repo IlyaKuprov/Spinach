@@ -32,7 +32,7 @@
 %          per requested time
 %
 %    aux - raw moments, first moments, ordering, validity, and absolute
-%          arithmetic error bounds; connect after ensemble averaging
+%          floating-point error estimates; connect after ensemble averaging
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -138,12 +138,30 @@ else
     L=kron(eye(bath_dim),bath_ham)-kron(bath_ham.',eye(bath_dim))+1i*loss;
     initial=B*density;
     if strcmp(noise.ordering,'symmetrized'), initial=(initial+density*B)/2; end
+
+    % Scale source formation and trace contraction in the Hilbert-Schmidt norm
+    roundoff=64*eps*numel(B); detector=norm(B,'fro'); purity_norm=norm(density,'fro');
+    source_norm=norm(initial,'fro'); initial_error=roundoff*detector*purity_norm;
+    frequency=norm(L,1);
     for n=1:n_times
 
         % Propagate the correlation source and the bath density
-        propagator=expm(-1i*L*parameters.times(n));
+        time=parameters.times(n); propagator=expm(-1i*L*time);
         moment(n)=trace(B*reshape(propagator*initial(:),bath_dim,bath_dim));
         mean_time(n)=trace(B*reshape(propagator*density(:),bath_dim,bath_dim));
+
+        % Transport source uncertainty through the actual nonunitary action
+        gain=sqrt(norm(propagator,1)*norm(propagator,inf));
+        arithmetic=roundoff*gain*(1+(time>0)+time*frequency);
+        bound(n)=detector*(gain*initial_error+arithmetic*source_norm);
+        if noise.connected
+
+            % Both ensemble first moments are at most the detector norm in magnitude
+            mean_error=arithmetic*detector*purity_norm;
+            bound(n)=bound(n)+detector*(mean_error+initial_error)+...
+                     mean_error*(roundoff*detector)+eps*(abs(moment(n))+2*detector^2);
+
+        end
 
     end
 

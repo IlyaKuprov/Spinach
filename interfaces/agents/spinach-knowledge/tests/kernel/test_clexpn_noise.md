@@ -9,3 +9,5 @@ The noise example uses native operator descriptors. The cosine reference and ori
 Direct registered-evaluator tests reject noise input paired with a foreign experiment schedule. The exact operator 1e-20*[0 1;0 0] is rejected using the operator-relative Hermiticity contract, independently of physical units.
 
 The sampled unequal-mean fixture also checks the centred-contribution standard error exactly against the empirical covariance expression; it is not the uncertainty of uncentred second moments.
+
+A polarised, relaxing spin with a complex transverse fluctuation checks both quantum orderings against exponential population and coherence decay. Connected and raw cases distinguish the first-moment cost, and rescaling the fluctuation tests squared-unit error scaling.

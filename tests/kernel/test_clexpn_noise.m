@@ -67,6 +67,54 @@ result=test_close(result,'Deterministic full-bath noise estimate',...
                   complete.reduction.abs_error_bound,complete.raw{1}(end).abs_error_bound,0,0,...
                   'The full-bath reference is not charged a redundant cluster recombination.');
 
+% Relaxation to the upper bath level fixes the populations and each coherence analytically
+open=p; open.cce.averaging='after_expansion'; open.cce.bath_state.rho={diag([0.7 0.3])};
+open.cce.numerics.atol=1e-30; open.cce.numerics.rtol=0;
+open.bath_jumps=struct('support',2,'operator',[0 1;0 0],'rate',0.9);
+open.noise.terms.operator=[1 0.4i;-0.4i -0.2]; times=open.times(:);
+decay=exp(-0.9*times); phase=sqrt(decay).*exp(1.3i*times);
+mean_zero=0.64; mean_time=1-0.36*decay;
+moment=0.7*(1+0.16*phase)-0.06*(1-1.2*decay)+0.048*conj(phase);
+for ordering={'ordered','symmetrized'}
+    open.noise.ordering=ordering{1}; open.noise.connected=false;
+    [raw,unconnected]=clexpn(s,@noise_correlation,open,'labframe');
+    open.noise.connected=true; [cov,connected]=clexpn(s,@noise_correlation,open,'labframe');
+    if strcmp(ordering{1},'symmetrized'), moment=real(moment); end
+    result=test_close(result,['Dissipative moment ' ordering{1}],raw,moment,1e-14,0,...
+                      'Polarised populations and damped complex coherences fix the ordered moment.');
+    result=test_close(result,['Dissipative covariance ' ordering{1}],cov,moment-mean_zero*mean_time,...
+                      1e-14,0,'The nonstationary first moment enters the connected result.');
+
+    % The analytic decay map has column norm one and row norm two minus the surviving population
+    source=sqrt(0.5864);
+    if strcmp(ordering{1},'symmetrized'), source=sqrt(0.5736); end
+    gain=sqrt(2-decay); estimate=256*eps*gain*sqrt(1.36).*...
+                                 (sqrt(1.36*0.58)+(1+(times>0)+1.8*times)*source);
+    result=test_close(result,['Dissipative raw gain ' ordering{1}],...
+                      unconnected.raw{1}(end).abs_error_bound./estimate,ones(3,1),0,1e-14,...
+                      'The nonunital map amplifies its source; the two orderings have distinct source norms.');
+
+    % Raw and connected deterministic records separately retain their strict-budget decisions
+    model=cce_compile(s,connected.parameters,'labframe');
+    first=cce_diagnostics(model,unconnected.raw,unconnected.reduction,unconnected.parameters);
+    second=cce_diagnostics(model,connected.raw,connected.reduction,connected.parameters);
+    result=test_true(result,['Dissipative budgets ' ordering{1}],...
+                     all(first.valid&second.valid&~first.numerical_budget_met&~second.numerical_budget_met)&&...
+                     all(second.numerical_error>first.numerical_error)&&all(diff(first.numerical_error)>0),...
+                     'Even at zero delay the sources and traces involve arithmetic; connection costs more.');
+
+end
+
+% Rescaling the fluctuation operator scales its correlation uncertainty quadratically
+open.noise.terms.operator=-3*open.noise.terms.operator; open.cce.numerics.atol=1e-8;
+[~,scaled]=clexpn(s,@noise_correlation,open,'labframe');
+checks=cce_diagnostics(model,scaled.raw,scaled.reduction,scaled.parameters);
+result=test_close(result,'Dissipative squared fluctuation units',...
+                  checks.numerical_error./second.numerical_error,9*ones(3,1),1e-13,0,...
+                  'Both source and detector carry the units of the fluctuation operator.');
+result=test_true(result,'Resolvable dissipative noise',all(checks.numerical_budget_met),...
+                 'A resolved tolerance accepts the nonzero estimate.');
+
 % Every descriptor field is checked, including selections outside the cluster
 bad={struct('operators','L+','spins',2,'coefficient',1),...
      struct('operators','Lz','spins',1,'coefficient',1),...

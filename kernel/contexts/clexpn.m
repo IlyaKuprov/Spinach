@@ -297,11 +297,6 @@ started=tic;
 pulse_sequence=schedule.pulse_sequence;
 contract=schedule.contract;
 
-% A checkpoint identifies the physical crystal, not its input field order
-if isfield(parameters.cce,'checkpoint')
-    parameters=orderfields(parameters);
-end
-
 % Compile immutable physical data, not a full-bath basis
 model=cce_compile(spin_system,parameters,assumptions);
 model.pulse_sequence=pulse_sequence;

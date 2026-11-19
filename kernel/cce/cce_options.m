@@ -11,6 +11,8 @@
 %                    and times (nonnegative increasing seconds). A transition
 %                    selector is required for projected evolution; explicit
 %                    generalised-state experiments need not supply one.
+%                    A grid name or explicit quadrature replaces orientation;
+%                    sum_up selects a weighted answer or unweighted node outputs.
 %                    Experiment controls stay at top level; approximation,
 %                    cluster selection, ensembles, and reduction live in cce.
 %   pulse_sequence - experiment function handle; its detailed preparation,
@@ -48,7 +50,16 @@ policy.assumptions=assumptions;
 policy.physical_tensor_conversion=false;
 
 % Resolve frame and algorithm containers without changing supplied values
-[parameters,policy]=default(parameters,'orientation',[0 0 0],policy,'parameters');
+if isfield(parameters,'grid')
+    [parameters,policy]=default(parameters,'sum_up',true,policy,'parameters');
+    if ischar(parameters.grid)&&isrow(parameters.grid)&&~isempty(parameters.grid)&&...
+       ~isfield(parameters,'orientation')
+        parameters.grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',parameters.grid),...
+                             'alphas','betas','gammas','weights');
+    end
+else
+    [parameters,policy]=default(parameters,'orientation',[0 0 0],policy,'parameters');
+end
 [parameters,policy]=default(parameters,'cce',struct(),policy,'parameters');
 c=parameters.cce;
 [c,policy]=default(c,'approximation','generalized',policy,'parameters.cce');
@@ -171,7 +182,7 @@ if isfield(p,'drive')&&~isequal(experiment,@finite_drive)&&...
     error('cce_options:drive','The drive descriptor belongs to finite_drive.');
 end
 fields(p,{'observed','transition','spins','times','nloops','preparation','rho0',...
-          'drive','coil','output','normalized','orientation','cce','pump',...
+          'drive','coil','output','normalized','orientation','grid','sum_up','cce','pump',...
           'bath_jumps','noise','spectrum','refocusing','train'},'parameters');
 if ~isa(experiment,'function_handle')
     error('cce_options:experiment','pulse_sequence must be a function handle.');
@@ -187,6 +198,21 @@ spin_ids(p.observed,system.comp.nspins,'observed',false);
 if ~isnumeric(p.times)||~isreal(p.times)||~isrow(p.times)||isempty(p.times)||...
    any(~isfinite(p.times))||any(p.times<0)||any(diff(p.times)<=0)
     error('cce_options:times','times must be a finite nonnegative strictly increasing row in seconds.');
+end
+if isfield(p,'grid')
+    if isfield(p,'orientation')
+        error('cce_options:orientation','Supply either grid or orientation, not both.');
+    end
+    fields(p.grid,{'alphas','betas','gammas','weights'},'grid');
+    grid_check(p.grid);
+    weights=double(p.grid.weights);
+    if any(weights<0)||~isfinite(sum(weights))||sum(weights)<=0
+        error('cce_options:weights','Grid weights must be nonnegative with finite positive sum.');
+    end
+end
+if isfield(p,'sum_up')&&(~(islogical(p.sum_up)||isnumeric(p.sum_up))||...
+   ~isreal(p.sum_up)||~isscalar(p.sum_up)||~ismember(p.sum_up,[0 1]))
+    error('cce_options:sum_up','sum_up must be a logical scalar or numeric zero or one.');
 end
 if isfield(p,'orientation')&&(~isnumeric(p.orientation)||~isreal(p.orientation)||...
    ~isequal(size(p.orientation),[1 3])||any(~isfinite(p.orientation)))

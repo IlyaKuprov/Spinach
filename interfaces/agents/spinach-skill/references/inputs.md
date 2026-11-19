@@ -41,7 +41,7 @@ fields it understands and errors on whatever is left.
 | `sys.magnet` | real scalar | Mandatory. Magnetic induction in tesla. Zero is legal (zero-field work). |
 | `sys.labels` | cell array of strings, same length as `sys.isotopes` | Optional text labels; printed in diagnostics and resolved to indices by `idxof`. |
 | `sys.output` | `'hush'`, `'console'`, or a file name | Destination of the console report. Default is the console. |
-| `sys.scratch` | directory path | Scratch directory; defaults to `<root>/scratch`, created if absent. |
+| `sys.scratch` | directory path | Scratch directory; defaults to `<root>/scratch`, created if absent. With cache hygiene enabled, a fresh cache still gets a write check and an expiry scan; only stale entries go to cleanup. |
 | `sys.disable` | cell array of strings | Switches off internal algorithms. |
 | `sys.enable` | cell array of strings | Switches on optional algorithms. |
 | `sys.tols` | structure | Overrides numerical cut-offs. |

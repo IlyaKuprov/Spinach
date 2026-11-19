@@ -122,7 +122,8 @@ diagnostics=[];
 if isstruct(pulse_sequence)
     grumble(spin_system,pulse_sequence,parameters,assumptions);
     [answer,diagnostics]=orientation_average(spin_system,pulse_sequence,parameters);
-    sph_grid=diagnostics.grid; return
+    sph_grid=diagnostics.grid;
+    return
 end
 
 % Show the banner

@@ -28,22 +28,34 @@ grumble(pulse_sequence);
 % These experiments explicitly support conventional and projected generators
 contract.pulse_sequence=pulse_sequence;
 contract.formalisms={'zeeman-hilb','zeeman-liouv'};
-contract.projected=true; contract.dissipative=false;
-contract.reduction='multiplicative'; contract.density_reduction=false;
+contract.projected=true;
+contract.dissipative=false;
+contract.reduction='multiplicative';
+contract.density_reduction=false;
 contract.outputs={'signal','observable'};
-contract.evaluator=@evaluate; contract.version=2;
+contract.evaluator=@evaluate;
+contract.version=2;
 if isequal(pulse_sequence,@hahn_echo)||isequal(pulse_sequence,@free_evolution)||...
-   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train), contract.version=4; end
-if isequal(pulse_sequence,@hahn_echo), contract.version=8; end
-if isequal(pulse_sequence,@bath_pumped_hahn), contract.version=5; end
-if isequal(pulse_sequence,@free_evolution), contract.version=5; end
+   isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)
+    contract.version=4;
+end
+if isequal(pulse_sequence,@hahn_echo)
+    contract.version=8;
+end
+if isequal(pulse_sequence,@bath_pumped_hahn)
+    contract.version=5;
+end
+if isequal(pulse_sequence,@free_evolution)
+    contract.version=5;
+end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||...
    isequal(pulse_sequence,@hahn_echo)
     contract.dissipative=true;
 end
 if isequal(pulse_sequence,@free_evolution)||isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)||...
    isequal(pulse_sequence,@hahn_echo)
-    contract.density_reduction=true; contract.outputs{end+1}='density';
+    contract.density_reduction=true;
+    contract.outputs{end+1}='density';
 end
 if isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)
     contract.projected=false;
@@ -52,9 +64,12 @@ if isequal(pulse_sequence,@refocusing_train)
     contract.formalisms={'zeeman-hilb'};
 end
 if isequal(pulse_sequence,@noise_correlation)
-    contract.projected=false; contract.dissipative=true;
-    contract.reduction='additive'; contract.outputs={'correlation'};
-    contract.evaluator=@evaluate_noise; contract.version=4;
+    contract.projected=false;
+    contract.dissipative=true;
+    contract.reduction='additive';
+    contract.outputs={'correlation'};
+    contract.evaluator=@evaluate_noise;
+    contract.version=4;
     contract.auxiliary={'moment','mean_time','mean_zero','valid','abs_error_bound'};
 end
 
@@ -88,8 +103,11 @@ if isfield(parameters.cce,'checkpoint')
 end
 
 % Bound retained time records before allocating subsystem or propagation arrays
-dc=prod(model.multiplicities(model.observed_ids)); components=1;
-if isfield(parameters,'output')&&strcmp(parameters.output,'density'), components=dc^2; end
+dc=prod(model.multiplicities(model.observed_ids));
+components=1;
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')
+    components=dc^2;
+end
 if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&...
    isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
@@ -104,7 +122,9 @@ if isequal(schedule.pulse_sequence,@noise_correlation)
     parameters.cce.approximation='generalized';
 end
 physical=configuration;
-if isfield(physical,'assignment'), physical=rmfield(physical,'assignment'); end
+if isfield(physical,'assignment')
+    physical=rmfield(physical,'assignment');
+end
 [spin_system,~]=cce_subsystem(model,cluster.sites,physical,[]);
 [H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
 if isstruct(H)&&~parameters.cce.second_order.enabled&&...
@@ -115,19 +135,25 @@ pulse_sequence=schedule.pulse_sequence;
 [answer,aux]=pulse_sequence(spin_system,parameters,H,R,K);
 
 % Preserve the experiment's natural numeric layout in the scheduler record
-raw.cluster_id=cluster.id; raw.value=answer;
-raw.abs_error_bound=aux.abs_error_bound; raw.valid=isfinite(answer);
+raw.cluster_id=cluster.id;
+raw.value=answer;
+raw.abs_error_bound=aux.abs_error_bound;
+raw.valid=isfinite(answer);
 raw.weight=configuration.weight;
-if isfield(parameters.cce_aux,'generator'), raw.generator=parameters.cce_aux.generator; end
+if isfield(parameters.cce_aux,'generator')
+    raw.generator=parameters.cce_aux.generator;
+end
 if isfield(aux,'eigen_residual')
     raw.eigen_residual=aux.eigen_residual;
     raw.orthogonality_residual=aux.orthogonality_residual;
-    raw.hamiltonian_bound=aux.hamiltonian_bound; raw.backend=aux.backend;
+    raw.hamiltonian_bound=aux.hamiltonian_bound;
+    raw.backend=aux.backend;
 end
 
 % Retain the experiment-owned inclusion decision for each observation time
 if isfield(aux,'pulse_time')
-    raw.pulse_time=aux.pulse_time; raw.pulse_applied=aux.pulse_applied;
+    raw.pulse_time=aux.pulse_time;
+    raw.pulse_applied=aux.pulse_applied;
 end
 
 % Retain generalized echo density and numerical propagation diagnostics
@@ -137,7 +163,9 @@ end
 
 % Retain unreduced noise moments and their validity evidence
 if isfield(aux,'moment')
-    raw.moment=aux.moment; raw.mean_time=aux.mean_time; raw.mean_zero=aux.mean_zero;
+    raw.moment=aux.moment;
+    raw.mean_time=aux.mean_time;
+    raw.mean_zero=aux.mean_zero;
     raw.valid=aux.valid;
 end
 

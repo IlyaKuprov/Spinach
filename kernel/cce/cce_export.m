@@ -30,7 +30,8 @@ function cce_export(filename,model,result)
 grumble(filename,model,result);
 
 % Infer the representation without extending the fixed public signature
-[~,~,extension]=fileparts(filename); format=lower(extension(2:end));
+[~,~,extension]=fileparts(filename);
+format=lower(extension(2:end));
 envelope=struct('schema','spinach-cce','version',1,'model',model,'payload',result);
 
 % Preserve native MATLAB arrays or explicitly typed JSON values
@@ -43,14 +44,18 @@ switch format
 
         % Encode typed values before writing the JSON envelope
         fid=fopen(filename,'w');
-        if fid<0, error('Cannot open export destination.'); end
+        if fid<0
+            error('Cannot open export destination.');
+        end
         cleanup=onCleanup(@()fclose(fid));
         fwrite(fid,jsonencode(pack(envelope)),'char');
     case 'csv'
 
         % Write the numeric view and its authoritative JSON sidecar
         fid=fopen(filename,'w');
-        if fid<0, error('Cannot open export destination.'); end
+        if fid<0
+            error('Cannot open export destination.');
+        end
         cleanup=onCleanup(@()fclose(fid));
         fprintf(fid,'field,index,real,imag\n');
         names=fieldnames(result);
@@ -90,16 +95,21 @@ elseif isstring(value)
 elseif iscell(value)
     encoded=struct('kind','cell','shape',size(value),'items',{cellfun(@pack,value(:),'UniformOutput',false)});
 elseif isa(value,'function_handle')
-    if ~isequal(value,@clexpn), cce_capabilities(value); end
+    if ~isequal(value,@clexpn)
+        cce_capabilities(value);
+    end
     encoded=struct('kind','function','name',func2str(value));
 elseif isstruct(value)&&isscalar(value)&&all(isfield(value,{'pulse_sequence','evaluator'}))&&...
        isa(value.pulse_sequence,'function_handle')&&isa(value.evaluator,'function_handle')&&...
        isequal(value,cce_capabilities(value.pulse_sequence))
     encoded=struct('kind','contract','name',func2str(value.pulse_sequence),'version',value.version);
 elseif isstruct(value)
-    names=fieldnames(value); entries=cell(numel(value),numel(names));
+    names=fieldnames(value);
+    entries=cell(numel(value),numel(names));
     for k=1:numel(value)
-        for j=1:numel(names), entries{k,j}=pack(value(k).(names{j})); end
+        for j=1:numel(names)
+            entries{k,j}=pack(value(k).(names{j}));
+        end
     end
     encoded=struct('kind','struct','shape',size(value),'fields',{names},'items',{entries(:)});
 else

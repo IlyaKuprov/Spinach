@@ -60,9 +60,13 @@ else
     cylinders={};
     for k=1:numel(model.clusters)
         parent=model.clusters(k);
-        if all(ismember(cluster.sites,parent.sites)), cylinders{end+1}=parent.sites; end %#ok<AGROW>
+        if all(ismember(cluster.sites,parent.sites))
+            cylinders{end+1}=parent.sites; %#ok<AGROW>
+        end
     end
-    if isempty(cylinders), cylinders={cluster.sites}; end
+    if isempty(cylinders)
+        cylinders={cluster.sites};
+    end
 end
 
 % Remove contained cylinders before charging the explicit enumeration budget
@@ -76,7 +80,8 @@ for j=1:numel(cylinders)
     end
 end
 cylinders=cylinders(keep);
-nb=numel(model.bath_ids); dimensions=model.multiplicities(model.bath_ids);
+nb=numel(model.bath_ids);
+dimensions=model.multiplicities(model.bath_ids);
 counts=cellfun(@(sites)prod(dimensions(ismember(model.bath_ids,sites))),cylinders);
 count=sum(counts);
 if count>spec.max_states
@@ -88,17 +93,22 @@ if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
 end
 
 % Enumerate unique product-state assignments inside the cylinder union
-assignments=zeros(count,nb); position=0;
+assignments=zeros(count,nb);
+position=0;
 for k=1:numel(cylinders)
     varied=find(ismember(model.bath_ids,cylinders{k}));
     for n=1:counts(k)
-        position=position+1; assignments(position,:)=reference.assignment; index=n-1;
+        position=position+1;
+        assignments(position,:)=reference.assignment;
+        index=n-1;
         for j=fliplr(varied)
-            assignments(position,j)=mod(index,dimensions(j))+1; index=floor(index/dimensions(j));
+            assignments(position,j)=mod(index,dimensions(j))+1;
+            index=floor(index/dimensions(j));
         end
     end
 end
-assignments=unique(assignments,'rows','sorted'); count=size(assignments,1);
+assignments=unique(assignments,'rows','sorted');
+count=size(assignments,1);
 
 % Form conditional weights with a common logarithmic scale
 logweights=zeros(count,1);
@@ -106,80 +116,117 @@ for j=1:nb
     logweights=logweights+log(ensemble.probabilities{j}(assignments(:,j)));
 end
 shift=max(logweights);
-if ~isfinite(shift), error('cce_interlace:zero_mass','Conditioning event has zero probability.'); end
-weights=exp(logweights-shift); logmass=shift+log(sum(weights));
-weights=weights/sum(weights); mass=exp(logmass); retained=find(weights>0);
+if ~isfinite(shift)
+    error('cce_interlace:zero_mass','Conditioning event has zero probability.');
+end
+weights=exp(logweights-shift);
+logmass=shift+log(sum(weights));
+weights=weights/sum(weights);
+mass=exp(logmass);
+retained=find(weights>0);
 
 % Average raw records before forming any irreducible quotient
 for n=reshape(retained,1,[])
-    configuration=reference; configuration.assignment=assignments(n,:);
+    configuration=reference;
+    configuration.assignment=assignments(n,:);
     for j=1:nb
-        vector=ensemble.bases{j}(:,assignments(n,j)); configuration.bath_rho{j}=vector*vector';
+        vector=ensemble.bases{j}(:,assignments(n,j));
+        configuration.bath_rho{j}=vector*vector';
     end
     item=evaluator(model,cluster,configuration,schedule,parameters);
     if n==retained(1)
-        raw=item; raw.value(:)=0; raw.abs_error_bound(:)=0; raw.valid(:)=true;
+        raw=item;
+        raw.value(:)=0;
+        raw.abs_error_bound(:)=0;
+        raw.valid(:)=true;
     end
     raw.value=raw.value+weights(n)*item.value;
     raw.abs_error_bound=raw.abs_error_bound+weights(n)*item.abs_error_bound;
     raw.valid=raw.valid&item.valid;
     for field={'eigen_residual','orthogonality_residual','unitarity_residual'}
-        if isfield(item,field{1}), raw.(field{1})=max(raw.(field{1}),item.(field{1})); end
+        if isfield(item,field{1})
+            raw.(field{1})=max(raw.(field{1}),item.(field{1}));
+        end
     end
 end
-raw.condition_sites=cylinders; raw.assignment_count=numel(retained);
-raw.assignments=assignments; raw.weights=weights;
-raw.condition_mass=mass; raw.log_condition_mass=logmass;
+raw.condition_sites=cylinders;
+raw.assignment_count=numel(retained);
+raw.assignments=assignments;
+raw.weights=weights;
+raw.condition_mass=mass;
+raw.log_condition_mass=logmass;
 raw.distribution_signature=struct('assignments',assignments,'weights',weights);
-raw.factor=[]; raw.factor_valid=[]; raw.factor_abs_error_bound=[];
-raw.reference=raw.value; raw.reference_error=raw.abs_error_bound;
+raw.factor=[];
+raw.factor_valid=[];
+raw.factor_abs_error_bound=[];
+raw.reference=raw.value;
+raw.reference_error=raw.abs_error_bound;
 raw.full_bath=isequal(sort(cluster.sites),sort(model.bath_ids));
-if isfield(spec,'raw_only')&&spec.raw_only, return; end
+if isfield(spec,'raw_only')&&spec.raw_only
+    return;
+end
 
 % Every denominator receives exactly the parent's conditioning event
 if ~isempty(cluster.sites)&&~raw.full_bath
-    local=parameters; local.cce.interlaced.condition_sites=cylinders;
+    local=parameters;
+    local.cce.interlaced.condition_sites=cylinders;
     local.cce.interlaced.raw_only=true;
     family=model.clusters;
     included=arrayfun(@(member)all(ismember(member.sites,cluster.sites)),family);
-    family=family(included); records=cell(1,numel(family)+1);
+    family=family(included);
+    records=cell(1,numel(family)+1);
     empty=struct('id',0,'sites',[]);
     records{1}=native_interlace(model,empty,ensemble,schedule,local,evaluator);
     for k=1:numel(family)
         if isequal(family(k).sites,cluster.sites), records{k+1}=raw;
-        else, records{k+1}=native_interlace(model,family(k),ensemble,schedule,local,evaluator); end
+        else
+            records{k+1}=native_interlace(model,family(k),ensemble,schedule,local,evaluator);
+        end
     end
-    factors=records{1}.value; errors=records{1}.abs_error_bound;
+    factors=records{1}.value;
+    errors=records{1}.abs_error_bound;
     for k=1:numel(family)
-        item=records{k+1}; denominator=records{1}.value;
-        denominator_error=records{1}.abs_error_bound; valid=records{1}.valid&item.valid;
+        item=records{k+1};
+        denominator=records{1}.value;
+        denominator_error=records{1}.abs_error_bound;
+        valid=records{1}.valid&item.valid;
         for j=family(k).proper_subsets
             position=find([family.id]==model.clusters(j).id,1);
-            if isempty(position), continue; end
+            if isempty(position)
+                continue;
+            end
             factor=records{position+1};
             denominator_error=abs(denominator).*factor.abs_error_bound+...
                               abs(factor.value).*denominator_error+...
                               denominator_error.*factor.abs_error_bound;
-            denominator=denominator.*factor.value; valid=valid&factor.valid;
+            denominator=denominator.*factor.value;
+            valid=valid&factor.valid;
         end
         resolved=valid&abs(denominator)>denominator_error+parameters.cce.numerics.atol+...
                  parameters.cce.numerics.rtol*abs(denominator);
-        value=NaN(size(item.value)); uncertainty=Inf(size(item.value));
+        value=NaN(size(item.value));
+        uncertainty=Inf(size(item.value));
         value(resolved)=item.value(resolved)./denominator(resolved);
         uncertainty(resolved)=(item.abs_error_bound(resolved)+...
             abs(value(resolved)).*denominator_error(resolved))./...
             (abs(denominator(resolved))-denominator_error(resolved));
-        item.value=value; item.abs_error_bound=uncertainty;
+        item.value=value;
+        item.abs_error_bound=uncertainty;
         item.valid=resolved&isfinite(value);
         records{k+1}=item;
     end
-    position=find([family.id]==cluster.id,1); factor=records{position+1};
-    raw.factor=factor.value; raw.factor_valid=factor.valid;
+    position=find([family.id]==cluster.id,1);
+    factor=records{position+1};
+    raw.factor=factor.value;
+    raw.factor_valid=factor.valid;
     raw.factor_abs_error_bound=factor.abs_error_bound;
-    raw.reference=factors; raw.reference_error=errors;
+    raw.reference=factors;
+    raw.reference_error=errors;
 end
 raw.kind='irreducible';
-if raw.full_bath, raw.kind='raw_full_bath'; end
+if raw.full_bath
+    raw.kind='raw_full_bath';
+end
 end
 
 % Validate the resolved ensemble contract without a method-name fallback
@@ -212,7 +259,8 @@ if ~isequal(reference.bath_ids,model.bath_ids)||...
     error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
 end
 for j=1:numel(model.bath_ids)
-    dimension=model.multiplicities(model.bath_ids(j)); index=reference.assignment(j);
+    dimension=model.multiplicities(model.bath_ids(j));
+    index=reference.assignment(j);
     if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
         error('cce:spin_config','Interlaced reference assignments must select local basis states.');
     end

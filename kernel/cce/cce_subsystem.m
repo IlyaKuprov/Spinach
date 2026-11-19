@@ -42,17 +42,24 @@ grumble(model,sites,configuration,cache);
 % An exact key avoids hash collisions and stale model or representation data
 signature=struct('model',model,'sites',sites,'configuration',configuration);
 if ~isempty(cache)&&isequaln(cache.signature,signature)
-    cluster_system=cache.cluster_system; cache.hits=cache.hits+1; return
+    cluster_system=cache.cluster_system;
+    cache.hits=cache.hits+1;
+    return
 end
 
 % Preserve observed-first tensor-product order and explicit physical mappings
-ids=[model.observed_ids sites]; dims=model.multiplicities(ids);
-cluster_system.kind='cce_subsystem'; cluster_system.model=model;
-cluster_system.formalism=model.formalism; cluster_system.sites=sites;
-cluster_system.physical_ids=ids; cluster_system.local_to_physical=ids;
+ids=[model.observed_ids sites];
+dims=model.multiplicities(ids);
+cluster_system.kind='cce_subsystem';
+cluster_system.model=model;
+cluster_system.formalism=model.formalism;
+cluster_system.sites=sites;
+cluster_system.physical_ids=ids;
+cluster_system.local_to_physical=ids;
 cluster_system.physical_to_local=zeros(size(model.physical_ids));
 cluster_system.physical_to_local(ids)=1:numel(ids);
-cluster_system.multiplicities=dims; cluster_system.dimension=prod(dims);
+cluster_system.multiplicities=dims;
+cluster_system.dimension=prod(dims);
 cluster_system.observed_dimension=prod(model.multiplicities(model.observed_ids));
 cluster_system.bath_dimension=prod(model.multiplicities(sites));
 cluster_system.isotopes=model.isotopes(ids);
@@ -63,9 +70,11 @@ cluster_system.groups=cellfun(@(group)group(ismember(group,ids)),...
 cluster_system.local_operators=cellfun(@pauli,num2cell(dims),'UniformOutput',false);
 
 % Bind a declared product bath density, never an inferred population
-bath_ids=model.bath_ids; state=model.parameters.cce.bath_state;
+bath_ids=model.bath_ids;
+state=model.parameters.cce.bath_state;
 if isfield(configuration,'bath_rho')
-    bath_ids=configuration.bath_ids; densities=configuration.bath_rho;
+    bath_ids=configuration.bath_ids;
+    densities=configuration.bath_rho;
 elseif strcmp(state.mode,'mixed_product')
     densities=arrayfun(@(id)speye(model.multiplicities(id))/model.multiplicities(id),...
                        bath_ids,'UniformOutput',false);
@@ -78,7 +87,8 @@ expectations=zeros(numel(bath_ids),3);
 for n=1:numel(bath_ids)
 
     % Compute physical Cartesian expectations from each validated local density
-    d=model.multiplicities(bath_ids(n)); rho=densities{n};
+    d=model.multiplicities(bath_ids(n));
+    rho=densities{n};
     operators=pauli(d);
     expectations(n,:)=[real(trace(rho*operators.x)) real(trace(rho*operators.y))...
                       real(trace(rho*operators.z))];
@@ -92,7 +102,8 @@ end
 % Use the same exterior assignment for every retained cluster
 [~,local]=ismember(sites,bath_ids);
 cluster_system.bath_rho=densities(local);
-exterior=~ismember(bath_ids,sites); exterior_ids=bath_ids(exterior);
+exterior=~ismember(bath_ids,sites);
+exterior_ids=bath_ids(exterior);
 exterior_values=expectations(exterior,:);
 if isfield(configuration,'exterior_ids')
     supplied=configuration.exterior_ids;
@@ -122,15 +133,20 @@ if strcmp(model.parameters.cce.meanfield,'static')
             distance=min(distance,sqrt(sum(delta.^2,2)).');
         end
         keep=distance<=model.parameters.cce.meanfield_radius;
-        exterior_ids=exterior_ids(keep); exterior_values=exterior_values(keep,:);
+        exterior_ids=exterior_ids(keep);
+        exterior_values=exterior_values(keep,:);
     end
     cluster_system.configuration.exterior_ids=exterior_ids;
     cluster_system.configuration.exterior_expectations=exterior_values;
 end
 
 % Cache only this explicit immutable view; generator caches belong downstream
-hits=0; misses=0;
-if ~isempty(cache), hits=cache.hits; misses=cache.misses; end
+hits=0;
+misses=0;
+if ~isempty(cache)
+    hits=cache.hits;
+    misses=cache.misses;
+end
 cache=struct('signature',signature,'cluster_system',cluster_system,...
              'hits',hits,'misses',misses+1);
 
@@ -183,13 +199,15 @@ if ~isempty(cache)&&(~isstruct(cache)||~isscalar(cache)||...
     error('cce_subsystem:cache','cache must be empty or returned by this service.');
 end
 if isfield(configuration,'bath_rho')
-    bath_ids=configuration.bath_ids; densities=configuration.bath_rho;
+    bath_ids=configuration.bath_ids;
+    densities=configuration.bath_rho;
     if ~iscell(densities)||(~isempty(densities)&&~isrow(densities))||...
        numel(densities)~=numel(bath_ids)
         error('cce_subsystem:density','Supply one density matrix per bath ID.');
     end
     for n=1:numel(bath_ids)
-        d=model.multiplicities(bath_ids(n)); rho=densities{n};
+        d=model.multiplicities(bath_ids(n));
+        rho=densities{n};
         tolerance=model.numerics.atol+model.numerics.rtol*norm(rho,'fro');
         if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...
            norm(rho-rho','fro')>tolerance||abs(trace(rho)-1)>tolerance||...

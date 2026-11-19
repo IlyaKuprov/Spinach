@@ -30,7 +30,8 @@ function rho=cce_state(cluster_system,states,spins)
 
 % Validate descriptors before changing the local representation
 grumble(cluster_system,states,spins);
-formalism=cluster_system.formalism; cluster_system.formalism='zeeman-hilb';
+formalism=cluster_system.formalism;
+cluster_system.formalism='zeeman-hilb';
 if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
 
     % Conventional spin-density operators use the common operator algebra
@@ -38,11 +39,16 @@ if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
 else
 
     % Every physical population is supplied explicitly in local dimension
-    ids=cluster_system.physical_ids; rho=sparse(1);
-    [~,order]=ismember(ids,spins); numerics=cluster_system.model.numerics;
+    ids=cluster_system.physical_ids;
+    rho=sparse(1);
+    [~,order]=ismember(ids,spins);
+    numerics=cluster_system.model.numerics;
     for n=1:numel(ids)
-        d=cluster_system.multiplicities(n); local=states{order(n)};
-        if isvector(local)&&numel(local)==d, local=diag(local); end
+        d=cluster_system.multiplicities(n);
+        local=states{order(n)};
+        if isvector(local)&&numel(local)==d
+            local=diag(local);
+        end
         if 16*(size(rho,1)*d)^2>numerics.max_memory_bytes
             error('cce_state:memory','Requested density exceeds the memory budget.');
         end
@@ -52,7 +58,9 @@ else
 end
 
 % Use the same column-major vectorisation as stock Spinach states
-if strcmp(formalism,'zeeman-liouv'), rho=rho(:); end
+if strcmp(formalism,'zeeman-liouv')
+    rho=rho(:);
+end
 
 end
 
@@ -64,7 +72,10 @@ if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
     error('cce_state:system','Use a supported cce_subsystem view.');
 end
 if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
-    if ischar(states), states={states}; spins={spins}; end
+    if ischar(states)
+        states={states};
+        spins={spins};
+    end
     if ~isrow(states)||isempty(states)||~all(cellfun(@isrow,states))||...
        ~iscell(spins)||~isequal(size(states),size(spins))
         error('cce_state:descriptor','Supply a label or matching cell rows of labels and spin selections.');
@@ -76,7 +87,9 @@ if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
         ids=spins{n};
         if ischar(ids)
             if strcmp(ids,'all'), ids=system.physical_ids;
-            else, ids=system.physical_ids(strcmp(system.isotopes,ids)); end
+            else
+                ids=system.physical_ids(strcmp(system.isotopes,ids));
+            end
         end
         if ~isnumeric(ids)||~isreal(ids)||isempty(ids)||~isrow(ids)||...
            numel(unique(ids))~=numel(ids)||any(~ismember(ids,system.physical_ids))
@@ -89,10 +102,14 @@ if ~iscell(states)||~isrow(states)||~isnumeric(spins)||~isrow(spins)||...
    numel(states)~=numel(spins)||~isequal(sort(spins),sort(system.physical_ids))
     error('cce_state:descriptor','Explicit states must specify every retained physical spin once.');
 end
-[~,order]=ismember(system.physical_ids,spins); numerics=system.model.numerics;
+[~,order]=ismember(system.physical_ids,spins);
+numerics=system.model.numerics;
 for n=1:numel(system.physical_ids)
-    d=system.multiplicities(n); local=states{order(n)};
-    if isvector(local)&&numel(local)==d, local=diag(local); end
+    d=system.multiplicities(n);
+    local=states{order(n)};
+    if isvector(local)&&numel(local)==d
+        local=diag(local);
+    end
     tolerance=numerics.atol+numerics.rtol*norm(local,'fro');
     if ~isnumeric(local)||~isequal(size(local),[d d])||...
        any(~isfinite(local),'all')||norm(local-local','fro')>tolerance||...

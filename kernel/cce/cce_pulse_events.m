@@ -30,10 +30,17 @@ function events=cce_pulse_events(parameters)
 
 % Validate declarations before generating an internal event array
 grumble(parameters);
-count=0; finite_count=0;
-if isfield(parameters,'drive'), finite_count=sum(arrayfun(@(d)numel(d.amplitude),parameters.drive)); end
-if isfield(parameters,'refocusing'), count=numel(parameters.refocusing); end
-if isfield(parameters,'train'), count=count+parameters.train.count; end
+count=0;
+finite_count=0;
+if isfield(parameters,'drive')
+    finite_count=sum(arrayfun(@(d)numel(d.amplitude),parameters.drive));
+end
+if isfield(parameters,'refocusing')
+    count=numel(parameters.refocusing);
+end
+if isfield(parameters,'train')
+    count=count+parameters.train.count;
+end
 events=repmat(struct('type','','target',[],'placement','','at',[],'duration',[],...
                      'axis',[],'amplitude',[],'detuning',[],'operator',[],'angle',[]),...
               1,finite_count+count);
@@ -42,11 +49,20 @@ events=repmat(struct('type','','target',[],'placement','','at',[],'duration',[],
 if isfield(parameters,'drive')
     index=0;
     for n=1:numel(parameters.drive)
-        drive=parameters.drive(n); start=0; placement='absolute';
-        if isfield(drive,'time'), start=drive.time(1); end
-        if isfield(drive,'fraction'), start=drive.fraction; placement='fraction'; end
+        drive=parameters.drive(n);
+        start=0;
+        placement='absolute';
+        if isfield(drive,'time')
+            start=drive.time(1);
+        end
+        if isfield(drive,'fraction')
+            start=drive.fraction;
+            placement='fraction';
+        end
         for k=1:numel(drive.amplitude)
-            if isfield(drive,'time')&&numel(drive.time)>1, start=drive.time(k); end
+            if isfield(drive,'time')&&numel(drive.time)>1
+                start=drive.time(k);
+            end
             index=index+1;
             events(index)=struct('type','finite','target',drive.spins,...
                                  'placement',placement,'at',start,...
@@ -60,9 +76,12 @@ end
 
 % Resolve literal XY8 phases and Uhrig fractions inside the experiment
 pulses={};
-if isfield(parameters,'refocusing'), pulses=parameters.refocusing; end
+if isfield(parameters,'refocusing')
+    pulses=parameters.refocusing;
+end
 if isfield(parameters,'train')
-    train=parameters.train; pulses=cell(1,train.count);
+    train=parameters.train;
+    pulses=cell(1,train.count);
     if strcmp(train.name,'xy8')
         phases=repmat('xyxyyxyx',1,train.count/8);
         fractions=((1:train.count)-0.5)/train.count;
@@ -78,12 +97,22 @@ end
 
 % Retain input order for coincident ideal pulses
 for k=1:numel(pulses)
-    pulse=pulses{k}; placement='absolute';
-    if isfield(pulse,'fraction'), at=pulse.fraction; placement='fraction';
-    else, at=pulse.time; end
-    operator=[]; axis=[]; angle=1;
+    pulse=pulses{k};
+    placement='absolute';
+    if isfield(pulse,'fraction')
+        at=pulse.fraction;
+        placement='fraction';
+    else
+        at=pulse.time;
+    end
+    operator=[];
+    axis=[];
+    angle=1;
     if isfield(pulse,'operator'), operator=pulse.operator;
-    else, axis=pulse.axis; angle=pulse.angle; end
+    else
+        axis=pulse.axis;
+        angle=pulse.angle;
+    end
     events(finite_count+k)=struct('type','ideal','target',pulse.spins,...
                                  'placement',placement,'at',at,'duration',[],'axis',axis,...
                                  'amplitude',[],'detuning',[],'operator',operator,'angle',angle);
@@ -120,7 +149,9 @@ if isfield(parameters,'drive')
             error('cce_pulse_events:spins','Drive spins must be distinct positive physical identifiers.');
         end
         axis=drive.axis;
-        if ischar(axis)&&ismember(axis,{'x','y','z'}), axis=double('xyz'==axis); end
+        if ischar(axis)&&ismember(axis,{'x','y','z'})
+            axis=double('xyz'==axis);
+        end
         if ~isnumeric(axis)||~isreal(axis)||~isequal(size(axis),[1 3])||...
            any(~isfinite(axis))||abs(norm(axis)-1)>3*eps
             error('cce_pulse_events:axis','A drive axis is x, y, z, or a unit three-vector.');

@@ -36,7 +36,8 @@ function [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assum
 
 % Check capabilities before constructing any retained Hilbert space
 grumble(spin_system,pulse_sequence,parameters,assumptions);
-started=tic; contract=cce_capabilities(pulse_sequence);
+started=tic;
+contract=cce_capabilities(pulse_sequence);
 [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions);
 if strcmp(parameters.cce.approximation,'projected')&&~contract.projected
     error('clexpn:projection','This experiment requires generalized evolution.');
@@ -59,10 +60,12 @@ end
 % Derive default numerical controls from precision and available host memory
 numerics=parameters.cce.numerics;
 if ~isfield(numerics,'atol')
-    numerics.atol=sqrt(eps); policy.defaults{end+1}='parameters.cce.numerics.atol';
+    numerics.atol=sqrt(eps);
+    policy.defaults{end+1}='parameters.cce.numerics.atol';
 end
 if ~isfield(numerics,'rtol')
-    numerics.rtol=sqrt(eps); policy.defaults{end+1}='parameters.cce.numerics.rtol';
+    numerics.rtol=sqrt(eps);
+    policy.defaults{end+1}='parameters.cce.numerics.rtol';
 end
 if ~isfield(numerics,'max_memory_bytes')
     operating_system=java.lang.management.ManagementFactory.getOperatingSystemMXBean();
@@ -80,12 +83,14 @@ end
 model=cce_compile(spin_system,parameters,assumptions);
 model.pulse_sequence=pulse_sequence;
 if isfield(model,'transition')
-    policy.transition=model.transition; policy.transition_meta=model.transition_meta;
+    policy.transition=model.transition;
+    policy.transition_meta=model.transition_meta;
 end
 if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
     model.formalism=parameters.cce.basis.formalism;
 elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
-    model.formalism='zeeman-liouv'; policy.defaults{end+1}='parameters.cce.basis.formalism';
+    model.formalism='zeeman-liouv';
+    policy.defaults{end+1}='parameters.cce.basis.formalism';
 end
 if ~ismember(model.formalism,contract.formalisms)
     error('clexpn:formalism','The experiment does not support the requested representation.');
@@ -112,8 +117,12 @@ if isempty(parameters.cce.order)
 end
 
 % Disjoint families retain single groups or all inter-group pairs
-if strcmp(parameters.cce.expansion,'disjoint'), parameters.cce.order=1; end
-if strcmp(parameters.cce.expansion,'disjoint_inter'), parameters.cce.order=2; end
+if strcmp(parameters.cce.expansion,'disjoint')
+    parameters.cce.order=1;
+end
+if strcmp(parameters.cce.expansion,'disjoint_inter')
+    parameters.cce.order=2;
+end
 
 % Build the physical connectivity and downward-closed cluster family
 options=parameters.cce;
@@ -121,15 +130,23 @@ selection=struct('graph',options.graph,'order',options.order,'numerics',options.
 if isfield(selection.numerics,'propagator')
     selection.numerics=rmfield(selection.numerics,'propagator');
 end
-selection.method='gcce'; selection.expansion=options.expansion;
-if strcmp(options.approximation,'projected'), selection.method='cce'; end
+selection.method='gcce';
+selection.expansion=options.expansion;
+if strcmp(options.approximation,'projected')
+    selection.method='cce';
+end
 if isequal(pulse_sequence,@noise_correlation)
-    selection.method='noise'; selection.noise=parameters.noise;
+    selection.method='noise';
+    selection.noise=parameters.noise;
     selection.bath_state=options.bath_state;
 end
-if strcmp(options.approximation,'projected'), selection.second_order=options.second_order; end
+if strcmp(options.approximation,'projected')
+    selection.second_order=options.second_order;
+end
 for field={'groups','selection','bath_radius'}
-    if isfield(options,field{1}), selection.(field{1})=options.(field{1}); end
+    if isfield(options,field{1})
+        selection.(field{1})=options.(field{1});
+    end
 end
 graph=cce_graph(model,selection);
 if isfield(options,'partition')
@@ -138,30 +155,42 @@ if isfield(options,'partition')
         error('clexpn:partition','Partition adaptation is incomplete: %s.',partition.diagnostics.reason);
     end
     selection.groups=partition.groups;
-    if ~isempty(partition.groups), parameters.cce.groups=partition.groups; end
-    model.parameters=parameters; model.groups=partition.groups; policy.partition=partition;
+    if ~isempty(partition.groups)
+        parameters.cce.groups=partition.groups;
+    end
+    model.parameters=parameters;
+    model.groups=partition.groups;
+    policy.partition=partition;
 end
 clusters=cce_clusters(model,graph,selection);
 model.parameters=parameters;
 
 % Construct product-state assignments without changing the caller's random stream
 state=parameters.cce.bath_state;
-ids=model.bath_ids; count=1;
-if ismember(state.mode,{'sampled','interlaced'}), count=state.samples; end
+ids=model.bath_ids;
+count=1;
+if ismember(state.mode,{'sampled','interlaced'})
+    count=state.samples;
+end
 bytes=count*(1024+16*sum(model.multiplicities(ids).^2)+32*numel(ids));
 if ~isfinite(bytes)||bytes>model.numerics.max_memory_bytes
     error('clexpn:memory','Sampled product-state storage exceeds the declared memory budget.');
 end
 configuration=struct('configuration_id',1,'state_id',1,'weight',1/count,...
                      'bath_ids',ids,'bath_rho',{{}},'assignment',zeros(1,numel(ids)));
-if isfield(state,'configuration_id'), configuration.configuration_id=state.configuration_id; end
-configs=repmat(configuration,1,count); bases=cell(1,numel(ids)); probabilities=bases;
+if isfield(state,'configuration_id')
+    configuration.configuration_id=state.configuration_id;
+end
+configs=repmat(configuration,1,count);
+bases=cell(1,numel(ids));
+probabilities=bases;
 for n=1:count
     if ismember(state.mode,{'sampled','interlaced'})
         stream=RandStream('Threefry','Seed',state.seed);
         stream.Substream=(configuration.configuration_id-1)*count+n;
     end
-    configs(n).state_id=n; configs(n).bath_rho=cell(1,numel(ids));
+    configs(n).state_id=n;
+    configs(n).bath_rho=cell(1,numel(ids));
     for j=1:numel(ids)
         d=model.multiplicities(ids(j));
         switch state.mode
@@ -170,37 +199,54 @@ for n=1:count
             case 'explicit_product'
                 rho=state.rho{j};
             otherwise
-                if ischar(state.basis), bases{j}=eye(d); else, bases{j}=state.basis{j}; end
+                if ischar(state.basis)
+                    bases{j}=eye(d);
+                else
+                    bases{j}=state.basis{j};
+                end
                 if ischar(state.probabilities)
                     probabilities{j}=ones(d,1)/d;
                 else
                     probabilities{j}=state.probabilities{j}(:);
                 end
-                u=rand(stream); pick=find(u<=cumsum(probabilities{j}),1);
-                if isempty(pick), pick=d; end
+                u=rand(stream);
+                pick=find(u<=cumsum(probabilities{j}),1);
+                if isempty(pick)
+                    pick=d;
+                end
                 configs(n).assignment(j)=pick;
-                vector=bases{j}(:,pick); rho=vector*vector';
+                vector=bases{j}(:,pick);
+                rho=vector*vector';
         end
         configs(n).bath_rho{j}=rho;
     end
 end
 ensemble=struct('spin_config',configs,'weights',[configs.weight],...
                 'bases',{bases},'probabilities',{probabilities});
-schedule.pulse_sequence=pulse_sequence; schedule.contract=contract;
+schedule.pulse_sequence=pulse_sequence;
+schedule.contract=contract;
 
 % Scheduler calls the registered evaluator, which calls the five-argument experiment
 raw=cce_schedule(model,clusters,ensemble,schedule,parameters,contract.evaluator);
 
 % Test completeness on the graph domain without trimming the exterior state
-request=parameters; request.cce.bath_spins=graph.bath_ids;
-reduced=cce_reduce(raw,clusters,request); answer=reduced.value;
+request=parameters;
+request.cce.bath_spins=graph.bath_ids;
+reduced=cce_reduce(raw,clusters,request);
+answer=reduced.value;
 
 % Keep diagnostics separate from the natural sequence output
-diagnostics.raw=raw; diagnostics.clusters=clusters; diagnostics.graph=graph;
-diagnostics.reduction=reduced; diagnostics.policy=policy;
-diagnostics.parameters=parameters; diagnostics.contract=contract;
-diagnostics.physical_ids=model.physical_ids; diagnostics.observed_ids=model.observed_ids;
-diagnostics.bath_ids=model.bath_ids; diagnostics.ensemble=ensemble;
+diagnostics.raw=raw;
+diagnostics.clusters=clusters;
+diagnostics.graph=graph;
+diagnostics.reduction=reduced;
+diagnostics.policy=policy;
+diagnostics.parameters=parameters;
+diagnostics.contract=contract;
+diagnostics.physical_ids=model.physical_ids;
+diagnostics.observed_ids=model.observed_ids;
+diagnostics.bath_ids=model.bath_ids;
+diagnostics.ensemble=ensemble;
 if isfield(parameters,'spectrum')
     diagnostics.spectrum=cce_spectrum(parameters.times,answer,...
                                      struct('spectrum',parameters.spectrum));

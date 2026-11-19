@@ -36,36 +36,59 @@ grumble(result,parameters);
 analysis=struct('times',result.times,'value',result.value,'valid',result.valid,...
                 'status','not_requested','warnings',{{}},'fit',[]);
 if ~isfield(parameters,'analysis')||~isfield(parameters.analysis,'fit')||...
-   ~parameters.analysis.fit, return; end
+   ~parameters.analysis.fit
+    return;
+end
 
 % Select the requested observable, envelope, and fitting interval
-a=parameters.analysis; t=result.times(:); column=a.observable;
-y=result.value(:,column); valid=result.valid(:,column);
-if strcmp(a.envelope,'magnitude'), y=abs(y); else, y=real(y); end
-window=t>=a.interval(1)&t<=a.interval(2); t=t(window); y=y(window);
-w=a.weights(window); w=w(:); np=2+strcmp(a.model,'stretched_exponential');
+a=parameters.analysis;
+t=result.times(:);
+column=a.observable;
+y=result.value(:,column);
+valid=result.valid(:,column);
+if strcmp(a.envelope,'magnitude')
+    y=abs(y);
+else
+    y=real(y);
+end
+window=t>=a.interval(1)&t<=a.interval(2);
+t=t(window);
+y=y(window);
+w=a.weights(window);
+w=w(:);
+np=2+strcmp(a.model,'stretched_exponential');
 
 % Refuse invalid or unidentifiable windows without masking evidence
 if numel(t)<=np||any(~valid(window))||any(~isfinite(y))||any(y<=0)
-    analysis.status='invalid_window'; analysis.warnings={'Invalid, nonpositive or insufficient fitting samples.'};
+    analysis.status='invalid_window';
+    analysis.warnings={'Invalid, nonpositive or insufficient fitting samples.'};
     return
 end
-scale=max(y); increases=diff(y)>sqrt(eps)*scale;
+scale=max(y);
+increases=diff(y)>sqrt(eps)*scale;
 if any(increases)||y(end)>=y(1)
-    analysis.status='not_decay'; analysis.warnings={'Oscillatory or nondecaying input: declare a valid envelope/window.'};
+    analysis.status='not_decay';
+    analysis.warnings={'Oscillatory or nondecaying input: declare a valid envelope/window.'};
     return
 end
 
 % Fit a dimensionless time coordinate with strictly positive model parameters
-time_scale=t(end); x=t/time_scale;
+time_scale=t(end);
+x=t/time_scale;
 initial=[log(y(1));log(max(eps,-(x(end)-x(1))/log(y(end)/y(1))))];
-if np==3, initial(3)=0; end
+if np==3
+    initial(3)=0;
+end
 objective=@(q) sum(w.*(decay(q,x)-y).^2)/sum(w);
 options=optimset('Display','off','TolX',1e-10,'TolFun',eps*scale^2,...
                  'MaxFunEvals',5000,'MaxIter',3000);
-[q,~,flag]=fminsearch(objective,initial,options); fitted=decay(q,x);
-residual=y-fitted; beta=1;
-if np==3, beta=exp(q(3)); end
+[q,~,flag]=fminsearch(objective,initial,options);
+fitted=decay(q,x);
+residual=y-fitted;
+beta=1;
+if np==3
+    beta=exp(q(3));
+end
 fit=struct('amplitude',exp(q(1)),'time_constant',exp(q(2))*time_scale,...
            'beta',beta,'model',a.model,'interval',a.interval,...
            'envelope',a.envelope,'observable',column,'times',t,...
@@ -76,9 +99,12 @@ fit=struct('amplitude',exp(q(1)),'time_constant',exp(q(2))*time_scale,...
 
 % Compute optional local Gaussian confidence intervals in positive coordinates
 if strcmp(a.confidence,'linearized')
-    power=(x/exp(q(2))).^beta; jac=[fitted fitted.*beta.*power];
+    power=(x/exp(q(2))).^beta;
+    jac=[fitted fitted.*beta.*power];
     if np==3
-        logarithm=zeros(size(x)); nonzero=x>0; logarithm(nonzero)=log(x(nonzero)/exp(q(2)));
+        logarithm=zeros(size(x));
+        nonzero=x>0;
+        logarithm(nonzero)=log(x(nonzero)/exp(q(2)));
         jac(:,3)=-fitted.*power.*beta.*logarithm;
     end
     information=jac'*(w.*jac);
@@ -87,16 +113,20 @@ if strcmp(a.confidence,'linearized')
     else
         variance=sum(w.*residual.^2)/(numel(t)-np);
         covariance=variance*(information\eye(np));
-        z=sqrt(2)*erfinv(a.confidence_level); radius=z*sqrt(max(0,diag(covariance)));
-        intervals=exp([q-radius q+radius]); intervals(2,:)=intervals(2,:)*time_scale;
+        z=sqrt(2)*erfinv(a.confidence_level);
+        radius=z*sqrt(max(0,diag(covariance)));
+        intervals=exp([q-radius q+radius]);
+        intervals(2,:)=intervals(2,:)*time_scale;
         fit.confidence_interval=intervals;
     end
 end
 
 % Preserve the selected observable and fit assumptions with an explicit status
-analysis.fit=fit; analysis.status='fitted';
+analysis.fit=fit;
+analysis.status='fitted';
 if flag<=0
-    analysis.status='fit_limit'; analysis.warnings{end+1}='Optimizer iteration or evaluation limit reached.';
+    analysis.status='fit_limit';
+    analysis.warnings{end+1}='Optimizer iteration or evaluation limit reached.';
 end
 
 end
@@ -106,7 +136,9 @@ function values=decay(q,t)
 
 % Recover positive parameters from logarithmic optimisation coordinates
 beta=1;
-if numel(q)==3, beta=exp(q(3)); end
+if numel(q)==3
+    beta=exp(q(3));
+end
 values=exp(q(1))*exp(-(t/exp(q(2))).^beta);
 
 end
@@ -121,7 +153,9 @@ if ~isstruct(result)||~all(isfield(result,{'times','value','valid'}))||...
    ~isstruct(parameters)||~isscalar(parameters)
     error('Result requires increasing nonnegative times, values and matching logical validity.');
 end
-if ~isfield(parameters,'analysis'), return; end
+if ~isfield(parameters,'analysis')
+    return;
+end
 a=parameters.analysis;
 allowed={'fit','observable','envelope','model','interval','weights',...
          'confidence','confidence_level','t1'};
@@ -134,7 +168,9 @@ end
 if ~isfield(a,'fit')||~islogical(a.fit)||~isscalar(a.fit)
     error('analysis.fit must be a scalar logical.');
 end
-if ~a.fit, return; end
+if ~a.fit
+    return;
+end
 if ~all(isfield(a,{'observable','envelope','model','interval','weights',...
                   'confidence','confidence_level'}))||...
    ~isscalar(a.observable)||a.observable~=fix(a.observable)||...

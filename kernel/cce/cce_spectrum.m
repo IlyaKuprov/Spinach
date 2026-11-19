@@ -38,7 +38,9 @@ function spectrum=cce_spectrum(times,correlation,parameters)
 
 % Validate the transform convention, dimensional axes, and quadrature
 grumble(times,correlation,parameters);
-s=parameters.spectrum; times=times(:); omega=s.frequency_grid(:);
+s=parameters.spectrum;
+times=times(:);
+omega=s.frequency_grid(:);
 original_times=times;
 
 % Extend only an explicitly declared stationary positive-time correlation
@@ -48,11 +50,13 @@ if strcmp(s.time_domain,'positive')
 end
 
 % Construct quadrature and an explicitly unnormalised symmetric window
-weights=quadrature(times,s.weights); window=ones(size(times));
+weights=quadrature(times,s.weights);
+window=ones(size(times));
 if strcmp(s.window,'hann')
     window=(1-cos(2*pi*(times-times(1))/(times(end)-times(1))))/2;
 end
-weighted=weights.*window.*correlation; values=complex(zeros(numel(omega),size(correlation,2)));
+weighted=weights.*window.*correlation;
+values=complex(zeros(numel(omega),size(correlation,2)));
 
 % Evaluate directly without hidden FFT shifts or odd-length assumptions
 for k=1:numel(omega)
@@ -72,18 +76,23 @@ spectrum=struct('omega',omega,'frequency_hz',omega/(2*pi),'value',values,...
 
 % Return the filter transform separately from any noise-model approximation
 if isfield(s,'modulation')
-    w=quadrature(original_times,s.weights); filter=zeros(numel(omega),1);
+    w=quadrature(original_times,s.weights);
+    filter=zeros(numel(omega),1);
     for k=1:numel(omega)
         filter(k)=abs(exp(1i*omega(k)*original_times.')*(w.*s.modulation(:)))^2;
     end
-    spectrum.filter=filter; spectrum.filter_units='seconds^2';
+    spectrum.filter=filter;
+    spectrum.filter_units='seconds^2';
 end
 
 end
 
 % Generate endpoint-aware weights on uniform or nonuniform axes
 function weights=quadrature(x,rule)
-if isscalar(x), weights=0; return; end
+if isscalar(x)
+    weights=0;
+    return;
+end
 if strcmp(rule,'rectangle')
     weights=repmat((x(end)-x(1))/(numel(x)-1),size(x));
 else
@@ -127,14 +136,17 @@ if strcmp(s.time_domain,'positive')
        ~isscalar(s.stationary)||~s.stationary
         error('Positive-time extension requires scalar logical stationary=true.');
     end
-    if times(1)~=0, error('Positive-time stationary input must start at zero.'); end
+    if times(1)~=0
+        error('Positive-time stationary input must start at zero.');
+    end
 end
 if strcmp(s.weights,'rectangle')&&...
    max(abs(diff(times)-mean(diff(times))))>100*eps*max(abs(times))
     error('Rectangle quadrature requires a uniform time grid.');
 end
 if strcmp(s.sidedness,'one-sided')
-    scale=max(abs(correlation),[],1); scale(scale==0)=1;
+    scale=max(abs(correlation),[],1);
+    scale(scale==0)=1;
     scaled=correlation./scale;
     if any(w<0)||any(max(abs(imag(scaled)),[],1)>100*eps)
         error('One-sided folding requires nonnegative frequencies and a real even correlation.');

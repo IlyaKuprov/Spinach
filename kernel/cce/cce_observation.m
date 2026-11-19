@@ -41,18 +41,29 @@ function [rho0,coil,reference,meta]=cce_observation(cluster_system,parameters)
 
 % Validate physical ownership before constructing preparation and detection
 grumble(cluster_system,parameters);
-model=cluster_system.model; dc=cluster_system.observed_dimension;
-db=cluster_system.bath_dimension; ids=model.observed_ids;
-local=cluster_system; local.physical_ids=ids; local.sites=[];
-local.multiplicities=model.multiplicities(ids); local.dimension=dc;
+model=cluster_system.model;
+dc=cluster_system.observed_dimension;
+db=cluster_system.bath_dimension;
+ids=model.observed_ids;
+local=cluster_system;
+local.physical_ids=ids;
+local.sites=[];
+local.multiplicities=model.multiplicities(ids);
+local.dimension=dc;
 local.isotopes=model.isotopes(ids);
-local.physical_to_local=zeros(size(model.physical_ids)); local.physical_to_local(ids)=1:numel(ids);
+local.physical_to_local=zeros(size(model.physical_ids));
+local.physical_to_local(ids)=1:numel(ids);
 local.formalism='zeeman-hilb';
 local.local_operators=cellfun(@pauli,num2cell(local.multiplicities),...
                             'UniformOutput',false);
-phase=0; normalised=false;
-if isfield(parameters,'receiver_phase'), phase=parameters.receiver_phase; end
-if isfield(parameters,'normalized'), normalised=parameters.normalized; end
+phase=0;
+normalised=false;
+if isfield(parameters,'receiver_phase')
+    phase=parameters.receiver_phase;
+end
+if isfield(parameters,'normalized')
+    normalised=parameters.normalized;
+end
 
 % Explicit expert density overrides the named experimental preparation
 if isfield(parameters,'rho0')
@@ -66,7 +77,8 @@ if isfield(parameters,'rho0')
 elseif isfield(parameters,'preparation')&&isequal(parameters.preparation,'transverse')
     observed=(eye(dc)+2*cce_operator(local,'Lx',ids))/2;
 elseif isfield(parameters,'preparation')&&isstruct(parameters.preparation)
-    spec=parameters.preparation; observed=cce_state(local,spec.states,spec.spins);
+    spec=parameters.preparation;
+    observed=cce_state(local,spec.states,spec.spins);
 elseif isfield(model,'transition')
     vector=(model.transition.alpha+model.transition.beta)/sqrt(2);
     observed=vector*vector';
@@ -81,19 +93,24 @@ end
 if isfield(parameters,'coil')
     detectors=parameters.coil;
 elseif isfield(parameters,'detection')&&isstruct(parameters.detection)
-    spec=parameters.detection; detectors=cce_operator(local,spec.operators,spec.spins);
+    spec=parameters.detection;
+    detectors=cce_operator(local,spec.operators,spec.spins);
 elseif isfield(model,'transition')
     detectors=model.transition.alpha*model.transition.beta';
 else
     error('cce_observation:detection','Declare a detector or select an observed transition.');
 end
-if ~iscell(detectors), detectors={detectors}; end
+if ~iscell(detectors)
+    detectors={detectors};
+end
 if isempty(detectors)||~isvector(detectors)||...
    ~all(cellfun(@(x)isnumeric(x)&&isequal(size(x),[dc dc])&&...
                    all(isfinite(x),'all'),detectors))
     error('cce_observation:detection','Every detector must be a finite observed-spin matrix.');
 end
-for k=1:numel(detectors), detectors{k}=exp(1i*phase)*detectors{k}; end
+for k=1:numel(detectors)
+    detectors{k}=exp(1i*phase)*detectors{k};
+end
 reference=cellfun(@(x)trace(x'*observed),detectors(:).');
 if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
     reference=exp(-1i*phase)*(model.transition.alpha'*observed*model.transition.beta);
@@ -111,28 +128,39 @@ end
 
 % Build the bath product in the exact retained order supplied by the subsystem
 bath=1;
-for k=1:numel(cluster_system.bath_rho), bath=kron(bath,cluster_system.bath_rho{k}); end
+for k=1:numel(cluster_system.bath_rho)
+    bath=kron(bath,cluster_system.bath_rho{k});
+end
 projected=strcmp(parameters.cce.approximation,'projected');
 if projected
     if ~isfield(model,'transition')||numel(detectors)~=1
         error('cce_observation:projected','Projected evolution requires one selected-transition detector.');
     end
-    alpha=model.transition.alpha; beta=model.transition.beta;
+    alpha=model.transition.alpha;
+    beta=model.transition.beta;
     basis_detector=alpha*beta';
     coefficient=trace(basis_detector'*detectors{1});
     if norm(detectors{1}-coefficient*basis_detector,'fro')>...
        dc*eps*norm(detectors{1},'fro')
         error('cce_observation:projected','The detector must select the propagated transition block.');
     end
-    rho0=(alpha'*observed*beta)*bath; rho0=rho0(:);
-    coil=coefficient*eye(db); coil=coil(:);
+    rho0=(alpha'*observed*beta)*bath;
+    rho0=rho0(:);
+    coil=coefficient*eye(db);
+    coil=coil(:);
 else
-    rho0=kron(observed,bath); coil=cell(size(detectors));
-    for k=1:numel(detectors), coil{k}=kron(detectors{k},eye(db)); end
-    if strcmp(cluster_system.formalism,'zeeman-liouv')
-        rho0=rho0(:); coil=cellfun(@(x)x(:),coil,'UniformOutput',false);
+    rho0=kron(observed,bath);
+    coil=cell(size(detectors));
+    for k=1:numel(detectors)
+        coil{k}=kron(detectors{k},eye(db));
     end
-    if isscalar(coil), coil=coil{1}; end
+    if strcmp(cluster_system.formalism,'zeeman-liouv')
+        rho0=rho0(:);
+        coil=cellfun(@(x)x(:),coil,'UniformOutput',false);
+    end
+    if isscalar(coil)
+        coil=coil{1};
+    end
 end
 
 % Keep actual and applied references distinct so normalisation occurs once
@@ -140,8 +168,12 @@ meta=struct('physical_ids',cluster_system.physical_ids,'observed_ids',ids,...
             'receiver_phase',phase,'normalized',normalised,...
             'initial_signal',reference,'normalization_divisor',ones(size(reference)),...
             'output_orientation','time-by-detector','vectorization','column-major');
-if normalised, meta.normalization_divisor=reference; end
-if isfield(model,'transition'), meta.transition=model.transition; end
+if normalised
+    meta.normalization_divisor=reference;
+end
+if isfield(model,'transition')
+    meta.transition=model.transition;
+end
 
 end
 
@@ -176,12 +208,18 @@ for name={'preparation','detection'}
                 valid=isscalar(system.model.observed_ids)&&system.observed_dimension==2;
             end
         elseif isstruct(value)&&isscalar(value)
-            if strcmp(name{1},'preparation'), field='states'; else, field='operators'; end
+            if strcmp(name{1},'preparation')
+                field='states';
+            else
+                field='operators';
+            end
             valid=all(isfield(value,{field,'spins'}));
         else
             valid=false;
         end
-        if ~valid, error('cce_observation:descriptor','Use a supported explicit observation descriptor.'); end
+        if ~valid
+            error('cce_observation:descriptor','Use a supported explicit observation descriptor.');
+        end
     end
 end
 if isfield(parameters,'receiver_phase')&&(~isnumeric(parameters.receiver_phase)||...

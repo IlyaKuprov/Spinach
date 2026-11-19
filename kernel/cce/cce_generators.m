@@ -42,26 +42,42 @@ function [H,R,K,parameters,cache]=cce_generators(cluster_system,parameters,cache
 
 % Validate ownership before allocating retained-space matrices
 grumble(cluster_system,parameters,cache);
-model=cluster_system.model; ids=cluster_system.physical_ids;
-d=cluster_system.dimension; db=cluster_system.bath_dimension;
+model=cluster_system.model;
+ids=cluster_system.physical_ids;
+d=cluster_system.dimension;
+db=cluster_system.bath_dimension;
 projected=strcmp(parameters.cce.approximation,'projected');
 jumps=[];
-if isfield(parameters,'bath_jumps'), jumps=parameters.bath_jumps; end
+if isfield(parameters,'bath_jumps')
+    jumps=parameters.bath_jumps;
+end
 
 % Exact input comparison prevents stale orientation or configuration reuse
-if isfield(parameters,'cce_aux'), parameters=rmfield(parameters,'cce_aux'); end
+if isfield(parameters,'cce_aux')
+    parameters=rmfield(parameters,'cce_aux');
+end
 signature=struct('cluster_system',cluster_system,'parameters',parameters);
 if ~isempty(cache)&&isequaln(cache.signature,signature)
-    H=cache.H; R=cache.R; K=cache.K; parameters=cache.parameters;
-    cache.hits=cache.hits+1; return
+    H=cache.H;
+    R=cache.R;
+    K=cache.K;
+    parameters=cache.parameters;
+    cache.hits=cache.hits+1;
+    return
 end
 
 % Count resident jump operators before Hamiltonian or dissipator allocation
 if ~isempty(jumps)||(projected&&strcmp(cluster_system.formalism,'zeeman-liouv'))
-    if projected, n=db; else, n=d; end
+    if projected
+        n=db;
+    else
+        n=d;
+    end
     included=0;
     for k=1:numel(jumps)
-        if all(ismember(jumps(k).support,ids)), included=included+1; end
+        if all(ismember(jumps(k).support,ids))
+            included=included+1;
+        end
     end
     memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*n^4+2*included*d^2));
 end
@@ -79,8 +95,10 @@ if projected
         error('cce_generators:transition','Projected evolution needs a transition.');
     end
     transition=model.transition;
-    va=kron(transition.alpha,eye(db)); vb=kron(transition.beta,eye(db));
-    left=va'*ham*va; right=vb'*ham*vb;
+    va=kron(transition.alpha,eye(db));
+    vb=kron(transition.beta,eye(db));
+    left=va'*ham*va;
+    right=vb'*ham*vb;
     leakage=max(norm(ham*va-va*left,'fro'),norm(ham*vb-vb*right,'fro'));
     parameters.cce_aux.projection_leakage=leakage;
     if ~isempty(jumps)&&leakage>d*eps*norm(ham,'fro')
@@ -99,11 +117,15 @@ if projected
         observed_system.configuration.exterior_expectations=zeros(0,3);
         [observed_hamiltonian,~]=matrix(observed_system,parameters);
         [vectors,energies]=eig(full((observed_hamiltonian+observed_hamiltonian')/2),'vector');
-        [energies,order]=sort(real(energies)); vectors=vectors(:,order);
+        [energies,order]=sort(real(energies));
+        vectors=vectors(:,order);
         [~,selected(1)]=max(abs(vectors'*model.transition.alpha).^2);
         [~,selected(2)]=max(abs(vectors'*model.transition.beta).^2);
-        second=parameters.cce.second_order; observed=model.observed_ids;
-        ops=cell(1,3*numel(observed)); fields=cell(size(ops)); axes={'x','y','z'};
+        second=parameters.cce.second_order;
+        observed=model.observed_ids;
+        ops=cell(1,3*numel(observed));
+        fields=cell(size(ops));
+        axes={'x','y','z'};
         for c=1:numel(observed)
             for a=1:3
                 slot=3*(c-1)+a;
@@ -129,7 +151,8 @@ if projected
 
         % Add the declared virtual-state correction to each conditional branch
         for branch=1:2
-            state=vectors(:,selected(branch)); gaps=energies(selected(branch))-energies;
+            state=vectors(:,selected(branch));
+            gaps=energies(selected(branch))-energies;
             outside=setdiff(1:numel(energies),selected(branch));
             if any(abs(gaps(outside))<=second.gap_tolerance)
                 error('Virtual-state energy gap is below the explicit tolerance.');
@@ -149,9 +172,14 @@ if projected
                     correction=correction+weight*fields{a}*fields{b};
                 end
             end
-            if branch==1, left=left+correction; else, right=right+correction; end
+            if branch==1
+                left=left+correction;
+            else
+                right=right+correction;
+            end
         end
-        left=(left+left')/2; right=(right+right')/2;
+        left=(left+left')/2;
+        right=(right+right')/2;
 
     end
     H=struct('kind','cce_projected','left',left,'right',right,...
@@ -167,22 +195,30 @@ if projected
         H.swap_matrix=sparse(1:db^2,labels(:),1,db^2,db^2);
 
     end
-    R=[]; K=[];
+    R=[];
+    K=[];
 elseif strcmp(cluster_system.formalism,'zeeman-liouv')
 
     % Column-major vectorisation fixes the transposes and the relaxation sign
     memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*d^4));
     H=kron(eye(d),ham)-kron(ham.',eye(d));
-    [R,jump_records]=dissipator(cluster_system,jumps,[],[]); K=zeros(size(H));
+    [R,jump_records]=dissipator(cluster_system,jumps,[],[]);
+    K=zeros(size(H));
 else
-    H=ham; R=zeros(size(H)); K=zeros(size(H));
+    H=ham;
+    R=zeros(size(H));
+    K=zeros(size(H));
 
 end
 
 % Retain the physical master-generator evidence with its completed raw task
 if exist('jump_records','var')
-    ha=ham; hb=ham;
-    if projected, ha=H.left; hb=H.right; end
+    ha=ham;
+    hb=ham;
+    if projected
+        ha=H.left;
+        hb=H.right;
+    end
     parameters.cce_aux.generator=struct('physical_ids',ids,'dimension',d,...
         'bath_dimension',db,'observed_dimension',cluster_system.observed_dimension,...
         'projected',projected,'h_alpha',ha,'h_beta',hb,'jumps',jump_records,...
@@ -191,8 +227,12 @@ if exist('jump_records','var')
 end
 
 % Cache only exact native inputs and the corresponding sequence auxiliaries
-hits=0; misses=0;
-if ~isempty(cache), hits=cache.hits; misses=cache.misses; end
+hits=0;
+misses=0;
+if ~isempty(cache)
+    hits=cache.hits;
+    misses=cache.misses;
+end
 cache=struct('signature',signature,'H',H,'R',R,'K',K,...
              'parameters',parameters,'hits',hits,'misses',misses+1);
 
@@ -202,15 +242,23 @@ end
 function [H,meta]=matrix(system,parameters)
 
 % Resolve only the construction backend; physical tensors are already in rad/s
-model=system.model; spin_config=system.configuration; bath_dimension=system.bath_dimension;
+model=system.model;
+spin_config=system.configuration;
+bath_dimension=system.bath_dimension;
 backend=parameters.cce.backend;
 if strcmp(backend,'auto')
-    if model.direct_supported, backend='direct'; else, backend='stock'; end
+    if model.direct_supported
+        backend='direct';
+    else
+        backend='stock';
+    end
 end
 if strcmp(backend,'direct')&&~model.direct_supported
     error('cce_generators:backend','The requested direct approximation is unsupported.');
 end
-ids=system.physical_ids; dims=system.multiplicities; dimension=system.dimension;
+ids=system.physical_ids;
+dims=system.multiplicities;
+dimension=system.dimension;
 memory_guard(parameters,16*dimension^2*(12+3*numel(ids)));
 
 % Construct angular momentum operators in canonical product ordering
@@ -218,7 +266,8 @@ ops=cell(numel(ids),3);
 for n=1:numel(ids)
 
     % Build local raising, lowering, and longitudinal matrices
-    spin=(dims(n)-1)/2; magnetic=spin:-1:-spin;
+    spin=(dims(n)-1)/2;
+    magnetic=spin:-1:-spin;
     raising=diag(sqrt(spin*(spin+1)-magnetic(2:end).*(magnetic(2:end)+1)),1);
     local={(raising+raising')/2,(raising-raising')/(2i),diag(magnetic)};
 
@@ -234,13 +283,17 @@ end
 if strcmp(backend,'direct')
 
     % Accumulate all retained local and unordered pair terms
-    H=sparse(dimension,dimension); sum_norm=0; operations=0;
+    H=sparse(dimension,dimension);
+    sum_norm=0;
+    operations=0;
     for n=1:numel(ids)
 
         % Select Zeeman components and rotating-frame carrier convention
-        id=ids(n); tensor=model.zeeman{id};
+        id=ids(n);
+        tensor=model.zeeman{id};
         strength=model.spin_system.inter.zeeman.strength{id};
-        field=zeros(1,3); isotropic=trace(model.spin_system.inter.zeeman.matrix{id})/3;
+        field=zeros(1,3);
+        isotropic=trace(model.spin_system.inter.zeeman.matrix{id})/3;
         anisotropic=tensor-isotropic*eye(3);
         [~,rank_one,rank_two]=mat2sphten(model.spin_system.inter.zeeman.matrix{id});
         if norm(rank_one,2)<=model.spin_system.tols.liouv_zero&&...
@@ -249,11 +302,15 @@ if strcmp(backend,'direct')
         end
         switch strength
             case 'full'
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero, isotropic=0; end
+                if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                    isotropic=0;
+                end
                 field=anisotropic(3,:)+[0 0 isotropic];
             case 'secular'
                 isotropic=isotropic-model.spin_system.inter.basefrqs(id);
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero, isotropic=0; end
+                if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                    isotropic=0;
+                end
                 field(3)=anisotropic(3,3)+isotropic;
             case 'ignore'
 
@@ -262,8 +319,10 @@ if strcmp(backend,'direct')
                 error('unvalidated direct Zeeman retention.');
         end
         for axis=1:3
-            term=field(axis)*ops{n,axis}; H=H+term;
-            sum_norm=sum_norm+norm(term,'fro'); operations=operations+1;
+            term=field(axis)*ops{n,axis};
+            H=H+term;
+            sum_norm=sum_norm+norm(term,'fro');
+            operations=operations+1;
         end
 
         % Apply the stock on-site quadratic retention convention
@@ -287,8 +346,10 @@ if strcmp(backend,'direct')
         end
         for axis=1:3
             for other=1:3
-                term=tensor(axis,other)*(ops{n,axis}*ops{n,other}); H=H+term;
-                sum_norm=sum_norm+norm(term,'fro'); operations=operations+dimension;
+                term=tensor(axis,other)*(ops{n,axis}*ops{n,other});
+                H=H+term;
+                sum_norm=sum_norm+norm(term,'fro');
+                operations=operations+dimension;
             end
         end
 
@@ -297,8 +358,10 @@ if strcmp(backend,'direct')
             tensor=model.retained{id,ids(k)};
             for axis=1:3
                 for other=1:3
-                    term=tensor(axis,other)*(ops{n,axis}*ops{k,other}); H=H+term;
-                    sum_norm=sum_norm+norm(term,'fro'); operations=operations+dimension;
+                    term=tensor(axis,other)*(ops{n,axis}*ops{k,other});
+                    H=H+term;
+                    sum_norm=sum_norm+norm(term,'fro');
+                    operations=operations+dimension;
                 end
             end
         end
@@ -308,22 +371,29 @@ else
 
     % Remove an inherited basis before slicing immutable physical metadata
     system=model.spin_system;
-    if isfield(system,'bas'), system=rmfield(system,'bas'); end
+    if isfield(system,'bas')
+        system=rmfield(system,'bas');
+    end
     system=kill_spin(system,setdiff(model.physical_ids,ids));
-    basis_parameters.formalism='zeeman-hilb'; basis_parameters.approximation={'none'};
+    basis_parameters.formalism='zeeman-hilb';
+    basis_parameters.approximation={'none'};
     system=basis(system,basis_parameters);
     system=assume(system,model.assumptions{:});
-    [H,Q]=hamiltonian(system); H=H+orientation(Q,model.orientation);
+    [H,Q]=hamiltonian(system);
+    H=H+orientation(Q,model.orientation);
 
     % Reorder the stock ascending physical indices into observed-first order
-    sorted_ids=sort(ids); sorted_dims=model.multiplicities(sorted_ids);
+    sorted_ids=sort(ids);
+    sorted_dims=model.multiplicities(sorted_ids);
     [~,order]=ismember(ids,sorted_ids);
     if numel(ids)>1
         indices=reshape(1:dimension,fliplr(sorted_dims));
         indices=permute(indices,numel(ids)+1-fliplr(order));
-        indices=indices(:); H=H(indices,indices);
+        indices=indices(:);
+        H=H(indices,indices);
     end
-    sum_norm=norm(H,'fro'); operations=dimension*numel(ids)^2;
+    sum_norm=norm(H,'fro');
+    operations=dimension*numel(ids)^2;
 
 end
 
@@ -337,8 +407,10 @@ if isfield(spin_config,'exterior_ids')
             field=model.retained{ids(n),spin_config.exterior_ids(k)}*...
                   spin_config.exterior_expectations(k,:).';
             for axis=1:3
-                term=field(axis)*ops{n,axis}; H=H+term;
-                sum_norm=sum_norm+norm(term,'fro'); operations=operations+dimension;
+                term=field(axis)*ops{n,axis};
+                H=H+term;
+                sum_norm=sum_norm+norm(term,'fro');
+                operations=operations+dimension;
             end
         end
     end
@@ -355,11 +427,16 @@ end
 H=(H+H')/2;
 
 % Return ordering, operators, backend, and approximation provenance
-meta.physical_ids=ids; meta.dimensions=dims; meta.dimension=dimension;
+meta.physical_ids=ids;
+meta.dimensions=dims;
+meta.dimension=dimension;
 meta.observed_dimension=prod(model.multiplicities(model.observed_ids));
-meta.bath_dimension=bath_dimension; meta.operators=ops;
-meta.backend=backend; meta.fallback_reason=model.fallback_reason;
-meta.source_hash=model.source_hash; meta.omitted_pairs=model.omitted_pairs;
+meta.bath_dimension=bath_dimension;
+meta.operators=ops;
+meta.backend=backend;
+meta.fallback_reason=model.fallback_reason;
+meta.source_hash=model.source_hash;
+meta.omitted_pairs=model.omitted_pairs;
 meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
 
 end
@@ -368,14 +445,23 @@ end
 function [R,records]=dissipator(system,jumps,va,vb)
 
 % Select the density dimension after the caller's allocation preflight
-ids=system.physical_ids; d=system.dimension; projected=~isempty(va);
-if projected, n=system.bath_dimension; else, n=d; end
-R=zeros(n^2); records=struct('support',{},'rate',{},'left',{},'right',{});
+ids=system.physical_ids;
+d=system.dimension;
+projected=~isempty(va);
+if projected
+    n=system.bath_dimension;
+else
+    n=d;
+end
+R=zeros(n^2);
+records=struct('support',{},'rate',{},'left',{},'right',{});
 for k=1:numel(jumps)
 
     % A supported jump is included only when its entire support is retained
     jump=jumps(k);
-    if jump.rate==0, continue; end
+    if jump.rate==0
+        continue;
+    end
     included=ismember(jump.support,ids);
     if ~any(included)
         if any(ismember(jump.support,system.configuration.exterior_ids))
@@ -387,7 +473,8 @@ for k=1:numel(jumps)
         error('cce:jumpSupport','A correlated jump crosses this cluster; group its support.');
     end
     if ischar(jump.operator)
-        labels={'L+','L-','Lx','Ly','Lz'}; fields={'p','m','x','y','z'};
+        labels={'L+','L-','Lx','Ly','Lz'};
+        fields={'p','m','x','y','z'};
         field=fields{strcmp(jump.operator,labels)};
         local=system.local_operators{find(ids==jump.support,1)}.(field);
     else
@@ -397,7 +484,9 @@ for k=1:numel(jumps)
     % Embed the declared jump and inspect conditional-manifold closure
     op=embed_jump(local,jump.support,ids,system.multiplicities);
     if projected
-        left=va'*op*va; right=vb'*op*vb; loss=op'*op;
+        left=va'*op*va;
+        right=vb'*op*vb;
+        loss=op'*op;
         leakage=norm(op*va-va*left,'fro')+norm(op*vb-vb*right,'fro');
         loss_leakage=norm(loss*va-va*(va'*loss*va),'fro')+...
                      norm(loss*vb-vb*(vb'*loss*vb),'fro');
@@ -405,7 +494,8 @@ for k=1:numel(jumps)
             error('cce:capability','A jump must preserve both projected manifolds.');
         end
     else
-        left=op; right=op;
+        left=op;
+        right=op;
     end
 
     % Accumulate the GKSL gain and both anticommutator loss terms
@@ -422,15 +512,19 @@ end
 function op=embed_jump(local,support,ids,dims)
 
 % Reorder a support-first tensor product into retained physical-spin order
-[~,positions]=ismember(support,ids); rest=setdiff(1:numel(ids),positions,'stable');
-order=[positions rest]; ordered_dims=dims(order);
+[~,positions]=ismember(support,ids);
+rest=setdiff(1:numel(ids),positions,'stable');
+order=[positions rest];
+ordered_dims=dims(order);
 if isscalar(dims)
-    op=local; return
+    op=local;
+    return
 end
 labels=reshape(1:prod(dims),fliplr(ordered_dims));
 [~,inverse]=sort(order);
 labels=permute(labels,numel(dims)+1-fliplr(inverse));
-labels=labels(:); source=kron(local,eye(prod(dims(rest))));
+labels=labels(:);
+source=kron(local,eye(prod(dims(rest))));
 op=source(labels,labels);
 
 end
@@ -441,14 +535,19 @@ function op=embed(local,position,dims)
 % Form the ordered product with identities on all other spins
 op=1;
 for k=1:numel(dims)
-    if k==position, op=kron(op,local); else, op=kron(op,eye(dims(k))); end
+    if k==position
+        op=kron(op,local);
+    else
+        op=kron(op,eye(dims(k)));
+    end
 end
 
 end
 
 % Select one local Cartesian spin operator without repeated full embeddings
 function op=pauli_axis(dimension,axis)
-local=pauli(dimension); op=local.(axis);
+local=pauli(dimension);
+op=local.(axis);
 end
 
 % Reject allocations exceeding the declared retained-space budget
@@ -485,10 +584,14 @@ if ~ischar(parameters.cce.backend)||~isrow(parameters.cce.backend)||...
 end
 if isfield(parameters,'bath_jumps')
     jumps=parameters.bath_jumps;
-    if ~isstruct(jumps), error('cce_options:jumps','bath_jumps must be a structure array.'); end
-    model=system.model; selected=[model.observed_ids model.bath_ids];
+    if ~isstruct(jumps)
+        error('cce_options:jumps','bath_jumps must be a structure array.');
+    end
+    model=system.model;
+    selected=[model.observed_ids model.bath_ids];
     for k=1:numel(jumps)
-        jump=jumps(k); required={'support','operator','rate'};
+        jump=jumps(k);
+        required={'support','operator','rate'};
         unknown=setdiff(fieldnames(jump),required);
         if ~isempty(unknown)
             error('cce_options:unknown','Unknown bath_jumps field: %s.',unknown{1});

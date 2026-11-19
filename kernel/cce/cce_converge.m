@@ -41,64 +41,92 @@ function [answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence
 
 % Reject shared checkpoints before evaluating any independent refinement
 grumble(spin_system,parameters,pulse_sequence,assumptions);
-control=parameters.cce.convergence; baseline=parameters;
+control=parameters.cce.convergence;
+baseline=parameters;
 baseline.cce=rmfield(baseline.cce,'convergence');
-[answer,diagnostics]=clexpn(spin_system,pulse_sequence,baseline,assumptions); work=1;
+[answer,diagnostics]=clexpn(spin_system,pulse_sequence,baseline,assumptions);
+work=1;
 model=struct('multiplicities',spin_system.comp.mults,'observed_ids',parameters.observed);
 audit=cce_diagnostics(model,diagnostics.raw,diagnostics.reduction,diagnostics.parameters);
 capacity=sum(arrayfun(@(x) numel(x.values)-1,control.ladders));
-if isfield(control,'checks'), capacity=capacity+numel(control.checks); end
+if isfield(control,'checks')
+    capacity=capacity+numel(control.checks);
+end
 report=repmat(struct('field','','step',0,'difference',Inf,'scaled_difference',Inf,...
                      'coverage',false,'numerical_error',Inf,'sampling_error',Inf,...
-                     'passed',false),1,capacity); recorded=0;
-all_pass=audit.acceptable; limited=false;
+                     'passed',false),1,capacity);
+recorded=0;
+all_pass=audit.acceptable;
+limited=false;
 for k=1:numel(control.ladders)
 
     % Evaluate successive levels of this independent approximation ladder
-    ladder=control.ladders(k); passed=true;
+    ladder=control.ladders(k);
+    passed=true;
     for j=2:numel(ladder.values)
-        if work>=control.max_work, limited=true; break; end
+        if work>=control.max_work
+            limited=true;
+            break;
+        end
 
         % Change exactly one declared approximation using common samples
-        trial=baseline; pieces=strsplit(ladder.field,'.');
+        trial=baseline;
+        pieces=strsplit(ladder.field,'.');
         trial=setfield(trial,pieces{:},ladder.values{j});
         if strcmp(ladder.field,'cce.order')
             trial.cce.order=min(trial.cce.order,numel(diagnostics.bath_ids));
         end
-        [current,details]=clexpn(spin_system,pulse_sequence,trial,assumptions); work=work+1;
+        [current,details]=clexpn(spin_system,pulse_sequence,trial,assumptions);
+        work=work+1;
         current_audit=cce_diagnostics(model,details.raw,details.reduction,details.parameters);
         entry=compare(answer,diagnostics,current,details,audit,current_audit,control,ladder.field,j);
-        recorded=recorded+1; report(recorded)=entry; passed=passed&&entry.passed;
+        recorded=recorded+1;
+        report(recorded)=entry;
+        passed=passed&&entry.passed;
     end
     all_pass=all_pass&&passed;
-    if limited, break; end
+    if limited
+        break;
+    end
 
 end
 
 % Assess held-out choices separately instead of reusing pilot samples
 if isfield(control,'checks')&&~limited
     for k=1:numel(control.checks)
-        if work>=control.max_work, limited=true; break; end
-        trial=baseline; override=control.checks{k}; fields=fieldnames(override);
+        if work>=control.max_work
+            limited=true;
+            break;
+        end
+        trial=baseline;
+        override=control.checks{k};
+        fields=fieldnames(override);
         for j=1:numel(fields)
             if strcmp(fields{j},'cce')
                 controls=fieldnames(override.cce);
-                for n=1:numel(controls), trial.cce.(controls{n})=override.cce.(controls{n}); end
+                for n=1:numel(controls)
+                    trial.cce.(controls{n})=override.cce.(controls{n});
+                end
             else
                 trial.(fields{j})=override.(fields{j});
             end
         end
-        [current,details]=clexpn(spin_system,pulse_sequence,trial,assumptions); work=work+1;
+        [current,details]=clexpn(spin_system,pulse_sequence,trial,assumptions);
+        work=work+1;
         current_audit=cce_diagnostics(model,details.raw,details.reduction,details.parameters);
         entry=compare(answer,diagnostics,current,details,audit,current_audit,control,'independent_check',k);
-        recorded=recorded+1; report(recorded)=entry; all_pass=all_pass&&entry.passed;
+        recorded=recorded+1;
+        report(recorded)=entry;
+        all_pass=all_pass&&entry.passed;
     end
 end
 
 % Report resource exhaustion distinctly from a failed or accepted ladder
 diagnostics.convergence='not_converged';
 if limited, diagnostics.convergence='limit_reached';
-elseif all_pass, diagnostics.convergence='converged'; end
+elseif all_pass
+    diagnostics.convergence='converged';
+end
 diagnostics.input_parameters=parameters;
 diagnostics.convergence_report=struct('comparisons',report(1:recorded),'work',work,...
                                       'max_work',control.max_work,'complete_coverage',audit.complete_coverage,...
@@ -115,7 +143,10 @@ function entry=compare(previous,prior,current,details,audit,current_audit,contro
 coverage=numel(shared)==numel(prior.parameters.times)&&...
          audit.acceptable&&current_audit.acceptable;
 if isempty(shared)||size(previous,2)~=size(current,2)
-    difference=Inf; scaled=Inf; numerical=Inf; sampling=Inf;
+    difference=Inf;
+    scaled=Inf;
+    numerical=Inf;
+    sampling=Inf;
 else
     delta=abs(previous(ia,:)-current(ib,:));
     budget=control.atol+control.rtol*max(abs(previous(ia,:)),abs(current(ib,:)));
@@ -125,9 +156,12 @@ else
                  [],'all','includemissing');
     difference=max(delta,[],'all');
     total=delta+prior.reduction.abs_error_bound(ia,:)+details.reduction.abs_error_bound(ib,:);
-    ratio=total./budget; ratio(total==0&budget==0)=0;
+    ratio=total./budget;
+    ratio(total==0&budget==0)=0;
     scaled=max(ratio,[],'all');
-    if any(~isfinite(delta),'all')||any(~isfinite(ratio),'all'), scaled=Inf; end
+    if any(~isfinite(delta),'all')||any(~isfinite(ratio),'all')
+        scaled=Inf;
+    end
 end
 entry=struct('field',field,'step',step,'difference',difference,...
              'scaled_difference',scaled,'coverage',coverage,...
@@ -219,7 +253,9 @@ if any(strcmp({control.ladders.field},'cce.bath_state.samples'))
                 check.cce.bath_state.seed~=parameters.cce.bath_state.seed);
         end
     end
-    if ~held_out, error('cce_converge:sampling','Sampling ladders require an independent seed check.'); end
+    if ~held_out
+        error('cce_converge:sampling','Sampling ladders require an independent seed check.');
+    end
 end
 end
 

@@ -47,7 +47,8 @@ if isfield(parameters,'groups')&&~isempty(parameters.groups)
 else
     groups=num2cell(sort(graph.bath_ids));
 end
-ng=numel(groups); max_order=min(parameters.order,ng);
+ng=numel(groups);
+max_order=min(parameters.order,ng);
 
 % Disjoint families contain single groups or inter-group pairs
 if strcmp(parameters.expansion,'disjoint')
@@ -61,11 +62,14 @@ budget=Inf;
 if isfield(parameters,'numerics')&&isfield(parameters.numerics,'max_memory_bytes')
     budget=parameters.numerics.max_memory_bytes;
 end
-prototype={[]}; metadata=whos('prototype');
-family_bytes=metadata.bytes/numel(prototype)+8*(max_order+1); check_storage(ng);
+prototype={[]};
+metadata=whos('prototype');
+family_bytes=metadata.bytes/numel(prototype)+8*(max_order+1);
+check_storage(ng);
 
 % Collapse physical graph edges and scores onto group vertices
-adjacency=false(ng); scores=zeros(ng);
+adjacency=false(ng);
+scores=zeros(ng);
 for a=1:ng
     for b=a+1:ng
 
@@ -74,7 +78,8 @@ for a=1:ng
         [~,ib]=ismember(groups{b},graph.bath_ids);
         adjacency(a,b)=any(graph.adjacency(ia,ib),'all');
         adjacency(b,a)=adjacency(a,b);
-        scores(a,b)=sum(graph.scores(ia,ib),'all'); scores(b,a)=scores(a,b);
+        scores(a,b)=sum(graph.scores(ia,ib),'all');
+        scores(b,a)=scores(a,b);
 
     end
 end
@@ -85,7 +90,8 @@ if explicit
     check_storage(numel(parameters.clusters));
     family=parameters.clusters(:);
 else
-    family=cell(0,1); frontier=(1:ng).';
+    family=cell(0,1);
+    frontier=(1:ng).';
     for order=1:max_order
 
         % Store this order before expanding its graph frontier
@@ -111,13 +117,17 @@ else
 end
 
 % Select capped candidates by descending score and lexicographic ties
-selected=cell(0,1); selected_counts=zeros(1,max_order);
+selected=cell(0,1);
+selected_counts=zeros(1,max_order);
 for order=1:max_order
 
     % A singleton score is its total incident coupling score
     candidates=family(cellfun(@numel,family)==order);
-    if isempty(candidates), continue; end
-    rows=vertcat(candidates{:}); weights=zeros(size(rows,1),1);
+    if isempty(candidates)
+        continue;
+    end
+    rows=vertcat(candidates{:});
+    weights=zeros(size(rows,1),1);
     for k=1:size(rows,1)
         if order==1
             weights(k)=sum(scores(rows(k,:),:),'all');
@@ -125,7 +135,8 @@ for order=1:max_order
             weights(k)=sum(scores(rows(k,:),rows(k,:)),'all')/2;
         end
     end
-    [~,permutation]=sortrows([-weights rows]); candidates=candidates(permutation);
+    [~,permutation]=sortrows([-weights rows]);
+    candidates=candidates(permutation);
 
     % Apply selection caps before adding all missing subsets
     count=numel(candidates);
@@ -156,7 +167,8 @@ for order=max_order:-1:2
         for k=1:numel(family)
             padded(k,1:numel(family{k})+1)=[numel(family{k}) family{k}];
         end
-        [~,indices]=unique(padded,'rows'); family=family(indices);
+        [~,indices]=unique(padded,'rows');
+        family=family(indices);
     end
 
 end
@@ -166,7 +178,8 @@ padded=zeros(numel(family),max_order+1);
 for k=1:numel(family)
     padded(k,1:numel(family{k})+1)=[numel(family{k}) family{k}];
 end
-[~,permutation]=sortrows(padded); family=family(permutation);
+[~,permutation]=sortrows(padded);
+family=family(permutation);
 
 % Bound decimal family signatures, including old/new concatenation copies
 physical_digits=1;
@@ -174,7 +187,9 @@ if ~isempty(model.physical_ids)
     physical_digits=1+floor(log10(max(model.physical_ids)));
 end
 group_digits=1;
-if ng>0, group_digits=1+floor(log10(ng)); end
+if ng>0
+    group_digits=1+floor(log10(ng));
+end
 characters=(physical_digits+1)*numel(model.bath_ids)+2*ng+1+...
            (group_digits+1)*sum(cellfun(@numel,family))+2*numel(family);
 if ~isfinite(characters)||6*characters>budget
@@ -198,7 +213,9 @@ end
 cap_overrun=zeros(1,max_order);
 if isfield(parameters,'cluster_cap')&&~all(isinf(parameters.cluster_cap))
     cap=parameters.cluster_cap;
-    if isscalar(cap), cap=repmat(cap,1,max_order); end
+    if isscalar(cap)
+        cap=repmat(cap,1,max_order);
+    end
     cap_overrun=max(0,actual_counts-cap(1:max_order));
 end
 
@@ -226,8 +243,10 @@ for k=1:numel(family)
     % Map group unions to physical Hilbert dimensions
     sites=sort([groups{family{k}}]);
     [~,positions]=ismember(sites,model.physical_ids);
-    clusters(k).id=uint64(k); clusters(k).groups=family{k};
-    clusters(k).sites=sites; clusters(k).order=numel(family{k});
+    clusters(k).id=uint64(k);
+    clusters(k).groups=family{k};
+    clusters(k).sites=sites;
+    clusters(k).order=numel(family{k});
     clusters(k).bath_dimension=prod(model.multiplicities(positions));
     clusters(k).dimension=observed_dimension*clusters(k).bath_dimension;
     if ~isfinite(clusters(k).dimension)||clusters(k).dimension>flintmax
@@ -248,14 +267,18 @@ for k=1:numel(family)
     clusters(k).weight=sum(scores(family{k},family{k}),'all')/2;
 
     % Label actual graph components without assuming factorisation
-    unseen=family{k}; components=cell(0,1);
+    unseen=family{k};
+    components=cell(0,1);
     while ~isempty(unseen)
-        component=unseen(1); changed=true;
+        component=unseen(1);
+        changed=true;
         while changed
             expanded=union(component,intersect(family{k},find(any(adjacency(component,:),1))));
-            changed=numel(expanded)>numel(component); component=expanded;
+            changed=numel(expanded)>numel(component);
+            component=expanded;
         end
-        components{end+1,1}=component; unseen=setdiff(unseen,component); %#ok<AGROW>
+        components{end+1,1}=component; %#ok<AGROW>
+        unseen=setdiff(unseen,component);
     end
     clusters(k).connected_components=components;
 
@@ -346,8 +369,12 @@ else
     ng=n;
 end
 limit=parameters.order;
-if strcmp(parameters.expansion,'disjoint'), limit=min(limit,1); end
-if strcmp(parameters.expansion,'disjoint_inter'), limit=min(limit,2); end
+if strcmp(parameters.expansion,'disjoint')
+    limit=min(limit,1);
+end
+if strcmp(parameters.expansion,'disjoint_inter')
+    limit=min(limit,2);
+end
 if isfield(parameters,'clusters')&&~isempty(parameters.clusters)
     if ~iscell(parameters.clusters)
         error('cce_clusters:explicit','explicit clusters must be cell rows of group IDs.');

@@ -26,15 +26,22 @@ function A=cce_operator(cluster_system,operators,spins)
 
 % Check the view, descriptor shape, and explicit tensor-product selections
 grumble(cluster_system,operators,spins);
-if ischar(operators), operators={operators}; spins={spins}; end
+if ischar(operators)
+    operators={operators};
+    spins={spins};
+end
 
 % Check dense-equivalent storage before any retained-system allocation
-d=cluster_system.dimension; power=2;
-if strcmp(cluster_system.formalism,'zeeman-liouv'), power=4; end
+d=cluster_system.dimension;
+power=2;
+if strcmp(cluster_system.formalism,'zeeman-liouv')
+    power=4;
+end
 if 16*d^power>cluster_system.model.numerics.max_memory_bytes
     error('cce_operator:memory','Requested representation exceeds the memory budget.');
 end
-A=speye(d); labels={'E','Lx','Ly','Lz','L+','L-'};
+A=speye(d);
+labels={'E','Lx','Ly','Lz','L+','L-'};
 fields={'u','x','y','z','p','m'};
 for n=1:numel(operators)
 
@@ -77,7 +84,10 @@ if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
    ~ismember(system.formalism,{'zeeman-hilb','zeeman-liouv'})
     error('cce_operator:system','Use a supported cce_subsystem view.');
 end
-if ischar(operators)&&isrow(operators), operators={operators}; spins={spins}; end
+if ischar(operators)&&isrow(operators)
+    operators={operators};
+    spins={spins};
+end
 if ~iscell(operators)||~isrow(operators)||isempty(operators)||...
    ~all(cellfun(@(label)ischar(label)&&isrow(label),operators))||...
    ~iscell(spins)||~isequal(size(operators),size(spins))
@@ -90,7 +100,9 @@ for n=1:numel(operators)
             ids=system.physical_ids;
         else
             ids=system.physical_ids(strcmp(system.isotopes,ids));
-            if isempty(ids), error('cce_operator:spins','No retained spin has this isotope.'); end
+            if isempty(ids)
+                error('cce_operator:spins','No retained spin has this isotope.');
+            end
         end
     end
     if ~isnumeric(ids)||~isreal(ids)||isempty(ids)||~isrow(ids)||...

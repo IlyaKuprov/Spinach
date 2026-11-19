@@ -38,22 +38,39 @@ function [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,n
 
 % Reject unsupported representation/output pairs before propagation
 grumble(cluster_system,L,coil,rho,timestep,nsteps,output);
-projected=isstruct(L); hilbert=~projected&&strcmp(cluster_system.formalism,'zeeman-hilb');
-if projected, d=cluster_system.bath_dimension; else, d=cluster_system.dimension; end
-if iscell(coil), coils=coil; else, coils={coil}; end
+projected=isstruct(L);
+hilbert=~projected&&strcmp(cluster_system.formalism,'zeeman-hilb');
+if projected
+    d=cluster_system.bath_dimension;
+else
+    d=cluster_system.dimension;
+end
+if iscell(coil)
+    coils=coil;
+else
+    coils={coil};
+end
 
 % Bound resident propagators and requested output before allocation
 elements=numel(rho);
-if strcmp(output,'trajectory'), elements=elements*(nsteps+1); end
-if strcmp(output,'observable'), elements=numel(coils)*(nsteps+1); end
+if strcmp(output,'trajectory')
+    elements=elements*(nsteps+1);
+end
+if strcmp(output,'observable')
+    elements=numel(coils)*(nsteps+1);
+end
 bytes=16*(12*d^2+elements);
-if ~hilbert&&(~projected||~isempty(L.dissipator)), bytes=bytes+16*4*d^4; end
+if ~hilbert&&(~projected||~isempty(L.dissipator))
+    bytes=bytes+16*4*d^4;
+end
 if bytes>cluster_system.model.parameters.cce.numerics.max_memory_bytes
     error('cce:memory','Propagation exceeds max_memory_bytes.');
 end
 
 % Keep the established eigenvalue propagation for coherent retained systems
-if ~projected&&~hilbert, L=full(L); end
+if ~projected&&~hilbert
+    L=full(L);
+end
 if projected
     [va,ea]=eig(full((L.left+L.left')/2),'vector');
     [vb,eb]=eig(full((L.right+L.right')/2),'vector');
@@ -80,7 +97,9 @@ switch output
         answer=rho;
 end
 steps=0:nsteps;
-if strcmp(output,'final'), steps=nsteps; end
+if strcmp(output,'final')
+    steps=nsteps;
+end
 
 % Estimate state roundoff using the CCE segment arithmetic models
 if nargout>1
@@ -89,9 +108,14 @@ if nargout>1
         frequency=norm(L.left,1)+norm(L.right,1);
         roundoff=16*d^3*eps;
     elseif hilbert
-        frequency=2*norm(L,1); roundoff=16*d^3*eps;
+        frequency=2*norm(L,1);
+        roundoff=16*d^3*eps;
     else
-        if projected, frequency=norm(generator,1); else, frequency=norm(L,1); end
+        if projected
+            frequency=norm(generator,1);
+        else
+            frequency=norm(L,1);
+        end
         roundoff=64*d^2*eps;
     end
     state_error=roundoff*norm(rho,'fro')*((elapsed>0)+elapsed*frequency);
@@ -108,7 +132,8 @@ for step=steps
         if isempty(L.dissipator)
             ua=va*diag(exp(-1i*ea*time))*va';
             ub=vb*diag(exp(-1i*eb*time))*vb';
-            state=ua*reshape(rho,d,d)*ub'; state=state(:);
+            state=ua*reshape(rho,d,d)*ub';
+            state=state(:);
         else
             state=expm(generator*time)*rho;
         end
@@ -126,7 +151,11 @@ for step=steps
                 answer(step+1,k)=coils{k}(:)'*state(:);
             end
         case 'trajectory'
-            if hilbert, answer(:,:,step+1)=state; else, answer(:,step+1)=state; end
+            if hilbert
+                answer(:,:,step+1)=state;
+            else
+                answer(:,step+1)=state;
+            end
         case 'total'
             answer=answer+state;
         case 'final'
@@ -171,7 +200,8 @@ if isstruct(L)
        (~isequal(size(L.dissipator),[d^2 d^2])||any(~isfinite(L.dissipator),'all')))
         error('cce_evolution:branches','Projected branch dimensions must match the bath block.');
     end
-    hermitian(L.left); hermitian(L.right);
+    hermitian(L.left);
+    hermitian(L.right);
 elseif strcmp(system.formalism,'zeeman-hilb')
     d=system.dimension;
     if ~isnumeric(L)||any(~isfinite(L),'all')||~isequal(size(L),[d d])||...
@@ -189,7 +219,9 @@ else
     error('cce_evolution:formalism','Only complete Zeeman representations are supported.');
 end
 if strcmp(output,'observable')
-    if ~iscell(coil), coil={coil}; end
+    if ~iscell(coil)
+        coil={coil};
+    end
     if isempty(coil)||~all(cellfun(@(x)isnumeric(x)&&numel(x)==d^2&&...
                                  all(isfinite(x),'all'),coil))
         error('cce_evolution:coil','Every detector must match the propagated state.');

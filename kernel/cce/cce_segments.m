@@ -34,21 +34,31 @@ grumble(system,parameters,drift,events);
 positions=zeros(numel(events),numel(parameters.times));
 for k=1:numel(events)
     if strcmp(events(k).placement,'fraction'), positions(k,:)=events(k).at*parameters.times;
-    else, positions(k,:)=events(k).at; end
+    else
+        positions(k,:)=events(k).at;
+    end
 end
 schedule=struct('events',events,'positions',positions,'times',parameters.times);
 segments=struct('schedule',schedule);
 
 % Bound retained segment matrices and exterior values before allocating operators
-model=system.model; sites=system.sites; spin_config=system.configuration;
-ids=system.physical_ids; dimension=system.dimension;
-events=schedule.events; segment_count=0;
+model=system.model;
+sites=system.sites;
+spin_config=system.configuration;
+ids=system.physical_ids;
+dimension=system.dimension;
+events=schedule.events;
+segment_count=0;
 for k=1:numel(schedule.times)
 
     % Count distinct event boundaries without retaining any dense operator
-    t=schedule.times(k); starts=schedule.positions(:,k); stops=starts;
+    t=schedule.times(k);
+    starts=schedule.positions(:,k);
+    stops=starts;
     for j=1:numel(events)
-        if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
+        if strcmp(events(j).type,'finite')
+            stops(j)=starts(j)+events(j).duration;
+        end
     end
     segment_count=segment_count+numel(unique([0;t;starts(starts>0&starts<t);stops(stops>0&stops<t)]));
 
@@ -56,8 +66,11 @@ end
 
 % Reserve sparse complex Hamiltonians, dense pulses, and exterior expectations
 retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
-dc=prod(model.multiplicities(model.observed_ids)); components=1;
-if isfield(parameters,'output')&&strcmp(parameters.output,'density'), components=dc^2; end
+dc=prod(model.multiplicities(model.observed_ids));
+components=1;
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')
+    components=dc^2;
+end
 if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&...
    isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
@@ -70,28 +83,44 @@ end
 
 % Build the Hamiltonian metadata only after the retained-storage check
 operators=parameters.cce_aux.operators;
-segments.durations=cell(size(schedule.times)); segments.hamiltonians=cell(size(schedule.times));
-segments.pulses=cell(size(schedule.times)); segments.exterior_expectations=cell(size(schedule.times));
+segments.durations=cell(size(schedule.times));
+segments.hamiltonians=cell(size(schedule.times));
+segments.pulses=cell(size(schedule.times));
+segments.exterior_expectations=cell(size(schedule.times));
 for t=1:numel(schedule.times)
 
     % Split at all ideal, drive-start, and drive-stop events inside this duration
-    total=schedule.times(t); starts=schedule.positions(:,t); stops=starts;
+    total=schedule.times(t);
+    starts=schedule.positions(:,t);
+    stops=starts;
     for j=1:numel(events)
-        if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
+        if strcmp(events(j).type,'finite')
+            stops(j)=starts(j)+events(j).duration;
+        end
     end
     boundaries=unique([0;total;starts(starts>0&starts<total);stops(stops>0&stops<total)]);
-    expectations=spin_config.expectations; states=spin_config.bath_rho;
-    durations=zeros(1,numel(boundaries)); hamiltonians=cell(size(durations));
-    pulses=cell(size(durations)); exterior_values=cell(size(durations));
+    expectations=spin_config.expectations;
+    states=spin_config.bath_rho;
+    durations=zeros(1,numel(boundaries));
+    hamiltonians=cell(size(durations));
+    pulses=cell(size(durations));
+    exterior_values=cell(size(durations));
     for b=1:numel(boundaries)
 
         % Build the left-limit Hamiltonian for the interval ending here
-        if b==1, left=0; else, left=boundaries(b-1); end
-        right=boundaries(b); ham_config=spin_config;
+        if b==1
+            left=0;
+        else
+            left=boundaries(b-1);
+        end
+        right=boundaries(b);
+        ham_config=spin_config;
         if strcmp(parameters.cce.meanfield,'static')
             ham_config.bath_rho=states;
             for field={'expectations','exterior_ids','exterior_expectations'}
-                if isfield(ham_config,field{1}), ham_config=rmfield(ham_config,field{1}); end
+                if isfield(ham_config,field{1})
+                    ham_config=rmfield(ham_config,field{1});
+                end
             end
             [current,~]=cce_subsystem(model,sites,ham_config,[]);
             [H,~,~]=cce_generators(current,parameters,[]);
@@ -103,7 +132,8 @@ for t=1:numel(schedule.times)
             if ~strcmp(events(j).type,'finite')||midpoint<starts(j)||midpoint>=stops(j)||right==left
                 continue;
             end
-            event=events(j); outside=setdiff(event.target,ids);
+            event=events(j);
+            outside=setdiff(event.target,ids);
             if ~isempty(outside)&&strcmp(parameters.cce.meanfield,'static')
                 error('cce_segments:exterior_finite','Finite exterior pulses require dynamical exterior spins.');
             end
@@ -112,8 +142,11 @@ for t=1:numel(schedule.times)
             end
             axis=axis_vector(event.axis);
             for id=reshape(intersect(event.target,ids,'stable'),1,[])
-                pos=ids==id; drive=zeros(dimension);
-                for a=1:3, drive=drive+axis(a)*operators{ids==id,a}; end
+                pos=ids==id;
+                drive=zeros(dimension);
+                for a=1:3
+                    drive=drive+axis(a)*operators{ids==id,a};
+                end
                 H=H+event.amplitude*drive+event.detuning*operators{pos,3};
             end
         end
@@ -124,7 +157,9 @@ for t=1:numel(schedule.times)
             indices=find(starts==right);
             for j=reshape(indices,1,[])
                 event=events(j);
-                if ~strcmp(event.type,'ideal'), continue; end
+                if ~strcmp(event.type,'ideal')
+                    continue;
+                end
                 exterior=intersect(event.target,setdiff(spin_config.bath_ids,sites));
                 if isfield(event,'operator')&&~isempty(event.operator)
 
@@ -138,32 +173,56 @@ for t=1:numel(schedule.times)
                     end
 
                     % Embed the selective operator in the retained tensor order
-                    if any(~ismember(event.target,ids)), error('Selective operator targets must be retained.'); end
+                    if any(~ismember(event.target,ids))
+                        error('Selective operator targets must be retained.');
+                    end
                     slots=arrayfun(@(id) find(ids==id),event.target);
-                    rest=setdiff(1:numel(ids),slots,'stable'); order=[slots rest];
-                    dims=model.multiplicities(ids); d=prod(dims);
-                    base=kron(event.operator,eye(prod(dims(rest)))); map=zeros(d,1);
+                    rest=setdiff(1:numel(ids),slots,'stable');
+                    order=[slots rest];
+                    dims=model.multiplicities(ids);
+                    d=prod(dims);
+                    base=kron(event.operator,eye(prod(dims(rest))));
+                    map=zeros(d,1);
                     for k=0:d-1
-                        digits=zeros(1,numel(dims)); remainder=k;
-                        for q=numel(dims):-1:1, digits(q)=mod(remainder,dims(q)); remainder=floor(remainder/dims(q)); end
+                        digits=zeros(1,numel(dims));
+                        remainder=k;
+                        for q=numel(dims):-1:1
+                            digits(q)=mod(remainder,dims(q));
+                            remainder=floor(remainder/dims(q));
+                        end
                         index=0;
-                        for q=order, index=index*dims(q)+digits(q); end
+                        for q=order
+                            index=index*dims(q)+digits(q);
+                        end
                         map(k+1)=index+1;
                     end
                     P=base(map,map);
-                    scale=1; if isfield(event,'angle')&&~isempty(event.angle), scale=event.angle; end
+                    scale=1;
+                    if isfield(event,'angle')&&~isempty(event.angle)
+                        scale=event.angle;
+                    end
                     pulse=expm(-1i*scale*P)*pulse;
                 else
-                    axis=axis_vector(event.axis); generator=zeros(dimension);
+                    axis=axis_vector(event.axis);
+                    generator=zeros(dimension);
                     for id=reshape(intersect(event.target,ids,'stable'),1,[])
-                        for a=1:3, generator=generator+axis(a)*operators{ids==id,a}; end
+                        for a=1:3
+                            generator=generator+axis(a)*operators{ids==id,a};
+                        end
                     end
                     pulse=expm(-1i*event.angle*generator)*pulse;
                     for id=reshape(exterior,1,[])
-                        pos=find(spin_config.bath_ids==id); spin=pauli(model.multiplicities(id)); x=spin.x; y=spin.y; z=spin.z;
-                        ops={x,y,z}; P=expm(-1i*event.angle*(axis(1)*x+axis(2)*y+axis(3)*z));
+                        pos=find(spin_config.bath_ids==id);
+                        spin=pauli(model.multiplicities(id));
+                        x=spin.x;
+                        y=spin.y;
+                        z=spin.z;
+                        ops={x,y,z};
+                        P=expm(-1i*event.angle*(axis(1)*x+axis(2)*y+axis(3)*z));
                         states{pos}=P*states{pos}*P';
-                        for a=1:3, expectations(pos,a)=real(trace(states{pos}*ops{a})); end
+                        for a=1:3
+                            expectations(pos,a)=real(trace(states{pos}*ops{a}));
+                        end
                     end
 
                 end
@@ -171,12 +230,16 @@ for t=1:numel(schedule.times)
         end
 
         % Store the interval and post-pulse exterior state without hidden averaging
-        durations(b)=right-left; hamiltonians{b}=H; pulses{b}=pulse;
+        durations(b)=right-left;
+        hamiltonians{b}=H;
+        pulses{b}=pulse;
         exterior_values{b}=expectations;
 
     end
-    segments.durations{t}=durations; segments.hamiltonians{t}=hamiltonians;
-    segments.pulses{t}=pulses; segments.exterior_expectations{t}=exterior_values;
+    segments.durations{t}=durations;
+    segments.hamiltonians{t}=hamiltonians;
+    segments.pulses{t}=pulses;
+    segments.exterior_expectations{t}=exterior_values;
 
 end
 
@@ -185,7 +248,8 @@ end
 % Convert validated axes into real Cartesian vectors
 function axis=axis_vector(value)
 if ischar(value)
-    axis=zeros(1,3); axis('xyz'==value)=1;
+    axis=zeros(1,3);
+    axis('xyz'==value)=1;
 else
     axis=reshape(value,1,3);
 end
@@ -233,7 +297,9 @@ for event=events
     end
     if ~isfield(event,'operator')||isempty(event.operator)
         axis=event.axis;
-        if ischar(axis)&&ismember(axis,{'x','y','z'}), axis=double('xyz'==axis); end
+        if ischar(axis)&&ismember(axis,{'x','y','z'})
+            axis=double('xyz'==axis);
+        end
         if ~isnumeric(axis)||~isreal(axis)||~isequal(size(axis),[1 3])||...
            any(~isfinite(axis))||abs(norm(axis)-1)>3*eps
             error('cce_segments:axis','Supply a Cartesian label or a real unit axis.');

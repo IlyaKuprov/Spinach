@@ -36,7 +36,8 @@
 function [answer,diagnostics]=orientation_average(spin_system,task,parameters)
 
 % Validate the request before resolving its named quadrature
-grumble(spin_system,task,parameters); started=tic;
+grumble(spin_system,task,parameters);
+started=tic;
 if ischar(parameters.grid)
     grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',parameters.grid),...
               'alphas','betas','gammas','weights');
@@ -47,10 +48,15 @@ end
 % Validate the descriptor and resolved quadrature before any nested calculation
 grumble(spin_system,task,struct('grid',grid));
 fields={'alphas','betas','gammas','weights'};
-for n=1:numel(fields), grid.(fields{n})=double(grid.(fields{n})(:)); end
+for n=1:numel(fields)
+    grid.(fields{n})=double(grid.(fields{n})(:));
+end
 keep=grid.weights>0;
-for n=1:numel(fields), grid.(fields{n})=grid.(fields{n})(keep); end
-grid.weights=grid.weights/sum(grid.weights); count=numel(grid.weights);
+for n=1:numel(fields)
+    grid.(fields{n})=grid.(fields{n})(keep);
+end
+grid.weights=grid.weights/sum(grid.weights);
+count=numel(grid.weights);
 if count>1&&isfield(task.parameters,'cce')&&isfield(task.parameters.cce,'checkpoint')
     error('orientation_average:checkpoint',...
           'Checkpoint files require exactly one positive-weight orientation.');
@@ -64,7 +70,8 @@ if ~isempty(getCurrentTask())
 end
 
 % Run independently rotated physical systems without a full-bath basis
-orientations=cell(1,count); values=cell(1,count);
+orientations=cell(1,count);
+values=cell(1,count);
 for n=1:count
     nested=task.parameters;
     nested.orientation=[grid.alphas(n) grid.betas(n) grid.gammas(n)];
@@ -90,7 +97,8 @@ if strcmp(parameters.cce.averaging,'internal_then_expansion')
         end
         raw=[raw records]; %#ok<AGROW>
     end
-    request=parameters; request.cce.bath_spins=orientations{1}.graph.bath_ids;
+    request=parameters;
+    request.cce.bath_spins=orientations{1}.graph.bath_ids;
     reduction=cce_reduce(raw,orientations{1}.clusters,request);
 
     % Quadrature nodes sharing a spin draw are not independent statistical samples
@@ -112,7 +120,9 @@ else
 
     % Accumulate completed expansions and conservative absolute error bounds
     fields={'value','by_order','abs_error_bound','by_order_error'};
-    for k=1:numel(fields), reduction.(fields{k})=0*reduction.(fields{k}); end
+    for k=1:numel(fields)
+        reduction.(fields{k})=0*reduction.(fields{k});
+    end
     for n=1:count
         current=orientations{n}.reduction;
         for k=1:numel(fields)
@@ -129,7 +139,9 @@ else
     % Reuse the same sampled spin states across orientations before estimating error
     samples=reduction.samples;
     for k=1:numel(samples)
-        for j=1:numel(fields), samples{k}.(fields{j})=0*samples{k}.(fields{j}); end
+        for j=1:numel(fields)
+            samples{k}.(fields{j})=0*samples{k}.(fields{j});
+        end
         for n=1:count
             current=orientations{n}.reduction;
             if ~isequal(current.weights,reduction.weights)||numel(current.samples)~=numel(samples)
@@ -145,7 +157,9 @@ else
             samples{k}.by_order_reason(failed)=current.samples{k}.by_order_reason(failed);
         end
     end
-    for k=1:numel(samples), samples{k}.reason=samples{k}.by_order_reason(:,:,end); end
+    for k=1:numel(samples)
+        samples{k}.reason=samples{k}.by_order_reason(:,:,end);
+    end
     reduction.samples=samples;
     if numel(samples)>1&&all(abs(reduction.weights-1/numel(samples))<=eps)
         sampled=cellfun(@(x)x.value,samples,'UniformOutput',false);
@@ -154,9 +168,12 @@ else
 end
 
 % Return the numeric answer separately from orientation-resolved evidence
-answer=reduction.value; diagnostics.grid=grid;
-diagnostics.orientations=orientations; diagnostics.values=values;
-diagnostics.parameters=parameters; diagnostics.reduction=reduction;
+answer=reduction.value;
+diagnostics.grid=grid;
+diagnostics.orientations=orientations;
+diagnostics.values=values;
+diagnostics.parameters=parameters;
+diagnostics.reduction=reduction;
 diagnostics.elapsed_seconds=toc(started);
 
 end
@@ -186,7 +203,9 @@ if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'grid')||..
      isrow(parameters.grid)&&~isempty(parameters.grid)))
     error('orientation_average:grid','Supply a grid name or explicit quadrature structure.');
 end
-if ischar(parameters.grid), return; end
+if ischar(parameters.grid)
+    return;
+end
 grid=parameters.grid;
 fields={'alphas','betas','gammas','weights'};
 if ~isstruct(grid)||~isscalar(grid)||~all(isfield(grid,fields))||...

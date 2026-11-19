@@ -35,7 +35,9 @@ end
 % Select expired entries before dispatching any cleanup work
 dir_cont=dir([spin_system.sys.scratch filesep 'spinach_*']);
 dir_cont=dir_cont([dir_cont.datenum]<time_horizon);
-if isempty(dir_cont), return; end
+if isempty(dir_cont)
+    return;
+end
 report(spin_system,'cleaning up disk cache, this can take a few seconds...');
 
 % Delete anything that is out of date
@@ -45,7 +47,8 @@ parfor n=1:numel(dir_cont) % rawrrrrrrr
         try %#ok<TRYNC> - fail quietly
             dir_name=[dir_cont(n).folder filesep dir_cont(n).name];
             if ~strcmp(dir_name,pool_dir)
-                rmdir(dir_name,'s'); n_dirs_gone=n_dirs_gone+1;
+                rmdir(dir_name,'s');
+                n_dirs_gone=n_dirs_gone+1;
             end
         end
     else

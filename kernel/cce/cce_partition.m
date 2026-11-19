@@ -29,23 +29,31 @@ function partition=cce_partition(model,graph,parameters)
 grumble(model,graph,parameters);
 
 % Keep experiment parameters intact while resolving the partition controls
-native_parameters=parameters; options=parameters.cce;
+native_parameters=parameters;
+options=parameters.cce;
 parameters=struct('partition',options.partition,'graph',options.graph,...
                   'order',options.order,'numerics',options.numerics,...
                   'expansion',options.expansion,'method','gcce');
 if isfield(parameters.numerics,'propagator')
     parameters.numerics=rmfield(parameters.numerics,'propagator');
 end
-if isfield(options,'groups'), parameters.groups=options.groups; end
-if strcmp(options.approximation,'projected'), parameters.method='cce'; end
+if isfield(options,'groups')
+    parameters.groups=options.groups;
+end
+if strcmp(options.approximation,'projected')
+    parameters.method='cce';
+end
 if isfield(native_parameters,'noise')
-    parameters.method='noise'; parameters.noise=native_parameters.noise;
+    parameters.method='noise';
+    parameters.noise=native_parameters.noise;
     parameters.bath_state=options.bath_state;
 end
 
 % Canonicalise physical group membership
-p=parameters.partition; ids=graph.bath_ids;
-[~,positions]=ismember(ids,model.physical_ids); dims=model.multiplicities(positions);
+p=parameters.partition;
+ids=graph.bath_ids;
+[~,positions]=ismember(ids,model.physical_ids);
+dims=model.multiplicities(positions);
 
 % Bound dense partition graph, edge candidates, and group copies before allocation
 bytes=3*(9*numel(ids)^2+32*numel(ids)*(numel(ids)-1)/2);
@@ -57,7 +65,8 @@ groups=num2cell(ids);
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
     groups=cellfun(@sort,parameters.groups,'UniformOutput',false);
 end
-[~,order]=sort(cellfun(@min,groups)); groups=groups(order);
+[~,order]=sort(cellfun(@min,groups));
+groups=groups(order);
 diagnostics=struct('probes',0,'rounds',0,'reason','',...
                    'pilot_error',[],'heldout_error',[]);
 complete=true;
@@ -68,43 +77,64 @@ if strcmp(p.mode,'coupling')
         edges=zeros(0,4);
         for a=1:numel(groups)
             for b=a+1:numel(groups)
-                if dimension([groups{a} groups{b}],ids,dims)>p.max_dimension, continue; end
-                [~,ia]=ismember(groups{a},ids); [~,ib]=ismember(groups{b},ids);
+                if dimension([groups{a} groups{b}],ids,dims)>p.max_dimension
+                    continue;
+                end
+                [~,ia]=ismember(groups{a},ids);
+                [~,ib]=ismember(groups{b},ids);
                 strength=norm(graph.pair_norm(ia,ib),'fro');
-                if strength>0, edges(end+1,:)=[-strength min(groups{a}) a b]; end %#ok<AGROW>
+                if strength>0
+                    edges(end+1,:)=[-strength min(groups{a}) a b]; %#ok<AGROW>
+                end
             end
         end
-        if isempty(edges), break; end
-        edges=sortrows(edges,[1 2 4]); a=edges(1,3); b=edges(1,4);
-        groups{a}=sort([groups{a} groups{b}]); groups(b)=[];
+        if isempty(edges)
+            break;
+        end
+        edges=sortrows(edges,[1 2 4]);
+        a=edges(1,3);
+        b=edges(1,4);
+        groups{a}=sort([groups{a} groups{b}]);
+        groups(b)=[];
     end
 end
 
 % Assign farthest-first spatial seeds subject to exact Hilbert capacities
 if strcmp(p.mode,'spatial')&&~isempty(ids)
-    xyz=model.coordinates_A(positions,:); seeds=1;
+    xyz=model.coordinates_A(positions,:);
+    seeds=1;
     for k=2:p.group_count
         distance=inf(numel(ids),1);
         for j=seeds
             distance=min(distance,sum((xyz-xyz(j,:)).^2,2));
         end
-        distance(seeds)=-inf; [~,next]=max(distance); seeds(end+1)=next; %#ok<AGROW>
+        distance(seeds)=-inf;
+        [~,next]=max(distance);
+        seeds(end+1)=next; %#ok<AGROW>
     end
     groups=cell(1,p.group_count);
-    for k=1:p.group_count, groups{k}=ids(seeds(k)); end
+    for k=1:p.group_count
+        groups{k}=ids(seeds(k));
+    end
     for k=setdiff(1:numel(ids),seeds,'stable')
-        [~,order]=sort(sum((xyz(seeds,:)-xyz(k,:)).^2,2)); placed=false;
+        [~,order]=sort(sum((xyz(seeds,:)-xyz(k,:)).^2,2));
+        placed=false;
         for g=order.'
             if dimension([groups{g} ids(k)],ids,dims)<=p.max_dimension
-                groups{g}=sort([groups{g} ids(k)]); placed=true; break;
+                groups{g}=sort([groups{g} ids(k)]);
+                placed=true;
+                break;
             end
         end
-        if ~placed, error('cce_partition:capacity','Spatial group capacity is insufficient.'); end
+        if ~placed
+            error('cce_partition:capacity','Spatial group capacity is insufficient.');
+        end
     end
 
     % Accept only strict centroid-objective improvements within the swap budget
     for r=1:p.max_rounds
-        improved=false; old=spatial_objective(groups,ids,xyz);
+        improved=false;
+        old=spatial_objective(groups,ids,xyz);
         for a=1:numel(groups)
             for b=a+1:numel(groups)
                 for x=groups{a}
@@ -114,19 +144,32 @@ if strcmp(p.mode,'spatial')&&~isempty(ids)
                         candidate{b}=sort([setdiff(groups{b},y) x]);
                         if max(cellfun(@(g)dimension(g,ids,dims),candidate))<=p.max_dimension&&...
                            spatial_objective(candidate,ids,xyz)<old
-                            groups=candidate; improved=true; break;
+                            groups=candidate;
+                            improved=true;
+                            break;
                         end
                     end
-                    if improved, break; end
+                    if improved
+                        break;
+                    end
                 end
-                if improved, break; end
+                if improved
+                    break;
+                end
             end
-            if improved, break; end
+            if improved
+                break;
+            end
         end
         diagnostics.rounds=r;
-        if ~improved, break; end
+        if ~improved
+            break;
+        end
     end
-    if improved, complete=false; diagnostics.reason='spatial_iteration_ceiling'; end
+    if improved
+        complete=false;
+        diagnostics.reason='spatial_iteration_ceiling';
+    end
 end
 
 % Run optional fixed-pilot adaptation before freezing the production partition
@@ -134,7 +177,8 @@ adaptive=strcmp(p.mode,'adaptive')||(isfield(p,'adaptive')&&p.adaptive);
 if adaptive&&complete
 
     % Both cohorts remain resident throughout pilot selection and validation
-    pilot=p.pilot_configs; heldout=p.heldout_configs;
+    pilot=p.pilot_configs;
+    heldout=p.heldout_configs;
     metadata=whos('pilot','heldout');
     count=min(numel(p.patches)*(numel(pilot)+numel(heldout)),p.max_probes);
     bytes=sum([metadata.bytes])+3*8*count;
@@ -143,38 +187,63 @@ if adaptive&&complete
               'Pilot and held-out configurations exceed numerics.max_memory_bytes.');
     end
     [objective,errors,used,valid]=patches(groups,p.pilot_configs,0);
-    diagnostics.probes=used; diagnostics.pilot_error=errors;
+    diagnostics.probes=used;
+    diagnostics.pilot_error=errors;
     complete=valid&&objective<=1;
     for r=1:p.max_rounds
-        if complete||~valid, break; end
-        best=objective; accepted=false; selected=groups; selected_errors=errors;
+        if complete||~valid
+            break;
+        end
+        best=objective;
+        accepted=false;
+        selected=groups;
+        selected_errors=errors;
         for a=1:numel(groups)
             for b=a+1:numel(groups)
-                if dimension([groups{a} groups{b}],ids,dims)>p.max_dimension, continue; end
-                candidate=groups; candidate{a}=sort([groups{a} groups{b}]); candidate(b)=[];
+                if dimension([groups{a} groups{b}],ids,dims)>p.max_dimension
+                    continue;
+                end
+                candidate=groups;
+                candidate{a}=sort([groups{a} groups{b}]);
+                candidate(b)=[];
                 [value,candidate_errors,used,valid]=patches(candidate,p.pilot_configs,diagnostics.probes);
                 diagnostics.probes=used;
-                if ~valid, break; end
+                if ~valid
+                    break;
+                end
 
                 % Allow bounded progress through unresolved intermediate reductions
                 if value<best||(isinf(value)&&isinf(best)&&~accepted)
-                    best=value; selected=candidate; accepted=true; selected_errors=candidate_errors;
+                    best=value;
+                    selected=candidate;
+                    accepted=true;
+                    selected_errors=candidate_errors;
                 end
             end
-            if ~valid, break; end
+            if ~valid
+                break;
+            end
         end
         diagnostics.rounds=r;
-        if ~valid||~accepted, break; end
-        groups=selected; objective=best; errors=selected_errors;
-        diagnostics.pilot_error=errors; complete=objective<=1;
+        if ~valid||~accepted
+            break;
+        end
+        groups=selected;
+        objective=best;
+        errors=selected_errors;
+        diagnostics.pilot_error=errors;
+        complete=objective<=1;
     end
 
     % Require all held-out spin_configs to pass using the frozen pilot-selected groups
     if complete
         [held,errors,used,valid]=patches(groups,p.heldout_configs,diagnostics.probes);
-        diagnostics.heldout_error=errors; diagnostics.probes=used;
+        diagnostics.heldout_error=errors;
+        diagnostics.probes=used;
         complete=valid&&held<=1;
-        if ~complete, diagnostics.reason='heldout_failure_or_probe_ceiling'; end
+        if ~complete
+            diagnostics.reason='heldout_failure_or_probe_ceiling';
+        end
     else
         diagnostics.reason='patch_tolerance_or_round_probe_dimension_ceiling';
     end
@@ -182,7 +251,8 @@ if adaptive&&complete
 end
 
 % Return canonical groups and expose exhausted validation budgets explicitly
-[~,order]=sort(cellfun(@min,groups)); groups=groups(order);
+[~,order]=sort(cellfun(@min,groups));
+groups=groups(order);
 partition=struct('groups',{groups},'dimensions',cellfun(@(g)dimension(g,ids,dims),groups),...
                  'complete',complete,'diagnostics',diagnostics,'mode',p.mode);
 
@@ -190,17 +260,30 @@ partition=struct('groups',{groups},'dimensions',cellfun(@(g)dimension(g,ids,dims
 function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
 
     % Choose the same exact evaluator and group order as production
-    objective=0; errors=[]; valid=true;
-    q=parameters; q.groups=candidate; q.expansion='standard';
+    objective=0;
+    errors=[];
+    valid=true;
+    q=parameters;
+    q.groups=candidate;
+    q.expansion='standard';
 
     % Reserve checkpoint ownership for the production scheduler
-    if isfield(q,'checkpoint'), q=rmfield(q,'checkpoint'); end
-    if strcmp(parameters.expansion,'disjoint'), q.order=1; end
-    if strcmp(parameters.expansion,'disjoint_inter'), q.order=2; end
-    contract=cce_capabilities(model.pulse_sequence); evaluator=contract.evaluator;
+    if isfield(q,'checkpoint')
+        q=rmfield(q,'checkpoint');
+    end
+    if strcmp(parameters.expansion,'disjoint')
+        q.order=1;
+    end
+    if strcmp(parameters.expansion,'disjoint_inter')
+        q.order=2;
+    end
+    contract=cce_capabilities(model.pulse_sequence);
+    evaluator=contract.evaluator;
     schedule=struct('pulse_sequence',model.pulse_sequence,'contract',contract);
-    evaluation=native_parameters; evaluation.cce.groups=q.groups;
-    evaluation.cce.order=q.order; evaluation.cce.expansion=q.expansion;
+    evaluation=native_parameters;
+    evaluation.cce.groups=q.groups;
+    evaluation.cce.order=q.order;
+    evaluation.cce.expansion=q.expansion;
     if isfield(evaluation.cce,'checkpoint')
         evaluation.cce=rmfield(evaluation.cce,'checkpoint');
     end
@@ -209,9 +292,12 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
     for n=1:numel(p.patches)
         sites=p.patches{n};
         if dimension(sites,ids,dims)>p.max_dimension
-            valid=false; objective=inf; return;
+            valid=false;
+            objective=inf;
+            return;
         end
-        local=q; local.bath_spins=sites;
+        local=q;
+        local.bath_spins=sites;
         local.groups=cellfun(@(g)intersect(g,sites),candidate,'UniformOutput',false);
         local.groups=local.groups(~cellfun(@isempty,local.groups));
 
@@ -223,9 +309,12 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
                 local.graph.(field{1})=matrix(indices,indices);
             end
         end
-        local_model=model; local_model.bath_ids=sites;
-        local_graph=cce_graph(local_model,local); family=cce_clusters(local_model,local_graph,local);
-        dc=prod(model.multiplicities(model.observed_ids)); components=1;
+        local_model=model;
+        local_model.bath_ids=sites;
+        local_graph=cce_graph(local_model,local);
+        family=cce_clusters(local_model,local_graph,local);
+        dc=prod(model.multiplicities(model.observed_ids));
+        components=1;
         if isfield(native_parameters,'output')&&strcmp(native_parameters.output,'density')
             components=dc^2;
         elseif isfield(native_parameters,'coil')&&iscell(native_parameters.coil)
@@ -238,11 +327,17 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             error('cce_partition:memory',...
                   'Patch cluster records exceed numerics.max_memory_bytes.');
         end
-        empty=struct('id',0,'sites',[]); whole=struct('id',1,'sites',sort(sites));
+        empty=struct('id',0,'sites',[]);
+        whole=struct('id',1,'sites',sort(sites));
         full=find(arrayfun(@(entry)isequal(sort(entry.sites),sort(sites)),family),1);
         for s=1:numel(spin_configs)
-            if used>=p.max_probes, valid=false; objective=inf; return; end
-            used=used+1; state=spin_configs(s);
+            if used>=p.max_probes
+                valid=false;
+                objective=inf;
+                return;
+            end
+            used=used+1;
+            state=spin_configs(s);
             state.weight=1;
             baseline=evaluator(model,empty,state,schedule,evaluation);
             exact=evaluator(model,whole,state,schedule,evaluation);
@@ -257,13 +352,15 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             elseif isempty(sites)
                 reduced=baseline;
             else
-                request=evaluation; request.cce.groups=local.groups;
+                request=evaluation;
+                request.cce.groups=local.groups;
                 request.cce.bath_spins=sites;
                 reduced=cce_reduce({[baseline records]},family,request);
             end
             difference=abs(reduced.value-exact.value);
             tolerance=p.patch_atol+p.patch_rtol*abs(exact.value);
-            ratio=difference./tolerance; ratio(tolerance==0&difference==0)=0;
+            ratio=difference./tolerance;
+            ratio(tolerance==0&difference==0)=0;
             if any(~reduced.valid|~exact.valid|~isfinite(ratio),'all')
                 objective=inf;
             else
@@ -279,7 +376,8 @@ end
 
 % Measure the exact retained bath Hilbert dimension
 function value=dimension(sites,ids,dims)
-[~,index]=ismember(sites,ids); value=prod(dims(index));
+[~,index]=ismember(sites,ids);
+value=prod(dims(index));
 
 end
 
@@ -287,7 +385,8 @@ end
 function objective=spatial_objective(groups,ids,xyz)
 objective=0;
 for k=1:numel(groups)
-    [~,index]=ismember(groups{k},ids); coordinates=xyz(index,:);
+    [~,index]=ismember(groups{k},ids);
+    coordinates=xyz(index,:);
     objective=objective+sum((coordinates-mean(coordinates,1)).^2,'all');
 end
 
@@ -316,7 +415,9 @@ if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids','multi
    ~isstruct(parameters.cce.partition)||~isscalar(parameters.cce.partition)
     error('Canonical model, graph, and scalar partition parameters are required.');
 end
-parameters=parameters.cce; p=parameters.partition; ids=graph.bath_ids;
+parameters=parameters.cce;
+p=parameters.partition;
+ids=graph.bath_ids;
 if ~isstruct(parameters.numerics)||~isscalar(parameters.numerics)||...
    ~isfield(parameters.numerics,'max_memory_bytes')||...
    ~isnumeric(parameters.numerics.max_memory_bytes)||...

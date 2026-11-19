@@ -42,14 +42,21 @@ if isfield(spin_system,'bas')
 end
 
 % Apply the requested stock approximation without building a basis
-if ischar(assumptions), assumptions={assumptions}; end
+if ischar(assumptions)
+    assumptions={assumptions};
+end
 spin_system=assume(spin_system,assumptions{:});
 
 % Copy immutable source metadata and stable physical identifiers
-model.spin_system=spin_system; model.parameters=parameters;
-model.kind='cce_model'; model.formalism=formalism;
-model.isotopes=spin_system.comp.isotopes; model.groups={};
-if isfield(parameters.cce,'groups'), model.groups=parameters.cce.groups; end
+model.spin_system=spin_system;
+model.parameters=parameters;
+model.kind='cce_model';
+model.formalism=formalism;
+model.isotopes=spin_system.comp.isotopes;
+model.groups={};
+if isfield(parameters.cce,'groups')
+    model.groups=parameters.cce.groups;
+end
 model.manifold_projectors=struct();
 model.physical_ids=1:spin_system.comp.nspins;
 model.observed_ids=parameters.observed;
@@ -59,7 +66,8 @@ model.gamma=spin_system.inter.gammas;
 model.units=struct('frequency','rad/s','distance','Angstrom','angle','radian');
 model.numerical_cutoffs=struct('interaction_Hz',spin_system.tols.inter_cutoff,...
                               'operator_rad_s',spin_system.tols.liouv_zero);
-model.assumptions=assumptions; model.orientation=parameters.orientation;
+model.assumptions=assumptions;
+model.orientation=parameters.orientation;
 model.interaction_cutoff=inf;
 if isfield(parameters.cce,'interaction_cutoff')
     model.interaction_cutoff=parameters.cce.interaction_cutoff;
@@ -80,33 +88,46 @@ end
 
 % Rotate canonical Cartesian tensors into the requested laboratory frame
 rotation=euler2dcm(parameters.orientation);
-model.zeeman=cell(1,nspins); model.quadratic=cell(1,nspins);
+model.zeeman=cell(1,nspins);
+model.quadratic=cell(1,nspins);
 model.pairs=struct('ids',{},'tensor',{});
-model.retained=cell(nspins); model.omitted_pairs=zeros(0,2);
+model.retained=cell(nspins);
+model.omitted_pairs=zeros(0,2);
 for n=1:nspins
 
     % Rotate the Zeeman and on-site quadratic tensors
     model.zeeman{n}=rotation*spin_system.inter.zeeman.matrix{n}*rotation.';
     tensor=spin_system.inter.coupling.matrix{n,n};
-    if isempty(tensor), tensor=zeros(3); end
-    if norm(tensor,2)<=2*pi*spin_system.tols.inter_cutoff, tensor=zeros(3); end
+    if isempty(tensor)
+        tensor=zeros(3);
+    end
+    if norm(tensor,2)<=2*pi*spin_system.tols.inter_cutoff
+        tensor=zeros(3);
+    end
     model.quadratic{n}=rotation*tensor*rotation.';
 
     % Combine ordered cells only after applying their retention masks
     for k=n+1:nspins
-        tensor=zeros(3); retained=zeros(3);
+        tensor=zeros(3);
+        retained=zeros(3);
         for direction=1:2
 
             % Retrieve one ordered cell and its independently declared strength
-            ids=[n k]; if direction==2, ids=fliplr(ids); end
+            ids=[n k];
+            if direction==2
+                ids=fliplr(ids);
+            end
             value=spin_system.inter.coupling.matrix{ids(1),ids(2)};
             if isempty(value)||norm(value,2)<=2*pi*spin_system.tols.inter_cutoff
                 continue
             end
 
             % Separate the stock isotropic and anisotropic numerical cutoffs
-            isotropic=trace(value)/3; anisotropic=value-isotropic*eye(3);
-            if abs(isotropic)<=2*pi*spin_system.tols.inter_cutoff, isotropic=0; end
+            isotropic=trace(value)/3;
+            anisotropic=value-isotropic*eye(3);
+            if abs(isotropic)<=2*pi*spin_system.tols.inter_cutoff
+                isotropic=0;
+            end
             [~,rank_one,rank_two]=mat2sphten(anisotropic);
             if norm(rank_one,2)<=spin_system.tols.liouv_zero&&...
                norm(rank_two,2)<=spin_system.tols.liouv_zero
@@ -117,8 +138,12 @@ for n=1:nspins
             % Stock spherical pair convention transposes each ordered cell
             value=rotation*value.'*rotation.';
             part=retain_pair(value,spin_system.inter.coupling.strength{ids(1),ids(2)});
-            if direction==2, value=value.'; part=part.'; end
-            tensor=tensor+value; retained=retained+part;
+            if direction==2
+                value=value.';
+                part=part.';
+            end
+            tensor=tensor+value;
+            retained=retained+part;
 
         end
 
@@ -131,7 +156,8 @@ for n=1:nspins
                 model.omitted_pairs(end+1,:)=[n k];
                 spin_system.inter.coupling.matrix{n,k}=zeros(3);
                 spin_system.inter.coupling.matrix{k,n}=zeros(3);
-                tensor=zeros(3); retained=zeros(3);
+                tensor=zeros(3);
+                retained=zeros(3);
             end
         end
 
@@ -139,7 +165,8 @@ for n=1:nspins
         if norm(tensor,'fro')>0
             model.pairs(end+1)=struct('ids',[n k],'tensor',tensor);
         end
-        model.retained{n,k}=retained; model.retained{k,n}=retained.';
+        model.retained{n,k}=retained;
+        model.retained{k,n}=retained.';
     end
 
 end
@@ -159,7 +186,9 @@ end
 % Exclude execution-only options from the physical model fingerprint
 physical=parameters;
 for name={'parallel','checkpoint','retain_raw','convergence'}
-    if isfield(physical.cce,name{1}), physical.cce=rmfield(physical.cce,name{1}); end
+    if isfield(physical.cce,name{1})
+        physical.cce=rmfield(physical.cce,name{1});
+    end
 end
 model.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,...
                             physical,assumptions,formalism});
@@ -167,12 +196,16 @@ model.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,
 % Declare the validated direct domain rather than guessing new physics
 model.direct_supported=ismember(assumptions{1},{'labframe','nmr','esr','deer','deer-zz'});
 model.fallback_reason='';
-if ~model.direct_supported, model.fallback_reason='unvalidated assumption set'; end
+if ~model.direct_supported
+    model.fallback_reason='unvalidated assumption set';
+end
 if any(~cellfun(@isempty,spin_system.inter.giant.coeff))
-    model.direct_supported=false; model.fallback_reason='giant-spin spherical terms';
+    model.direct_supported=false;
+    model.fallback_reason='giant-spin spherical terms';
 end
 if isfield(spin_system.inter,'modes')
-    model.direct_supported=false; model.fallback_reason='spin-boson terms';
+    model.direct_supported=false;
+    model.fallback_reason='spin-boson terms';
 end
 if strcmp(model.backend,'direct')&&~model.direct_supported
     error('direct Hamiltonian is not validated for %s.',model.fallback_reason);

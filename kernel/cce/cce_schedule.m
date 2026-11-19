@@ -38,16 +38,23 @@ function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
 grumble(model,clusters,ensemble,schedule,parameters,evaluator);
 
 % Build deterministic tasks from resolved native controls
-options=parameters.cce; ns=numel(ensemble.spin_config); nc=numel(clusters)+1;
-mode='serial'; workers=1; batch_size=1;
-if isfield(options,'parallel'), mode=options.parallel.mode; end
+options=parameters.cce;
+ns=numel(ensemble.spin_config);
+nc=numel(clusters)+1;
+mode='serial';
+workers=1;
+batch_size=1;
+if isfield(options,'parallel')
+    mode=options.parallel.mode;
+end
 if ~strcmp(mode,'serial')
     pool=gcp('nocreate');
     if isempty(pool)||~isfield(model.spin_system.sys,'parallel')||...
        pool.NumWorkers~=model.spin_system.sys.parallel{2}
         error('cce_schedule:pool','Parallel scheduling requires an explicitly configured pool.');
     end
-    workers=pool.NumWorkers; batch_size=workers;
+    workers=pool.NumWorkers;
+    batch_size=workers;
 end
 if isfield(options,'parallel')&&isfield(options.parallel,'batch_size')
     batch_size=options.parallel.batch_size;
@@ -62,24 +69,32 @@ if isfield(parameters,'output')&&strcmp(parameters.output,'density')
 elseif isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
-nt=numel(parameters.times); dc=prod(model.multiplicities(model.observed_ids));
+nt=numel(parameters.times);
+dc=prod(model.multiplicities(model.observed_ids));
 metadata=whos('model','clusters','ensemble','schedule','parameters');
 resident=3*ns*nc*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
 noise=isequal(schedule.pulse_sequence,@noise_correlation);
 master=strcmp(model.formalism,'zeeman-liouv')||...
        (isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps));
-if noise, resident=resident+3*ns*nc*(32*nt+16); end
+if noise
+    resident=resident+3*ns*nc*(32*nt+16);
+end
 
 % Count retained experiment-owned control intervals before dispatch
 segment_count=0;
 if isequal(schedule.pulse_sequence,@finite_drive)||isequal(schedule.pulse_sequence,@refocusing_train)
     events=cce_pulse_events(parameters);
     for t=parameters.times
-        starts=[events.at].'; stops=starts;
+        starts=[events.at].';
+        stops=starts;
         for j=1:numel(events)
-            if strcmp(events(j).placement,'fraction'), starts(j)=starts(j)*t; end
+            if strcmp(events(j).placement,'fraction')
+                starts(j)=starts(j)*t;
+            end
             stops(j)=starts(j);
-            if strcmp(events(j).type,'finite'), stops(j)=starts(j)+events(j).duration; end
+            if strcmp(events(j).type,'finite')
+                stops(j)=starts(j)+events(j).duration;
+            end
         end
         segment_count=segment_count+numel(unique([0;t;starts(starts>0&starts<t);stops(stops>0&stops<t)]));
     end
@@ -88,31 +103,40 @@ end
 % Reserve full physical construction and every simultaneous propagation workspace
 peak=0;
 for k=0:numel(clusters)
-    sites=[]; if k>0, sites=clusters(k).sites; end
-    ids=[model.observed_ids sites]; db=prod(model.multiplicities(sites)); dimension=dc*db;
+    sites=[];
+    if k>0
+        sites=clusters(k).sites;
+    end
+    ids=[model.observed_ids sites];
+    db=prod(model.multiplicities(sites));
+    dimension=dc*db;
     copies=12+3*numel(ids);
     if ~model.direct_supported||strcmp(model.backend,'stock')
         ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
         copies=copies+sum((2*(1:ranks)+1).^2);
     end
-    workspace=16*copies*dimension^2; propagated=dimension;
+    workspace=16*copies*dimension^2;
+    propagated=dimension;
     if (strcmp(options.approximation,'projected')&&~noise)||(noise&&~master)
         propagated=db;
     end
     if master
 
         % Count manifold, spin, and included jump arrays retained by every task
-        jumps=0; labels=0;
+        jumps=0;
+        labels=0;
         if isfield(parameters,'bath_jumps')
             for jump=parameters.bath_jumps
                 if all(ismember(jump.support,ids))
-                    jumps=jumps+1; labels=labels+numel(jump.support)+1;
+                    jumps=jumps+1;
+                    labels=labels+numel(jump.support)+1;
                 end
             end
         end
         retained=16*(3*numel(ids)*dimension^2+2*(1+jumps)*propagated^2)+...
                  8*(2*numel(ids)+labels);
-        resident=resident+3*ns*retained; workspace=workspace+retained;
+        resident=resident+3*ns*retained;
+        workspace=workspace+retained;
         propagated=propagated^2;
 
     end
@@ -139,15 +163,22 @@ end
 
 % The model is hashed from its full physical content, not its derived cache key
 payload.model=rmfield(payload.model,'source_hash');
-ids=zeros(ns*nc,3); indices=zeros(ns*nc,2); position=0;
+ids=zeros(ns*nc,3);
+indices=zeros(ns*nc,2);
+position=0;
 for n=1:ns
     for k=1:nc
-        position=position+1; id=0; if k>1, id=clusters(k-1).id; end
+        position=position+1;
+        id=0;
+        if k>1
+            id=clusters(k-1).id;
+        end
         ids(position,:)=[ensemble.spin_config(n).configuration_id ensemble.spin_config(n).state_id id];
         indices(position,:)=[n k];
     end
 end
-[ids,order]=sortrows(ids,[1 2 3]); indices=indices(order,:);
+[ids,order]=sortrows(ids,[1 2 3]);
+indices=indices(order,:);
 identity=struct();
 if isfield(options,'checkpoint')
 
@@ -163,7 +194,8 @@ if isfield(options,'checkpoint')
 end
 state=struct('version',1,'identity',identity,'payload',payload,...
              'task_ids',ids,'completed',false(ns*nc,1),'records',{cell(ns*nc,1)},...
-             'checksum',''); filename='';
+             'checksum','');
+filename='';
 if isfield(options,'checkpoint')
     filename=options.checkpoint.file;
     if isfield(options.checkpoint,'resume')&&options.checkpoint.resume
@@ -180,7 +212,8 @@ end
 pending=find(~state.completed);
 for b=1:batch_size:numel(pending)
     selected=pending(b:min(b+batch_size-1,numel(pending)));
-    records=cell(numel(selected),1); tasks=indices(selected,:);
+    records=cell(numel(selected),1);
+    tasks=indices(selected,:);
     if strcmp(mode,'serial')
         for j=1:numel(selected)
             records{j}=native_task(model,clusters,ensemble,schedule,parameters,evaluator,tasks(j,:));
@@ -190,14 +223,18 @@ for b=1:batch_size:numel(pending)
             records{j}=native_task(model,clusters,ensemble,schedule,parameters,evaluator,tasks(j,:));
         end
     end
-    state.records(selected)=records; state.completed(selected)=true;
-    if ~isempty(filename), state=cce_checkpoint(filename,'write',state); end
+    state.records(selected)=records;
+    state.completed(selected)=true;
+    if ~isempty(filename)
+        state=cce_checkpoint(filename,'write',state);
+    end
 end
 raw=cell(1,ns);
 for n=1:ns
     records=cell(1,nc);
     for k=1:nc
-        position=find(indices(:,1)==n&indices(:,2)==k,1); records{k}=state.records{position};
+        position=find(indices(:,1)==n&indices(:,2)==k,1);
+        records{k}=state.records{position};
     end
     if strcmp(options.bath_state.mode,'interlaced')
         records=records(~cellfun(@(item)strcmp(item.kind,'not_evaluated'),records));
@@ -210,13 +247,17 @@ end
 % Invoke exactly the registered evaluator on ordinary and conditioned paths
 function raw=native_task(model,clusters,ensemble,schedule,parameters,evaluator,index)
 cluster=struct('id',0,'sites',[]);
-if index(2)>1, cluster=clusters(index(2)-1); end
+if index(2)>1
+    cluster=clusters(index(2)-1);
+end
 if strcmp(parameters.cce.bath_state.mode,'interlaced')
     parameters.cce.interlaced.reference_state=index(1);
     complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.bath_ids)),clusters));
     if complete&&~isequal(sort(cluster.sites),sort(model.bath_ids))
         channels=1;
-        if isfield(parameters,'coil')&&iscell(parameters.coil), channels=numel(parameters.coil); end
+        if isfield(parameters,'coil')&&iscell(parameters.coil)
+            channels=numel(parameters.coil);
+        end
         raw=struct('cluster_id',cluster.id,'value',NaN(numel(parameters.times),channels),...
                    'abs_error_bound',Inf(numel(parameters.times),channels),...
                    'valid',false(numel(parameters.times),channels),...
@@ -246,7 +287,9 @@ if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'spin_system','multip
     error('cce_schedule:input','Native model, ensemble, schedule, parameters and evaluator are required.');
 end
 mode='serial';
-if isfield(parameters.cce,'parallel'), mode=parameters.cce.parallel.mode; end
+if isfield(parameters.cce,'parallel')
+    mode=parameters.cce.parallel.mode;
+end
 if ~ismember(mode,{'serial','clusters','states'})
     error('cce_schedule:parallel','Choose serial, clusters or states parallelism.');
 end

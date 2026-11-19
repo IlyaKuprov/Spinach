@@ -49,22 +49,29 @@ grumble(model,parameters);
 % Locate physical sites without interpreting IDs as array subscripts
 [~,bath_pos]=ismember(model.bath_ids,model.physical_ids);
 [~,observed_pos]=ismember(model.observed_ids,model.physical_ids);
-ids=model.bath_ids; n=numel(ids); nc=numel(observed_pos);
+ids=model.bath_ids;
+n=numel(ids);
+nc=numel(observed_pos);
 
 % Obtain physical two-spin operator norms before graph pruning
-pair_norm=zeros(n); attachments=false(n,nc);
+pair_norm=zeros(n);
+attachments=false(n,nc);
 for k=1:numel(model.pairs)
 
     % Resolve this unordered physical pair
     pair=model.pairs(k);
     [~,a]=ismember(pair.ids(1),model.physical_ids);
     [~,b]=ismember(pair.ids(2),model.physical_ids);
-    ma=model.multiplicities(a); mb=model.multiplicities(b);
+    ma=model.multiplicities(a);
+    mb=model.multiplicities(b);
     spins=cell(2,3);
     for q=1:2
 
         % Construct angular momentum matrices at physical multiplicity
-        d=[ma mb]; d=d(q); s=(d-1)/2; m=(s:-1:-s).';
+        d=[ma mb];
+        d=d(q);
+        s=(d-1)/2;
+        m=(s:-1:-s).';
         plus=diag(sqrt(s*(s+1)-m(2:end).*(m(2:end)+1)),1);
         spins(q,:)={(plus+plus')/2,(plus-plus')/(2i),diag(m)};
 
@@ -80,10 +87,13 @@ for k=1:numel(model.pairs)
     strength=norm(interaction,2);
 
     % Accumulate bath edges and exact observed attachment topology
-    ia=find(ids==pair.ids(1)); ib=find(ids==pair.ids(2));
-    ca=find(model.observed_ids==pair.ids(1)); cb=find(model.observed_ids==pair.ids(2));
+    ia=find(ids==pair.ids(1));
+    ib=find(ids==pair.ids(2));
+    ca=find(model.observed_ids==pair.ids(1));
+    cb=find(model.observed_ids==pair.ids(2));
     if ~isempty(ia)&&~isempty(ib)
-        pair_norm(ia,ib)=strength; pair_norm(ib,ia)=strength;
+        pair_norm(ia,ib)=strength;
+        pair_norm(ib,ia)=strength;
     elseif ~isempty(ia)&&~isempty(cb)
         attachments(ia,cb)=strength>0;
     elseif ~isempty(ib)&&~isempty(ca)
@@ -93,7 +103,8 @@ for k=1:numel(model.pairs)
 end
 
 % Keep the observed-spin system joint unless state/detection factorisation is proven
-attached=any(attachments,2); mediated=attached&attached.';
+attached=any(attachments,2);
+mediated=attached&attached.';
 mediated(1:n+1:end)=false;
 
 % Construct scores without modifying the Hamiltonian or edge norms
@@ -145,7 +156,8 @@ if strcmp(parameters.method,'noise')&&isfield(parameters,'noise')
             support=[parameters.noise.descriptors.spins];
         end
         observed=ismember(model.bath_ids,support);
-        adjacency(observed,observed)=true; adjacency(1:n+1:end)=false;
+        adjacency(observed,observed)=true;
+        adjacency(1:n+1:end)=false;
     end
 end
 
@@ -176,7 +188,8 @@ if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids',...
         'observed_ids','bath_ids','multiplicities','coordinates_A','pairs'}))
     error('cce_graph:model','incomplete scalar model structure.');
 end
-ids=model.physical_ids; n=numel(model.bath_ids);
+ids=model.physical_ids;
+n=numel(model.bath_ids);
 if ~isnumeric(ids)||~isreal(ids)||(~isrow(ids)&&~isempty(ids))||...
    any(~isfinite(ids))||any(ids<1)||any(ids~=fix(ids))||numel(unique(ids))~=numel(ids)
     error('cce_graph:ids','physical IDs must be distinct positive integers.');

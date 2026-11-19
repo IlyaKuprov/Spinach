@@ -38,9 +38,13 @@
 function [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions)
 
 % Record only explicitly declared default-policy decisions
-policy.defaults={}; policy.tensor_units='rad/s'; policy.time_units='s';
-policy.native_input_frequency_units='Hz'; policy.jump_rate_units='s^-1';
-policy.experiment=func2str(pulse_sequence); policy.assumptions=assumptions;
+policy.defaults={};
+policy.tensor_units='rad/s';
+policy.time_units='s';
+policy.native_input_frequency_units='Hz';
+policy.jump_rate_units='s^-1';
+policy.experiment=func2str(pulse_sequence);
+policy.assumptions=assumptions;
 policy.physical_tensor_conversion=false;
 
 % Resolve frame and algorithm containers without changing supplied values
@@ -56,7 +60,11 @@ c=parameters.cce;
 [c,policy]=default(c,'averaging','after_expansion',policy,'parameters.cce');
 [c,policy]=default(c,'reducer','powers',policy,'parameters.cce');
 [c,policy]=default(c,'backend','auto',policy,'parameters.cce');
-if isfield(c,'groups'), expansion='partition'; else, expansion='standard'; end
+if isfield(c,'groups')
+    expansion='partition';
+else
+    expansion='standard';
+end
 [c,policy]=default(c,'expansion',expansion,policy,'parameters.cce');
 [c,policy]=default(c,'retain_raw',false,policy,'parameters.cce');
 [c,policy]=default(c,'second_order',struct('enabled',false),policy,'parameters.cce');
@@ -73,17 +81,21 @@ policy.accuracy_requires_resolution=~all(isfield(c.numerics,{'atol','rtol'}));
 policy.bath_state=c.bath_state.mode;
 policy.meanfield=c.meanfield;
 policy.approximation=c.approximation;
-policy.averaging=c.averaging; policy.reducer=c.reducer;
+policy.averaging=c.averaging;
+policy.reducer=c.reducer;
 policy.reduction_algebra_requires_experiment=true;
 policy.experiment_validation_required=true;
-if isfield(parameters,'pump'), policy.pump_frequency_units=parameters.pump.units; end
+if isfield(parameters,'pump')
+    policy.pump_frequency_units=parameters.pump.units;
+end
 
 end
 
 % Insert only a declared default and record its ownership
 function [s,policy]=default(s,name,value,policy,prefix)
 if ~isfield(s,name)
-    s.(name)=value; policy.defaults{end+1}=[prefix '.' name];
+    s.(name)=value;
+    policy.defaults{end+1}=[prefix '.' name];
 end
 end
 
@@ -93,7 +105,9 @@ if ~isstruct(s)||~isscalar(s)
     error('cce_options:structure','%s must be a scalar structure.',label);
 end
 unknown=setdiff(fieldnames(s),allowed);
-if ~isempty(unknown), error('cce_options:unknown','Unknown %s field: %s.',label,unknown{1}); end
+if ~isempty(unknown)
+    error('cce_options:unknown','Unknown %s field: %s.',label,unknown{1});
+end
 end
 
 % Require an explicitly supported textual choice
@@ -181,7 +195,9 @@ end
 if isfield(p,'spins')&&(~iscell(p.spins)||~isrow(p.spins)||~all(cellfun(@ischar,p.spins)))
     error('cce_options:channels','spins contains isotope channel names, not physical IDs.');
 end
-if isfield(p,'nloops'), integer(p.nloops,'nloops',1); end
+if isfield(p,'nloops')
+    integer(p.nloops,'nloops',1);
+end
 if isfield(p,'normalized')&&(~islogical(p.normalized)||~isscalar(p.normalized))
     error('cce_options:normalized','normalized must be a logical scalar.');
 end
@@ -211,7 +227,9 @@ if isfield(p,'spectrum')
     fields(p.spectrum,{'frequency_grid','convention','window','weights','sidedness',...
                        'time_domain','stationary','modulation'},'spectrum');
 end
-if ~isfield(p,'cce'), return; end
+if ~isfield(p,'cce')
+    return;
+end
 fields(p.cce,{'approximation','bath_spins','order','expansion','groups','partition',...
               'graph','interaction_cutoff','bath_radius','bath_state',...
               'meanfield','meanfield_radius','interlaced','averaging','reducer',...
@@ -229,9 +247,14 @@ contracts={'graph',{'mode','score','radius','threshold','adjacency','scores','mi
            'basis',{'formalism','approximation'}};
 for k=1:size(contracts,1)
     name=contracts{k,1};
-    if isfield(p.cce,name), fields(p.cce.(name),contracts{k,2},['cce.' name]); end
+    if isfield(p.cce,name)
+        fields(p.cce.(name),contracts{k,2},['cce.' name]);
+    end
 end
-c=p.cce; ids=p.observed; bath=c.bath_spins; nspins=system.comp.nspins;
+c=p.cce;
+ids=p.observed;
+bath=c.bath_spins;
+nspins=system.comp.nspins;
 if isfield(c,'checkpoint')
     if ~isfield(c.checkpoint,'file')||~ischar(c.checkpoint.file)||...
        ~isrow(c.checkpoint.file)||isempty(c.checkpoint.file)||...
@@ -260,7 +283,9 @@ if ~isempty(c.order)&&(~isnumeric(c.order)||~isreal(c.order)||~isscalar(c.order)
     error('cce_options:order','Order must be an integer within the supplied bath or empty for convergence selection.');
 end
 for name={'interaction_cutoff','bath_radius','meanfield_radius'}
-    if isfield(c,name{1}), nonnegative(c.(name{1}),['cce.' name{1}],true); end
+    if isfield(c,name{1})
+        nonnegative(c.(name{1}),['cce.' name{1}],true);
+    end
 end
 for name={'atol','rtol','max_memory_bytes'}
     if isfield(c.numerics,name{1})
@@ -290,7 +315,9 @@ if isfield(c,'groups')
     if ~iscell(c.groups)||~isrow(c.groups)||isempty(c.groups)
         error('cce_options:groups','Groups must be a nonempty cell row of physical bath-ID rows.');
     end
-    for k=1:numel(c.groups), spin_ids(c.groups{k},nspins,'cce.groups',false); end
+    for k=1:numel(c.groups)
+        spin_ids(c.groups{k},nspins,'cce.groups',false);
+    end
     members=[c.groups{:}];
     if ~isequal(sort(members),sort(bath))
         error('cce_options:groups','Groups must partition the selected bath exactly once.');
@@ -304,10 +331,14 @@ if ~isfield(c.graph,'mode')
 end
 choice(c.graph.mode,{'complete','distance','coupling','explicit'},'cce.graph.mode');
 if strcmp(c.graph.mode,'distance')
-    if ~isfield(c.graph,'radius'), error('cce_options:graph','Distance graphs require an explicit radius.'); end
+    if ~isfield(c.graph,'radius')
+        error('cce_options:graph','Distance graphs require an explicit radius.');
+    end
     nonnegative(c.graph.radius,'cce.graph.radius',true);
 elseif strcmp(c.graph.mode,'coupling')
-    if ~isfield(c.graph,'threshold'), error('cce_options:graph','Coupling graphs require an explicit threshold.'); end
+    if ~isfield(c.graph,'threshold')
+        error('cce_options:graph','Coupling graphs require an explicit threshold.');
+    end
     nonnegative(c.graph.threshold,'cce.graph.threshold',true);
 elseif strcmp(c.graph.mode,'explicit')
     if ~isfield(c.graph,'adjacency')||~islogical(c.graph.adjacency)||...
@@ -317,13 +348,17 @@ elseif strcmp(c.graph.mode,'explicit')
     end
 end
 state=c.bath_state;
-if ~isfield(state,'mode'), error('cce_options:state','A bath-state mode is required.'); end
+if ~isfield(state,'mode')
+    error('cce_options:state','A bath-state mode is required.');
+end
 choice(state.mode,{'mixed_product','explicit_product','sampled','interlaced'},'cce.bath_state.mode');
 if strcmp(state.mode,'explicit_product')
     if ~isfield(state,'rho')||~iscell(state.rho)||~isequal(size(state.rho),[1 numel(bath)])
         error('cce_options:state','Explicit bath states require one density matrix per ordered bath ID.');
     end
-    for k=1:numel(bath), density(state.rho{k},system.comp.mults(bath(k))); end
+    for k=1:numel(bath)
+        density(state.rho{k},system.comp.mults(bath(k)));
+    end
 elseif isfield(state,'rho')
     error('cce_options:state','rho belongs to explicit_product bath states.');
 end
@@ -332,7 +367,9 @@ if ismember(state.mode,{'sampled','interlaced'})
         error('cce_options:state','Sampled states require explicit basis, probabilities, samples and seed.');
     end
     integer(state.seed,'seed',0);
-    if state.seed>2^32-1, error('cce_options:seed','The seed exceeds the mt19937ar range.'); end
+    if state.seed>2^32-1
+        error('cce_options:seed','The seed exceeds the mt19937ar range.');
+    end
     integer(state.samples,'bath_state.samples',1);
     basis_uniform=ischar(state.basis)&&strcmp(state.basis,'uniform');
     uniform_populations=ischar(state.probabilities)&&strcmp(state.probabilities,'uniform');
@@ -342,8 +379,16 @@ if ismember(state.mode,{'sampled','interlaced'})
     end
     for k=1:numel(bath)
         d=system.comp.mults(bath(k));
-        if basis_uniform, U=eye(d); else, U=state.basis{k}; end
-        if uniform_populations, probabilities=ones(1,d)/d; else, probabilities=state.probabilities{k}; end
+        if basis_uniform
+            U=eye(d);
+        else
+            U=state.basis{k};
+        end
+        if uniform_populations
+            probabilities=ones(1,d)/d;
+        else
+            probabilities=state.probabilities{k};
+        end
         if ~isnumeric(U)||~isequal(size(U),[d d])||any(~isfinite(U),'all')||...
            norm(U'*U-eye(d),'fro')>d*eps*max(1,norm(U,'fro')^2)
             error('cce_options:state','Each sampled basis must be orthonormal.');
@@ -357,19 +402,26 @@ if ismember(state.mode,{'sampled','interlaced'})
 elseif isfield(state,'seed')||isfield(state,'samples')||isfield(state,'probabilities')||isfield(state,'basis')
     error('cce_options:state','Sampling fields require sampled or interlaced bath states.');
 end
-if isfield(state,'configuration_id'), integer(state.configuration_id,'bath_state.configuration_id',1); end
+if isfield(state,'configuration_id')
+    integer(state.configuration_id,'bath_state.configuration_id',1);
+end
 if isfield(c,'meanfield_radius')&&~strcmp(c.meanfield,'static')
     error('cce_options:meanfield','meanfield_radius requires static mean fields.');
 end
-if isfield(p,'rho0'), density(p.rho0,prod(system.comp.mults(ids))); end
+if isfield(p,'rho0')
+    density(p.rho0,prod(system.comp.mults(ids)));
+end
 if isfield(p,'rho0')&&isfield(p,'preparation')
     error('cce_options:preparation','Specify a preparation or an explicit rho0, not both.');
 end
 if isfield(p,'bath_jumps')
     jumps=p.bath_jumps;
-    if ~isstruct(jumps), error('cce_options:jumps','bath_jumps must be a structure array.'); end
+    if ~isstruct(jumps)
+        error('cce_options:jumps','bath_jumps must be a structure array.');
+    end
     for k=1:numel(jumps)
-        j=jumps(k); fields(j,{'support','operator','rate'},'bath_jumps');
+        j=jumps(k);
+        fields(j,{'support','operator','rate'},'bath_jumps');
         if ~all(isfield(j,{'support','operator','rate'}))
             error('cce_options:jumps','Every bath jump needs support, operator and rate.');
         end
@@ -407,7 +459,9 @@ if isfield(p,'pump')
         error('cce_options:pump','Pump species must be an explicit cell row of isotope names.');
     end
     choice(p.pump.units,{'Hz','rad/s'},'pump.units');
-    if isfield(p.pump,'boundary'), choice(p.pump.boundary,{'open','closed'},'pump.boundary'); end
+    if isfield(p.pump,'boundary')
+        choice(p.pump.boundary,{'open','closed'},'pump.boundary');
+    end
     if ~isnumeric(p.pump.center)||~isreal(p.pump.center)||~isscalar(p.pump.center)||~isfinite(p.pump.center)
         error('cce_options:pump','Pump center must be finite in the explicitly declared frequency units.');
     end

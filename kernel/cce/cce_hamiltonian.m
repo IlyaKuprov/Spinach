@@ -34,17 +34,25 @@ grumble(model,sites,spin_config);
 
 % Resolve the validated construction path
 backend=model.backend;
-if isfield(spin_config,'backend'), backend=spin_config.backend; end
+if isfield(spin_config,'backend')
+    backend=spin_config.backend;
+end
 if strcmp(backend,'auto')
-    if model.direct_supported, backend='direct'; else, backend='stock'; end
+    if model.direct_supported
+        backend='direct';
+    else
+        backend='stock';
+    end
 end
 if strcmp(backend,'direct')&&~model.direct_supported
     error('direct Hamiltonian is not validated for %s.',model.fallback_reason);
 end
 
 % Bound simultaneous dense matrices before allocating cluster operators
-ids=[model.observed_ids sites]; dims=model.multiplicities(ids);
-dimension=prod(dims); copies=4+3*numel(ids);
+ids=[model.observed_ids sites];
+dims=model.multiplicities(ids);
+dimension=prod(dims);
+copies=4+3*numel(ids);
 if strcmp(backend,'stock')
 
     % Reserve every stock spherical component as a dense worst case
@@ -61,7 +69,8 @@ ops=cell(numel(ids),3);
 for n=1:numel(ids)
 
     % Build local raising, lowering, and longitudinal matrices
-    spin=(dims(n)-1)/2; magnetic=spin:-1:-spin;
+    spin=(dims(n)-1)/2;
+    magnetic=spin:-1:-spin;
     raising=diag(sqrt(spin*(spin+1)-magnetic(2:end).*(magnetic(2:end)+1)),1);
     local={(raising+raising')/2,(raising-raising')/(2i),diag(magnetic)};
 
@@ -77,13 +86,17 @@ end
 if strcmp(backend,'direct')
 
     % Accumulate all retained local and unordered pair terms
-    H=sparse(dimension,dimension); sum_norm=0; operations=0;
+    H=sparse(dimension,dimension);
+    sum_norm=0;
+    operations=0;
     for n=1:numel(ids)
 
         % Select Zeeman components and rotating-frame carrier convention
-        id=ids(n); tensor=model.zeeman{id};
+        id=ids(n);
+        tensor=model.zeeman{id};
         strength=model.spin_system.inter.zeeman.strength{id};
-        field=zeros(1,3); isotropic=trace(model.spin_system.inter.zeeman.matrix{id})/3;
+        field=zeros(1,3);
+        isotropic=trace(model.spin_system.inter.zeeman.matrix{id})/3;
         anisotropic=tensor-isotropic*eye(3);
         [~,rank_one,rank_two]=mat2sphten(model.spin_system.inter.zeeman.matrix{id});
         if norm(rank_one,2)<=model.spin_system.tols.liouv_zero&&...
@@ -92,11 +105,15 @@ if strcmp(backend,'direct')
         end
         switch strength
             case 'full'
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero, isotropic=0; end
+                if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                    isotropic=0;
+                end
                 field=anisotropic(3,:)+[0 0 isotropic];
             case 'secular'
                 isotropic=isotropic-model.spin_system.inter.basefrqs(id);
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero, isotropic=0; end
+                if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                    isotropic=0;
+                end
                 field(3)=anisotropic(3,3)+isotropic;
             case 'ignore'
 
@@ -105,8 +122,10 @@ if strcmp(backend,'direct')
                 error('unvalidated direct Zeeman retention.');
         end
         for axis=1:3
-            term=field(axis)*ops{n,axis}; H=H+term;
-            sum_norm=sum_norm+norm(term,'fro'); operations=operations+1;
+            term=field(axis)*ops{n,axis};
+            H=H+term;
+            sum_norm=sum_norm+norm(term,'fro');
+            operations=operations+1;
         end
 
         % Apply the stock on-site quadratic retention convention
@@ -130,8 +149,10 @@ if strcmp(backend,'direct')
         end
         for axis=1:3
             for other=1:3
-                term=tensor(axis,other)*(ops{n,axis}*ops{n,other}); H=H+term;
-                sum_norm=sum_norm+norm(term,'fro'); operations=operations+dimension;
+                term=tensor(axis,other)*(ops{n,axis}*ops{n,other});
+                H=H+term;
+                sum_norm=sum_norm+norm(term,'fro');
+                operations=operations+dimension;
             end
         end
 
@@ -140,8 +161,10 @@ if strcmp(backend,'direct')
             tensor=model.retained{id,ids(k)};
             for axis=1:3
                 for other=1:3
-                    term=tensor(axis,other)*(ops{n,axis}*ops{k,other}); H=H+term;
-                    sum_norm=sum_norm+norm(term,'fro'); operations=operations+dimension;
+                    term=tensor(axis,other)*(ops{n,axis}*ops{k,other});
+                    H=H+term;
+                    sum_norm=sum_norm+norm(term,'fro');
+                    operations=operations+dimension;
                 end
             end
         end
@@ -151,22 +174,29 @@ else
 
     % Remove an inherited basis before slicing immutable physical metadata
     system=model.spin_system;
-    if isfield(system,'bas'), system=rmfield(system,'bas'); end
+    if isfield(system,'bas')
+        system=rmfield(system,'bas');
+    end
     system=kill_spin(system,setdiff(model.physical_ids,ids));
-    basis_parameters.formalism='zeeman-hilb'; basis_parameters.approximation={'none'};
+    basis_parameters.formalism='zeeman-hilb';
+    basis_parameters.approximation={'none'};
     system=basis(system,basis_parameters);
     system=assume(system,model.assumptions{:});
-    [H,Q]=hamiltonian(system); H=H+orientation(Q,model.orientation);
+    [H,Q]=hamiltonian(system);
+    H=H+orientation(Q,model.orientation);
 
     % Reorder the stock ascending physical indices into observed-first order
-    sorted_ids=sort(ids); sorted_dims=model.multiplicities(sorted_ids);
+    sorted_ids=sort(ids);
+    sorted_dims=model.multiplicities(sorted_ids);
     [~,order]=ismember(ids,sorted_ids);
     if numel(ids)>1
         indices=reshape(1:dimension,fliplr(sorted_dims));
         indices=permute(indices,numel(ids)+1-fliplr(order));
-        indices=indices(:); H=H(indices,indices);
+        indices=indices(:);
+        H=H(indices,indices);
     end
-    sum_norm=norm(H,'fro'); operations=dimension*numel(ids)^2;
+    sum_norm=norm(H,'fro');
+    operations=dimension*numel(ids)^2;
 
 end
 
@@ -180,8 +210,10 @@ if isfield(spin_config,'exterior_ids')
             field=model.retained{ids(n),spin_config.exterior_ids(k)}*...
                   spin_config.exterior_expectations(k,:).';
             for axis=1:3
-                term=field(axis)*ops{n,axis}; H=H+term;
-                sum_norm=sum_norm+norm(term,'fro'); operations=operations+dimension;
+                term=field(axis)*ops{n,axis};
+                H=H+term;
+                sum_norm=sum_norm+norm(term,'fro');
+                operations=operations+dimension;
             end
         end
     end
@@ -198,11 +230,16 @@ end
 H=(H+H')/2;
 
 % Return ordering, operators, backend, and approximation provenance
-meta.physical_ids=ids; meta.dimensions=dims; meta.dimension=dimension;
+meta.physical_ids=ids;
+meta.dimensions=dims;
+meta.dimension=dimension;
 meta.observed_dimension=prod(model.multiplicities(model.observed_ids));
-meta.bath_dimension=prod(model.multiplicities(sites)); meta.operators=ops;
-meta.backend=backend; meta.fallback_reason=model.fallback_reason;
-meta.source_hash=model.source_hash; meta.omitted_pairs=model.omitted_pairs;
+meta.bath_dimension=prod(model.multiplicities(sites));
+meta.operators=ops;
+meta.backend=backend;
+meta.fallback_reason=model.fallback_reason;
+meta.source_hash=model.source_hash;
+meta.omitted_pairs=model.omitted_pairs;
 meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
 
 end
@@ -229,7 +266,8 @@ if xor(isfield(spin_config,'exterior_ids'),isfield(spin_config,'exterior_expecta
     error('exterior_ids and exterior_expectations must be supplied together.');
 end
 if isfield(spin_config,'exterior_ids')
-    ids=spin_config.exterior_ids; values=spin_config.exterior_expectations;
+    ids=spin_config.exterior_ids;
+    values=spin_config.exterior_expectations;
     if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
        any(~isfinite(ids))||numel(unique(ids))~=numel(ids)||...
        ~all(ismember(ids,setdiff(model.physical_ids,[model.observed_ids sites])))||...

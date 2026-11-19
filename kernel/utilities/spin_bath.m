@@ -37,27 +37,38 @@ function [sys,inter,bath]=spin_bath(sys,inter,specification)
 grumble(sys,inter,specification);
 
 % Generate the finite bath using the authoritative native magnetic field
-s=specification; s.magnetic=sys.magnet;
+s=specification;
+s.magnetic=sys.magnet;
 stream=[];
-if isfield(s,'seed'), stream=RandStream('mt19937ar','Seed',s.seed); end
+if isfield(s,'seed')
+    stream=RandStream('mt19937ar','Seed',s.seed);
+end
 
 % Construct deterministic candidate positions
 switch s.mode
     case 'explicit'
-        xyz=s.coordinates_A; origin=1:size(xyz,1);
+        xyz=s.coordinates_A;
+        origin=1:size(xyz,1);
     case 'lattice'
         [x,y,z]=ndgrid(0:s.repeats(1)-1,0:s.repeats(2)-1,0:s.repeats(3)-1);
-        shifts=[x(:) y(:) z(:)]; xyz=zeros(0,3); origin=[];
+        shifts=[x(:) y(:) z(:)];
+        xyz=zeros(0,3);
+        origin=[];
         for n=1:size(shifts,1)
             xyz=[xyz;(s.fractional+shifts(n,:))*s.cell_A]; %#ok<AGROW>
             origin=[origin 1:size(s.fractional,1)]; %#ok<AGROW>
         end
     case 'random'
-        span=diff(s.bounds_A,1,1); active=span>0;
+        span=diff(s.bounds_A,1,1);
+        active=span>0;
         measure=prod(span(active)*1e-10);
         if isfield(s,'count'), count=s.count;
-        else, count=round(s.density*measure); end
-        xyz=zeros(count,3); accepted=0; attempts=0;
+        else
+            count=round(s.density*measure);
+        end
+        xyz=zeros(count,3);
+        accepted=0;
+        attempts=0;
         while accepted<count&&attempts<s.max_attempts
             candidate=s.bounds_A(1,:)+rand(stream,1,3).*span;
             attempts=attempts+1;
@@ -65,32 +76,47 @@ switch s.mode
                any(vecnorm(xyz(1:accepted,:)-candidate,2,2)<s.exclusion_A)
                 continue;
             end
-            accepted=accepted+1; xyz(accepted,:)=candidate;
+            accepted=accepted+1;
+            xyz(accepted,:)=candidate;
         end
-        if accepted<count, error('spin_bath:packing','Random packing attempt ceiling reached.'); end
+        if accepted<count
+            error('spin_bath:packing','Random packing attempt ceiling reached.');
+        end
         origin=ones(1,count);
 end
 
 % Expand site properties and preserve pre-deletion identities
-ids=1:size(xyz,1); species=s.isotopes;
+ids=1:size(xyz,1);
+species=s.isotopes;
 if isscalar(species), species=repmat(species,1,numel(ids));
-elseif numel(species)~=numel(ids), species=species(origin); end
+elseif numel(species)~=numel(ids)
+    species=species(origin);
+end
 prob=[];
 if isfield(s,'occupancy')
     prob=s.occupancy;
     if size(prob,1)==1, prob=repmat(prob,numel(ids),1);
-    elseif size(prob,1)~=numel(ids), prob=prob(origin,:); end
+    elseif size(prob,1)~=numel(ids)
+        prob=prob(origin,:);
+    end
 end
 
 % Apply explicitly specified frame transformations
-rotation=eye(3); translation=zeros(1,3);
-if isfield(s,'rotation'), rotation=s.rotation; end
-if isfield(s,'translation_A'), translation=s.translation_A; end
+rotation=eye(3);
+translation=zeros(1,3);
+if isfield(s,'rotation')
+    rotation=s.rotation;
+end
+if isfield(s,'translation_A')
+    translation=s.translation_A;
+end
 xyz=xyz*rotation.'+translation;
 
 % Delete sites and apply multi-centre shell union selection
 keep=true(size(ids));
-if isfield(s,'remove_ids'), keep=~ismember(ids,s.remove_ids); end
+if isfield(s,'remove_ids')
+    keep=~ismember(ids,s.remove_ids);
+end
 if isfield(s,'selection')
     nearest=inf(numel(ids),1);
     for n=1:size(s.selection.centres_A,1)
@@ -98,9 +124,15 @@ if isfield(s,'selection')
     end
     keep=keep&(nearest.'>=s.selection.inner_A)&(nearest.'<=s.selection.outer_A);
 end
-ids=ids(keep); xyz=xyz(keep,:); species=species(keep);
-if ~isempty(prob), prob=prob(keep,:); end
-if size(unique(xyz,'rows'),1)~=size(xyz,1), error('spin_bath:duplicates','Duplicate positions.'); end
+ids=ids(keep);
+xyz=xyz(keep,:);
+species=species(keep);
+if ~isempty(prob)
+    prob=prob(keep,:);
+end
+if size(unique(xyz,'rows'),1)~=size(xyz,1)
+    error('spin_bath:duplicates','Duplicate positions.');
+end
 
 % Construct weighted isotopologues before choosing a physical realisation
 configs=struct('ids',{},'isotopes',{},'weight',{},'multiplicities',{});
@@ -110,16 +142,21 @@ if isfield(s,'configurations')
         configs(n)=configuration(ids,names,s.configurations(n).weight);
     end
 elseif isfield(s,'isotopologues')
-    if isempty(prob), error('Isotopologue enumeration requires occupancy.'); end
+    if isempty(prob)
+        error('Isotopologue enumeration requires occupancy.');
+    end
     options=s.isotopologues;
     if strcmp(options.mode,'enumerate')
-        states={cell(1,0)}; weights=1;
+        states={cell(1,0)};
+        weights=1;
         for n=1:numel(ids)
-            p=[prob(n,:) 1-sum(prob(n,:))]; choices=find(p>0);
+            p=[prob(n,:) 1-sum(prob(n,:))];
+            choices=find(p>0);
             if numel(states)*numel(choices)>options.max_configurations
                 error('spin_bath:configurations','Enumeration ceiling reached.');
             end
-            next={}; next_weights=[];
+            next={};
+            next_weights=[];
             for a=1:numel(states)
                 for b=choices
                     labels=[s.species {''}];
@@ -127,23 +164,37 @@ elseif isfield(s,'isotopologues')
                     next_weights(end+1)=weights(a)*p(b); %#ok<AGROW>
                 end
             end
-            states=next; weights=next_weights;
+            states=next;
+            weights=next_weights;
         end
     else
-        states=cell(1,options.count); weights=ones(1,options.count)/options.count;
-        for n=1:options.count, states{n}=draw(prob,s.species,stream); end
+        states=cell(1,options.count);
+        weights=ones(1,options.count)/options.count;
+        for n=1:options.count
+            states{n}=draw(prob,s.species,stream);
+        end
     end
-    for n=1:numel(states), configs(n)=configuration(ids,states{n},weights(n)); end
+    for n=1:numel(states)
+        configs(n)=configuration(ids,states{n},weights(n));
+    end
 end
 
 % Sample occupancy only for a requested single physical realisation
-if ~isempty(prob)&&isempty(configs), species=draw(prob,s.species,stream); end
-if ~isempty(configs)
-    chosen=configs(1); active=ismember(ids,chosen.ids); species=chosen.isotopes;
-else
-    active=~cellfun(@isempty,species); species=species(active);
+if ~isempty(prob)&&isempty(configs)
+    species=draw(prob,s.species,stream);
 end
-candidate_ids=ids; candidate_xyz=xyz; ids=ids(active); xyz=xyz(active,:);
+if ~isempty(configs)
+    chosen=configs(1);
+    active=ismember(ids,chosen.ids);
+    species=chosen.isotopes;
+else
+    active=~cellfun(@isempty,species);
+    species=species(active);
+end
+candidate_ids=ids;
+candidate_xyz=xyz;
+ids=ids(active);
+xyz=xyz(active,:);
 
 % Translate the selected realisation to native Spinach inputs
 added_inter.coordinates=mat2cell(xyz,ones(size(xyz,1),1),3).';
@@ -175,35 +226,55 @@ if isfield(s,'pairs_Hz')
         [present,index]=ismember(s.pairs_Hz(n).ids,ids);
         if all(present)
             tensor=s.pairs_Hz(n).tensor;
-            if isscalar(tensor), tensor=tensor*eye(3); end
+            if isscalar(tensor)
+                tensor=tensor*eye(3);
+            end
             added_inter.coupling.matrix{index(1),index(2)}=rotation*tensor*rotation.';
         end
     end
 end
 
 % Return explicit provenance, occupancy, and immutable physical group labels
-bath.schema_version=1; bath.ids=ids; bath.coordinates_A=xyz;
-bath.isotopes=species; bath.configurations=configs;
-bath.candidate_ids=candidate_ids; bath.candidate_coordinates_A=candidate_xyz;
-bath.rotation=rotation; bath.translation_A=translation;
+bath.schema_version=1;
+bath.ids=ids;
+bath.coordinates_A=xyz;
+bath.isotopes=species;
+bath.configurations=configs;
+bath.candidate_ids=candidate_ids;
+bath.candidate_coordinates_A=candidate_xyz;
+bath.rotation=rotation;
+bath.translation_A=translation;
 bath.configuration_selection=1;
-if isempty(configs), bath.configuration_selection=[]; end
-bath.groups=num2cell(ids); bath.units=struct('coordinates','angstrom','couplings','Hz');
+if isempty(configs)
+    bath.configuration_selection=[];
+end
+bath.groups=num2cell(ids);
+bath.units=struct('coordinates','angstrom','couplings','Hz');
 if isfield(s,'groups')
     bath.groups=cellfun(@(g)intersect(g,ids,'stable'),s.groups(:).','UniformOutput',false);
     bath.groups=bath.groups(~cellfun(@isempty,bath.groups));
-    if ~isequal(sort([bath.groups{:}]),ids), error('Groups must partition retained IDs.'); end
+    if ~isequal(sort([bath.groups{:}]),ids)
+        error('Groups must partition retained IDs.');
+    end
 end
 if strcmp(s.mode,'random')
-    bath.measure_SI=measure; bath.dimension=s.dimension;
+    bath.measure_SI=measure;
+    bath.dimension=s.dimension;
     bath.realized_density=numel(ids)/measure;
 end
 
 % Append physical sites without changing the existing input arrays
-if ~isfield(sys,'isotopes'), sys.isotopes=cell(1,0); end
-count=numel(sys.isotopes); sys.isotopes=[sys.isotopes species];
-if isfield(sys,'labels'), sys.labels=[sys.labels species]; end
-if count==0, inter.coordinates=cell(1,0); end
+if ~isfield(sys,'isotopes')
+    sys.isotopes=cell(1,0);
+end
+count=numel(sys.isotopes);
+sys.isotopes=[sys.isotopes species];
+if isfield(sys,'labels')
+    sys.labels=[sys.labels species];
+end
+if count==0
+    inter.coordinates=cell(1,0);
+end
 inter.coordinates=[inter.coordinates added_inter.coordinates];
 
 % Preserve create's electron fallback when introducing a Zeeman declaration
@@ -211,7 +282,9 @@ if count>0&&~isfield(inter,'zeeman')&&~isfield(inter,'suscept')&&isfield(added_i
     constants=tolerances(struct('sys',struct('output','hush','enable',{{}})),struct());
     inter.zeeman.matrix=cell(1,count);
     for k=1:count
-        if sys.isotopes{k}(1)=='E', inter.zeeman.matrix{k}=constants.tols.freeg*eye(3); end
+        if sys.isotopes{k}(1)=='E'
+            inter.zeeman.matrix{k}=constants.tols.freeg*eye(3);
+        end
     end
 end
 
@@ -231,9 +304,15 @@ end
 names={'zeeman','coupling'};
 for n=1:numel(names)
     name=names{n};
-    if ~isfield(inter,name)&&~isfield(added_inter,name), continue; end
-    if ~isfield(inter,name), inter.(name)=struct(); end
-    if ~isfield(added_inter,name), added_inter.(name)=struct(); end
+    if ~isfield(inter,name)&&~isfield(added_inter,name)
+        continue;
+    end
+    if ~isfield(inter,name)
+        inter.(name)=struct();
+    end
+    if ~isfield(added_inter,name)
+        added_inter.(name)=struct();
+    end
     fields=union(fieldnames(inter.(name)),fieldnames(added_inter.(name)));
     for k=1:numel(fields)
         field=fields{k};
@@ -241,7 +320,8 @@ for n=1:numel(names)
             if isfield(inter.(name),field)&&~isequal(inter.(name).(field),added_inter.(name).(field))
                 error('spin_bath:ownership','Generated metadata conflicts with existing native input.');
             end
-            inter.(name).(field)=added_inter.(name).(field); continue;
+            inter.(name).(field)=added_inter.(name).(field);
+            continue;
         end
         if isfield(inter.(name),field)
             old=inter.(name).(field);
@@ -250,14 +330,18 @@ for n=1:numel(names)
         else
             old=cell(count);
         end
-        if ~iscell(old), continue; end
+        if ~iscell(old)
+            continue;
+        end
         if strcmp(name,'zeeman')
-            table=cell(1,numel(sys.isotopes)); table(1:count)=old;
+            table=cell(1,numel(sys.isotopes));
+            table(1:count)=old;
             if isfield(added_inter.(name),field)
                 table(count+1:end)=added_inter.(name).(field);
             end
         else
-            table=cell(numel(sys.isotopes),numel(sys.isotopes)); table(1:count,1:count)=old;
+            table=cell(numel(sys.isotopes),numel(sys.isotopes));
+            table(1:count,1:count)=old;
             if isfield(added_inter.(name),field)
                 table(count+1:end,count+1:end)=added_inter.(name).(field);
             end
@@ -270,7 +354,9 @@ end
 if ~isempty(species)&&isfield(inter,'giant')&&all(isfield(inter.giant,{'coeff','euler'}))
     for field={'coeff','euler'}
         table=inter.giant.(field{1});
-        if ~isvector(table), table=table(:); end
+        if ~isvector(table)
+            table=table(:);
+        end
         table{end+numel(species)}=[];
         inter.giant.(field{1})=table;
     end
@@ -288,7 +374,8 @@ end
 
 % Draw each categorical site independently, including explicit vacancies
 function names=draw(prob,species,stream)
-names=cell(1,size(prob,1)); labels=[species {''}];
+names=cell(1,size(prob,1));
+labels=[species {''}];
 for k=1:size(prob,1)
     choice=find(rand(stream)<cumsum([prob(k,:) 1-sum(prob(k,:))]),1);
     names{k}=labels{choice};
@@ -298,10 +385,14 @@ end
 
 % Preserve the actual Hilbert dimension of every occupied isotopic species
 function item=configuration(ids,names,weight)
-active=~cellfun(@isempty,names); item.ids=ids(active);
-item.isotopes=names(active); item.weight=weight;
+active=~cellfun(@isempty,names);
+item.ids=ids(active);
+item.isotopes=names(active);
+item.weight=weight;
 item.multiplicities=zeros(size(item.ids));
-for k=1:numel(item.ids), [~,item.multiplicities(k)]=spin(item.isotopes{k}); end
+for k=1:numel(item.ids)
+    [~,item.multiplicities(k)]=spin(item.isotopes{k});
+end
 
 end
 
@@ -344,12 +435,20 @@ if isfield(sys,'labels')&&(~iscell(sys.labels)||numel(sys.labels)~=count)
     error('spin_bath:labels','Existing labels must match the existing sites.');
 end
 for name={'zeeman','coupling'}
-    if ~isfield(inter,name{1}), continue; end
+    if ~isfield(inter,name{1})
+        continue;
+    end
     fields=fieldnames(inter.(name{1}));
     for k=1:numel(fields)
         value=inter.(name{1}).(fields{k});
-        if ~iscell(value), continue; end
-        if strcmp(name{1},'zeeman'), shape=[1 count]; else, shape=[count count]; end
+        if ~iscell(value)
+            continue;
+        end
+        if strcmp(name{1},'zeeman')
+            shape=[1 count];
+        else
+            shape=[count count];
+        end
         if ~isequal(size(value),shape)&&~(count==0&&isempty(value))
             error('spin_bath:tables','Existing native interaction tables must match the sites.');
         end
@@ -362,7 +461,9 @@ if ~isstruct(s)||~isscalar(s)||~all(isfield(s,{'mode','isotopes','magnetic'}))||
    ~isreal(s.magnetic)||~isfinite(s.magnetic)||s.magnetic<0
     error('Invalid bath specification.');
 end
-for k=1:numel(s.isotopes), spin(s.isotopes{k}); end
+for k=1:numel(s.isotopes)
+    spin(s.isotopes{k});
+end
 if isfield(s,'seed')&&(~isnumeric(s.seed)||~isreal(s.seed)||~isscalar(s.seed)||...
    ~isfinite(s.seed)||s.seed<0||s.seed>2^32-1||s.seed~=fix(s.seed))
     error('Seed must be a nonnegative integer.');
@@ -372,7 +473,9 @@ allowed={'mode','isotopes','magnetic','coordinates_A','fractional','cell_A','rep
          'rotation','translation_A','species','configurations','remove_ids',...
          'selection','isotopologues','tensors_Hz','pairs_Hz','groups'};
 unknown=setdiff(fieldnames(s),allowed);
-if ~isempty(unknown), error('Unsupported bath specification.%s.',unknown{1}); end
+if ~isempty(unknown)
+    error('Unsupported bath specification.%s.',unknown{1});
+end
 mode_fields={'coordinates_A','explicit';'fractional','lattice';'cell_A','lattice';...
              'repeats','lattice';'bounds_A','random';'count','random';...
              'density','random';'dimension','random';'exclusion_A','random';'max_attempts','random'};
@@ -415,13 +518,21 @@ switch s.mode
            (isfield(s,'count')==isfield(s,'density'))
             error('Random baths need bounds, dimension, seed, attempt ceiling, and count OR density.');
         end
-        if isfield(s,'count')&&(~isscalar(s.count)||s.count<0||s.count~=fix(s.count)), error('Invalid count.'); end
-        if isfield(s,'density')&&(~isscalar(s.density)||~isfinite(s.density)||s.density<0), error('Invalid SI density.'); end
-        if isfield(s,'exclusion_A')&&(~isscalar(s.exclusion_A)||~isfinite(s.exclusion_A)||s.exclusion_A<0), error('Invalid exclusion.'); end
+        if isfield(s,'count')&&(~isscalar(s.count)||s.count<0||s.count~=fix(s.count))
+            error('Invalid count.');
+        end
+        if isfield(s,'density')&&(~isscalar(s.density)||~isfinite(s.density)||s.density<0)
+            error('Invalid SI density.');
+        end
+        if isfield(s,'exclusion_A')&&(~isscalar(s.exclusion_A)||~isfinite(s.exclusion_A)||s.exclusion_A<0)
+            error('Invalid exclusion.');
+        end
         n=1;
 end
 site_count=n;
-if strcmp(s.mode,'lattice'), site_count=n*prod(s.repeats); end
+if strcmp(s.mode,'lattice')
+    site_count=n*prod(s.repeats);
+end
 if strcmp(s.mode,'random')
     if isfield(s,'dimension')&&(~isnumeric(s.dimension)||~isscalar(s.dimension)||...
        s.dimension~=nnz(diff(s.bounds_A)))
@@ -434,10 +545,16 @@ if strcmp(s.mode,'random')
         site_count=round(s.density*prod(widths(widths>0)*1e-10));
     end
 end
-if strcmp(s.mode,'random'), n=site_count; end
-if numel(s.isotopes)~=1&&numel(s.isotopes)~=n, error('Species count mismatch.'); end
+if strcmp(s.mode,'random')
+    n=site_count;
+end
+if numel(s.isotopes)~=1&&numel(s.isotopes)~=n
+    error('Species count mismatch.');
+end
 if isfield(s,'groups')
-    if ~iscell(s.groups)||~isrow(s.groups), error('Groups must be a cell row.'); end
+    if ~iscell(s.groups)||~isrow(s.groups)
+        error('Groups must be a cell row.');
+    end
     for k=1:numel(s.groups)
         g=s.groups{k};
         if ~isnumeric(g)||~isreal(g)||~isrow(g)||isempty(g)||...
@@ -455,7 +572,8 @@ if isfield(s,'pairs_Hz')
     end
     pair_ids=zeros(numel(s.pairs_Hz),2);
     for k=1:numel(s.pairs_Hz)
-        ids=s.pairs_Hz(k).ids; tensor=s.pairs_Hz(k).tensor;
+        ids=s.pairs_Hz(k).ids;
+        tensor=s.pairs_Hz(k).tensor;
         if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||numel(ids)~=2||...
            any(~isfinite(ids))||any(ids<1)||any(ids>site_count)||any(ids~=fix(ids))
             error('Pair tensors require valid candidate site IDs.');
@@ -473,7 +591,9 @@ end
 if isfield(s,'selection')
     q=s.selection;
     unknown=setdiff(fieldnames(q),{'centres_A','inner_A','outer_A'});
-    if ~isempty(unknown), error('Unsupported selection.%s.',unknown{1}); end
+    if ~isempty(unknown)
+        error('Unsupported selection.%s.',unknown{1});
+    end
     if ~isstruct(q)||~all(isfield(q,{'centres_A','inner_A','outer_A'}))||...
        isempty(q.centres_A)||size(q.centres_A,2)~=3||any(~isfinite(q.centres_A),'all')||...
        ~isscalar(q.inner_A)||~isscalar(q.outer_A)||q.inner_A<0||q.outer_A<q.inner_A||...
@@ -488,7 +608,9 @@ if isfield(s,'remove_ids')&&(~isnumeric(s.remove_ids)||~isreal(s.remove_ids)||..
 end
 if isfield(s,'pairs_Hz')
     unknown=setdiff(fieldnames(s.pairs_Hz),{'ids','tensor'});
-    if ~isempty(unknown), error('Unsupported pairs_Hz.%s.',unknown{1}); end
+    if ~isempty(unknown)
+        error('Unsupported pairs_Hz.%s.',unknown{1});
+    end
 end
 if isfield(s,'tensors_Hz')&&(~isnumeric(s.tensors_Hz)||~isreal(s.tensors_Hz)||...
    size(s.tensors_Hz,1)~=3||size(s.tensors_Hz,2)~=3||any(~isfinite(s.tensors_Hz),'all'))
@@ -499,23 +621,33 @@ if isfield(s,'rotation')&&(~isnumeric(s.rotation)||~isreal(s.rotation)||~isequal
    abs(det(s.rotation)-1)>100*eps)
     error('Rotation must be proper orthogonal.');
 end
-if isfield(s,'translation_A')&&(~isequal(size(s.translation_A),[1 3])||any(~isfinite(s.translation_A))), error('Invalid translation.'); end
+if isfield(s,'translation_A')&&(~isequal(size(s.translation_A),[1 3])||any(~isfinite(s.translation_A)))
+    error('Invalid translation.');
+end
 if isfield(s,'occupancy')
     if ~isfield(s,'species')||~iscellstr(s.species)||size(s.occupancy,2)~=numel(s.species)||...
        ~ismember(size(s.occupancy,1),[1 n])||any(~isfinite(s.occupancy),'all')||...
        any(s.occupancy<0,'all')||any(sum(s.occupancy,2)>1)
         error('Invalid isotope probabilities.');
     end
-    for k=1:numel(s.species), spin(s.species{k}); end
-    if ~isfield(s,'isotopologues')&&~isfield(s,'seed'), error('Occupancy sampling requires a seed.'); end
+    for k=1:numel(s.species)
+        spin(s.species{k});
+    end
+    if ~isfield(s,'isotopologues')&&~isfield(s,'seed')
+        error('Occupancy sampling requires a seed.');
+    end
 end
 if isfield(s,'configurations')
     unknown=setdiff(fieldnames(s.configurations),{'isotopes','weight'});
-    if ~isempty(unknown), error('Unsupported configurations.%s.',unknown{1}); end
+    if ~isempty(unknown)
+        error('Unsupported configurations.%s.',unknown{1});
+    end
 end
 if isfield(s,'isotopologues')
     unknown=setdiff(fieldnames(s.isotopologues),{'mode','max_configurations','count'});
-    if ~isempty(unknown), error('Unsupported isotopologues.%s.',unknown{1}); end
+    if ~isempty(unknown)
+        error('Unsupported isotopologues.%s.',unknown{1});
+    end
     if strcmp(s.isotopologues.mode,'enumerate')&&isfield(s.isotopologues,'count')
         error('isotopologues.count requires sample mode.');
     end
@@ -529,14 +661,20 @@ if isfield(s,'configurations')
         error('Joint configuration weights must sum to one.');
     end
     for k=1:numel(weights)
-        if numel(s.configurations(k).isotopes)~=site_count, error('Joint configuration size mismatch.'); end
+        if numel(s.configurations(k).isotopes)~=site_count
+            error('Joint configuration size mismatch.');
+        end
     end
 end
 if isfield(s,'isotopologues')
     o=s.isotopologues;
-    if ~isfield(o,'mode')||~ismember(o.mode,{'enumerate','sample'}), error('Invalid isotopologue mode.'); end
+    if ~isfield(o,'mode')||~ismember(o.mode,{'enumerate','sample'})
+        error('Invalid isotopologue mode.');
+    end
     if strcmp(o.mode,'enumerate')
-        if ~isfield(o,'max_configurations')||o.max_configurations<1||o.max_configurations~=fix(o.max_configurations), error('Enumeration ceiling required.'); end
+        if ~isfield(o,'max_configurations')||o.max_configurations<1||o.max_configurations~=fix(o.max_configurations)
+            error('Enumeration ceiling required.');
+        end
     elseif ~isfield(s,'seed')||~isfield(o,'count')||o.count<1||o.count~=fix(o.count)
         error('Sampling count and seed required.');
     end

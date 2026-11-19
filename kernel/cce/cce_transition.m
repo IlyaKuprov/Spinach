@@ -39,48 +39,70 @@ grumble(spin_system,parameters,assumptions);
 % A compiled model reuses the retained generator; ordinary callers use stock
 model=[];
 if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
-    model=spin_system; spin_system=model.spin_system;
+    model=spin_system;
+    spin_system=model.spin_system;
 end
 
 % Preserve the caller's random stream across stock subsystem construction
-rng_state=rng; rng_restore=onCleanup(@()rng(rng_state));
-selection=parameters.transition; ids=parameters.observed;
-dims=spin_system.comp.mults(ids); dimension=prod(dims);
+rng_state=rng;
+rng_restore=onCleanup(@()rng(rng_state));
+selection=parameters.transition;
+ids=parameters.observed;
+dims=spin_system.comp.mults(ids);
+dimension=prod(dims);
 
 % Construct only the observed Hamiltonian in the declared physical frame
 angles=[0 0 0];
-if isfield(parameters,'orientation'), angles=parameters.orientation; end
-if ischar(assumptions), assumption_args={assumptions}; else, assumption_args=assumptions; end
+if isfield(parameters,'orientation')
+    angles=parameters.orientation;
+end
+if ischar(assumptions)
+    assumption_args={assumptions};
+else
+    assumption_args=assumptions;
+end
 native=~isempty(model)&&isfield(parameters.transition,'ms')&&...
        strcmp(model.formalism,'zeeman-hilb')&&...
        strcmp(model.parameters.cce.bath_state.mode,'mixed_product')&&...
        (~isfield(model.parameters,'bath_jumps')||isempty(model.parameters.bath_jumps));
 if ~native
     system=spin_system;
-    if isfield(system,'bas'), system=rmfield(system,'bas'); end
+    if isfield(system,'bas')
+        system=rmfield(system,'bas');
+    end
     system=kill_spin(system,setdiff(1:spin_system.comp.nspins,ids));
-    bas.formalism='zeeman-hilb'; bas.approximation={'none'};
+    bas.formalism='zeeman-hilb';
+    bas.approximation={'none'};
     system=basis(system,bas);
     system=assume(system,assumption_args{:});
-    if isfield(parameters,'orientation'), angles=parameters.orientation; else, angles=[0 0 0]; end
-    [H,Q]=hamiltonian(system); H=full(H+orientation(Q,angles));
+    if isfield(parameters,'orientation')
+        angles=parameters.orientation;
+    else
+        angles=[0 0 0];
+    end
+    [H,Q]=hamiltonian(system);
+    H=full(H+orientation(Q,angles));
 
     % Preserve the caller's tensor-product ordering rather than sorting spin IDs
     if numel(ids)>1
         [~,order]=ismember(ids,sort(ids));
         indices=reshape(1:dimension,fliplr(spin_system.comp.mults(sort(ids))));
         indices=permute(indices,numel(ids)+1-fliplr(order));
-        indices=indices(:); H=H(indices,indices);
+        indices=indices(:);
+        H=H(indices,indices);
     end
 
 else
 
     % Reuse the compiled observed subsystem without exterior mean fields
-    model.parameters.cce.meanfield='none'; model.formalism='zeeman-hilb';
+    model.parameters.cce.meanfield='none';
+    model.formalism='zeeman-hilb';
     config=struct('configuration_id',1,'state_id',1,'weight',1);
     [system,~]=cce_subsystem(model,[],config,[]);
-    p=model.parameters; p.cce.approximation='generalized';
-    [H,~,~,~]=cce_generators(system,p,[]); H=full(H);
+    p=model.parameters;
+    p.cce.approximation='generalized';
+    [H,~,~,~]=cce_generators(system,p,[]);
+    H=full(H);
 end
 
 % Check Hermiticity at the rounding scale of the observed Hamiltonian
@@ -88,7 +110,9 @@ tolerance=dimension*eps(max(1,norm(H,'fro')));
 if norm(H-H','fro')>tolerance
     error('cce_transition:hermiticity','The observed Hamiltonian must be Hermitian.');
 end
-[V,D]=eig((H+H')/2,'vector'); [energies,order]=sort(real(D)); V=V(:,order);
+[V,D]=eig((H+H')/2,'vector');
+[energies,order]=sort(real(D));
+V=V(:,order);
 
 % Resolve product magnetic quantum numbers or energy-ordered eigenstates
 if isfield(selection,'ms')
@@ -118,7 +142,8 @@ elseif isfield(selection,'levels')
     end
     kind='levels';
 else
-    vectors=[selection.alpha selection.beta]; kind='explicit';
+    vectors=[selection.alpha selection.beta];
+    kind='explicit';
 end
 
 % Return the ordered states and their physically meaningful energy metadata
@@ -128,7 +153,8 @@ meta=struct('selector',kind,'spins',ids,'multiplicities',dims,...
             'assumptions',{assumption_args},'energy_units','rad/s');
 meta.energies=real(diag(vectors'*H*vectors)).';
 meta.gap=meta.energies(2)-meta.energies(1);
-meta.residuals=zeros(1,2); meta.nearest_gaps=NaN(1,2);
+meta.residuals=zeros(1,2);
+meta.nearest_gaps=NaN(1,2);
 meta.eigenvalues=energies.';
 for k=1:2
     meta.residuals(k)=norm(H*vectors(:,k)-meta.energies(k)*vectors(:,k));
@@ -164,7 +190,8 @@ explicit=isfield(s,'alpha')||isfield(s,'beta');
 if double(isfield(s,'ms'))+double(isfield(s,'levels'))+double(explicit)~=1
     error('cce_transition:selector','Choose exactly one of ms, levels or alpha/beta.');
 end
-dims=spin_system.comp.mults(ids); dimension=prod(dims);
+dims=spin_system.comp.mults(ids);
+dimension=prod(dims);
 if isfield(s,'ms')
     if ~isnumeric(s.ms)||~isreal(s.ms)||~isequal(size(s.ms),[numel(ids) 2])||...
        any(~isfinite(s.ms),'all')

@@ -33,8 +33,10 @@ function [sys,inter,fixture]=cce_fixture(name,revision)
 grumble(name,revision);
 
 % Standard Spinach system with source gyromagnetic ratios mapped to g/ppm
-sys.magnet=500*1e-4; sys.isotopes={'E3','13C','13C','13C','13C'};
-inter.zeeman.matrix=cell(1,5); inter.coupling.matrix=cell(5);
+sys.magnet=500*1e-4;
+sys.isotopes={'E3','13C','13C','13C','13C'};
+inter.zeeman.matrix=cell(1,5);
+inter.coupling.matrix=cell(5);
 gfree=2.00231930436256;
 inter.zeeman.matrix{1}=gfree*(-17608.59705*1e7/spin('E3'))*eye(3);
 for n=2:5
@@ -68,7 +70,8 @@ for j=1:4
     for k=j+1:4
 
         % Independent source-unit conversion; displacement is in Angstrom
-        r=(xyz(k,:)-xyz(j,:))*1e-10; u=r/norm(r);
+        r=(xyz(k,:)-xyz(j,:))*1e-10;
+        u=r/norm(r);
         angular=1e-7*1.054571817e-34*(6.7282853242747445*1e7)^2/norm(r)^3;
         inter.coupling.matrix{j+1,k+1}=angular*(eye(3)-3*(u.'*u))/(2*pi);
 
@@ -76,7 +79,8 @@ for j=1:4
 end
 
 % Retain the original literal grid and inspectable source metadata
-fixture.name=name; fixture.revision=revision;
+fixture.name=name;
+fixture.revision=revision;
 fixture.source=struct('repository','MICCoMpy/PyCCE',...
                       'commit','d74d3cb683bf3caa07231654314e554f440833b4',...
                       'doi','10.1002/adts.202100254');

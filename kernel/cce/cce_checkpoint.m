@@ -35,8 +35,11 @@ grumble(filename,action,state);
 if strcmp(action,'read')
 
     % Validate stored data and compare all run identities and task IDs
-    expected=state; loaded=load(filename,'state');
-    if ~isfield(loaded,'state'), error('cce_checkpoint:schema','Missing checkpoint state.'); end
+    expected=state;
+    loaded=load(filename,'state');
+    if ~isfield(loaded,'state')
+        error('cce_checkpoint:schema','Missing checkpoint state.');
+    end
     state=cce_checkpoint(filename,'validate',loaded.state);
     if ~isequaln(state.identity,expected.identity)||~isequaln(state.task_ids,expected.task_ids)
         error('cce_checkpoint:identity','Checkpoint identity or task list differs.');
@@ -47,7 +50,9 @@ end
 
 % Cover the payload, identities, completion bitmap, and raw numerical data
 content=state;
-if isfield(content,'checksum'), content=rmfield(content,'checksum'); end
+if isfield(content,'checksum')
+    content=rmfield(content,'checksum');
+end
 checksum=md5_hash(content);
 if strcmp(action,'validate')
     if ~isfield(state,'checksum')||~isequal(state.checksum,checksum)
@@ -66,8 +71,12 @@ if isfile(filename)
     end
 end
 folder=fileparts(filename);
-if isempty(folder), folder=pwd; end
-if ~isfolder(folder), error('cce_checkpoint:directory','Checkpoint directory does not exist.'); end
+if isempty(folder)
+    folder=pwd;
+end
+if ~isfolder(folder)
+    error('cce_checkpoint:directory','Checkpoint directory does not exist.');
+end
 
 % Write and verify a closed temporary file before a single atomic rename
 temporary=[tempname(folder) '.mat'];
@@ -75,9 +84,13 @@ try
     save(temporary,'state','-v7');
     cce_checkpoint(temporary,'read',state);
     [ok,message]=movefile(temporary,filename,'f');
-    if ~ok, error('cce_checkpoint:write','%s',message); end
+    if ~ok
+        error('cce_checkpoint:write','%s',message);
+    end
 catch exception
-    if isfile(temporary), delete(temporary); end
+    if isfile(temporary)
+        delete(temporary);
+    end
     rethrow(exception);
 end
 
@@ -102,7 +115,9 @@ if isfield(state,'identity')&&isfield(state.identity,'experiment')&&...
     ~ischar(state.identity.experiment)||~isscalar(state.identity.capability_version))
     error('cce_checkpoint:experiment','Native identity requires experiment and capability_version.');
 end
-if strcmp(action,'read'), return; end
+if strcmp(action,'read')
+    return;
+end
 fields={'version','identity','payload','task_ids','completed','records'};
 if ~all(isfield(state,fields))||~isequal(state.version,1)||...
    ~isstruct(state.identity)||~isscalar(state.identity)||...

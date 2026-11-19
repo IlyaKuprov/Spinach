@@ -41,9 +41,12 @@ grumble(filename,format,units);
 if ismember(format,{'json','mat'})||...
    (strcmp(format,'csv')&&isfile([filename '.json']))
     if strcmp(format,'mat')
-        loaded=load(filename,'envelope'); envelope=loaded.envelope;
+        loaded=load(filename,'envelope');
+        envelope=loaded.envelope;
     else
-        if strcmp(format,'csv'), filename=[filename '.json']; end
+        if strcmp(format,'csv')
+            filename=[filename '.json'];
+        end
         envelope=unpack(jsondecode(fileread(filename)));
     end
     if ~isstruct(envelope)||~all(isfield(envelope,{'schema','version','payload'}))||...
@@ -51,12 +54,15 @@ if ismember(format,{'json','mat'})||...
        ~isfield(envelope,'model')||~isfield(envelope,'payload')
         error('cce_import:version','Unsupported CCE file schema.');
     end
-    imported=struct('model',envelope.model,'result',envelope.payload); return;
+    imported=struct('model',envelope.model,'result',envelope.payload);
+    return;
 end
 
 % Apply the declared frame for non-self-describing physical input
 rotation=eye(3);
-if isfield(units,'rotation'), rotation=units.rotation; end
+if isfield(units,'rotation')
+    rotation=units.rotation;
+end
 imported=struct('schema_version',1,'source',filename,'input_units',units,...
                 'frame','lab','rotation',rotation);
 
@@ -65,12 +71,19 @@ switch format
     case 'xyz'
 
         % Read the declared site count and Cartesian coordinate rows
-        fid=fopen(filename,'r'); cleanup=onCleanup(@()fclose(fid));
-        n=str2double(fgetl(fid)); imported.comment=fgetl(fid);
-        if ~isscalar(n)||~isfinite(n)||n<0||n~=fix(n), error('Invalid XYZ site count.'); end
+        fid=fopen(filename,'r');
+        cleanup=onCleanup(@()fclose(fid));
+        n=str2double(fgetl(fid));
+        imported.comment=fgetl(fid);
+        if ~isscalar(n)||~isfinite(n)||n<0||n~=fix(n)
+            error('Invalid XYZ site count.');
+        end
         data=textscan(fid,'%s %f %f %f','CollectOutput',true);
-        if numel(data{1})~=n||size(data{2},1)~=n, error('XYZ count mismatch.'); end
-        imported.labels=data{1}.'; imported.ids=1:n;
+        if numel(data{1})~=n||size(data{2},1)~=n
+            error('XYZ count mismatch.');
+        end
+        imported.labels=data{1}.';
+        imported.ids=1:n;
         imported.coordinates_A=data{2}*length_factor(units)*rotation.';
     case 'csv'
 
@@ -79,13 +92,17 @@ switch format
         if ~all(ismember({'id','isotope','x','y','z'},data.Properties.VariableNames))
             error('Spin CSV requires id,isotope,x,y,z.');
         end
-        imported.ids=data.id.'; imported.isotopes=cellstr(data.isotope).';
+        imported.ids=data.id.';
+        imported.isotopes=cellstr(data.isotope).';
         imported.coordinates_A=[data.x data.y data.z]*length_factor(units)*rotation.';
-        if numel(unique(imported.ids))~=height(data), error('Duplicate physical IDs.'); end
+        if numel(unique(imported.ids))~=height(data)
+            error('Duplicate physical IDs.');
+        end
     case 'tensor'
 
         % Rotate scalar or full Cartesian pair tensors into laboratory axes
-        data=readmatrix(filename); data=data(~all(isnan(data),2),:);
+        data=readmatrix(filename);
+        data=data(~all(isnan(data),2),:);
         if ~ismember(size(data,2),[3 11])||any(~isfinite(data),'all')
             error('Tensor CSV needs id1,id2,scalar or nine row-major components.');
         end
@@ -97,37 +114,58 @@ switch format
             case 'rad/s', scale=1/(2*pi);
             case {'T','mT','G'}
                 scale=1;
-                if strcmp(units.tensor,'mT'), scale=1e-3; end
-                if strcmp(units.tensor,'G'), scale=1e-4; end
+                if strcmp(units.tensor,'mT')
+                    scale=1e-3;
+                end
+                if strcmp(units.tensor,'G')
+                    scale=1e-4;
+                end
                 scale=scale*units.gyro_rad_s_T/(2*pi);
         end
         for k=1:size(data,1)
             if size(data,2)==3, tensor=data(k,3)*eye(3);
-            else, tensor=reshape(data(k,3:11),3,3).'; end
+            else
+                tensor=reshape(data(k,3:11),3,3).';
+            end
             imported.pairs_Hz(k)=struct('ids',data(k,1:2),...
                                        'tensor',scale*rotation*tensor*rotation.');
         end
     case 'cube'
 
         % Preserve voxel geometry and density units without interpolation
-        fid=fopen(filename,'r'); cleanup=onCleanup(@()fclose(fid));
+        fid=fopen(filename,'r');
+        cleanup=onCleanup(@()fclose(fid));
         imported.comment={fgetl(fid),fgetl(fid)};
-        line=sscanf(fgetl(fid),'%f').'; atoms=line(1);
-        if atoms<0||atoms~=fix(atoms), error('Orbital cubes are not supported.'); end
-        imported.origin_A=line(2:4)*length_factor(units)*rotation.';
-        counts=zeros(1,3); vectors=zeros(3);
-        for k=1:3
-            line=sscanf(fgetl(fid),'%f').'; counts(k)=line(1); vectors(k,:)=line(2:4);
+        line=sscanf(fgetl(fid),'%f').';
+        atoms=line(1);
+        if atoms<0||atoms~=fix(atoms)
+            error('Orbital cubes are not supported.');
         end
-        if any(counts<=0|counts~=fix(counts)), error('Cube counts must be positive; declare units explicitly.'); end
+        imported.origin_A=line(2:4)*length_factor(units)*rotation.';
+        counts=zeros(1,3);
+        vectors=zeros(3);
+        for k=1:3
+            line=sscanf(fgetl(fid),'%f').';
+            counts(k)=line(1);
+            vectors(k,:)=line(2:4);
+        end
+        if any(counts<=0|counts~=fix(counts))
+            error('Cube counts must be positive; declare units explicitly.');
+        end
         atom_table=zeros(atoms,5);
-        for k=1:atoms, atom_table(k,:)=sscanf(fgetl(fid),'%f').'; end
+        for k=1:atoms
+            atom_table(k,:)=sscanf(fgetl(fid),'%f').';
+        end
         values=fscanf(fid,'%f');
-        if numel(values)~=prod(counts), error('Cube voxel count mismatch.'); end
-        imported.atomic_numbers=atom_table(:,1); imported.charges=atom_table(:,2);
+        if numel(values)~=prod(counts)
+            error('Cube voxel count mismatch.');
+        end
+        imported.atomic_numbers=atom_table(:,1);
+        imported.charges=atom_table(:,2);
         imported.coordinates_A=atom_table(:,3:5)*length_factor(units)*rotation.';
         imported.voxel_vectors_A=vectors*length_factor(units)*rotation.';
-        imported.grid_size=counts; imported.density=permute(reshape(values,fliplr(counts)),[3 2 1]);
+        imported.grid_size=counts;
+        imported.density=permute(reshape(values,fliplr(counts)),[3 2 1]);
         imported.density_units=units.density;
 end
 
@@ -163,42 +201,68 @@ switch encoded.kind
         end
     case 'function'
         value=str2func(encoded.name);
-        if ~isequal(value,@clexpn), cce_capabilities(value); end
+        if ~isequal(value,@clexpn)
+            cce_capabilities(value);
+        end
     case 'sparse'
         value=sparse(unpack(encoded.rows),unpack(encoded.columns),...
                      unpack(encoded.entries),encoded.shape(1),encoded.shape(2));
         value=cast(value,encoded.class);
     case 'integer'
         if prod(encoded.shape)==0
-            value=zeros(encoded.shape.',encoded.class); return;
+            value=zeros(encoded.shape.',encoded.class);
+            return;
         end
         value=reshape(typecast(uint8(encoded.bytes),encoded.class),encoded.shape.');
     case 'array'
         if prod(encoded.shape)==0
-            value=zeros(encoded.shape.',encoded.class); return;
+            value=zeros(encoded.shape.',encoded.class);
+            return;
         end
-        re=str2double(encoded.real); im=str2double(encoded.imag);
-        if all(im==0), data=re; else, data=complex(re,im); end
+        re=str2double(encoded.real);
+        im=str2double(encoded.imag);
+        if all(im==0)
+            data=re;
+        else
+            data=complex(re,im);
+        end
         value=reshape(cast(data,encoded.class),encoded.shape.');
     case 'char'
         value=encoded.value;
-        if isfield(encoded,'shape'), value=reshape(value,encoded.shape.'); end
+        if isfield(encoded,'shape')
+            value=reshape(value,encoded.shape.');
+        end
     case 'string'
         value=reshape(string(encoded.items),encoded.shape.');
-        if isfield(encoded,'missing'), value(unpack(encoded.missing))=missing; end
+        if isfield(encoded,'missing')
+            value(unpack(encoded.missing))=missing;
+        end
     case 'cell'
         items=encoded.items;
-        if isempty(items), items=cell(0,1); end
-        if isstruct(items), items=num2cell(items); end
+        if isempty(items)
+            items=cell(0,1);
+        end
+        if isstruct(items)
+            items=num2cell(items);
+        end
         value=reshape(cellfun(@unpack,items,'UniformOutput',false),encoded.shape.');
     case 'struct'
-        names=encoded.fields; items=encoded.items;
-        if isempty(names), names=cell(0,1); end
-        if isempty(items), items=cell(0,1); end
-        if isstruct(items), items=num2cell(items); end
+        names=encoded.fields;
+        items=encoded.items;
+        if isempty(names)
+            names=cell(0,1);
+        end
+        if isempty(items)
+            items=cell(0,1);
+        end
+        if isstruct(items)
+            items=num2cell(items);
+        end
         value=repmat(cell2struct(cell(size(names)),names),encoded.shape.');
         for j=1:numel(names)
-            for k=1:numel(value), value(k).(names{j})=unpack(items{k+(j-1)*numel(value)}); end
+            for k=1:numel(value)
+                value(k).(names{j})=unpack(items{k+(j-1)*numel(value)});
+            end
         end
     otherwise
         error('Unknown serialization type.');
@@ -214,12 +278,22 @@ if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
     error('Invalid CCE import arguments.');
 end
 allowed={};
-if ismember(format,{'xyz','csv','cube'}), allowed={'length','rotation','frame'}; end
-if strcmp(format,'tensor'), allowed={'tensor','rotation','gyro_rad_s_T','frame'}; end
-if strcmp(format,'cube'), allowed=[allowed {'density'}]; end
-if strcmp(format,'csv')&&isfile([filename '.json']), allowed={}; end
+if ismember(format,{'xyz','csv','cube'})
+    allowed={'length','rotation','frame'};
+end
+if strcmp(format,'tensor')
+    allowed={'tensor','rotation','gyro_rad_s_T','frame'};
+end
+if strcmp(format,'cube')
+    allowed=[allowed {'density'}];
+end
+if strcmp(format,'csv')&&isfile([filename '.json'])
+    allowed={};
+end
 unknown=setdiff(fieldnames(units),allowed);
-if ~isempty(unknown), error('Unsupported units.%s for format %s.',unknown{1},format); end
+if ~isempty(unknown)
+    error('Unsupported units.%s for format %s.',unknown{1},format);
+end
 if isfield(units,'gyro_rad_s_T')&&isfield(units,'tensor')&&...
    ~ismember(units.tensor,{'T','mT','G'})
     error('units.gyro_rad_s_T is only used for field-valued tensors.');
@@ -236,14 +310,20 @@ if ~isfield(units,'frame')||~ischar(units.frame)||isempty(units.frame)
     error('External physical input requires a declared frame.');
 end
 if ismember(format,{'xyz','csv','cube'})
-    if ~isfield(units,'length'), error('Length units are required.'); end
-    if ~ismember(units.length,{'angstrom','nm','m','bohr'}), error('Unsupported length units.'); end
+    if ~isfield(units,'length')
+        error('Length units are required.');
+    end
+    if ~ismember(units.length,{'angstrom','nm','m','bohr'})
+        error('Unsupported length units.');
+    end
 end
 if strcmp(format,'cube')&&~isfield(units,'density')
     error('Cube density units must be declared.');
 end
 if strcmp(format,'tensor')
-    if ~isfield(units,'tensor'), error('Tensor units are required.'); end
+    if ~isfield(units,'tensor')
+        error('Tensor units are required.');
+    end
     if ~ismember(units.tensor,{'Hz','kHz','MHz','rad/s','T','mT','G'})
         error('Unsupported tensor units.');
     end

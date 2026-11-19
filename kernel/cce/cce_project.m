@@ -43,16 +43,20 @@ operators=reshape(meta.operators.',1,[]);
 
 % Resolve the explicitly optional second-order approximation
 enabled=isfield(parameters,'second_order')&&parameters.second_order.enabled;
-manifolds.second_order_enabled=enabled; manifolds.observed_hamiltonian=H_obs;
-manifolds.observed_ids=model.observed_ids; manifolds.eigenvalues=eigenvalues;
+manifolds.second_order_enabled=enabled;
+manifolds.observed_hamiltonian=H_obs;
+manifolds.observed_ids=model.observed_ids;
+manifolds.eigenvalues=eigenvalues;
 manifolds.source_hash=model.source_hash;
 
 % Project both user-supplied vectors without selecting arbitrary eigenindices
 for name={'alpha','beta'}
 
     % Record the state and each physical-spin angular momentum expectation
-    state=parameters.transition.(name{1}); manifold.vector=state;
-    manifold.projector=state*state'; manifold.energy=real(state'*H_obs*state);
+    state=parameters.transition.(name{1});
+    manifold.vector=state;
+    manifold.projector=state*state';
+    manifold.energy=real(state'*H_obs*state);
     manifold.expectations=zeros(numel(model.observed_ids),3);
     for n=1:numel(model.observed_ids)
         for a=1:3
@@ -78,7 +82,9 @@ for name={'alpha','beta'}
             error('transition.%s has a near-degenerate second-order denominator.',name{1});
         end
         for n=1:numel(eigenvalues)
-            if n==selected, continue; end
+            if n==selected
+                continue;
+            end
             matrix_elements=zeros(numel(operators),1);
             for k=1:numel(operators)
                 matrix_elements(k)=state'*operators{k}*eigenvectors(:,n);
@@ -89,7 +95,8 @@ for name={'alpha','beta'}
     end
 
     % Store manifold-specific first- and second-order coefficients
-    manifold.susceptibility=susceptibility; manifolds.(name{1})=manifold;
+    manifold.susceptibility=susceptibility;
+    manifolds.(name{1})=manifold;
 
 end
 

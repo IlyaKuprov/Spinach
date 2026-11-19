@@ -46,10 +46,14 @@
 function [answer,aux]=cce_acquire(spin_system,parameters,H,R,K)
 
 % Set the experiment-owned normalisation and density detector defaults
-if ~isfield(parameters,'normalized'), parameters.normalized=true; end
+if ~isfield(parameters,'normalized')
+    parameters.normalized=true;
+end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     parameters.normalized=false;
-    if ~isfield(parameters,'coil'), parameters.coil=eye(spin_system.observed_dimension); end
+    if ~isfield(parameters,'coil')
+        parameters.coil=eye(spin_system.observed_dimension);
+    end
 end
 
 % Validate preparation and detection before compiling physical controls
@@ -67,28 +71,37 @@ if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-lio
     % Diagonalise each bath Hamiltonian once in its original numerical convention
     [va,ea]=eig(full((H.left+H.left')/2),'vector');
     [vb,eb]=eig(full((H.right+H.right')/2),'vector');
-    ra=norm(H.left*va-va.*ea.','fro'); rb=norm(H.right*vb-vb.*eb.','fro');
-    oa=norm(va'*va-eye(size(H.left)),'fro'); ob=norm(vb'*vb-eye(size(H.right)),'fro');
-    residual=max(ra,rb); orthogonality=max(oa,ob);
+    ra=norm(H.left*va-va.*ea.','fro');
+    rb=norm(H.right*vb-vb.*eb.','fro');
+    oa=norm(va'*va-eye(size(H.left)),'fro');
+    ob=norm(vb'*vb-eye(size(H.right)),'fro');
+    residual=max(ra,rb);
+    orthogonality=max(oa,ob);
     rho=1;
-    for k=1:numel(spin_system.bath_rho), rho=kron(rho,spin_system.bath_rho{k}); end
-    answer=complex(zeros(numel(parameters.times),1)); bounds=zeros(size(answer));
+    for k=1:numel(spin_system.bath_rho)
+        rho=kron(rho,spin_system.bath_rho{k});
+    end
+    answer=complex(zeros(numel(parameters.times),1));
+    bounds=zeros(size(answer));
 
     % Keep the branch multiplication order and forward bound of the reference
     for n=1:numel(parameters.times)
         time=parameters.times(n);
-        ua=eye(spin_system.bath_dimension); ub=ua;
+        ua=eye(spin_system.bath_dimension);
+        ub=ua;
         if time~=0
             ua=((va.*exp(-1i*time*ea).')*va')*ua;
             ub=((vb.*exp(-1i*time*eb).')*vb')*ub;
         end
         answer(n)=trace(ua*rho*ub');
-        operations=12*spin_system.bath_dimension^3; gamma=operations*eps/(1-operations*eps);
+        operations=12*spin_system.bath_dimension^3;
+        gamma=operations*eps/(1-operations*eps);
         bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+4*orthogonality+...
                   gamma*(1+time*H.hamiltonian_norm);
     end
     if ~meta.normalized
-        answer=answer*reference; bounds=bounds*abs(reference);
+        answer=answer*reference;
+        bounds=bounds*abs(reference);
     end
     aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
                'orthogonality_residual',orthogonality,...
@@ -99,20 +112,33 @@ if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-lio
 end
 
 % Select the detector layout and retained generator representation
-if ~iscell(coil), detectors={coil}; else, detectors=coil; end
-if isstruct(H), generator=H; else, generator=H+1i*R+1i*K; end
+if ~iscell(coil)
+    detectors={coil};
+else
+    detectors=coil;
+end
+if isstruct(H)
+    generator=H;
+else
+    generator=H+1i*R+1i*K;
+end
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
 if density
-    if isstruct(H), error('cce_acquire:density','Projected branches do not return a density matrix.'); end
+    if isstruct(H)
+        error('cce_acquire:density','Projected branches do not return a density matrix.');
+    end
     answer=complex(zeros(numel(parameters.times),spin_system.observed_dimension^2));
 else
     answer=complex(zeros(numel(parameters.times),numel(reference)));
 end
 
 % Compile experiment-owned finite drives once for this retained subsystem
-segments=struct(); segmented=false;
+segments=struct();
+segmented=false;
 if ~isempty(events)
-    if isstruct(H), error('cce_acquire:projection','Finite controls require generalized dynamics.'); end
+    if isstruct(H)
+        error('cce_acquire:projection','Finite controls require generalized dynamics.');
+    end
     segmented=strcmp(spin_system.formalism,'zeeman-hilb')&&...
               (any(strcmp({events.type},'ideal'))||strcmp(parameters.cce.meanfield,'static')||...
                any(~ismember([events.target],spin_system.physical_ids)));
@@ -122,7 +148,9 @@ if ~isempty(events)
 
         % Allocate event times and a Hilbert representation for local operators
         starts=zeros(numel(events),numel(parameters.times));
-        drives=cell(1,numel(events)); local=spin_system; local.formalism='zeeman-hilb';
+        drives=cell(1,numel(events));
+        local=spin_system;
+        local.formalism='zeeman-hilb';
         for k=1:numel(events)
 
             % Build each retained target drive in its declared Cartesian direction
@@ -131,14 +159,21 @@ if ~isempty(events)
                 error('cce_acquire:exterior','Finite drives require retained target spins.');
             end
             axis=e.axis;
-            if ischar(axis), axis=double('xyz'==axis); end
+            if ischar(axis)
+                axis=double('xyz'==axis);
+            end
             detuning=e.detuning;
             drive=sparse(spin_system.dimension,spin_system.dimension);
             for target=e.target
                 for a=1:3
-                    names={'Lx','Ly','Lz'}; weight=e.amplitude*axis(a);
-                    if a==3, weight=weight+detuning; end
-                    if weight~=0, drive=drive+weight*cce_operator(local,names{a},target); end
+                    names={'Lx','Ly','Lz'};
+                    weight=e.amplitude*axis(a);
+                    if a==3
+                        weight=weight+detuning;
+                    end
+                    if weight~=0
+                        drive=drive+weight*cce_operator(local,names{a},target);
+                    end
                 end
             end
             if strcmp(spin_system.formalism,'zeeman-liouv')
@@ -146,7 +181,9 @@ if ~isempty(events)
             end
             drives{k}=drive;
             if strcmp(e.placement,'fraction'), starts(k,:)=e.at*parameters.times;
-            else, starts(k,:)=e.at; end
+            else
+                starts(k,:)=e.at;
+            end
 
         end
 
@@ -158,7 +195,9 @@ aux=struct();
 controlled=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
 if controlled
     aux.abs_error_bound=zeros(size(answer));
-    if segmented, aux.segments=segments; end
+    if segmented
+        aux.segments=segments;
+    end
     aux.density=complex(zeros(spin_system.observed_dimension,spin_system.observed_dimension,numel(parameters.times)));
 end
 coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
@@ -169,9 +208,12 @@ liouville=isempty(events)&&(projected_me||(~isstruct(H)&&...
 if projected_me
     db=spin_system.bath_dimension;
     generator=kron(eye(db),H.left)-kron(H.right.',eye(db));
-    if ~isempty(H.dissipator), generator=generator+1i*H.dissipator; end
+    if ~isempty(H.dissipator)
+        generator=generator+1i*H.dissipator;
+    end
     if meta.normalized
-        rho0=rho0/meta.initial_signal; reference=1;
+        rho0=rho0/meta.initial_signal;
+        reference=1;
     end
 end
 
@@ -185,22 +227,28 @@ end
 % Preserve the stock density action and its arithmetic estimate
 if liouville||driven_liouville
     if liouville
-        engine=spin_system.model.spin_system; engine.bas.formalism='sphten-liouv';
+        engine=spin_system.model.spin_system;
+        engine.bas.formalism='sphten-liouv';
         engine.tols.prop_chop=0;
     end
     scale=ones(1,size(answer,2));
     if projected_me
         scale=norm(reshape(full(coil),spin_system.bath_dimension,[]),2);
-        if ~meta.normalized, scale=scale*abs(meta.initial_signal); end
+        if ~meta.normalized
+            scale=scale*abs(meta.initial_signal);
+        end
     elseif ~density
         if ~selected
-            db=spin_system.bath_dimension; dc=spin_system.observed_dimension;
+            db=spin_system.bath_dimension;
+            dc=spin_system.observed_dimension;
             for k=1:numel(detectors)
                 detector=reshape(detectors{k},dc*db,dc*db);
                 scale(k)=norm(detector(1:db:end,1:db:end),2);
             end
         end
-        if meta.normalized, scale=scale./abs(reference); end
+        if meta.normalized
+            scale=scale./abs(reference);
+        end
     end
     if driven_liouville
         aux.abs_error_bound=zeros(size(answer));
@@ -222,7 +270,8 @@ if coherent
     aux.orthogonality_residual=norm(vectors'*vectors-eye(size(generator)),'fro');
     aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
     aux.backend=parameters.cce_aux.backend;
-    operations=12*size(generator,1)^3; gamma=operations*eps/(1-operations*eps);
+    operations=12*size(generator,1)^3;
+    gamma=operations*eps/(1-operations*eps);
     bounds=2*parameters.times(:)*(aux.eigen_residual+aux.hamiltonian_bound)+...
            4*aux.orthogonality_residual+...
            gamma*(1+parameters.times(:)*norm(generator,'fro'));
@@ -230,7 +279,9 @@ if coherent
         scale=ones(1,spin_system.observed_dimension^2);
     else
         scale=cellfun(@(op)norm(op,2),detectors(:).');
-        if meta.normalized, scale=scale./abs(reference); end
+        if meta.normalized
+            scale=scale./abs(reference);
+        end
     end
     aux.abs_error_bound=bounds.*scale;
 end
@@ -262,9 +313,11 @@ for n=1:numel(parameters.times)
         aux.abs_error_bound(n)=bound*scale;
     else
         if segmented
-            rho=rho0; scale=0;
+            rho=rho0;
+            scale=0;
             for k=1:numel(segments.durations{n})
-                ham=segments.hamiltonians{n}{k}; dt=segments.durations{n}(k);
+                ham=segments.hamiltonians{n}{k};
+                dt=segments.durations{n}(k);
                 pulse_prop=segments.pulses{n}{k}*expm(-1i*dt*ham);
                 rho=pulse_prop*rho*pulse_prop';
                 scale=scale+1+abs(dt)*norm(full(ham),2);
@@ -279,7 +332,9 @@ for n=1:numel(parameters.times)
                 aux.abs_error_bound(n,:)=bound;
             else
                 norms=cellfun(@(detector)norm(full(detector),2),detectors(:).');
-                if meta.normalized, norms=norms./abs(reference); end
+                if meta.normalized
+                    norms=norms./abs(reference);
+                end
                 aux.abs_error_bound(n,:)=bound*norms;
             end
         elseif driven_liouville
@@ -289,11 +344,14 @@ for n=1:numel(parameters.times)
 
     % Trace out the bath before applying observed-spin detection
     if density||~isstruct(H)
-        dc=spin_system.observed_dimension; db=spin_system.bath_dimension;
+        dc=spin_system.observed_dimension;
+        db=spin_system.bath_dimension;
         blocks=reshape(full(rho),[db dc db dc]);
         blocks=reshape(permute(blocks,[1 3 2 4]),[db*db dc*dc]);
         observed=reshape(sum(blocks(1:db+1:db*db,:),1),[dc dc]);
-        if controlled, aux.density(:,:,n)=observed; end
+        if controlled
+            aux.density(:,:,n)=observed;
+        end
         if density
             answer(n,:)=observed(:).';
         else
@@ -305,14 +363,18 @@ for n=1:numel(parameters.times)
                     detector=detector(1:db:end,1:db:end);
                     value=trace(detector'*observed);
                 end
-                if meta.normalized, value=value/reference(k); end
+                if meta.normalized
+                    value=value/reference(k);
+                end
                 answer(n,k)=value;
             end
         end
     else
         for k=1:numel(detectors)
             value=conj(detectors{k}(1))*trace(reshape(rho,spin_system.bath_dimension,[]));
-            if meta.normalized, value=value/reference(k); end
+            if meta.normalized
+                value=value/reference(k);
+            end
             answer(n,k)=value;
         end
     end
@@ -326,16 +388,23 @@ function [rho,bound]=driven_evolution(system,L,rho,total,events,starts,drives)
 
 % Include every drive boundary inside this observation interval
 stops=starts+reshape([events.duration],[],1);
-scale=0; coherent=strcmp(system.formalism,'zeeman-hilb');
+scale=0;
+coherent=strcmp(system.formalism,'zeeman-hilb');
 boundaries=unique([0;total;starts(starts>0&starts<total);stops(stops>0&stops<total)]);
-if coherent, boundaries=[0;boundaries]; end
+if coherent
+    boundaries=[0;boundaries];
+end
 for k=1:numel(boundaries)-1
 
     % Add simultaneously active drives without changing multiplication order
-    left=boundaries(k); right=boundaries(k+1); generator=L;
+    left=boundaries(k);
+    right=boundaries(k+1);
+    generator=L;
     midpoint=(left+right)/2;
     active=find(starts<=midpoint&stops>midpoint&right~=left);
-    for n=reshape(active,1,[]), generator=generator+drives{n}; end
+    for n=reshape(active,1,[])
+        generator=generator+drives{n};
+    end
     if coherent
         propagator=eye(size(generator))*expm(-1i*(right-left)*generator);
         rho=propagator*rho*propagator';

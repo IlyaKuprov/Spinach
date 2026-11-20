@@ -1,18 +1,21 @@
 % Field-dependent energy levels of the electron–vanadium-51 register
 % in VO(TPP), using Eq. (10) and Table I to reconstruct Figure 2 of
 % doi:10.1063/5.0278659. The field is transverse to the unique axis
-% of the g, hyperfine, and quadrupolar tensors. This is the observed
-% Hamiltonian of gCCE before any bath spins are added, not a Hahn echo.
+% of the g, hyperfine, and quadrupolar tensors. The proton Hahn echo
+% (middle of Figure 3) uses projected CCE-2 with the source crystal
+% coordinates and tensors, retaining the entire proton bath inside 20 A.
 % Syntax:
 %
-%                    [energies,fields]=gcce_votpp()
+%                    [energies,fields,echo,times]=gcce_votpp()
 %
 % Rows of energies contain the 16 ascending energy levels in GHz
 % at the corresponding entries of the field row vector fields in tesla.
+% echo and times are rows of complex normalised coherence and total
+% Hahn echo times (seconds) at 0.33 T.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [energies,fields]=gcce_votpp()
+function [energies,fields,echo,times]=gcce_votpp()
 
 % The unique axis is x in the crystal frame; the applied field is along z
 sys.isotopes={'E','51V'};
@@ -57,6 +60,14 @@ kfigure();
 plot(fields,energies);
 kxlabel('magnetic field / T');
 kylabel('energy / GHz');
+kgrid();
+
+% Calculate and display the proton-limited molecular echo
+[echo,times]=votpp_proton_echo();
+kfigure();
+plot(1e6*times,real(echo));
+kxlabel('total echo time / microseconds');
+kylabel('normalised coherence');
 kgrid();
 
 end

@@ -197,11 +197,8 @@ if (~isa(parameters.field,'function_handle'))||(~isscalar(parameters.field))
 end
 dim=parameters.spn_dim*parameters.spc_dim;
 if (~isa(parameters.transport,'double'))||(~isequal(size(parameters.transport),[dim dim]))||...
-   (any(~isfinite(parameters.transport(:))))
-    error('parameters.transport must be a finite double matrix on the full spin-space basis.');
-end
-if ~issparse(parameters.transport)
-    error('parameters.transport must be sparse.');
+   (~issparse(parameters.transport))||(any(~isfinite(nonzeros(parameters.transport))))
+    error('parameters.transport must be a finite sparse double matrix on the full spin-space basis.');
 end
 if (~isfloat(parameters.rho0))||(~isequal(size(parameters.rho0),[dim 1]))||...
    (any(~isfinite(parameters.rho0(:))))

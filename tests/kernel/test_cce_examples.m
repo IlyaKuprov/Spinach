@@ -14,6 +14,12 @@
 
 function [result,reference_capture]=test_cce_examples()
 
+% Make the CCE examples available for the duration of this test
+saved_path=path;
+path_cleanup=onCleanup(@() path(saved_path));
+root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
+addpath(fullfile(root,'examples','cce'));
+
 % Initialise the standard test record and preserve figure visibility
 result=new_test_result('kernel/cce_examples','CCE application examples',...
                        'Runnable categories and independently evaluated small limits.');
@@ -22,24 +28,37 @@ visibility=get(groot,'defaultFigureVisible');
 cleanup=onCleanup(@() set(groot,'defaultFigureVisible',visibility));
 set(groot,'defaultFigureVisible','off');
 
-% Enumerate examples explicitly so new unrelated files cannot enter the test
-names={'cce_single_nucleus','cce_nv_diamond','cce_sip_donor',...
-       'cce_sic_divacancy','gcce_sic_clock','cce_p1_electron_bath',...
-       'pcce_electron_layer','gcce_votpp','cce_erbium_cawo4',...
-       'gcce_highspin_siv','cce_hbn_quadrupoles','cce_polarized_bath',...
-       'gcce_two_centres','gcce_finite_drive','cce_deer_bandwidth',...
-       'cce_noise_spectrum','mecce_dissipative_bath',...
-       'cce_methyl_molecular','cce_molecular_powder'};
-for n=1:numel(names)
+% Pair stable reference keys with the compact calculations that produce them
+cases={'cce_single_nucleus', @cce_single_nucleus;...
+       'cce_nv_diamond', @cce_nv_four_spin;...
+       'cce_sip_donor', @cce_sip_small;...
+       'cce_sic_divacancy', @cce_sic_small;...
+       'gcce_sic_clock', @gcce_clock_small;...
+       'cce_p1_electron_bath', @p1_hahn_fixture;...
+       'pcce_electron_layer', @pcce_patch_fixture;...
+       'gcce_votpp', @votpp_density_case;...
+       'cce_erbium_cawo4', @cce_erbium_cawo4_small;...
+       'gcce_highspin_siv', @cce_siv_three_spin;...
+       'cce_hbn_quadrupoles', @cce_hbn_quadrupoles;...
+       'cce_polarized_bath', @cce_polarized_bath;...
+       'gcce_two_centres', @fixture_cce_two;...
+       'gcce_finite_drive', @gcce_finite_drive;...
+       'cce_deer_bandwidth', @cce_deer_bandwidth;...
+       'cce_noise_spectrum', @cce_noise_spectrum;...
+       'mecce_dissipative_bath', @mecce_density_case;...
+       'cce_methyl_molecular', @fixture_cce_methyl;...
+       'cce_molecular_powder', @fixture_cce_powder};
+for n=1:size(cases,1)
 
-    % Execute each public example and retain the standard harness fields only
+    % Execute each compact calculation and retain the standard harness fields only
+    name=cases{n,1};
     started=tic;
-    if ismember(names{n},{'cce_noise_spectrum','cce_single_nucleus','cce_nv_diamond',...
+    if ismember(name,{'cce_noise_spectrum','cce_single_nucleus','cce_nv_diamond',...
                           'cce_p1_electron_bath','pcce_electron_layer',...
                           'cce_erbium_cawo4','cce_hbn_quadrupoles',...
                           'cce_methyl_molecular','cce_sic_divacancy','cce_sip_donor'})
-        [answer,diagnostics]=feval(names{n});
-        switch names{n}
+        [answer,diagnostics]=cases{n,2}();
+        switch name
             case 'cce_noise_spectrum'
 
                 % Evaluate the independent transverse correlation and retain its arrays
@@ -1210,14 +1229,14 @@ for n=1:numel(names)
         end
         actual=struct('value',answer,'reference_error',reference_error,...
                       'valid',diagnostics.reduction.valid,'density',[]);
-        reference_capture.(names{n})=snapshot;
-        reference_capture.(names{n}).diagnostics=diagnostics;
-        result=test_true(result,[names{n} ' projected error bounds'],...
+        reference_capture.(name)=snapshot;
+        reference_capture.(name).diagnostics=diagnostics;
+        result=test_true(result,[name ' projected error bounds'],...
                          all(diagnostics.reduction.abs_error_bound>0),...
                          'Projected spectral error bounds must reach the reducer.');
-    elseif ismember(names{n},{'gcce_sic_clock','gcce_highspin_siv','gcce_votpp',...
+    elseif ismember(name,{'gcce_sic_clock','gcce_highspin_siv','gcce_votpp',...
                               'gcce_two_centres','gcce_finite_drive','mecce_dissipative_bath'})
-        [answer,diagnostics]=feval(names{n});
+        [answer,diagnostics]=cases{n,2}();
         actual=diagnostics.reduction;
         actual.times=diagnostics.parameters.times(:);
 
@@ -1231,7 +1250,7 @@ for n=1:numel(names)
             actual.diagnostics.trace_error(sample)=abs(trace(rho)-1);
             actual.diagnostics.minimum_eigenvalue(sample)=min(eig((rho+rho')/2));
         end
-        switch names{n}
+        switch name
             case 'gcce_sic_clock'
 
                 % Start fresh physical inputs for this independent reference
@@ -1795,9 +1814,9 @@ for n=1:numel(names)
                                  all(diagnostics.reduction.abs_error_bound>0,'all'),...
                                  'The stock Liouville action retains its arithmetic estimate.');
         end
-        reference_capture.(names{n}).diagnostics=diagnostics;
-    elseif strcmp(names{n},'cce_deer_bandwidth')
-        [answer,diagnostics]=cce_deer_bandwidth();
+        reference_capture.(name).diagnostics=diagnostics;
+    elseif strcmp(name,'cce_deer_bandwidth')
+        [answer,diagnostics]=cases{n,2}();
         actual=diagnostics.reduction;
         actual.value=answer;
         actual.density=[];
@@ -1840,8 +1859,8 @@ for n=1:numel(names)
         % Retain this case reference in the public capture structure
         actual.reference_error=reference_error;
         reference_capture.cce_deer_bandwidth=snapshot;
-    elseif strcmp(names{n},'cce_molecular_powder')
-        [answer,diagnostics]=cce_molecular_powder();
+    elseif strcmp(name,'cce_molecular_powder')
+        [answer,diagnostics]=cases{n,2}();
         actual=diagnostics.reduction;
         actual.value=answer;
         actual.density=[];
@@ -1933,8 +1952,8 @@ for n=1:numel(names)
         % Retain this case reference in the public capture structure
         actual.reference_error=reference_error;
         reference_capture.cce_molecular_powder=snapshot;
-    elseif strcmp(names{n},'cce_polarized_bath')
-        [answer,diagnostics]=cce_polarized_bath();
+    elseif strcmp(name,'cce_polarized_bath')
+        [answer,diagnostics]=cases{n,2}();
         actual=diagnostics.reduction;
         actual.value=answer;
 
@@ -1983,31 +2002,31 @@ for n=1:numel(names)
                           diagnostics.reduction.abs_error_bound,bound+rounding*magnitude,0,0,...
                           'Deterministic summation error is distinct from estimator uncertainty.');
     else
-        actual=feval(names{n});
+        actual=cases{n,2}();
     end
-    result=test_true(result,[names{n} ' valid'],all(actual.valid,'all'),...
+    result=test_true(result,[name ' valid'],all(actual.valid,'all'),...
                      'Every displayed time point has a valid expansion.');
-    result=test_true(result,[names{n} ' finite'],all(isfinite(actual.value),'all'),...
+    result=test_true(result,[name ' finite'],all(isfinite(actual.value),'all'),...
                      'Every returned complex value is finite.');
     if isfield(actual,'reference_error')
 
         % Independent small-system targets use an absolute trace-error criterion
-        result=test_close(result,[names{n} ' reference'],actual.reference_error,...
+        result=test_close(result,[name ' reference'],actual.reference_error,...
                           0,1e-7,0,'Analytic, dense expm, or pinned Python reference.');
 
     end
     if ~isempty(actual.density)
 
         % Full-order finite baths must preserve observed density physicality
-        result=test_true(result,[names{n} ' trace'],...
+        result=test_true(result,[name ' trace'],...
                          max(actual.diagnostics.trace_error)<1e-8,...
                          'Reduced density matrices retain unit trace.');
-        result=test_true(result,[names{n} ' positive'],...
+        result=test_true(result,[name ' positive'],...
                          min(actual.diagnostics.minimum_eigenvalue)>-1e-8,...
                          'No material negative population at full bath order.');
 
     end
-    if strcmp(names{n},'cce_deer_bandwidth')
+    if strcmp(name,'cce_deer_bandwidth')
 
         % Excluding the pump resonance must remove its selected pulse
         parameters=diagnostics.parameters;
@@ -2031,10 +2050,10 @@ for n=1:numel(names)
                          'The native selector removes the pulse and enforces allow_empty.');
 
     end
-    if strcmp(names{n},'cce_molecular_powder')
+    if strcmp(name,'cce_molecular_powder')
 
         % Completed orientation expansions must reproduce the powder average
-        values=cell2mat(diagnostics.values);
+        values=cat(2,diagnostics.values{:});
         result=test_close(result,'Powder weighted response',actual.value,...
                           values*diagnostics.grid.weights,2e-15,2e-15,...
                           'Powder averages completed physical responses.');
@@ -2063,7 +2082,7 @@ for n=1:numel(names)
                           'The normalized initial Hahn signal is unity.');
 
     end
-    fprintf('Example %s completed in %.3f s.\n',names{n},toc(started));
+    fprintf('Example %s completed in %.3f s.\n',name,toc(started));
     close all;
 
 end

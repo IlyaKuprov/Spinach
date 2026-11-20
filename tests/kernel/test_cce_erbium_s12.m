@@ -5,6 +5,12 @@
 
 function result=test_cce_erbium_s12()
 
+% Make the CCE examples available for the duration of this test
+saved_path=path;
+path_cleanup=onCleanup(@() path(saved_path));
+root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
+addpath(fullfile(root,'examples','cce'));
+
 % Three tungsten sites in the region of resolvable flip-flop decay
 result=new_test_result('kernel/cce_erbium_s12','Er:CaWO4 secular pair reduction',...
                        'Compare the analytical pair product with explicit Hahn propagation.');

@@ -1,9 +1,11 @@
 % Field-dependent energy levels of the electron–vanadium-51 register
 % in VO(TPP), using Eq. (10) and Table I to reconstruct Figure 2 of
-% doi:10.1063/5.0278659. The field is transverse to the unique axis
+% doi:10.1063/5.0278659. For Figure 2 the field is transverse to the unique axis
 % of the g, hyperfine, and quadrupolar tensors. The proton Hahn echo
 % (middle of Figure 3) uses projected CCE-2 with the source crystal
 % coordinates and tensors, retaining the entire proton bath inside 20 A.
+% For Figure 3 the companion input swaps x and z in g and A only;
+% the scalar vanadium quadrupolar splitting remains axial along z.
 % Syntax:
 %
 %                    [energies,fields,echo,times]=gcce_votpp()

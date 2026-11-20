@@ -15,7 +15,7 @@ tensor=2*pi*1200*diag([-1/2 -1/2 1]);
 tilts=deg2rad([40 75]);
 t_jump=0.43/rate;
 t_after=(0:80)/(32*rate);
-grid=load('leb_3ang_rank_5.mat','alphas','betas','gammas','weights');
+grid=load('leb_3ang_rank_17.mat','alphas','betas','gammas','weights');
 traces=complex(zeros(2,numel(t_after)));
 fine=complex(zeros(1,numel(t_after)));
 

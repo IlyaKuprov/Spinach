@@ -1,0 +1,3 @@
+# examples/imaging/distant_dipolar/ddf_uniform_shift.m
+
+A spatially uniform proton magnetisation is tilted 60° about x at resonance, without gradients or dissipation. The plotted phase is unwrapped relative to the first sample, so the pulse phase does not enter the fitted slope. The longitudinal component is half the equilibrium value. For dipolar time 0.1 s and the fixed L+ receiver the analytical slopes are 0, +2.5, and −5 rad/s for a sphere, axial needle, and disc normal to the field, respectively. These shapes prescribe only the uniform-mode boundary condition; the simulation does not resolve a finite sample surface.

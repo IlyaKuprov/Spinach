@@ -530,3 +530,12 @@ For one orientation, set `parameters.orientation` to a radian Euler triple. For 
 Each orientation runs independent complete dynamics. The task's cce.averaging selects expansion-first averaging or raw-record averaging before expansion with a common cluster family; the observed-only reference participates in both. Hamiltonians are never averaged. Orientations are serial; nested cluster/configuration scheduling may use the existing pool, but becomes serial inside an outer worker.
 
 The clexpn native boundary rejects parameters.sequence, including empty arrays. Use finite_drive, refocusing_train, or a named echo experiment with native physical descriptors; free_evolution is uncontrolled.
+
+For an absolutely referenced one-axis distant-dipolar CRAZED FID, call
+`imaging(spin_system,@crazed_ddf,parameters)` with a periodic uniform grid
+and independently specified equilibrium magnetisation in A/m. The pulse
+sequence recomputes the macroscopic field of the evolving magnetisation;
+its receiver is not the source of that field. Use the ideal `crazed`
+sequence instead when the question is which molecular coherence pathway
+survives a prescribed filter. The two calculations are not alternative
+implementations of the same observable.

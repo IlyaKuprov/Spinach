@@ -1,0 +1,3 @@
+# examples/imaging/distant_dipolar/ddf_coupled_pair.m
+
+Two protons at 0 and 0.02 ppm in 7 T are coupled by an isotropic 7 Hz scalar interaction. The axial 1:2 grating prepares a second-order CRAZED signal. The local molecular Hamiltonian is identical in the two acquisitions; only the dipolar feedback from the combined proton magnetisation is switched off in the control. Both receiver quadratures are divided by the same complex single-pulse signal, not by either echo maximum. This lossless synthetic pair illustrates molecular evolution in a self-consistent field; it is not an experimental assignment or a model with explicit intermolecular quantum correlations.

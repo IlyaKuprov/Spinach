@@ -42,7 +42,11 @@ else
 end
 
 % Extract ensemble grid dimensions
-n_state_pairs=numel(control.rho_init);
+if isfield(control,'gate_targets')
+    n_state_pairs=numel(control.gate_targets);
+else
+    n_state_pairs=numel(control.rho_init);
+end
 n_ens_systems=control.ndrifts;
 n_power_levls=numel(control.pwr_levels);
 n_phase_specs=size(control.phase_cycle,1);
@@ -152,7 +156,7 @@ function grumble(control)
 if ~isstruct(control)
     error('control must be a data structure produced by optimcon.m');
 end
-if ~all(isfield(control,{'rho_init','ndrifts','pwr_levels','offsets',...
+if ~all(isfield(control,{'ndrifts','pwr_levels','offsets',...
                          'phase_cycle','distortion','ens_corrs','budget'}))
     error('control must be a data structure produced by optimcon.m');
 end

@@ -76,6 +76,9 @@ switch spin_system.bas.formalism
         error('unrecognised formalism specification.');
 end
 
+% Gate objectives share waveform pullbacks with state transfer
+gate_mode=isfield(control,'gate_targets');
+
 % Cases of this block, waveform dimensions, and offset ensemble size
 my_cases=frozen.worker_cases{block}; n_mine=numel(my_cases); catalog=control.catalog;
 ncont=size(waveform,1); nsteps=size(waveform,2); off_ens_sizes=cellfun(@numel,control.offsets);
@@ -94,9 +97,12 @@ for m=1:n_mine
     n_phi=catalog(n,5); n_dis=catalog(n,6);
 
     % Get initial and target states, drift, and waveform
-    rho_init=control.rho_init{n_rho}; rho_targ=control.rho_targ{n_rho};
-    if isfield(control,'case_targets')
-        rho_targ=control.case_targets{n};
+    if ~gate_mode
+        rho_init=control.rho_init{n_rho};
+        rho_targ=control.rho_targ{n_rho};
+        if isfield(control,'case_targets')
+            rho_targ=control.case_targets{n};
+        end
     end
     L=drifts{n_sys}; local_waveform=waveform;
 
@@ -143,7 +149,13 @@ for m=1:n_mine
 
     % Fidelity, trajectory, and derivatives
     outputs=cell(1,n_outputs);
-    [outputs{:}]=grape(spin_system,L,spin_system.control.operators,local_waveform,rho_init,rho_targ,control.fidelity);
+    if gate_mode
+        [outputs{:}]=grape_gate(spin_system,L,spin_system.control.operators,...
+                                local_waveform,control.gate_targets{n_rho});
+    else
+        [outputs{:}]=grape(spin_system,L,spin_system.control.operators,...
+                           local_waveform,rho_init,rho_targ,control.fidelity);
+    end
     traj{m}=outputs{1}; fid(m)=outputs{2};
 
     % Gradient through the Jacobian, the phase cycle, and the power level

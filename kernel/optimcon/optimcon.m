@@ -271,118 +271,148 @@ else
 
 end
 
-% Process initial states
-if isfield(control,'rho_init')
-    
-    % Input validation
-    if ~iscell(control.rho_init)
-        error('control.rho_init must be a cell array of vectors.');
+% Validate gate targets or process the ordinary state pair lists
+gate_mode=isfield(control,'gate_targets');
+if gate_mode
+
+    % Exclude options that require a propagated state or Hessian
+    forbidden={'rho_init','rho_targ','phase_cycle','keyholes','traj_pen',...
+               'traj_opts','prefix','suffix','steady','fid_type','plotting'};
+    if any(isfield(control,forbidden))||~strcmp(spin_system.bas.formalism,'zeeman-hilb')||...
+       ~strcmp(spin_system.control.integrator,'rectangle')||...
+       ~ismember(spin_system.control.method,{'lbfgs','rbfgs'})
+        error('gate targets require rectangle Hilbert-space first-order control without state options.');
     end
-
-    % In-depth checking
-    for n=1:numel(control.rho_init)
-
-        switch spin_system.bas.formalism
-
-            case {'sphten-liouv','zeeman-liouv'}
-
-                if (~isnumeric(control.rho_init{n}))||(~iscolumn(control.rho_init{n}))
-                    error('control.rho_init must be a cell array of column vectors.');
-                end
-
-            case 'zeeman-hilb'
-
-                if (~isnumeric(control.rho_init{n}))||(size(control.rho_init{n},1)~=...
-                                                       size(control.rho_init{n},2))
-                    error('control.rho_init must be a cell array of square matrices.');
-                end
-
-            case 'zeeman-wavef'
-
-                if (~isnumeric(control.rho_init{n}))||(size(control.rho_init{n},2)~=1)
-                    error('control.rho_init must be a cell array of column vectors.');
-                end
-
-            otherwise
-
-                error('unrecognised formalism specification.');
-
+    if ~iscell(control.gate_targets)||isempty(control.gate_targets)||~isvector(control.gate_targets)
+        error('gate targets must be a nonempty cell vector of unitary matrices.');
+    end
+    dim=size(spin_system.control.operators{1},1);
+    for n=1:numel(control.gate_targets)
+        U=control.gate_targets{n};
+        if ~isfloat(U)||~isequal(size(U),[dim dim])||any(~isfinite(U),'all')||...
+           norm(U'*U-eye(dim),'fro')>1e-10*sqrt(dim)
+            error('each gate target must be unitary and match the Hilbert dimension.');
         end
-
     end
-    
-    % Absorb initial states
-    spin_system.control.rho_init=control.rho_init; 
-    control=rmfield(control,'rho_init');
-
-    % Inform the user
-    report(spin_system,[pad('Initial states per ensemble member',60) ...
-                        int2str(numel(spin_system.control.rho_init))]);
+    spin_system.control.gate_targets=control.gate_targets;
+    control=rmfield(control,'gate_targets');
 
 else
 
-    % Complain and bomb out
-    error('initial states must be supplied in control.rho_init field.');
+    % Process initial states
+    if isfield(control,'rho_init')
 
-end
+        % Input validation
+        if ~iscell(control.rho_init)
+            error('control.rho_init must be a cell array of vectors.');
+        end
 
-% Process target states
-if isfield(control,'rho_targ')
+        % In-depth checking
+        for n=1:numel(control.rho_init)
 
-    % Input validation
-    if ~iscell(control.rho_targ)
-        error('control.rho_targ must be a cell array of vectors.');
-    end
-    
-    % In-depth checking
-    for n=1:numel(control.rho_targ)
+            switch spin_system.bas.formalism
 
-        switch spin_system.bas.formalism
+                case {'sphten-liouv','zeeman-liouv'}
 
-            case {'sphten-liouv','zeeman-liouv'}
+                    if (~isnumeric(control.rho_init{n}))||(~iscolumn(control.rho_init{n}))
+                        error('control.rho_init must be a cell array of column vectors.');
+                    end
 
-                if (~isnumeric(control.rho_targ{n}))||(~iscolumn(control.rho_targ{n}))
-                    error('control.rho_targ must be a cell array of column vectors.');
-                end
+                case 'zeeman-hilb'
 
-            case 'zeeman-hilb'
+                    if (~isnumeric(control.rho_init{n}))||(size(control.rho_init{n},1)~=...
+                                                           size(control.rho_init{n},2))
+                        error('control.rho_init must be a cell array of square matrices.');
+                    end
 
-                if (~isnumeric(control.rho_targ{n}))||(size(control.rho_targ{n},1)~=...
-                                                       size(control.rho_targ{n},2))
-                    error('control.rho_targ must be a cell array of square matrices.');
-                end
+                case 'zeeman-wavef'
 
-            case 'zeeman-wavef'
+                    if (~isnumeric(control.rho_init{n}))||(size(control.rho_init{n},2)~=1)
+                        error('control.rho_init must be a cell array of column vectors.');
+                    end
 
-                if (~isnumeric(control.rho_targ{n}))||(size(control.rho_targ{n},2)~=1)
-                    error('control.rho_targ must be a cell array of column vectors.');
-                end
+                otherwise
 
-            otherwise
+                    error('unrecognised formalism specification.');
 
-                error('unrecognised formalism specification.');
+            end
 
         end
 
+        % Absorb initial states
+        spin_system.control.rho_init=control.rho_init;
+        control=rmfield(control,'rho_init');
+
+        % Inform the user
+        report(spin_system,[pad('Initial states per ensemble member',60) ...
+                            int2str(numel(spin_system.control.rho_init))]);
+
+    else
+
+        % Complain and bomb out
+        error('initial states must be supplied in control.rho_init field.');
+
     end
 
-    % Source-target pair consistency
-    if numel(control.rho_targ)~=numel(spin_system.control.rho_init)
-        error('control.rho_targ must have the same size as control.rho_init');
+    % Process target states
+    if isfield(control,'rho_targ')
+
+        % Input validation
+        if ~iscell(control.rho_targ)
+            error('control.rho_targ must be a cell array of vectors.');
+        end
+
+        % In-depth checking
+        for n=1:numel(control.rho_targ)
+
+            switch spin_system.bas.formalism
+
+                case {'sphten-liouv','zeeman-liouv'}
+
+                    if (~isnumeric(control.rho_targ{n}))||(~iscolumn(control.rho_targ{n}))
+                        error('control.rho_targ must be a cell array of column vectors.');
+                    end
+
+                case 'zeeman-hilb'
+
+                    if (~isnumeric(control.rho_targ{n}))||(size(control.rho_targ{n},1)~=...
+                                                           size(control.rho_targ{n},2))
+                        error('control.rho_targ must be a cell array of square matrices.');
+                    end
+
+                case 'zeeman-wavef'
+
+                    if (~isnumeric(control.rho_targ{n}))||(size(control.rho_targ{n},2)~=1)
+                        error('control.rho_targ must be a cell array of column vectors.');
+                    end
+
+                otherwise
+
+                    error('unrecognised formalism specification.');
+
+            end
+
+        end
+
+        % Source-target pair consistency
+        if numel(control.rho_targ)~=numel(spin_system.control.rho_init)
+            error('control.rho_targ must have the same size as control.rho_init');
+        end
+
+        % Absorb target states
+        spin_system.control.rho_targ=control.rho_targ;
+        control=rmfield(control,'rho_targ');
+
+        % Inform the user
+        report(spin_system,[pad('Target states per ensemble member',60) ...
+                            int2str(numel(spin_system.control.rho_targ))]);
+
+    else
+
+        % Complain and bomb out
+        error('target states must be supplied in control.rho_targ field.');
+
     end
-
-    % Absorb target states
-    spin_system.control.rho_targ=control.rho_targ; 
-    control=rmfield(control,'rho_targ');
-
-    % Inform the user
-    report(spin_system,[pad('Target states per ensemble member',60) ...
-                        int2str(numel(spin_system.control.rho_targ))]);
-
-else
-
-    % Complain and bomb out
-    error('target states must be supplied in control.rho_targ field.');
 
 end
 
@@ -1185,6 +1215,13 @@ else
                              ',' num2str(max(spin_system.control.l_bound(:)),'%+.9g') ']']);
 end
 
+% Count targets for correlated ensemble construction
+if gate_mode
+    target_count=numel(spin_system.control.gate_targets);
+else
+    target_count=numel(spin_system.control.rho_init);
+end
+
 % Process ensemble correlations
 if isfield(control,'ens_corrs')
 
@@ -1201,7 +1238,7 @@ if isfield(control,'ens_corrs')
         error('rho_ens cannot be combined with other ensemble correlations.');
     end
     if ismember('rho_drift',control.ens_corrs)&&...
-       (numel(spin_system.control.rho_init)~=spin_system.control.ndrifts)
+       (target_count~=spin_system.control.ndrifts)
         error('rho_drift correlation needs one state pair per drift.');
     end
     if ismember('power_drift',control.ens_corrs)&&...
@@ -1507,7 +1544,7 @@ n_cases=size(spin_system.control.catalog,1);
 
 % Match the state pair list to the correlated ensemble
 if ismember('rho_ens',spin_system.control.ens_corrs)&&...
-   (numel(spin_system.control.rho_init)~=prod(spin_system.control.ens_sizes(2:end)))
+   (target_count~=prod(spin_system.control.ens_sizes(2:end)))
     error('rho_ens correlation needs one state pair per ensemble member.');
 end
 

@@ -136,6 +136,9 @@ end
 if any(isfield(spin_system.control,spin_system.control.frozen_fields))
     error('generators and operators are frozen after optimcon(), re-run optimcon() to change them.');
 end
+if (n_outputs>3)&&isfield(spin_system.control,'gate_targets')
+    error('gate Hessians are not implemented.');
+end
 if (n_outputs>3)&&(~all(cellfun(@(f)isequal(f,@no_dist),spin_system.control.distortion(:))))
     error('Hessians are not available with waveform distortions.');
 end
@@ -164,7 +167,8 @@ if numel(spin_system.control.pulse_dt)~=spin_system.control.pulse_nsteps
     error('the length of control.pulse_dt has changed, re-run optimcon().');
 end
 [catalog_now,ens_sizes_now]=ens_catalog(spin_system.control);
-if (numel(spin_system.control.rho_targ)~=numel(spin_system.control.rho_init))||...
+state_mode=~isfield(spin_system.control,'gate_targets');
+if (state_mode&&(numel(spin_system.control.rho_targ)~=numel(spin_system.control.rho_init)))||...
    (~isequal(ens_sizes_now,spin_system.control.ens_sizes))||...
    (~isequal(catalog_now,spin_system.control.catalog))
     error('ensemble composition changed after optimcon(), re-run optimcon().');

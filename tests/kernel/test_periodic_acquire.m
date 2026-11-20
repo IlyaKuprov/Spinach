@@ -58,6 +58,14 @@ ref=0.5*exp(-2i*pi*720*(0:parameters.npoints-1)*parameters.dwell);
 result=test_close(result,'one-tick roundoff',fid,ref,1e-12,0,...
                   'A sub-ulp deficit in one tick must not reject a synchronous dwell.');
 
+% Resolve the two-ulp deficit from a different rotor grid
+parameters.rate=1000;
+parameters.dwell=1/(1000*115);
+fid=periodic_acquire(spin_system,parameters,repmat(H(1),1,115),zero,zero);
+ref=0.5*exp(-2i*pi*720*(0:parameters.npoints-1)*parameters.dwell);
+result=test_close(result,'accumulated one-tick roundoff',fid,ref,1e-12,0,...
+                  'The count recovery must allow the combined arithmetic roundoff.');
+
 % Restore the single-tick rotor period for the rejection checks
 parameters.dwell=1/parameters.rate;
 

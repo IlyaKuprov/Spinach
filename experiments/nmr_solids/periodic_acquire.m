@@ -16,6 +16,8 @@
 %    parameters.start_tick - one-based index of the first tick
 %    parameters.dwell      - acquisition dwell in seconds, an
 %                            integer multiple of the rotor tick
+%                            within six unit roundoffs (five operations
+%                            to form and recover a synchronous dwell)
 %    parameters.npoints    - positive number of acquired samples
 %    parameters.rho0       - initial Hilbert-space density matrix
 %    parameters.coil       - Hilbert-space detection matrix
@@ -108,7 +110,9 @@ validateattributes(parameters.start_tick,{'numeric'},{'scalar','integer','positi
 validateattributes(parameters.dwell,{'numeric'},{'scalar','real','finite','positive'});
 validateattributes(parameters.npoints,{'numeric'},{'scalar','integer','positive'});
 ticks=parameters.dwell*abs(parameters.rate)*numel(H);
-if round(ticks)<1||abs(ticks-round(ticks))>eps(ticks)
+nearest=round(ticks);
+tolerance=(3*eps)*nearest;
+if ~isfinite(ticks)||nearest<1||abs(ticks-nearest)>tolerance
     error('Acquisition dwell must be a positive integer number of rotor ticks.');
 end
 end

@@ -63,6 +63,14 @@ for fixture=1:4
         amplitudes=[0 0]; pulse_dt=[0.1 0.2]; drift_scale=0;
     end
 
+    % Use unequal weights and matched powers in the two-member fixture
+    drift_scales=drift_scale*ones(size(powers));
+    weights=ones(size(powers))/numel(powers);
+    if fixture==2
+        drift_scales=[-0.7 2.1];
+        weights=[1 3]/4;
+    end
+
     % Independently propagate both experiments in Hilbert space
     overlaps=zeros(numel(powers),2); dirt_cost=zeros(numel(powers),1);
     for power_idx=1:numel(powers)
@@ -70,7 +78,7 @@ for fixture=1:4
         for pulse_idx=1:2
             rho=rho_init;
             for slice=1:numel(pulse_dt)
-                H=drift_scale*spin_ops.z+powers(power_idx)*amplitudes(slice)*...
+                H=drift_scales(power_idx)*spin_ops.z+powers(power_idx)*amplitudes(slice)*...
                   (cos(phase_pair(pulse_idx,slice))*spin_ops.x+...
                    sin(phase_pair(pulse_idx,slice))*spin_ops.y);
                 P=expm(-1i*H*pulse_dt(slice)); rho=P*rho*P';
@@ -97,6 +105,11 @@ for fixture=1:4
             control.rho_init={rho_init}; control.rho_targ={rho_targ};
         end
         control.operators={lx,ly}; control.drifts={{drift_scale*lz}};
+        if fixture==2
+            control.drifts={{drift_scales(1)*lz},{drift_scales(2)*lz}};
+            control.ens_corrs={'power_drift'};
+            control.drift_weights=weights;
+        end
         control.pwr_levels=powers; control.pulse_dt=pulse_dt;
         control.method='lbfgs'; control.max_iter=0;
         control.penalties={'none'}; control.p_weights=0;
@@ -113,7 +126,7 @@ for fixture=1:4
                 case 'real', primary=real(overlaps);
                 case 'square', primary=abs(overlaps).^2;
             end
-            expected=mean(primary,'all')-mean(dirt_cost);
+            expected=weights*(mean(primary,2)-dirt_cost);
             label=sprintf('fixture %d %s %s',fixture,formalisms{form_idx},measures{measure_idx});
             result=test_close(result,[label ' objective'],fidelity(1),expected,1e-11,0,...
                               'Independent propagation must retain the requested primary measure.');

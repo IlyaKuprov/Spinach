@@ -95,6 +95,9 @@ for m=1:n_mine
 
     % Get initial and target states, drift, and waveform
     rho_init=control.rho_init{n_rho}; rho_targ=control.rho_targ{n_rho};
+    if isfield(control,'case_targets')
+        rho_targ=control.case_targets{n};
+    end
     L=drifts{n_sys}; local_waveform=waveform;
 
     % Phase cycle: a rotation of each control channel and phases on the states

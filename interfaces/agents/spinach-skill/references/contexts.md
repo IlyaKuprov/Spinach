@@ -231,7 +231,7 @@ distinguish a central transition from satellites of the same order.
 Lift with the spatial identity for a rotor-space state. The `stmas`
 callback applies those projectors around finite excitation and conversion
 pulses and returns the complex shifted echo in direct-by-indirect order.
-Use distinct spectral widths: the indirect width is 17/9 times the
+Use distinct spectral widths: the indirect width is 9/17 times the
 rotor rate, whereas the direct width is the rotor rate.
 
 `dnp_freq_scan` honours the polyadic enable switch for `fp-gmres`, using FFT phase differentiation and a spin-sized Fourier-block preconditioner. Nonconverged implicit solves fail explicitly. `fp-backs` retains direct matrix solves, and LvN methods are unchanged. This is a CPU steady-state route, not GPU GMRES.

@@ -43,7 +43,7 @@ fid=singlerot(spin_system,@stmas,parameters,'labframe');
 % Process both time dimensions with their distinct spectral widths
 fid=apodisation(spin_system,fid,{{'sqcos'},{'sqcos'}});
 spectrum=fftshift(fft2(fid));
-parameters.sweep=parameters.rate*[17/9 1];
+parameters.sweep=parameters.rate*[9/17 1];
 parameters.offset=[0 0];
 parameters.axis_units='kHz';
 

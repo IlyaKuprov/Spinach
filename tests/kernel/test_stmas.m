@@ -92,6 +92,23 @@ for quad_hz=[2100 0]
 
 end
 
+% Calibrate the plotted axes with a negative indirect and positive direct tone
+indirect_dwell=diff(sat_times)+diff(ct_times);
+tone_hz=[-1/(6*indirect_dwell) 2/(8*period)];
+phase=(0:7)'*period*tone_hz(2)+(0:5)*indirect_dwell*tone_hz(1);
+spectrum=abs(fftshift(fft2(exp(2i*pi*phase))));
+parameters.sweep=parameters.rate*[9/17 1];
+parameters.offset=[0 0];
+parameters.spins={'87Rb'};
+parameters.axis_units='Hz';
+cleaner=test_graphics(); %#ok<NASGU>
+[axis_f1,axis_f2,plotted]=plot_2d(spin_system,spectrum,parameters,...
+                                 8,[0.1 0.5 0.1 0.5],2,256,6,'positive');
+[~,peak]=max(plotted(:));
+[indirect_bin,direct_bin]=ind2sub(size(plotted),peak);
+result=test_close(result,'signed spectral axes',[axis_f1(indirect_bin) axis_f2(direct_bin)],...
+                  tone_hz,1e-8,0,'plot_2d must label both signed tones in Hz at the actual dwells');
+
 % Refuse a negative first free-delay interval
 parameters.pulse_dur=[30 20 25]*1e-6;
 try

@@ -2,7 +2,10 @@
 % PSPAR model systems. PAIN-CP uses the same RF field on carbon and
 % nitrogen. For PAR and PSPAR the two carbons share one RF field.
 % This reduced matching grid illustrates the signed terminal signal;
-% it is not a converged reproduction of the full powder maps.
+% it is not a converged reproduction of the full powder maps. Models
+% and terminal-sample conventions: dnp-grenoble source revision
+% fa4d4d9ec2f49aed9a01bac7343f9e166121ad34, tsar/pain_grid.in,
+% tsar/par_grid.in, and tsar/pspar_grid.in (RF matching maps).
 %
 % talos@spindynamics.org
 
@@ -105,7 +108,7 @@ for n=1:numel(panels)
     colorbar;
     kxlabel('Heavy-spin RF / MAS rate');
     kylabel('Proton RF / MAS rate');
-    title(panels{n});
+    ktitle(panels{n});
 
 end
 

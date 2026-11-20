@@ -6,7 +6,7 @@
 % log is one ensemble case to be simulated at each evaluation of the
 % control sequence fidelity. Syntax:
 %
-%              [catalog,ens_sizes]=ens_catalog(control)
+%              [catalog,ens_sizes,case_weights]=ens_catalog(control)
 %
 % Parameters:
 %
@@ -22,11 +22,13 @@
 %    ens_sizes  - [1 x 6] array of the ensemble dimension sizes the
 %                 catalog was built from, in the same column order
 %
+%    case_weights - normalised [n_cases x 1] weights in catalog order
+%
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=ens_catalog.m>
 
-function [catalog,ens_sizes]=ens_catalog(control)
+function [catalog,ens_sizes,case_weights]=ens_catalog(control)
 
 % Check consistency
 grumble(control);
@@ -88,6 +90,12 @@ end
 % Apply ensemble budget
 if ens_budget<n_cases
 
+    % Stochastic selection is not a deterministic weighted quadrature
+    if isfield(control,'drift_weights')
+        error('Spinach:optimcon:weightedBudget',...
+              'control.drift_weights requires a full ensemble budget.');
+    end
+
     % Get RNG into a reproducible state
     rng_state=rng; rng(5318008,'twister');
 
@@ -96,6 +104,34 @@ if ens_budget<n_cases
 
     % Release RNG
     rng(rng_state);
+
+end
+
+% Give each retained case its drift weight, then normalise once
+if isfield(control,'drift_weights')
+
+    % Refuse unequal replication without a specified joint measure
+    counts=accumarray(catalog(:,2),ones(size(catalog,1),1),[control.ndrifts 1]);
+    if any(counts~=counts(1))
+        error('Spinach:optimcon:unequalDriftReplication',...
+              'drift weights require equal retained case counts per drift.');
+    end
+
+    % Scale before summation to avoid overflow for large finite weights
+    case_weights=control.drift_weights(catalog(:,2));
+    scale=max(case_weights);
+    if isempty(scale)||(scale==0)
+        error('Spinach:optimcon:zeroDriftWeight',...
+              'the retained ensemble must have positive total drift weight.');
+    end
+    case_weights=case_weights/scale;
+    case_weights=case_weights/sum(case_weights);
+
+else
+
+    % Give equal weight to the retained members, including budgeted subsets
+    n_cases=size(catalog,1);
+    case_weights=ones(n_cases,1)/n_cases;
 
 end
 

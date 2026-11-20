@@ -12,10 +12,10 @@ Offsets are supplied in Hz and enter the drift as angular-frequency terms `2*pi*
 
 ## Outputs and limits
 
-- `traj`: a cell array of trajectory structures, one per case in block order (empty for an empty block). With `'average'` in `control.traj_opts`, a nonempty block is collapsed to one structure whose `forward` member is the sum of that block's forward trajectories; `ensemble.m` forms the catalog-wide mean.
+- `traj`: a cell array of trajectory structures, one per case in block order (empty for an empty block). With `'average'` in `control.traj_opts`, a nonempty block is collapsed to one structure whose `forward` member is the sum of that block's forward trajectories weighted by their normalised catalog weights; `ensemble.m` adds the block sums.
 - `fid`: one fidelity per case, `1 x n_block`.
-- `grad`: block-summed case gradients, a `(ncontrols*nsteps) x 1` column when requested.
-- `hess`: block-summed case Hessians, flattened as a `((ncontrols*nsteps)^2) x 1` column when requested.
+- `grad`: weighted block sum of case gradients after pullback, a `(ncontrols*nsteps) x 1` column when requested.
+- `hess`: weighted block sum of transformed case Hessians, flattened as a `((ncontrols*nsteps)^2) x 1` column when requested.
 
 The waveform is real numeric, in rad/s, with `ncontrols` rows and `pulse_nsteps` columns for the rectangle integrator or one extra column for the trapezium integrator. The implementation checks type and shape but does not explicitly test sample finiteness. Hessians are supported only with the rectangle integrator and no waveform distortions. The Hessian pullback accounts for phase cycling and power scaling; frozen input coordinates have zero rows and columns.
 

@@ -37,11 +37,11 @@
 %
 %   fid          - [1 x n_block] array of case fidelities
 %
-%   grad         - sum of the case gradients over the block, a
+%   grad         - weighted sum of the case gradients over the block, a
 %                  [ncontrols*nsteps x 1] column, empty unless
 %                  n_outputs>2
 %
-%   hess         - sum of the case Hessians over the block, a
+%   hess         - weighted sum of the case Hessians over the block, a
 %                  [(ncontrols*nsteps)^2 x 1] column, empty un-
 %                  less n_outputs>3
 %
@@ -89,7 +89,7 @@ if n_outputs>3, hess=zeros((ncont*nsteps)^2,1); end
 for m=1:n_mine
 
     % Extract ensemble indices
-    n=my_cases(m); n_rho=catalog(n,1); n_sys=catalog(n,2);
+    n=my_cases(m); weight=control.case_weights(n); n_rho=catalog(n,1); n_sys=catalog(n,2);
     n_pwr=catalog(n,3); n_off=catalog(n,4);
     n_phi=catalog(n,5); n_dis=catalog(n,6);
 
@@ -146,13 +146,13 @@ for m=1:n_mine
     % Gradient through the Jacobian, the phase cycle, and the power level
     if n_outputs>2
         grad_n=R'*reshape(J'*outputs{3}(:),ncont,nsteps);
-        grad=grad+power_lvl*grad_n(:);
+        grad=grad+(weight*power_lvl)*grad_n(:);
     end
 
     % Hessian through the phase cycle and the power level
     if n_outputs>3
         K=kron(speye(nsteps),sparse(R')); hess_n=K*outputs{4}*K';
-        hess=hess+power_lvl^2*hess_n(:);
+        hess=hess+(weight*power_lvl^2)*hess_n(:);
     end
 
 end
@@ -166,9 +166,9 @@ end
 
 % Collapse a non-empty block into one trajectory sum when only the average is needed
 if ismember('average',control.traj_opts)&&(n_mine>0)
-    traj_sum=traj{1}.forward;
+    traj_sum=control.case_weights(my_cases(1))*traj{1}.forward;
     for m=2:n_mine
-        traj_sum=traj_sum+traj{m}.forward;
+        traj_sum=traj_sum+control.case_weights(my_cases(m))*traj{m}.forward;
     end
     traj={struct('forward',{traj_sum})};
 end

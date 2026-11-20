@@ -37,4 +37,4 @@ Export a complete complex CCE result and its model.
 
 Character tags retain MATLAB array shape, including nonstandard empty character dimensions. The importer remains compatible with earlier character tags without a shape field.
 
-JSON and CSV sidecars preserve complete native diagnostics: registered capability contracts are stored by experiment name and capability version, then reconstructed through cce_capabilities on import. Registered sequence handles and @clexpn deferred descriptors are portable; arbitrary handles are rejected. Sparse arrays retain storage type, shape, and complex values; character matrices and missing string elements retain their original values.
+JSON and CSV sidecars preserve complete native diagnostics: registered capability contracts are stored by experiment name and capability version, then reconstructed through cce_capabilities on import. Registered sequence handles and @clexpn deferred descriptors are portable; arbitrary handles are rejected before any JSON, CSV, or sidecar file is opened. Sparse arrays retain storage type, shape, and complex values; character matrices and missing string elements retain their original values.

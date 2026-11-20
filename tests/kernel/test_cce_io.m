@@ -31,6 +31,32 @@ for format={'mat','json','csv'}
     result=test_true(result,['Exact complex round trip: ' format{1}],isequaln(original,restored.result)&&isequaln(model,restored.model),['Exact complex round trip: ' format{1}]);
 end
 
+% Refuse unregistered handles before replacing any serialised output
+previous_sidecar=fileread(fullfile(folder,'result.csv.json'));
+replacement=struct('value',0,'nested',{{@sin}});
+for format={'json','csv'}
+
+    % Attempt to replace the valid export with different numeric data
+    file=fullfile(folder,['result.' format{1}]);
+    previous=fileread(file);
+    rejected=false;
+    try
+        cce_export(file,model,replacement);
+    catch problem
+        rejected=strcmp(problem.identifier,'cce_capabilities:unregistered');
+    end
+    result=test_true(result,['Rejected overwrite: ' format{1}],rejected,...
+                     'The unregistered nested handle must be rejected.');
+    result=test_true(result,['Previous output preserved: ' format{1}],...
+                     strcmp(previous,fileread(file)),'Rejected data must not replace a previous export.');
+
+end
+
+% Check the authoritative CSV sidecar independently of the numeric view
+result=test_true(result,'Previous CSV sidecar preserved',...
+                 strcmp(previous_sidecar,fileread(fullfile(folder,'result.csv.json'))),...
+                 'Rejected data must not replace the authoritative CSV sidecar.');
+
 % Preserve all empty container and numeric shapes in the tagged JSON envelope
 empty_model=struct('observed',{{}},'empty_struct',struct([]));
 empty_model.manifolds=cell(0,2);

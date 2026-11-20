@@ -34,41 +34,43 @@ grumble(filename,model,result);
 format=lower(extension(2:end));
 envelope=struct('schema','spinach-cce','version',1,'model',model,'payload',result);
 
-% Preserve native MATLAB arrays or explicitly typed JSON values
-switch format
-    case 'mat'
+% Store the complete native envelope without conversion
+if strcmp(format,'mat')
+    save(filename,'envelope');
+    return
+end
 
-        % Store the complete native envelope without conversion
-        save(filename,'envelope');
-    case 'json'
+% Serialise the full envelope before opening either text destination
+json=jsonencode(pack(envelope));
+if strcmp(format,'csv')
 
-        % Encode typed values before writing the JSON envelope
-        fid=fopen(filename,'w');
-        if fid<0
-            error('Cannot open export destination.');
-        end
-        cleanup=onCleanup(@()fclose(fid));
-        fwrite(fid,jsonencode(pack(envelope)),'char');
-    case 'csv'
-
-        % Write the numeric view and its authoritative JSON sidecar
-        fid=fopen(filename,'w');
-        if fid<0
-            error('Cannot open export destination.');
-        end
-        cleanup=onCleanup(@()fclose(fid));
-        fprintf(fid,'field,index,real,imag\n');
-        names=fieldnames(result);
-        for k=1:numel(names)
-            value=result.(names{k});
-            if isnumeric(value)
-                for j=1:numel(value)
-                    fprintf(fid,'%s,%d,%.17g,%.17g\n',names{k},j,full(real(value(j))),full(imag(value(j))));
-                end
+    % Write the numeric view before its authoritative JSON sidecar
+    fid=fopen(filename,'w');
+    if fid<0
+        error('Cannot open export destination.');
+    end
+    cleanup=onCleanup(@()fclose(fid));
+    fprintf(fid,'field,index,real,imag\n');
+    names=fieldnames(result);
+    for k=1:numel(names)
+        value=result.(names{k});
+        if isnumeric(value)
+            for j=1:numel(value)
+                fprintf(fid,'%s,%d,%.17g,%.17g\n',names{k},j,full(real(value(j))),full(imag(value(j))));
             end
         end
-        cce_export([filename '.json'],model,result);
+    end
+    filename=[filename '.json'];
+
 end
+
+% Write the standalone JSON envelope or the CSV sidecar
+fid=fopen(filename,'w');
+if fid<0
+    error('Cannot open export destination.');
+end
+cleanup=onCleanup(@()fclose(fid));
+fwrite(fid,json,'char');
 
 end
 

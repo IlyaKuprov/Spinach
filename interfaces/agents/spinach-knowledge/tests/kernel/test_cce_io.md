@@ -23,6 +23,7 @@ Checks the following named assertions in the source:
 - `CSV physical isotope labels`.
 - `Missing frame refused`.
 - `Unsupported export refused`.
+- Replacing an existing JSON or CSV export with an unregistered handle fails without changing the original file or CSV sidecar.
 
 The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
 

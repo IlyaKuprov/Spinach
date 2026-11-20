@@ -164,7 +164,7 @@ The old observed_spins spelling is removed; use observed. Old top-level order, g
 
 Raw sequence/name/event-array forms are rejected at runtime, including empty arrays. Use the registered experiment and its drive, refocusing, train, nloops, or pump controls instead. All finite-drive physics checks use native descriptors: independent-axis overlapping drives, fractional starts, partial observations, coupled drift, and simultaneous GKSL relaxation. Internal events are compiled inside cce_acquire from validated native declarations; no raw parameter field or alternate context API remains.
 
-Use cce_analyse with an explicit record containing times, value, and valid and separate analysis options; that small data record is not a returned legacy simulation wrapper. Use cce_export(filename,model,payload) with an explicitly packed answer/diagnostics payload. Both utilities remain explicit post-processing choices.
+Use cce_analyse with an explicit record containing times, value, and valid and separate analysis options; that small data record is not a returned legacy simulation wrapper. Use cce_export(filename,model,payload) with an explicitly packed answer/diagnostics payload. For JSON and CSV, unregistered handles in the model or payload are rejected before existing output files are modified. Both utilities remain explicit post-processing choices.
 
 finite_drive accepts a nonempty structure row of independent drives. Each has observed spins, axis, amplitude/duration rows, detuning, and optional absolute time; a single finite pulse may instead specify a start fraction in [0,1]. Durations remain seconds, and overlapping contributions add while the full drift and supported dissipation remain active.
 

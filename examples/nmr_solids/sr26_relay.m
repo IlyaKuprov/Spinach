@@ -2,6 +2,11 @@
 % network, using the Grenoble SR26 and S3 trains. The direct-only
 % and relay-only models share the same shifts and crystal orientation.
 % This single-crystal example uses DQ selection between identical arms.
+% Pulse schedules: dnp-grenoble revision fa4d4d9ec2f49aed9a01bac7343f9e166121ad34,
+% homonuclear_recoupling/SR26_CC.in (fumarate, cf. Teymoori et al.,
+% J. Magn. Reson. 261, 205-220, Fig. 3c, PMID 26515279) and
+% homonuclear_recoupling/S3SR26_SiSi_varydist.in (silicon DQ buildup).
+% This model adds a relay spin and does not replicate either powder result.
 %
 % talos@spindynamics.org
 
@@ -65,6 +70,7 @@ for n=1:2
     parameters.coil=-coil_state(spin_system,'Lz',2);
 
     % Propagate using the verified SR26 and S3 schedules
+    parameters.isotope='29Si';
     parameters.sr26=true;
     parameters.phases=phase;
     parameters.rf=rf;
@@ -83,52 +89,6 @@ kfigure(); plot(time,real(curves).','o-');
 kxlabel('Total recoupling duration, ms');
 kylabel('Longitudinal transfer'); kgrid;
 klegend({'SR26 pair','SR26 relay','S3 pair','S3 relay'});
-
-end
-
-% Compile one rotor-synchronous block and reuse it on both sides of selection
-function signal=relay_echo(spin_system,parameters,H,R,K)
-
-% Form spatially replicated RF controls and the MAS drift
-L=H+1i*R+1i*K;
-space_id=speye(parameters.spc_dim);
-Sx=kron(space_id,operator(spin_system,'Lx','29Si'));
-Sy=kron(space_id,operator(spin_system,'Ly','29Si'));
-if parameters.sr26
-
-    % Reuse the distinct phase-duration segments of SR26
-    [blocks,order]=rseq_compiler(spin_system,L,Sx,Sy,parameters.phases,...
-                                 parameters.rf,parameters.widths,'90270_pulse');
-
-else
-
-    % Compile the S3 composite elements without changing their order
-    blocks=cell(size(parameters.phases));
-    order=1:numel(blocks);
-    for n=order
-        phase=parameters.phases(n);
-        drive=parameters.rf*(cos(phase)*Sx+sin(phase)*Sy);
-        blocks{n}=propagator(spin_system,L+drive,parameters.widths(n));
-    end
-
-end
-
-% Accumulate the chronological product once
-U=speye(size(L));
-for n=1:numel(order)
-    U=blocks{order(n)}*U;
-end
-
-% Advance preparation and receiver independently and select DQ coherence
-rho=parameters.rho0;
-coil=parameters.coil;
-signal=zeros(size(parameters.counts));
-signal(1)=coil'*rho;
-for n=2:numel(signal)
-    rho=U*rho;
-    coil=U'*coil;
-    signal(n)=coil'*coherence(spin_system,rho,{{'all',[-2 2]}});
-end
 
 end
 

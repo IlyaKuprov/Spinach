@@ -33,7 +33,7 @@ grumble(spin_system,parameters,H,R,K);
 % Set the centre-to-centre rotor clock and the two free intervals
 period=1/abs(parameters.rate);
 duration=parameters.pulse_dur;
-sat_delay=(1:parameters.npoints(1))*period-(duration(1)+duration(2))/2;
+sat_delay=period-(duration(1)+duration(2))/2;
 ct_delay=parameters.tau+(8/9)*sat_delay;
 
 % Compose the drift and lift spin operators and transition projectors
@@ -47,21 +47,36 @@ central=kron(space_unit,stmas_filter(spin_system,1,[2 3]));
 rho_sat=step(spin_system,L+parameters.pulse_amp(1)*Lx,parameters.rho0,duration(1));
 rho_sat=satellite*rho_sat;
 
-% Carry each increment through conversion, inversion, and acquisition
-fid=complex(zeros(parameters.npoints(2),parameters.npoints(1)));
-for n=1:parameters.npoints(1)
+% Propagate the first satellite interval and reuse one turn for later increments
+rho_sat=step(spin_system,L,rho_sat,sat_delay);
+sat_stack=evolution(spin_system,L,[],rho_sat,period,...
+                    parameters.npoints(1)-1,'trajectory');
+ct_stack=central*step(spin_system,L+parameters.pulse_amp(2)*Lx,sat_stack,duration(2));
 
-    % Evolve the satellite and central coherences at their actual rotor phases
-    rho=step(spin_system,L,rho_sat,sat_delay(n));
-    rho=step(spin_system,L+parameters.pulse_amp(2)*Lx,rho,duration(2));
-    rho=step(spin_system,L,central*rho,ct_delay(n));
-    rho=step(spin_system,L+parameters.pulse_amp(3)*Lx,rho,duration(3));
+% Split the common CT delay into bounded rotor-period steps
+turns=floor(ct_delay/period);
+ct_stack=evolution(spin_system,L,[],ct_stack,period,turns,'final');
+ct_stack=step(spin_system,L,ct_stack,ct_delay-turns*period);
 
-    % Record the complex echo beginning at the end of the inversion pulse
-    fid(:,n)=evolution(spin_system,L,parameters.coil,rho,period,...
-                       parameters.npoints(2)-1,'observable');
+% Apply the incremental CT delay by powers of a short propagator
+increment=propagator(spin_system,L,(8/9)*period);
+indices=0:parameters.npoints(1)-1;
+while any(indices)
+
+    % Apply the current binary power to the relevant increments
+    selected=logical(mod(indices,2));
+    ct_stack(:,selected)=increment*ct_stack(:,selected);
+    indices=floor(indices/2);
+    if any(indices)
+        increment=increment*increment;
+    end
 
 end
+
+% Invert at the actual rotor phases and acquire every increment
+rho=step(spin_system,L+parameters.pulse_amp(3)*Lx,ct_stack,duration(3));
+fid=evolution(spin_system,L,parameters.coil,rho,period,...
+              parameters.npoints(2)-1,'observable');
 
 end
 

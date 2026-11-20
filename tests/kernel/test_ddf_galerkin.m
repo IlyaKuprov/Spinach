@@ -10,6 +10,12 @@
 
 function result=test_ddf_galerkin()
 
+% Find the example and restore the caller path on return
+root_dir=fileparts(fileparts(fileparts(mfilename('fullpath'))));
+old_path=path;
+restore_path=onCleanup(@()path(old_path));
+addpath(fullfile(root_dir,'examples','imaging','distant_dipolar'));
+
 % Sample a trilinear magnetisation at the upstream centre quadrature points
 result=new_test_result('kernel/ddf_galerkin','Bounded Galerkin comparisons',...
                        'Softened midpoint fields and archived sphere decays.');

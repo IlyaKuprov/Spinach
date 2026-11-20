@@ -11,6 +11,12 @@
 
 function result=test_ddf_bore()
 
+% Find the example and restore the caller path on return
+root_dir=fileparts(fileparts(fileparts(mfilename('fullpath'))));
+old_path=path;
+restore_path=onCleanup(@()path(old_path));
+addpath(fullfile(root_dir,'examples','imaging','distant_dipolar'));
+
 % Acquire both preparations with the FFT field and split Bloch solver
 result=new_test_result('kernel/ddf_bore','Bore phantom imaging',...
                        'Independent discrete oracle, padding, and separate refinements.');

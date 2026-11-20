@@ -50,6 +50,17 @@ ref=0.5*exp(-2i*pi*720*(0:parameters.npoints-1)*parameters.dwell);
 result=test_close(result,'signed frequency',fid,ref,1e-12,0,...
                   'The non-Hermitian receiver resolves the sign of phase evolution.');
 
+% Accept the one-tick boundary when the inferred count rounds down slightly
+parameters.rate=6000;
+parameters.dwell=1/(6000*41);
+fid=periodic_acquire(spin_system,parameters,repmat(H(1),1,41),zero,zero);
+ref=0.5*exp(-2i*pi*720*(0:parameters.npoints-1)*parameters.dwell);
+result=test_close(result,'one-tick roundoff',fid,ref,1e-12,0,...
+                  'A sub-ulp deficit in one tick must not reject a synchronous dwell.');
+
+% Restore the single-tick rotor period for the rejection checks
+parameters.dwell=1/parameters.rate;
+
 % Reject asynchronous acquisition, a nonperiodic waveform, and dissipation
 for n=1:3
 

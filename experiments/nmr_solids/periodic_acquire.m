@@ -108,7 +108,7 @@ validateattributes(parameters.start_tick,{'numeric'},{'scalar','integer','positi
 validateattributes(parameters.dwell,{'numeric'},{'scalar','real','finite','positive'});
 validateattributes(parameters.npoints,{'numeric'},{'scalar','integer','positive'});
 ticks=parameters.dwell*abs(parameters.rate)*numel(H);
-if ticks<1||abs(ticks-round(ticks))>eps(ticks)
+if round(ticks)<1||abs(ticks-round(ticks))>eps(ticks)
     error('Acquisition dwell must be a positive integer number of rotor ticks.');
 end
 end

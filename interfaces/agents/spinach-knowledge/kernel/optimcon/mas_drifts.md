@@ -12,7 +12,7 @@ The function constructs second-order rotating-frame drift Hamiltonians for a qua
 |---|---|
 | `spins` | One-element cell array containing the isotope string for the nucleus (the source example is `{'27Al'}`); it must identify an isotope in `spin_system`. |
 | `axis` | Normalised three-element row vector for the spinning axis. |
-| `grid` | Name of a two-angle powder grid. Its weights must be uniform: the implementation rejects nonuniform weights because the optimisation ensemble average is unweighted. |
+| `grid` | Name of a two-angle powder grid. It may also be an explicit grid structure. Request the second output for nonuniform weights. |
 | `n_ticks` | Number of discrete rotor-phase ticks per rotor period. |
 | `n_phases` | Number of initial rotor phases; must divide `n_ticks`. These phases are separated by `n_ticks/n_phases` ticks. |
 | `n_slices` | Positive integer number of rotor ticks sampled for the pulse; indexing wraps around the rotor stack. |
@@ -29,3 +29,7 @@ The grid's two angles do not mean the implementation discards a third Euler angl
 
 - MATLAB source: [kernel/optimcon/mas_drifts.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/mas_drifts.m)
 - Spin Dynamics Wiki: <https://spindynamics.org/wiki/index.php?title=mas_drifts.m>
+
+For heteronuclear problems, supply ordered `parameters.rframes={{isotope,order},...}`. Each frame uses its own carrier. The second output gives the orientation weights divided equally among initial phases, in drift-list order.
+
+With more than one frame, subtract the active carrier terms from the laboratory stack before reintroducing each as the numerical reference. Other active carrier terms are not perturbations in the current frame. This is an ordered approximation, not a joint rotating-frame propagator.

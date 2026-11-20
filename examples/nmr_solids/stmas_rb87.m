@@ -37,6 +37,11 @@ parameters.coil=coil_state(spin_system,'CT-',1);
 parameters.pulse_amp=2*pi*[100e3 100e3 10e3];
 parameters.pulse_dur=[1.6 1.6 25]*1e-6;
 
+% Report the signed second-order CT correction for the static powder limit
+nu_hz=-sys.magnet*spin('87Rb')/(2*pi);
+fprintf('CT second-order isotropic correction: %.4f Hz\n',...
+        quad_iso_shift(3/2,4e6,0,nu_hz,0.5,-0.5));
+
 % Simulate the complex echo in direct-by-indirect sample order
 fid=singlerot(spin_system,@stmas,parameters,'labframe');
 

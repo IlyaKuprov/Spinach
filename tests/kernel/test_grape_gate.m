@@ -54,6 +54,33 @@ delta=1e-5;
 result=test_close(result,'directional derivative',sum(grad(:,:,1).*direction,'all'),...
                   (plus(1)-minus(1))/(2*delta),1e-9,0,'The suffix and prefix give the trace derivative.');
 
+% Compare neutral settings with the default objective
+neutral=control;
+neutral.dead_time=0;
+neutral.bsiegert=false;
+[~,neutral_fid,neutral_grad]=grape_xy(wave,optimcon(spin_system,neutral));
+result=test_close(result,'neutral gate options',neutral_fid,fid,0,0,'Disabled options preserve fidelity.');
+result=test_close(result,'neutral gate derivative',neutral_grad,grad,0,0,'Disabled options preserve derivatives.');
+
+% Reject physical settings the gate worker does not propagate
+options={'bsiegert','dead_time'};
+settings={true,0.2};
+for n=1:2
+
+    % Exercise both setup and the public objective on stock code
+    active=control;
+    active.(options{n})=settings{n};
+    refused=false;
+    try
+        [~,actual]=grape_xy(wave,optimcon(spin_system,active));
+        fprintf('Accepted %s; objective change %.12g\n',options{n},actual(1)-fid(1));
+    catch err
+        refused=strcmp(err.identifier,['Spinach:optimcon:gate_' options{n}]);
+    end
+    result=test_true(result,['reject ' options{n}],refused,'Unsupported physical terms must not be ignored.');
+
+end
+
 % Reject an explicit state fidelity that would otherwise be ignored
 control.fidelity='real';
 refused=false;

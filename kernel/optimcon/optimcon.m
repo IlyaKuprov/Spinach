@@ -559,6 +559,9 @@ if isfield(control,'dead_time')
     end
     
     % Absorb dead time
+    if gate_mode&&(control.dead_time~=0)
+        error('Spinach:optimcon:gate_dead_time','nonzero dead time is not implemented for gate targets.');
+    end
     spin_system.control.dead_time=control.dead_time;
     control=rmfield(control,'dead_time');
     
@@ -675,6 +678,9 @@ if isfield(control,'bsiegert')
     end
     
     % Absorb the switch
+    if gate_mode&&control.bsiegert
+        error('Spinach:optimcon:gate_bsiegert','Bloch-Siegert corrections are not implemented for gate targets.');
+    end
     spin_system.control.bsiegert=control.bsiegert;
     control=rmfield(control,'bsiegert');
     

@@ -37,3 +37,5 @@ A supplied `phase_cycle` is a real numeric table, requires an even number of con
 The higher-level wrappers [`grape_xy.m`](wrappers/grape_xy.md) and [`grape_phase.m`](wrappers/grape_phase.md) provide pulse parameterisations around the low-level evaluator [`grape_hilb.m`](grape_hilb.md). `optimcon` validates their settings; it does not itself perform waveform optimisation.
 
 For gate control, supply a nonempty cell vector of finite unitary matrices matching the Hilbert dimension in `control.gate_targets`, in place of both state lists. Gate mode uses terminal square fidelity (its default), rectangle slices, and LBFGS/RBFGS. State phase cycles, keyholes, prefix/suffix, steady state, time weighting, and trajectory/plotting options are not accepted.
+
+Gate targets reject enabled Bloch–Siegert corrections and nonzero dead time. Explicitly disabling the correction or setting zero dead time is equivalent to omitting these settings.

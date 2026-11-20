@@ -62,11 +62,12 @@ switch reference(1).type
         % Multiply up the tensor train
         [ncores,ntrains]=size(ttrain.cores);
         for n=1:ntrains
-            x=ttrain.cores{ncores,n}(:,ind(ncores),jnd(ncores),:);
-            for k=(ncores-1):(-1):1
-                x=ttrain.cores{k,n}(:,ind(k),jnd(k),:)*x;
+            x=1;
+            for k=ncores:-1:1
+                slice=ttrain.cores{k,n}(:,ind(k),jnd(k),:);
+                x=reshape(slice,size(slice,1),size(slice,4))*x;
             end
-            answer=answer+ttrain.coeff(n)*x(1,1);
+            answer=answer+ttrain.coeff(n)*x;
         end
         
     otherwise

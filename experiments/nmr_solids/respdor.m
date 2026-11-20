@@ -1,6 +1,6 @@
 % R- and S-RESPDOR echoes for the Liouville-space singlerot context.
 % The R variant uses a two-rotor-period rotary-resonance block;
-% the S variant uses a three-period phase-supercycled R4 block.
+% the S variant uses a six-period phase-supercycled R4 block.
 % The two recoupling arms have the same pulse order. A requested
 % zero count returns the prepared-state overlap without an echo.
 %

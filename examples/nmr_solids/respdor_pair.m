@@ -46,12 +46,12 @@ time_r=4*parameters.ncycles/parameters.rate;
 
 % S-RESPDOR with transverse preparation and detection
 parameters.sequence='S';
-parameters.ncycles=0:8;
+parameters.ncycles=0:4;
 parameters.sat_time=1/parameters.rate;
 parameters.rho0=state(spin_system,'Lx','13C');
 parameters.coil=coil_state(spin_system,'L+','13C');
 curve_s=singlerot(spin_system,@respdor,parameters,'nmr');
-time_s=6*parameters.ncycles/parameters.rate;
+time_s=12*parameters.ncycles/parameters.rate;
 
 % Normalise only after powder averaging and omit unresolved references
 contrast_r=nan(size(time_r));

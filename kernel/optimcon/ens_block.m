@@ -82,7 +82,13 @@ ncont=size(waveform,1); nsteps=size(waveform,2); off_ens_sizes=cellfun(@numel,co
 
 % Preallocate block outputs, derivative buffers only when requested
 traj=cell(n_mine,1); fid=zeros(1,n_mine); grad=[]; hess=[];
-if n_outputs>2, grad=zeros(ncont*nsteps,1); end
+group_count=1;
+fidelity_type=control.fidelity;
+if isfield(control,'gamma_groups')
+    group_count=max(control.gamma_groups);
+    fidelity_type='complex';
+end
+if n_outputs>2, grad=zeros(ncont*nsteps,group_count); end
 if n_outputs>3, hess=zeros((ncont*nsteps)^2,1); end
 
 % Loop over the cases of the block
@@ -143,13 +149,15 @@ for m=1:n_mine
 
     % Fidelity, trajectory, and derivatives
     outputs=cell(1,n_outputs);
-    [outputs{:}]=grape(spin_system,L,spin_system.control.operators,local_waveform,rho_init,rho_targ,control.fidelity);
+    [outputs{:}]=grape(spin_system,L,spin_system.control.operators,local_waveform,rho_init,rho_targ,fidelity_type);
     traj{m}=outputs{1}; fid(m)=outputs{2};
 
     % Gradient through the Jacobian, the phase cycle, and the power level
     if n_outputs>2
         grad_n=R'*reshape(J'*outputs{3}(:),ncont,nsteps);
-        grad=grad+(weight*power_lvl)*grad_n(:);
+        group=1;
+        if isfield(control,'gamma_groups'), group=control.gamma_groups(n_sys); end
+        grad(:,group)=grad(:,group)+(weight*power_lvl)*grad_n(:);
     end
 
     % Hessian through the phase cycle and the power level
@@ -161,7 +169,7 @@ for m=1:n_mine
 end
 
 % Freeze input derivatives after all physical-coordinate transformations
-if n_outputs>2, grad(freeze(:))=0; end
+if n_outputs>2, grad(freeze(:),:)=0; end
 if n_outputs>3
     hess=reshape(hess,ncont*nsteps,ncont*nsteps);
     hess(freeze(:),:)=0; hess(:,freeze(:))=0; hess=hess(:);

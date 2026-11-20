@@ -819,7 +819,7 @@ if isfield(control,'amplitudes')
     % Store the profile (validated in grape_phase)
     spin_system.control.amplitudes=control.amplitudes;
     control=rmfield(control,'amplitudes');
- 
+
 end
 
 % Read the optional quadrature weights in drift order
@@ -1486,6 +1486,29 @@ if isfield(control,'parameters')
 end
 
 % Catch unparsed fields
+
+% Consume physical gamma-group identifiers before checking for extra fields
+if isfield(control,'gamma_groups')
+
+    % Grouping requires terminal squared overlap and first derivatives
+    if ~strcmp(spin_system.control.fidelity,'square')||...
+       ~ismember(spin_system.control.method,{'lbfgs','rbfgs'})||...
+       ~strcmp(spin_system.control.fid_type,'terminal')
+        error('gamma_groups requires terminal square fidelity and a first-derivative method.');
+    end
+    groups=control.gamma_groups;
+    if ~isnumeric(groups)||~isreal(groups)||~isrow(groups)||...
+       numel(groups)~=spin_system.control.ndrifts||...
+       any(~isfinite(groups))||any(groups<1)||any(mod(groups,1)~=0)
+        error('gamma_groups must contain one positive integer label per drift.');
+    end
+    [~,~,group_ids]=unique(groups);
+    spin_system.control.gamma_groups=group_ids;
+    control=rmfield(control,'gamma_groups');
+
+end
+
+% Check for unrecognised options
 unparsed=fieldnames(control);
 if ~isempty(unparsed)
     for n=1:numel(unparsed)

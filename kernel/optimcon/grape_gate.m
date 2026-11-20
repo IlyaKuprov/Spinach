@@ -3,7 +3,8 @@
 %
 % The rectangle waveform is in physical angular frequency units. Drifts
 % contain either one Hamiltonian or one Hamiltonian per slice. Trajectory
-% output is empty because no density operator is propagated.
+% output is empty because no density operator is propagated. Slice
+% histories are retained only when the gradient is requested.
 %
 % Talos <talos@spindynamics.org>
 
@@ -12,31 +13,45 @@ function [traj,fidelity,grad]=grape_gate(spin_system,drifts,ops,wave,target)
 % Check consistency
 grumble(spin_system,drifts,ops,wave,target);
 
-% Accumulate time-ordered prefix products
+% Initialise the running time-ordered product
 nsteps=size(wave,2);
 dim=size(target,1);
-prefix=cell(1,nsteps+1);
-prefix{1}=eye(dim);
-H=cell(1,nsteps);
-P=cell(1,nsteps);
+U=eye(dim);
 dt=spin_system.control.pulse_dt;
+need_grad=nargout>2;
+
+% Retain slice histories only for the backward derivative sweep
+if need_grad
+    prefix=cell(1,nsteps);
+    H=cell(1,nsteps);
+    P=cell(1,nsteps);
+end
+
+% Accumulate the pulse in chronological order
 for n=1:nsteps
 
     % Assemble and exponentiate the physical slice
-    H{n}=drifts{min(n,numel(drifts))};
+    Hslice=drifts{min(n,numel(drifts))};
     for k=1:numel(ops)
-        H{n}=H{n}+wave(k,n)*ops{k};
+        Hslice=Hslice+wave(k,n)*ops{k};
     end
-    P{n}=propagator(spin_system,H{n},dt(n));
-    prefix{n+1}=P{n}*prefix{n};
+    Pslice=propagator(spin_system,Hslice,dt(n));
+
+    % Store the product strictly before this slice for differentiation
+    if need_grad
+        prefix{n}=U;
+        H{n}=Hslice;
+        P{n}=Pslice;
+    end
+    U=Pslice*U;
 
 end
-overlap=trace(target'*prefix{end})/dim;
+overlap=trace(target'*U)/dim;
 fidelity=abs(overlap)^2;
 traj=struct('forward',[]);
 
 % Differentiate the overlap using a backward suffix sweep
-if nargout>2
+if need_grad
 
     % Move the target into the left factor for the trace
     suffix=target';

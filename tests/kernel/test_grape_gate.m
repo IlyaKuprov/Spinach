@@ -37,6 +37,9 @@ control.gate_targets={target};
 local=optimcon(spin_system,control);
 wave=[3 1 -2;1 -4 2];
 [~,fid,grad]=grape_xy(wave,local);
+[~,value_only]=grape_xy(wave,local);
+result=test_close(result,'value-only gate',value_only,fid,0,0,...
+                  'Streaming and gradient paths must return the same objective.');
 U=eye(2);
 for n=1:3
 

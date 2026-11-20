@@ -33,6 +33,14 @@ result=test_true(result,'coordinates',isequal(xyz,{[-8.329 74.278 16.744];...
                                                    [-3.579 75.879 21.170]}),...
                  'retain the coordinates of each atom');
 
+% Keep both alternate locations distinguishable during BMRB residue matching
+lines=["ATOM    547  CG AMET A1051      12.090  68.381   9.108  0.50 36.86";...
+       "ATOM    548  CG BMET A1051      12.094  68.360   9.084  0.50 34.17"];
+writelines(lines,file_name);
+[res,types]=read_pdb_pro(file_name,1);
+result=test_true(result,'alternate locations',isequal(res,[1051;1051])&&...
+                 isequal(types,{'AMET';'BMET'}),'do not collapse alternate locations onto MET');
+
 end
 
 

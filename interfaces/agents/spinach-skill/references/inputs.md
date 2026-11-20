@@ -483,7 +483,10 @@ acids, taking shifts from an ASCII file formatted as
 `[residue_number atom_id shift]`. `options.deut_list` marks deuterated atoms and
 reduces the affected J-couplings; `options.noshift` behaves as above.
 `read_pdb_pro(pdb_file_name,mod_id)`, `read_pdb_nuc(pdb_file_name)` and
-`read_bmrb(bmrb_file_name)` are the underlying record readers.
+`read_bmrb(bmrb_file_name)` are the underlying record readers. The protein reader uses fixed PDB
+columns for standard ATOM records and accepts historical space-delimited
+records. Resolve alternate locations before BMRB matching: the reader retains
+the alternate-location character as a prefix on the residue label.
 
 `[sys,inter]=gissmo2spinach(filename,subsystem)` reads a GISSMO XML file and
 returns a ready-to-use liquid-state NMR spin system. GISSMO supplies only

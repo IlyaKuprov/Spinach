@@ -186,7 +186,10 @@ Lebedev grid; rank and grid are both convergence parameters and must be raised
 together. `gridfree` takes the same three but no grid, `doublerot` handles DOR.
 Cross polarisation is `cp_powder_static_nh.m` and
 `cp_contact_mas_nh_fplanck.m`; recoupling is `redor_curve.m` and
-`pdsd_simple.m`.
+`pdsd_simple.m`. For TEDOR, `tedor_filter.m` demonstrates the ZF element
+mask and signed receiver cycle as distinct selections. The `tedor` callback
+also supports direct heteronuclear acquisition with one FID column per
+mixing count.
 
 For a direct single-crystal MAS route check, run
 `examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced

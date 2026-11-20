@@ -1,15 +1,9 @@
-# examples/cce/gcce_votpp.m
+# VO(TPP) energy levels
 
-The observed electron and vanadium-51 form a multilevel spin system coupled to one proton bath spin, treated at generalised CCE order one. The coupling tensors are illustrative, not quantitative VOTPP tensors.
+`[energies,fields]=gcce_votpp()` calculates the 16 energy levels of the electron–vanadium-51 register over 0–0.15 T, using Eq. (10) and Table I of [Ryan et al.](https://doi.org/10.1063/5.0278659) to reconstruct Figure 2. The energy array has one row per entry in the field row vector. Energies are in GHz, and fields are in tesla.
 
-## Interface
+The applied field is transverse to the unique axis of the electronic g, electron–vanadium hyperfine, and vanadium quadrupolar tensors. The interaction (p I_{\parallel}^2) is represented by its traceless part, which changes no transition frequency. The field dependence is linear at the Hamiltonian level, not at the level of individual eigenvalues.
 
-`[answer,diagnostics]=gcce_votpp()` returns numeric rows of column-major observed density matrices. `diagnostics.parameters.times` gives elapsed times; `diagnostics.reduction` contains order-resolved answers, validity masks, and numerical error bounds. No clipping or positivity repair is applied.
+This is the observed (empty-cluster) Hamiltonian used in gCCE. It does not calculate a Hahn echo, include a nuclear or electronic bath, or reproduce the crystal decoherence panels in Figure 3. The separate [source-input regression](../../../../../tests/kernel/test_cce_lunghi_fixtures.m) checks a reduced finite-bath echo and distinguishes Spinach's unitary pulse from the pulse in the archived PyCCE fixture.
 
-The example uses standard sys/inter/bas/parameters blocks, a product-ms transition selector, and `clexpn(spin_system,@free_evolution,parameters,'labframe')`. The selected manifolds define the equal coherent preparation; no state or operator matrix is assembled in the example. The plot shows observed populations.
-
-The independent dense Hamiltonian, preparation, propagation, and reduced-density comparison live in `tests/kernel/test_cce_examples.m`.
-
-The example takes no inputs and uses times in seconds and coupling tensors in Hz. It creates the spin system without a full-bath basis and uses a local one-worker pool; do not put Spinach and EasySpin on the same MATLAB path. This deliberately small illustrative model is not a publication-scale material reproduction. Quantitative comparisons require material structures, tensor frames, defect provenance, and source licences; the finite bath does not establish a thermodynamic T2 or microscopic T1.
-
-[MATLAB source](../../../../../examples/cce/gcce_votpp.m) · [Independent reference tests](../../../../../tests/kernel/test_cce_examples.m)
+[MATLAB source](../../../../../examples/cce/gcce_votpp.m) · [Independent spectrum regression](../../../../../tests/kernel/test_cce_examples.m)

@@ -1,3 +1,5 @@
 # MAXCRAZED acquisition and refinement
 
 Use the common scan to vary the maximum substep and voxel counts independently while keeping the timing, coil, chemical shifts, and frequency bins fixed. The inter-lobe gap and the recovery from the returning lobe to acquisition are independent times, in seconds. Unencoded directions have uniform initial conditions, RF, detection, and reflecting walls. Their solution remains constant along these directions, so only the constant Fourier mode is retained there. Along encoded directions the supplied voxel counts determine resolution.
+
+At a 60 ms inter-lobe gap and 0.25 ms maximum step, refining the active axes from 18 × 24 to 24 × 32 changes the X, XY, and XZ complex FIDs by 0.015%, 0.57%, and 0.59% respectively (relative Frobenius norm). At the latter resolution halving the step changes them by 0.023%, 0.029%, and 0.087%; the refined mixed/self ratios are 0.6364, 0.6363, and 11.09. The experimental XZ ratio is 2.65: the numerical refinements preserve the qualitative discrimination but do not resolve the discrepancy.

@@ -20,6 +20,6 @@ Required inputs:
 - parameters.n_rnk: rank of the nuclear pulse grid (dimensionless numerical setting).
 - H, R, and K: same-size matrices supplied by the calling context, normally powder() according to the source comments. They encode the Hamiltonian, relaxation, and kinetics contributions.
 
-Return value: endor_spec is one signal value per entry of n_frq, in the same order. It is a simulated, RF-on-minus-RF-off complex coherence signal; the function does not claim a measured spectrum.
+Return value: endor_spec is one signal value per entry of n_frq, in the same shape and order. It is a simulated, RF-on-minus-RF-off complex coherence signal; the function does not claim a measured spectrum.
 
 Limits: the electron pulses are ideal instantaneous rotations, whereas only the nuclear RF pulse is shaped. Interpretation therefore depends on the supplied spin system and context matrices, the chosen powder/orientation treatment, and the frequency grid; this routine itself does not add experimental data or perform a separate Fourier transform.

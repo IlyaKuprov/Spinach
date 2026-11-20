@@ -186,7 +186,10 @@ Lebedev grid; rank and grid are both convergence parameters and must be raised
 together. `gridfree` takes the same three but no grid, `doublerot` handles DOR.
 Cross polarisation is `cp_powder_static_nh.m` and
 `cp_contact_mas_nh_fplanck.m`; recoupling is `redor_curve.m` and
-`pdsd_simple.m`.
+`pdsd_simple.m`. For DIPSHIFT, use `dipshift_pair.m` with `singlerot`
+and `@dipshift`. Compare finite X,Y pulses to zero-width X,Y pulses on the
+same timing schedule, not to the distinct X-only sequence. The complex
+output is indexed by pulse displacement, not directly acquired time.
 
 For a direct single-crystal MAS route check, run
 `examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced

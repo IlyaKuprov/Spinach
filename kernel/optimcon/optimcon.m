@@ -1193,7 +1193,7 @@ if isfield(control,'ens_corrs')
         error('control.ens_corrs must be a cell array of character strings.');
     end
     for n=1:numel(control.ens_corrs)
-        if ~ismember(control.ens_corrs{n},{'rho_ens','rho_drift','power_drift'})
+        if ~ismember(control.ens_corrs{n},{'rho_ens','rho_drift','power_drift','dist_drift'})
             error('control.ens_corrs contains an unknown ensemble correlation setting')
         end
     end
@@ -1207,6 +1207,11 @@ if isfield(control,'ens_corrs')
     if ismember('power_drift',control.ens_corrs)&&...
        (numel(spin_system.control.pwr_levels)~=spin_system.control.ndrifts)
         error('power_drift correlation needs one power level per drift.');
+    end
+
+    if ismember('dist_drift',control.ens_corrs)&&...
+       (size(spin_system.control.distortion,1)~=spin_system.control.ndrifts)
+        error('dist_drift correlation needs one distortion row per drift.');
     end
 
     % Absorb ensemble correlations

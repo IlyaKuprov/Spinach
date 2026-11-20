@@ -36,7 +36,7 @@ inter.coupling.matrix=cell(4);
 for n=1:6
 
     % Orient the dipolar axis in the molecular frame
-    D=euler2dcm(0,deg2rad(angles(n,1)),deg2rad(angles(n,2)));
+    D=euler2dcm(deg2rad(angles(n,2)),deg2rad(angles(n,1)),0);
     inter.coupling.matrix{pairs(n,1),pairs(n,2)}=dip(n)*D*diag([-1 -1 2])*D';
 
 end

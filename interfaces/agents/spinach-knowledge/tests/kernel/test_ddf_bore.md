@@ -1,0 +1,5 @@
+# Rotated bore phantom oracle
+
+A dense direct-space field operator from independent Gaussian face quadrature drives an adaptive unsplit Bloch ODE. Both the bore and preparation axis rotate 90 degrees about Z relative to the FFT calculation. After registering the object, the complex voxel signal and band-limited image must agree. The reduced grid makes the dense oracle practical; the 1% image tolerance checks the discrete forward map, not continuum accuracy. Face quadrature also checks the field at bore and exterior targets; doubling the vacuum box at fixed spacing checks for periodic copies.
+
+The spatial regression fixes all substep counts, phantom dimensions, and readout moments, and checks that successive changes shrink on 24×24×30, 32×32×40, and 48×48×60 meshes. The temporal regression halves every time step on the finest mesh and requires a change below 0.1%. Both checks compare the unscaled complex k-space in the two shots separately; by Parseval these are relative complex image L² differences at identical readout resolution. A decrease alone does not establish spatial accuracy.

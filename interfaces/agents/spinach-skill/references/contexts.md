@@ -539,3 +539,13 @@ its receiver is not the source of that field. Use the ideal `crazed`
 sequence instead when the question is which molecular coherence pathway
 survives a prescribed filter. The two calculations are not alternative
 implementations of the same observable.
+For a matched encode/decode pair, see `ddf_chen_helix` for representing
+the final kick in the receiver and measuring the signed dipolar phase slope.
+
+For finite, overlapping Cartesian gradient and RF segments with feedback,
+use `imaging(spin_system,@ddf_sequence,p)`. Declare each source group's
+moment-to-A/m calibration and rotating frame independently of the receiver;
+zero source scale selects a passive reporter, not an undetectable spin.
+Choose the magnetostatic boundary using the field callback and the molecular
+transport boundary using the diffusion operator. The two need not coincide.
+See `ddf_tracer` for a two-substance setup with separate diffusivities.

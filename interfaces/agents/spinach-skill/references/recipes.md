@@ -912,3 +912,23 @@ acquisition. Check convergence under refinement, not just agreement with a port
 using the same grid. For integrator comparisons, retain
 `examples/fundamentals/quadratures/product_quadratures_2.m` as the companion
 example; it compares numerical methods rather than providing an analytic truth.
+
+### Bounded or periodic Cartesian dipolar feedback
+
+Precompute `symbol=ddf_bounded(npts,spacing)` for an isolated object or
+`symbol=ddf_periodic(npts,spacing,demag_factor)` for a repeating pattern.
+Pass `@(m) ddf_cartesian(m,npts,symbol)` to the field callback; source
+rows follow MATLAB ndgrid order (X fastest), in A/m, and fields are in T.
+Zero the source outside the sample, not the calculated field. For an
+impermeable wall, use `ddf_diffusion(mask,spacing,D)` as a rate in the
+material and leave the FFT boundary independent of the diffusion boundary.
+Use the bore example for raw complex projection data and profiles.
+
+For a uniform, on-resonance coil and a positive gyromagnetic ratio, radiation
+damping adds a spatially uniform field proportional to
+`[-mean(My),mean(Mx),0]` in the resonant frame. The coefficient has units
+T m/A and includes the filling factor. Add this term to the field callback
+only when modelling coil feedback; it is not a dipolar shape correction.
+The waveform regression switches this term on separately.
+
+Use `ddf_regularised` for the BlochDDFGalerkin centre-quadrature comparison, not the cell-integrated cavity. The `ddf_sphere_decay` example compares the second radial Neumann mode with the archived sphere traces.

@@ -21,3 +21,5 @@ The source applies these named correlation filters when present in `control.ens_
 Budgeting is applied after filtering. A finite budget at most 1 is treated as a fraction of the filtered case count, rounded to a sample count and clamped to at least 1. Otherwise the budget is used as a case count. If the resulting budget is smaller than the catalog, a subset is selected with a fixed Twister seed; the caller's prior MATLAB RNG state is restored afterward.
 
 The optional third output is a column of normalised case weights in catalog row order. Explicit drift weights are indexed by column two after correlation filtering; each drift must have the same number of retained rows, the retained mass must be positive, and stochastic subsampling is not allowed. Without explicit weights, retained rows share equal weight.
+
+In gate mode the first catalog column indexes `control.gate_targets` instead of state pairs. With `rho_drift`, the target index equals the drift index.

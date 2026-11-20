@@ -23,3 +23,5 @@ Call on the same parallel pool that was open when `optimcon.m` ran. Inside a `pa
 - `fidelity`: scalar mean figure of merit over catalog cases.
 - `gradient`: mean fidelity derivative with respect to waveform samples, with the same dimensions as `waveform`, returned when requested.
 - `hessian`: mean fidelity Hessian with dimensions `numel(waveform) x numel(waveform)`, returned when requested and supported.
+
+For gate control, fidelity is the weighted mean of the squared normalised trace overlaps, not the square of a mean trace. The trajectory structures carry no density trajectory; no gate Hessian is returned.

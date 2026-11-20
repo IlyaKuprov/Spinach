@@ -482,6 +482,9 @@ experiments are `nmr_spen/ufcosy_2spin.m` and `ufdosy_1spin.m`.
 
 ## Optimal control
 
+For phase-insensitive gate control, supply `control.gate_targets` instead of state pairs; use `rho_drift` to match targets to offsets.
+Use terminal square fidelity, rectangle slices, and LBFGS or RBFGS. Targets are Hilbert-sized unitaries; phase and Cartesian wrappers return values and gradients, not gate Hessians.
+
 Use `rotor_rf` for sampled complex RF gains, with `dist_drift` to link each map to its physical drift.
 For heteronuclear rotor drifts, give `mas_drifts` ordered numerical frames and pass its second output as the drift weights.
 The reduced `Tosner_tmSPICE/tmspice_nca.m` case study combines both interfaces and checks the waveform gradient.

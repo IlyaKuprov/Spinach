@@ -32,6 +32,7 @@ control.pwr_levels=1;
 control.pulse_dt=[0.02 0.03 0.04 0.01];
 control.drifts={{S.z,-2*S.z,S.x,0.4*S.z}};
 control.method='newton';
+control.max_iter=4;
 control.penalties={'NS'};
 control.p_weights=0.2;
 control.l_bound=-100;
@@ -66,6 +67,12 @@ for n=1:size(hess,3)
 end
 result=test_close(result,'tied Hessian action',observed,expected,1e-8,1e-8,...
                   'both input and output derivative axes are tied across the full time grid.');
+
+% Optimise the actual short guess through the public optimiser
+optimised=fmaxnewton(spin_system,@grape_repeat,waveform);
+[~,improved]=grape_repeat(optimised,spin_system);
+result=test_true(result,'short guess optimisation',isequal(size(optimised),size(waveform))&&...
+                 improved(1)>fid(1),'the public optimiser improves fidelity without untying the repeats.');
 
 end
 

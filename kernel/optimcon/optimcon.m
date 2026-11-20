@@ -40,6 +40,12 @@ end
 % Show the banner 
 banner(spin_system,'optimcon');
 
+% Gate objectives use the squared normalised trace overlap
+gate_mode=isfield(control,'gate_targets');
+if gate_mode&&~isfield(control,'fidelity')
+    control.fidelity='square';
+end
+
 % Process fidelity type
 if isfield(control,'fidelity')
 
@@ -272,8 +278,12 @@ else
 end
 
 % Validate gate targets or process the ordinary state pair lists
-gate_mode=isfield(control,'gate_targets');
 if gate_mode
+
+    % Reject fidelity options that the gate worker cannot evaluate
+    if ~strcmp(spin_system.control.fidelity,'square')
+        error('gate targets require square fidelity.');
+    end
 
     % Exclude options that require a propagated state or Hessian
     forbidden={'rho_init','rho_targ','phase_cycle','keyholes','traj_pen',...

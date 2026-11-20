@@ -9,3 +9,5 @@ The amplitude and phase arrays must be real numeric arrays with equal element co
 Two outputs request trajectory and fidelity only; three also returns the phase gradient; four request gradient and Hessian. The gradient is converted from Cartesian derivatives with `cartesian2polar` and has one third-dimension slice for the objective and each penalty. The Hessian has shape `numel(phi_profile)` by `numel(phi_profile)` by (number of penalties+1): Cartesian channel blocks are reordered, contracted into phase-pair blocks, and the same-track diagonal includes the second-derivative correction from the polar map. Final ordering follows MATLAB vectorisation. The source rejects unsupported output counts and unknown time-propagation algorithms.
 
 [Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/wrappers/grape_phase.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=grape_phase.m)
+
+Gate control uses the same fixed-amplitude Cartesian transform and phase pullback. Request two or three outputs; there is no gate Hessian.

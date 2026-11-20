@@ -54,6 +54,34 @@ delta=1e-5;
 result=test_close(result,'directional derivative',sum(grad(:,:,1).*direction,'all'),...
                   (plus(1)-minus(1))/(2*delta),1e-9,0,'The suffix and prefix give the trace derivative.');
 
+% Reject an explicit state fidelity that would otherwise be ignored
+control.fidelity='real';
+refused=false;
+try
+    optimcon(spin_system,control);
+catch err
+    refused=strcmp(err.message,'gate targets require square fidelity.');
+end
+result=test_true(result,'reject real fidelity',refused,'Gate mode only supports squared trace overlap.');
+
+% Require an actual unitary with the Hilbert dimension
+control.fidelity='square';
+targets={eye(3),2*eye(2),ones(2,2,2)};
+for n=1:numel(targets)
+
+    % Check wrong dimensions, scaling, and rank of the array
+    control.gate_targets=targets(n);
+    refused=false;
+    try
+        optimcon(spin_system,control);
+    catch err
+        refused=strcmp(err.message,'each gate target must be unitary and match the Hilbert dimension.');
+    end
+    result=test_true(result,sprintf('reject target %d',n),refused,...
+                     'Gate targets must be square unitaries at the Hilbert dimension.');
+
+end
+
 end
 
 

@@ -9,3 +9,5 @@ Evaluates the ensemble GRAPE objective for Cartesian control amplitudes and adds
 Two outputs return trajectory and a fidelity row containing the ensemble objective followed by one weighted slice per penalty. Three outputs add `grad`, with one third-dimension slice per objective or penalty. Four outputs also add `hess`, whose first two dimensions are `numel(waveform)` and whose third dimension has the same slice convention. When a basis is used, gradients are pulled back to basis coefficients and Hessians are transformed on both coordinate dimensions. There is no explicit default optimiser, line-search, or Hessian-approximation setting in this wrapper.
 
 [Source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/wrappers/grape_xy.m) · [Wiki](https://spindynamics.org/wiki/index.php?title=grape_xy.m)
+
+Gate control uses the same Cartesian basis and distortion pullbacks for the squared normalised trace overlap. Request two or three outputs; gate Hessians are not supported.

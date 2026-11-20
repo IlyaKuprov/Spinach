@@ -80,50 +80,50 @@ parfor (k=1:8,curve_workers)
     axis_dir=direction(k,:);
     wave_num=1/sqrt(tau_d*diffusivity*curve_weight(k));
     wavelength=2*pi/wave_num;
-    p=params;
+    parameters=params;
     if periods>0
 
         % A plane grating with a spherical mean field
-        p.npts=1+(periods*points_per_wave-1)*axis_dir;
+        parameters.npts=1+(periods*points_per_wave-1)*axis_dir;
         spacing=repmat(wavelength/points_per_wave,1,3);
-        p.dims=p.npts.*spacing;
-        mask=true(p.npts);
-        p.field=@(magn)ddf_field(magn,axis_dir,1/3);
+        parameters.dims=parameters.npts.*spacing;
+        mask=true(parameters.npts);
+        parameters.field=@(magn)ddf_field(magn,axis_dir,1/3);
 
     else
 
         % Voxelised sphere with vacuum outside and reflecting diffusion inside
-        p.npts=repmat(ceil(diameter*points_per_wave/wavelength),1,3);
-        p.dims=repmat(diameter,1,3);
-        spacing=p.dims./p.npts;
-        axis_pos=((1:p.npts(1))-(p.npts(1)+1)/2)*spacing(1);
+        parameters.npts=repmat(ceil(diameter*points_per_wave/wavelength),1,3);
+        parameters.dims=repmat(diameter,1,3);
+        spacing=parameters.dims./parameters.npts;
+        axis_pos=((1:parameters.npts(1))-(parameters.npts(1)+1)/2)*spacing(1);
         [xx,yy,zz]=ndgrid(axis_pos,axis_pos,axis_pos);
         mask=(xx.^2+yy.^2+zz.^2)<=(diameter/2)^2;
-        symbol=ddf_bounded(p.npts,spacing);
-        p.field=@(magn)ddf_cartesian(magn,p.npts,symbol);
+        symbol=ddf_bounded(parameters.npts,spacing);
+        parameters.field=@(magn)ddf_cartesian(magn,parameters.npts,symbol);
 
     end
 
     % Prepare the volume-averaged receiver and fixed diffusion and relaxation
-    p.spc_dim=prod(p.npts);
-    p.spn_dim=dim;
-    p.rho0=kron(double(mask(:)),rho_id+rho_z);
-    p.coil=kron(double(mask(:))/nnz(mask),detect);
+    parameters.spc_dim=prod(parameters.npts);
+    parameters.spn_dim=dim;
+    parameters.rho0=kron(double(mask(:)),rho_id+rho_z);
+    parameters.coil=kron(double(mask(:))/nnz(mask),detect);
     diffusion=ddf_diffusion(mask,spacing,diffusivity);
     if periods>0
 
         % Close the diffusion line periodically across one end face
-        seam=sparse([1 p.spc_dim],[1 1],[1 -1],p.spc_dim,1);
+        seam=sparse([1 parameters.spc_dim],[1 1],[1 -1],parameters.spc_dim,1);
         diffusion=diffusion-(diffusivity/spacing(1)^2)*(seam*seam.');
 
     end
-    p.transport=1i*kron(diffusion,speye(dim));
-    R=kron(spdiags(double(mask(:)),0,p.spc_dim,p.spc_dim),relax);
-    empty=sparse(p.spc_dim*dim,p.spc_dim*dim);
-    G=cellfun(@inflate,g2fplanck(spin_system,p),'UniformOutput',false);
+    parameters.transport=1i*kron(diffusion,speye(dim));
+    R=kron(spdiags(double(mask(:)),0,parameters.spc_dim,parameters.spc_dim),relax);
+    empty=sparse(parameters.spc_dim*dim,parameters.spc_dim*dim);
+    G=cellfun(@inflate,g2fplanck(spin_system,parameters),'UniformOutput',false);
 
     % Calibrate the fixed receiver on a hard 90-degree readout with no feedback
-    p_ref=p;
+    p_ref=parameters;
     p_ref.scale=0;
     p_ref.duration=rf_width;
     p_ref.rf=pi/(2*rf_width);
@@ -131,7 +131,7 @@ parfor (k=1:8,curve_workers)
     p_ref.steps=1;
     p_ref.acquire=true;
     reference=ddf_sequence(spin_system,p_ref,empty,empty,empty,G,empty);
-    model={p,empty,R,G,wave_num*axis_dir/(gamma*delta),reference};
+    model={parameters,empty,R,G,wave_num*axis_dir/(gamma*delta),reference};
 
     % Acquire all four completed transients before forming each echo
     [signal(:,k),shots(:,k,:)]=echo_curve(spin_system,model,time_axis,delta,...
@@ -217,11 +217,12 @@ for j=1:2
              'HandleVisibility','off');
 
     end
-    xlabel('t_2, s');
-    ylabel('echo amplitude / M_0');
-    orientations={'parallel to B_0','perpendicular to B_0'};
-    title(orientations{j});
-    title(legend('Location','northeast'),'G, T/m');
+    kxlabel('$t_2$, s');
+    kylabel('echo amplitude / $M_0$');
+    orientations={'parallel to $B_0$','perpendicular to $B_0$'};
+    ktitle(orientations{j});
+    leg=klegend('Location','northeast');
+    leg.Title.String='G, T/m';
     ylim([0 0.14]);
     kgrid
 
@@ -231,7 +232,7 @@ end
 
 % Simulate and cycle each echo independently
 function [signal,shots]=echo_curve(spin_system,model,time_axis,delta,t_first,...
-                           rf_width,max_step,phase,weights)
+                                              rf_width,max_step,phase,weights)
 
 % Initialise the echo curve
 signal=zeros(size(time_axis));
@@ -241,28 +242,28 @@ for n=1:numel(time_axis)
     % Set the refocusing pulse at the midpoint of the two equal tau intervals
     t_echo=time_axis(n);
     tau=(t_echo-2*delta-2*t_first)/2;
-    p=model{1};
+    parameters=model{1};
     empty=model{2};
     R=model{3};
     G=model{4};
     gradient=model{5};
     reference=model{6};
-    p.duration=[rf_width; delta; t_first-delta-rf_width; rf_width;...
-                2*delta; 2*t_first+tau-rf_width/2; rf_width; tau-rf_width/2];
-    p.gradient=zeros(numel(p.duration),3);
-    p.gradient([2 5],:)=[gradient; gradient];
-    p.steps=max(1,ceil(p.duration/max_step));
-    p.acquire=false(size(p.duration));
-    p.acquire(end)=true;
+    parameters.duration=[rf_width; delta; t_first-delta-rf_width; rf_width;...
+                         2*delta; 2*t_first+tau-rf_width/2; rf_width; tau-rf_width/2];
+    parameters.gradient=zeros(numel(parameters.duration),3);
+    parameters.gradient([2 5],:)=[gradient; gradient];
+    parameters.steps=max(1,ceil(parameters.duration/max_step));
+    parameters.acquire=false(size(parameters.duration));
+    parameters.acquire(end)=true;
 
     % Project onto second-order coherence before taking the magnitude
     fid=zeros(1,4);
     for q=1:4
 
         % Excitation phase cycle, fixed minus-Y mixing, and fixed X refocusing
-        p.rf=zeros(size(p.duration));
-        p.rf([1 4 7])=[phase(q)*pi/2; -1i*pi/2; pi]/rf_width;
-        fid(q)=ddf_sequence(spin_system,p,empty,R,empty,G,empty);
+        parameters.rf=zeros(size(parameters.duration));
+        parameters.rf([1 4 7])=[phase(q)*pi/2; -1i*pi/2; pi]/rf_width;
+        fid(q)=ddf_sequence(spin_system,parameters,empty,R,empty,G,empty);
 
     end
     shots(n,1,:)=fid;

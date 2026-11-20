@@ -46,8 +46,14 @@ function grumble(mask,spacing,diffusivity)
 if ~islogical(mask)||isempty(mask)||(ndims(mask)>3)
     error('mask must be a nonempty logical Cartesian array.');
 end
-validateattributes(spacing,{'double'},{'size',[1 3],'real','finite','positive'});
-validateattributes(diffusivity,{'double'},{'scalar','real','finite','nonnegative'});
+if (~isa(spacing,'double'))||(~isequal(size(spacing),[1 3]))||(~isreal(spacing))||...
+   (any(~isfinite(spacing(:))))||(any(spacing(:)<=0))
+    error('spacing must be a real finite positive double 1-by-3 array.');
+end
+if (~isa(diffusivity,'double'))||(~isscalar(diffusivity))||(~isreal(diffusivity))||...
+   (~isfinite(diffusivity))||(diffusivity<0)
+    error('diffusivity must be a real finite nonnegative double scalar.');
+end
 end
 
 

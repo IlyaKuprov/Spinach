@@ -18,59 +18,59 @@ bas.approximation={'none','none'};
 spin_system=basis(create(sys,inter),bas);
 
 % Set the two rotating frames and the Cartesian grid
-p.spins=sys.isotopes;
-p.offset=[0 0];
-p.groups={1,2};
-p.frames=[1 2];
-p.npts=[10 10 10];
-p.dims=[1 1 0.15]*1e-3;
-p.deriv={'period',3};
-p.diff=0;
-spacing=p.dims./p.npts;
-symbol=ddf_periodic(p.npts,spacing,0);
-p.field=@(m)ddf_cartesian(m,p.npts,symbol);
+parameters.spins=sys.isotopes;
+parameters.offset=[0 0];
+parameters.groups={1,2};
+parameters.frames=[1 2];
+parameters.npts=[10 10 10];
+parameters.dims=[1 1 0.15]*1e-3;
+parameters.deriv={'period',3};
+parameters.diff=0;
+spacing=parameters.dims./parameters.npts;
+symbol=ddf_periodic(parameters.npts,spacing,0);
+parameters.field=@(m)ddf_cartesian(m,parameters.npts,symbol);
 
 % Prepare the grating and detect one face with a uniform receiver phase
-grating=1+0.5*cos(pi*((1:p.npts(3))-0.5)/p.npts(3));
-p.rho0_ph={repmat(reshape(grating,1,1,[]),[p.npts(1:2) 1]),ones(p.npts)};
-receiver=zeros(p.npts);
-receiver(:,:,1)=1/prod(p.npts(1:2));
-p.coil_ph={receiver};
+grating=1+0.5*cos(pi*((1:parameters.npts(3))-0.5)/parameters.npts(3));
+parameters.rho0_ph={repmat(reshape(grating,1,1,[]),[parameters.npts(1:2) 1]),ones(parameters.npts)};
+receiver=zeros(parameters.npts);
+receiver(:,:,1)=1/prod(parameters.npts(1:2));
+parameters.coil_ph={receiver};
 dim=spin_system.bas.offsets(end);
-p.rlx_ph={ones(p.npts)};
-p.rlx_op={sparse(dim,dim)};
+parameters.rlx_ph={ones(parameters.npts)};
+parameters.rlx_op={sparse(dim,dim)};
 
 % Assign separate reflecting diffusion rates to the two substance blocks
 diffusivity=[2e-9 7e-10];
-p.transport=sparse(dim*prod(p.npts),dim*prod(p.npts));
+parameters.transport=sparse(dim*prod(parameters.npts),dim*prod(parameters.npts));
 ref=zeros(1,2);
 for q=1:2
     sites=(spin_system.bas.offsets(q)+1):spin_system.bas.offsets(q+1);
     proj=sparse(sites,sites,1,dim,dim);
-    rate=ddf_diffusion(true(p.npts),spacing,diffusivity(q));
-    p.transport=p.transport+1i*kron(rate,proj);
+    rate=ddf_diffusion(true(parameters.npts),spacing,diffusivity(q));
+    parameters.transport=parameters.transport+1i*kron(rate,proj);
     z=coil_state(spin_system,'Lz',q);
     ref(q)=real(z'*z);
-    p.rho0_st{q}=z+coil_state(spin_system,'Lx',q);
+    parameters.rho0_st{q}=z+coil_state(spin_system,'Lx',q);
 end
 
 % Sample the free induction at fixed receiver phase every 5 ms
-p.duration=[0;0.005*ones(8,1)];
-p.acquire=true(9,1);
-p.steps=2*ones(9,1);
-p.rf=zeros(9,2);
-p.gradient=zeros(9,3);
+parameters.duration=[0;0.005*ones(8,1)];
+parameters.acquire=true(9,1);
+parameters.steps=2*ones(9,1);
+parameters.rf=zeros(9,2);
+parameters.gradient=zeros(9,3);
 
 % Compare reciprocal phase accumulation on each receiver independently
 kfigure();
 for q=1:2
-    p.coil_st={coil_state(spin_system,'L+',q)};
+    parameters.coil_st={coil_state(spin_system,'L+',q)};
     subplot(1,2,q);
     hold on;
     for carbon=[0 0.03]
-        p.scale=[0.05 carbon]./ref;
-        fid=imaging(spin_system,@ddf_sequence,p);
-        plot(1e3*cumsum(p.duration),unwrap(angle(fid)));
+        parameters.scale=[0.05 carbon]./ref;
+        fid=imaging(spin_system,@ddf_sequence,parameters);
+        plot(1e3*cumsum(parameters.duration),unwrap(angle(fid)));
     end
     kxlabel('time, ms');
     kylabel([sys.isotopes{q} ' phase, rad']);

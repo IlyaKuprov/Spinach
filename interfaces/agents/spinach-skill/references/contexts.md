@@ -543,7 +543,7 @@ For a matched encode/decode pair, see `ddf_chen_helix` for representing
 the final kick in the receiver and measuring the signed dipolar phase slope.
 
 For finite, overlapping Cartesian gradient and RF segments with feedback,
-use `imaging(spin_system,@ddf_sequence,p)`. Declare each source group's
+use `imaging(spin_system,@ddf_sequence,parameters)`. Declare each source group's
 moment-to-A/m calibration and rotating frame independently of the receiver;
 zero source scale selects a passive reporter, not an undetectable spin.
 Choose the magnetostatic boundary using the field callback and the molecular

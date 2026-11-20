@@ -35,9 +35,18 @@ end
 
 % Consistency enforcement
 function grumble(npts,spacing,demag_factor)
-validateattributes(npts,{'double'},{'size',[1 3],'real','finite','integer','positive'});
-validateattributes(spacing,{'double'},{'size',[1 3],'real','finite','positive'});
-validateattributes(demag_factor,{'double'},{'scalar','real','>=',0,'<=',1});
+if (~isa(npts,'double'))||(~isequal(size(npts),[1 3]))||(~isreal(npts))||...
+   (any(~isfinite(npts(:))))||(any(npts(:)~=fix(npts(:))))||(any(npts(:)<=0))
+    error('npts must be a 1-by-3 double row of positive integers.');
+end
+if (~isa(spacing,'double'))||(~isequal(size(spacing),[1 3]))||(~isreal(spacing))||...
+   (any(~isfinite(spacing(:))))||(any(spacing(:)<=0))
+    error('spacing must be a real finite positive double 1-by-3 array.');
+end
+if (~isa(demag_factor,'double'))||(~isscalar(demag_factor))||(~isreal(demag_factor))||...
+   (demag_factor<0)||(demag_factor>1)||(~isfinite(demag_factor))
+    error('demag_factor must be a real double scalar in the interval [0,1].');
+end
 end
 
 

@@ -50,8 +50,14 @@ end
 
 % Consistency enforcement
 function grumble(count,radius)
-validateattributes(count,{'double'},{'scalar','real','finite','positive','integer'});
-validateattributes(radius,{'double'},{'scalar','real','finite','positive','<',0.5});
+if (~isa(count,'double'))||(~isscalar(count))||(~isreal(count))||(~isfinite(count))||(count<=0)||...
+   (count~=fix(count))
+    error('count must be a real finite positive integer-valued double scalar.');
+end
+if (~isa(radius,'double'))||(~isscalar(radius))||(~isreal(radius))||(~isfinite(radius))||...
+   (radius<=0)||(radius>=0.5)
+    error('radius must be a real double scalar strictly between zero and 0.5.');
+end
 if mod(count,2)~=0
     error('count must be even to sample the sphere centre.');
 end

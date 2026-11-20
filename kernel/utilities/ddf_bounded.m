@@ -49,8 +49,14 @@ end
 
 % Consistency enforcement
 function grumble(npts,spacing)
-validateattributes(npts,{'double'},{'size',[1 3],'real','finite','integer','positive'});
-validateattributes(spacing,{'double'},{'size',[1 3],'real','finite','positive'});
+if (~isa(npts,'double'))||(~isequal(size(npts),[1 3]))||(~isreal(npts))||...
+   (any(~isfinite(npts(:))))||(any(npts(:)~=fix(npts(:))))||(any(npts(:)<=0))
+    error('npts must be a 1-by-3 double row of positive integers.');
+end
+if (~isa(spacing,'double'))||(~isequal(size(spacing),[1 3]))||(~isreal(spacing))||...
+   (any(~isfinite(spacing(:))))||(any(spacing(:)<=0))
+    error('spacing must be a real finite positive double 1-by-3 array.');
+end
 end
 
 

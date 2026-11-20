@@ -31,19 +31,19 @@ sys.disable={'hygiene'};
 bas.formalism='sphten-liouv';
 bas.approximation={'none'};
 s=basis(create(sys,struct()),bas);
-p=phantom(s,24);
-p.flip_angles=[pi/2 0];
-pulse=imaging(s,@crazed_ddf,p);
+parameters=phantom(s,24);
+parameters.flip_angles=[pi/2 0];
+pulse=imaging(s,@crazed_ddf,parameters);
 gain=pulse(1)/1i;
-result=test_close(result,'raw pulse phase',gain,p.coil_st{1}'*state(s,'Lx','1H'),...
+result=test_close(result,'raw pulse phase',gain,parameters.coil_st{1}'*state(s,'Lx','1H'),...
                   1e-10,0,'a positive X pulse makes negative Y magnetisation');
-time=(0:p.npoints-1)'/p.sweep;
+time=(0:parameters.npoints-1)'/parameters.sweep;
 
 % Compare the entire complex trajectory including precession direction
-p.flip_angles=[pi/3 0];
+parameters.flip_angles=[pi/3 0];
 for shape=[1/3 0 1]
-    p.demag_factor=shape;
-    signal=imaging(s,@crazed_ddf,p)/gain;
+    parameters.demag_factor=shape;
+    signal=imaging(s,@crazed_ddf,parameters)/gain;
     rate=10*cos(pi/3)*(3*shape-1)/2;
     target=1i*sin(pi/3)*exp(-1i*rate*time);
     result=test_close(result,sprintf('tilt Nz=%g',shape),...
@@ -51,47 +51,47 @@ for shape=[1/3 0 1]
 end
 
 % Detect longitudinal magnetisation without changing the source calibration
-p.coil_st={p.rho_ref};
-signal=imaging(s,@crazed_ddf,p);
-target=cos(pi/3)*(p.rho_ref'*p.rho_ref);
+parameters.coil_st={parameters.rho_ref};
+signal=imaging(s,@crazed_ddf,parameters);
+target=cos(pi/3)*(parameters.rho_ref'*parameters.rho_ref);
 result=test_close(result,'conserved longitudinal component',...
                   max(abs(signal-target)),0,1e-7,0,'the tilted uniform state retains Mz');
 
 % Isolate the imposed Hamiltonian offset with no dipolar feedback
-p=phantom(s,24);
-p.flip_angles=[pi/2 0];
-p.offset=3;
-p.magnetisation=0;
-signal=imaging(s,@crazed_ddf,p)/gain;
+parameters=phantom(s,24);
+parameters.flip_angles=[pi/2 0];
+parameters.offset=3;
+parameters.magnetisation=0;
+signal=imaging(s,@crazed_ddf,parameters)/gain;
 result=test_close(result,'offset sign',max(abs(signal-1i*exp(-6i*pi*time))),...
                   0,1e-7,0,'positive rotating-frame offset rotates L+ detection negatively');
 
 % Select the first three grating orders after two ninety-degree pulses
-p=phantom(s,24);
-area=2*pi/(spin('1H')*p.dims);
-p.flip_angles=[pi/2 pi/2];
+parameters=phantom(s,24);
+area=2*pi/(spin('1H')*parameters.dims);
+parameters.flip_angles=[pi/2 pi/2];
 for zcos=[1 0 sqrt(1/3)]
-    p.direction=[sqrt(1-zcos^2) 0 zcos];
-    p.demag_factor=zcos^2;
+    parameters.direction=[sqrt(1-zcos^2) 0 zcos];
+    parameters.demag_factor=zcos^2;
     arg=10*(3*zcos^2-1)*time/2;
     for n=1:3
-        p.gradient_areas=area*[1 n];
+        parameters.gradient_areas=area*[1 n];
         target=-(1i)^n*(besselj(n-1,arg)+besselj(n+1,arg))/2;
-        signal=imaging(s,@crazed_ddf,p)/gain;
-        result=test_close(result,sprintf('Bessel p=%d cos=%g',n,zcos),...
+        signal=imaging(s,@crazed_ddf,parameters)/gain;
+        result=test_close(result,sprintf('Bessel order=%d cos=%g',n,zcos),...
                           max(abs(signal-target)),0,1e-5,0,'complex echo in single-pulse units');
     end
 end
 
 % Detect the encoded harmonic directly with a fixed phase-sensitive coil
-p.magnetisation=0;
-p.flip_angles=[pi/2 0];
-p.gradient_areas=area*[2 0];
-p.diff=2e-9;
-phase=2*pi*((0:p.npts-1)'+0.5-p.npts/2)/p.npts;
-p.coil_ph={exp(2i*phase)/p.npts};
-signal=imaging(s,@crazed_ddf,p)/gain;
-target=1i*exp(-p.diff*(4*pi/p.dims)^2*time);
+parameters.magnetisation=0;
+parameters.flip_angles=[pi/2 0];
+parameters.gradient_areas=area*[2 0];
+parameters.diff=2e-9;
+phase=2*pi*((0:parameters.npts-1)'+0.5-parameters.npts/2)/parameters.npts;
+parameters.coil_ph={exp(2i*phase)/parameters.npts};
+signal=imaging(s,@crazed_ddf,parameters)/gain;
+target=1i*exp(-parameters.diff*(4*pi/parameters.dims)^2*time);
 result=test_close(result,'diffusion of second harmonic',...
                   max(abs(signal-target)),0,1e-7,0,'Fourier diffusion damps the encoded mode');
 
@@ -103,21 +103,21 @@ inter.zeeman.scalar=num2cell(-2*pi*1e6*shifts/spin('1H'));
 inter.coupling.scalar=cell(2);
 inter.coupling.scalar{1,2}=coupling;
 s=basis(create(sys,inter),bas);
-p=phantom(s,32);
-p.diff=2e-9;
-p.flip_angles=[1.1 0.9];
-p.gradient_areas=area*[1 -2];
-p.demag_factor=1/3;
-p.sweep=400;
-p.ddf_steps=8;
-ref=pair_reference(p,shifts,coupling,12);
-wide=pair_reference(p,shifts,coupling,18);
+parameters=phantom(s,32);
+parameters.diff=2e-9;
+parameters.flip_angles=[1.1 0.9];
+parameters.gradient_areas=area*[1 -2];
+parameters.demag_factor=1/3;
+parameters.sweep=400;
+parameters.ddf_steps=8;
+ref=pair_reference(parameters,shifts,coupling,12);
+wide=pair_reference(parameters,shifts,coupling,18);
 result=test_close(result,'Galerkin bandwidth',max(abs(ref-wide)),0,1e-9,0,...
                   'zero-padded convolution converges under independent mode refinement');
 
 % Verify that the receiver distinguishes scalar coupling and transport
-uncoupled=pair_reference(p,shifts,0,12);
-static=p;
+uncoupled=pair_reference(parameters,shifts,0,12);
+static=parameters;
 static.diff=0;
 immobile=pair_reference(static,shifts,coupling,12);
 result=test_true(result,'resolved coupling',max(abs(uncoupled-ref))>1e-5,...
@@ -126,18 +126,18 @@ result=test_true(result,'resolved transport',max(abs(immobile-ref))>1e-5,...
                  'omitting diffusion changes the trace above its acceptance tolerance');
 
 % Refine the time step and then the voxel grid at fixed physical length
-coarse=imaging(s,@crazed_ddf,p);
-p.ddf_steps=2*p.ddf_steps;
-fine=imaging(s,@crazed_ddf,p);
-p.npts=2*p.npts;
-p.rho0_ph={ones(p.npts,1)};
-p.coil_ph={ones(p.npts,1)/p.npts};
-p.rlx_ph={ones(p.npts,1)};
-finer=imaging(s,@crazed_ddf,p);
-p.flip_angles=[pi/2 0];
-p.gradient_areas=[0 0];
-p.npoints=1;
-pulse=imaging(s,@crazed_ddf,p);
+coarse=imaging(s,@crazed_ddf,parameters);
+parameters.ddf_steps=2*parameters.ddf_steps;
+fine=imaging(s,@crazed_ddf,parameters);
+parameters.npts=2*parameters.npts;
+parameters.rho0_ph={ones(parameters.npts,1)};
+parameters.coil_ph={ones(parameters.npts,1)/parameters.npts};
+parameters.rlx_ph={ones(parameters.npts,1)};
+finer=imaging(s,@crazed_ddf,parameters);
+parameters.flip_angles=[pi/2 0];
+parameters.gradient_areas=[0 0];
+parameters.npoints=1;
+pulse=imaging(s,@crazed_ddf,parameters);
 gain=pulse(1)/1i;
 result=test_close(result,'time refinement',max(abs((fine-coarse)/gain)),0,1e-6,0,...
                   'halving the integration step resolves the coupled signal');
@@ -149,34 +149,34 @@ result=test_close(result,'two-spin Fourier reference',max(abs(finer/gain-wide)),
 end
 
 % Specify a homogeneous periodic phantom with a volume-average receiver
-function p=phantom(s,count)
+function parameters=phantom(s,count)
 
 % Sample a 0.5 mm pitch with a 100 ms dipolar time
-p.npts=count;
-p.dims=5e-4;
-p.deriv={'fourier'};
-p.diff=0;
-p.spins={'1H'};
-p.offset=0;
-p.direction=[0 0 1];
-p.demag_factor=1/3;
-p.magnetisation=10/(spin('1H')*1.25663706127e-6);
-p.rho_ref=state(s,'Lz','1H');
-p.rho0_st={p.rho_ref};
-p.rho0_ph={ones(count,1)};
-p.coil_st={coil_state(s,'L+','1H')};
-p.coil_ph={ones(count,1)/count};
-p.rlx_ph={ones(count,1)};
-p.rlx_op={sparse(numel(p.rho_ref),numel(p.rho_ref))};
-p.gradient_areas=[0 0];
-p.sweep=80;
-p.npoints=9;
-p.ddf_steps=16;
+parameters.npts=count;
+parameters.dims=5e-4;
+parameters.deriv={'fourier'};
+parameters.diff=0;
+parameters.spins={'1H'};
+parameters.offset=0;
+parameters.direction=[0 0 1];
+parameters.demag_factor=1/3;
+parameters.magnetisation=10/(spin('1H')*1.25663706127e-6);
+parameters.rho_ref=state(s,'Lz','1H');
+parameters.rho0_st={parameters.rho_ref};
+parameters.rho0_ph={ones(count,1)};
+parameters.coil_st={coil_state(s,'L+','1H')};
+parameters.coil_ph={ones(count,1)/count};
+parameters.rlx_ph={ones(count,1)};
+parameters.rlx_op={sparse(numel(parameters.rho_ref),numel(parameters.rho_ref))};
+parameters.gradient_areas=[0 0];
+parameters.sweep=80;
+parameters.npoints=9;
+parameters.ddf_steps=16;
 
 end
 
 % Propagate a two-proton Hilbert density matrix for each spatial harmonic
-function fid=pair_reference(p,shifts,coupling,halfwidth)
+function fid=pair_reference(parameters,shifts,coupling,halfwidth)
 
 % Assemble scalar coupling and magnetic moments from Cartesian Pauli matrices
 pauli={[0 1;1 0]/2,[0 -1i;1i 0]/2,diag([1 -1])/2};
@@ -200,8 +200,8 @@ rho=zeros(16,numel(modes));
 rho(:,halfwidth+1)=mom(:,3);
 orders=diag(total)-diag(total).';
 for k=1:2
-    rho=expm(p.flip_angles(k)*rot(:,:,1))*rho;
-    pitch=round(p.gradient_areas(k)*spin('1H')*p.dims/(2*pi));
+    rho=expm(parameters.flip_angles(k)*rot(:,:,1))*rho;
+    pitch=round(parameters.gradient_areas(k)*spin('1H')*parameters.dims/(2*pi));
     for n=1:16
         shift=orders(n)*pitch;
         keep=abs(modes-shift)<=halfwidth;
@@ -211,11 +211,11 @@ for k=1:2
 end
 
 % Differentiate the Fourier series by a non-circular coefficient convolution
-weight=ones(size(modes))*(3*p.direction(3)^2-1)/2;
-weight(halfwidth+1)=(3*p.demag_factor-1)/2;
-field_scale=-spin('1H')*1.25663706127e-6*p.magnetisation*[1 1 -2]/(3*norm(mom(:,3))^2);
-decay=p.diff*(2*pi*modes/p.dims).^2;
-time=(0:p.npoints-1)'/p.sweep;
+weight=ones(size(modes))*(3*parameters.direction(3)^2-1)/2;
+weight(halfwidth+1)=(3*parameters.demag_factor-1)/2;
+field_scale=-spin('1H')*1.25663706127e-6*parameters.magnetisation*[1 1 -2]/(3*norm(mom(:,3))^2);
+decay=parameters.diff*(2*pi*modes/parameters.dims).^2;
+time=(0:parameters.npoints-1)'/parameters.sweep;
 opts=odeset('AbsTol',1e-13,'RelTol',1e-11);
 [~,traj]=ode45(@rhs,time,rho(:),opts);
 coil=mom(:,1)+1i*mom(:,2);

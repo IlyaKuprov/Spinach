@@ -44,9 +44,9 @@ drift=hamiltonian(spin_system);
 
 % Use a bulk cell with one X pitch and two pitches along each strong axis
 pitch=1e-3;
-p.dims=pitch*[1 0.2 0.2];
-p.groups={1,2};
-p.frames=[1 2];
+parameters.dims=pitch*[1 0.2 0.2];
+parameters.groups={1,2};
+parameters.frames=[1 2];
 
 % Sample both dimensions on grids that put the four peaks on DFT bins
 split=abs(diff(offset_hz));
@@ -63,9 +63,9 @@ g=2*pi/(gamma*delta*pitch);
 strong=[0 0  0;...
         0 10 0;...
         0 0 10];
-p.rf=zeros(8+nt2,2);
-p.rf([1 4],:)=pi/(2*pulse);
-p.acquire=[false(8,1);true(nt2,1)];
+parameters.rf=zeros(8+nt2,2);
+parameters.rf([1 4],:)=pi/(2*pulse);
+parameters.acquire=[false(8,1);true(nt2,1)];
 
 % Compare X, XY, and XZ with identical elapsed time before acquisition
 for n=1:3
@@ -73,47 +73,47 @@ for n=1:3
     % Collapse exactly uniform directions to their constant Fourier mode
     grid_size=npts;
     grid_size([false strong(n,2:3)==0])=1;
-    p.npts=grid_size;
+    parameters.npts=grid_size;
     nvox=prod(grid_size);
-    spacing=p.dims./grid_size;
+    spacing=parameters.dims./grid_size;
     symbol=ddf_periodic(grid_size,spacing,1/3);
-    p.field=@(m)ddf_cartesian(m,grid_size,symbol);
+    parameters.field=@(m)ddf_cartesian(m,grid_size,symbol);
 
     % Use separate diffusion blocks and a concentration-weighted receiver
-    p.transport=sparse(dim*nvox,dim*nvox);
+    parameters.transport=sparse(dim*nvox,dim*nvox);
     source=sparse(dim,1);
     receiver=sparse(dim,1);
-    p.scale=zeros(1,2);
+    parameters.scale=zeros(1,2);
     for q=1:2
         z=coil_state(spin_system,'Lz',q);
         source=source+z;
-        p.scale(q)=magn(q)/real(z'*z);
-        receiver=receiver+p.scale(q)*coil_state(spin_system,'L+',q);
+        parameters.scale(q)=magn(q)/real(z'*z);
+        receiver=receiver+parameters.scale(q)*coil_state(spin_system,'L+',q);
         sites=(spin_system.bas.offsets(q)+1):spin_system.bas.offsets(q+1);
         proj=sparse(sites,sites,1,dim,dim);
         rate=ddf_diffusion(true(grid_size),spacing,diffusivity(q));
-        p.transport=p.transport+1i*kron(rate,proj);
+        parameters.transport=parameters.transport+1i*kron(rate,proj);
     end
 
     % Embed the spin operators only on the occupied spatial modes
-    p.spc_dim=nvox;
-    p.spn_dim=dim;
-    p.rho0=kron(ones(nvox,1),source);
-    p.coil=kron(ones(nvox,1)/nvox,receiver);
+    parameters.spc_dim=nvox;
+    parameters.spn_dim=dim;
+    parameters.rho0=kron(ones(nvox,1),source);
+    parameters.coil=kron(ones(nvox,1)/nvox,receiver);
     H=kron(speye(nvox),drift);
     empty=sparse(nvox*dim,nvox*dim);
-    G=cellfun(@inflate,g2fplanck(spin_system,p),'UniformOutput',false);
+    G=cellfun(@inflate,g2fplanck(spin_system,parameters),'UniformOutput',false);
 
     % Add the balanced strong lobes after the 2X correlation lobe
-    p.gradient=g*[zeros(2,3);1 0 0;0 0 0;2 0 0;strong(n,:);...
-                  0 0 0;-strong(n,:);zeros(nt2,3)];
+    parameters.gradient=g*[zeros(2,3);1 0 0;0 0 0;2 0 0;strong(n,:);...
+                           0 0 0;-strong(n,:);zeros(nt2,3)];
     for k=1:nt1
 
         % Increment t1 before the first correlation gradient
-        p.duration=[pulse;(k-1)*dt1;delta;pulse;delta;delta;delay;delta;recovery;...
-                    repmat(dt2,nt2-1,1)];
-        p.steps=max(1,ceil(p.duration/max_step));
-        result.fid(k,:,n)=transpose(ddf_sequence(spin_system,p,H,empty,empty,G,empty));
+        parameters.duration=[pulse;(k-1)*dt1;delta;pulse;delta;delta;delay;delta;recovery;...
+                             repmat(dt2,nt2-1,1)];
+        parameters.steps=max(1,ceil(parameters.duration/max_step));
+        result.fid(k,:,n)=transpose(ddf_sequence(spin_system,parameters,H,empty,empty,G,empty));
 
     end
 
@@ -139,10 +139,21 @@ end
 
 % Consistency enforcement
 function grumble(npts,max_step,delay,recovery)
-validateattributes(npts,{'numeric'},{'size',[1 3],'integer','positive','finite'});
-validateattributes(max_step,{'numeric'},{'scalar','real','positive','finite'});
-validateattributes(delay,{'numeric'},{'scalar','real','nonnegative','finite'});
-validateattributes(recovery,{'numeric'},{'scalar','real','nonnegative','finite'});
+if (~isnumeric(npts))||(~isequal(size(npts),[1 3]))||(~isreal(npts))||(any(~isfinite(npts(:))))||...
+   (any(npts(:)~=fix(npts(:))))||(any(npts(:)<=0))
+    error('npts must be a 1-by-3 row of positive integers.');
+end
+if (~isnumeric(max_step))||(~isscalar(max_step))||(~isreal(max_step))||(max_step<=0)||...
+   (~isfinite(max_step))
+    error('max_step must be a real positive finite numeric scalar.');
+end
+if (~isnumeric(delay))||(~isscalar(delay))||(~isreal(delay))||(delay<0)||(~isfinite(delay))
+    error('delay must be a real nonnegative finite numeric scalar.');
+end
+if (~isnumeric(recovery))||(~isscalar(recovery))||(~isreal(recovery))||(recovery<0)||...
+   (~isfinite(recovery))
+    error('recovery must be a real nonnegative finite numeric scalar.');
+end
 end
 
 

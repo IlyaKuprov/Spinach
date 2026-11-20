@@ -35,12 +35,21 @@ end
 
 % Consistency enforcement
 function grumble(magn,npts,symbol)
-validateattributes(npts,{'double'},{'size',[1 3],'real','finite','integer','positive'});
-validateattributes(magn,{'double'},{'size',[prod(npts) 3],'real','finite','nonsparse'});
+if (~isa(npts,'double'))||(~isequal(size(npts),[1 3]))||(~isreal(npts))||...
+   (any(~isfinite(npts(:))))||(any(npts(:)~=fix(npts(:))))||(any(npts(:)<=0))
+    error('npts must be a 1-by-3 double row of positive integers.');
+end
+if (~isa(magn,'double'))||(~isequal(size(magn),[prod(npts) 3]))||(~isreal(magn))||...
+   (any(~isfinite(magn(:))))||(issparse(magn))
+    error('magn must be a full real double array with three finite components per voxel.');
+end
 if (ndims(symbol)>3)||(~isequal(size(symbol,1:3),npts)&&~isequal(size(symbol,1:3),2*npts-1))
     error('symbol dimensions must match the periodic or isolated grid.');
 end
-validateattributes(symbol,{'double'},{'real','finite','nonsparse','nonempty'});
+if (~isa(symbol,'double'))||(~isreal(symbol))||(any(~isfinite(symbol(:))))||(issparse(symbol))||...
+   (isempty(symbol))
+    error('symbol must be a real finite full non-empty double array.');
+end
 end
 
 

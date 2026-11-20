@@ -31,8 +31,14 @@
 function [kspace,img,profile,psf,signal]=ddf_bore_image(npts,steps)
 
 % Specify a centred cylinder and an empty bore at X=2 mm
-validateattributes(npts,{'double'},{'size',[1 3],'integer','positive','finite'});
-validateattributes(steps,{'double'},{'size',[1 3],'integer','positive','finite'});
+if (~isa(npts,'double'))||(~isequal(size(npts),[1 3]))||(~isreal(npts))||...
+   (any(~isfinite(npts(:))))||(any(npts(:)~=fix(npts(:))))||(any(npts(:)<=0))
+    error('npts must be a 1-by-3 double row of positive integers.');
+end
+if (~isa(steps,'double'))||(~isequal(size(steps),[1 3]))||(~isreal(steps))||...
+   (any(~isfinite(steps(:))))||(any(steps(:)~=fix(steps(:))))||(any(steps(:)<=0))
+    error('steps must be a 1-by-3 double row of positive integers.');
+end
 spacing=[8 8 10]*1e-3./npts;
 axes_m=cell(1,3);
 for n=1:3

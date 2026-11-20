@@ -134,25 +134,69 @@ if (~iscell(parameters.spins))||(~isscalar(parameters.spins))||...
    (~ischar(parameters.spins{1}))||(~all(strcmp(parameters.spins{1},spin_system.comp.isotopes)))
     error('one isotope common to all spins must be selected.');
 end
-validateattributes(parameters.npts,{'numeric'},{'scalar','integer','>',1});
-validateattributes(parameters.dims,{'double','single'},{'scalar','real','finite','positive'});
+if (~isnumeric(parameters.npts))||(~isscalar(parameters.npts))||(~isreal(parameters.npts))||...
+   (~isfinite(parameters.npts))||(parameters.npts~=fix(parameters.npts))||(parameters.npts<=1)
+    error('parameters.npts must be an integer greater than one.');
+end
+if (~isfloat(parameters.dims))||(~isscalar(parameters.dims))||(~isreal(parameters.dims))||...
+   (~isfinite(parameters.dims))||(parameters.dims<=0)
+    error('parameters.dims must be a real finite positive floating-point scalar.');
+end
 if ~ismember(parameters.deriv{1},{'period','fourier'})
     error('the spatial derivative must be periodic.');
 end
-validateattributes(parameters.rho_ref,{'double','single'},{'finite','size',[parameters.spn_dim 1]});
-validateattributes(parameters.rho0,{'double','single'},{'finite','size',[parameters.spn_dim*parameters.npts 1]});
-validateattributes(parameters.coil,{'double','single'},{'finite','size',[parameters.spn_dim*parameters.npts 1]});
-validateattributes(parameters.direction,{'double','single'},{'vector','numel',3,'real','finite'});
+if (~isfloat(parameters.rho_ref))||(any(~isfinite(parameters.rho_ref(:))))||...
+   (~isequal(size(parameters.rho_ref),[parameters.spn_dim 1]))
+    error('parameters.rho_ref must be a finite local spin-state column.');
+end
+if (~isfloat(parameters.rho0))||(any(~isfinite(parameters.rho0(:))))||...
+   (~isequal(size(parameters.rho0),[parameters.spn_dim*parameters.npts 1]))
+    error('parameters.rho0 must be a finite column matching the spin-space dimension.');
+end
+if (~isfloat(parameters.coil))||(any(~isfinite(parameters.coil(:))))||...
+   (~isequal(size(parameters.coil),[parameters.spn_dim*parameters.npts 1]))
+    error('parameters.coil must be a finite column matching the spin-space dimension.');
+end
+if (~isfloat(parameters.direction))||(~isvector(parameters.direction))||...
+   (numel(parameters.direction)~=3)||(~isreal(parameters.direction))||...
+   (any(~isfinite(parameters.direction(:))))
+    error('parameters.direction must be a real finite floating-point 3-element vector.');
+end
 if abs(norm(parameters.direction)-1)>3*eps(class(parameters.direction))
     error('direction must be a unit vector.');
 end
-validateattributes(parameters.demag_factor,{'double','single'},{'scalar','real','>=',0,'<=',1});
-validateattributes(parameters.magnetisation,{'double','single'},{'scalar','real','finite','nonnegative'});
-validateattributes(parameters.flip_angles,{'double','single'},{'size',[1 2],'real','finite'});
-validateattributes(parameters.gradient_areas,{'double','single'},{'size',[1 2],'real','finite'});
-validateattributes(parameters.sweep,{'double','single'},{'scalar','real','finite','positive'});
-validateattributes(parameters.npoints,{'numeric'},{'scalar','integer','positive'});
-validateattributes(parameters.ddf_steps,{'numeric'},{'scalar','integer','positive'});
+if (~isfloat(parameters.demag_factor))||(~isscalar(parameters.demag_factor))||...
+   (~isreal(parameters.demag_factor))||(parameters.demag_factor<0)||(parameters.demag_factor>1)||...
+   (~isfinite(parameters.demag_factor))
+    error('parameters.demag_factor must be a real scalar in the interval [0,1].');
+end
+if (~isfloat(parameters.magnetisation))||(~isscalar(parameters.magnetisation))||...
+   (~isreal(parameters.magnetisation))||(~isfinite(parameters.magnetisation))||...
+   (parameters.magnetisation<0)
+    error('parameters.magnetisation must be a real finite nonnegative floating-point scalar.');
+end
+if (~isfloat(parameters.flip_angles))||(~isequal(size(parameters.flip_angles),[1 2]))||...
+   (~isreal(parameters.flip_angles))||(any(~isfinite(parameters.flip_angles(:))))
+    error('parameters.flip_angles must be a real finite floating-point 1-by-2 array.');
+end
+if (~isfloat(parameters.gradient_areas))||(~isequal(size(parameters.gradient_areas),[1 2]))||...
+   (~isreal(parameters.gradient_areas))||(any(~isfinite(parameters.gradient_areas(:))))
+    error('parameters.gradient_areas must be a real finite floating-point 1-by-2 array.');
+end
+if (~isfloat(parameters.sweep))||(~isscalar(parameters.sweep))||(~isreal(parameters.sweep))||...
+   (~isfinite(parameters.sweep))||(parameters.sweep<=0)
+    error('parameters.sweep must be a real finite positive floating-point scalar.');
+end
+if (~isnumeric(parameters.npoints))||(~isscalar(parameters.npoints))||...
+   (~isreal(parameters.npoints))||(~isfinite(parameters.npoints))||...
+   (parameters.npoints~=fix(parameters.npoints))||(parameters.npoints<=0)
+    error('parameters.npoints must be a positive integer.');
+end
+if (~isnumeric(parameters.ddf_steps))||(~isscalar(parameters.ddf_steps))||...
+   (~isreal(parameters.ddf_steps))||(~isfinite(parameters.ddf_steps))||...
+   (parameters.ddf_steps~=fix(parameters.ddf_steps))||(parameters.ddf_steps<=0)
+    error('parameters.ddf_steps must be a positive integer.');
+end
 end
 
 

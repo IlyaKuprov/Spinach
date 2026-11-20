@@ -69,14 +69,17 @@ for m=1:numel(D) % Build drift Hamiltonians
     D{m}{1}=hamiltonian(assume(spin_system,'nmr'));
 end
 
+% Nominal RF amplitude (rad/s)
+nominal_pwr=2*pi*500;
+
 % Define control parameters
 control.isotopes={'1H','13C'};          % Isotopes
 control.channels=[1; 1; 2; 2];          % Channel map
 control.drifts=D;                       % Drift array
-control.operators={LxH,LyH,LxC,LyC};	% Control operators
+control.operators={LxH,LyH,LxC,LyC};    % Control operators
 control.rho_init=sources;               % Initial states
 control.rho_targ=targets;               % Destination states
-control.pwr_levels=2*pi*[450 500 550];  % Power levals
+control.pwr_levels=nominal_pwr*[0.9 1 1.1]; % RF amplitude ensemble
 control.pulse_dt=5e-4*ones(1,275);      % Interval grid
 control.penalties={'NS','SNS'};         % Penalty
 control.p_weights=[1 100];              % Penalty weight
@@ -93,8 +96,8 @@ spin_system=optimcon(spin_system,control);
 % Run the optimisation from a random guess
 pulse=fmaxnewton(spin_system,@grape_xy,randn(4,275)/10);
 
-% Denormalise and format the waveform
-pulse=pulse*control.pwr_levels;
+% Denormalise at nominal RF amplitude and format the waveform
+pulse=nominal_pwr*pulse;
 pulse=mat2cell(pulse,[1 1 1 1]);
 
 % Run a test simulation using the optimal pulse
@@ -107,4 +110,5 @@ report(spin_system,['TT->SS: Re[<target|rho(T)>] = ' num2str(fidelity_a)]);
 report(spin_system,['TS->ST: Re[<target|rho(T)>] = ' num2str(fidelity_b)]);
 
 end
+
 

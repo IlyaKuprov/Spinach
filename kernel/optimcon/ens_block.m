@@ -156,7 +156,7 @@ for m=1:n_mine
     if n_outputs>2
         grad_n=R'*reshape(J'*outputs{3}(:),ncont,nsteps);
         group=1;
-        if isfield(control,'gamma_groups'), group=control.gamma_groups(n_sys); end
+        if isfield(control,'gamma_groups'), group=control.gamma_groups(n); end
         grad(:,group)=grad(:,group)+(weight*power_lvl)*grad_n(:);
     end
 

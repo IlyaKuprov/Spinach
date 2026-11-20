@@ -88,8 +88,7 @@ end
 if isfield(control,'gamma_groups')
 
     % Sum complex overlaps within each physical group, then average group scores
-    groups=control.gamma_groups(control.catalog(:,2));
-    groups=groups(:);
+    groups=control.gamma_groups;
     group_count=max(control.gamma_groups);
     weights=accumarray(groups,control.case_weights,[group_count 1]);
     overlaps=accumarray(groups,fidelities(:).*control.case_weights,[group_count 1]);
@@ -102,6 +101,9 @@ if isfield(control,'gamma_groups')
     if n_outputs>2
         gradient=2*real(gradient*conj(means));
     end
+
+    % Plot individual squared overlap magnitudes, not complex amplitudes
+    fidelities=abs(fidelities).^2;
 
 else
 

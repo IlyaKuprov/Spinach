@@ -119,6 +119,9 @@ for fixture=1:4
         % Preserve each primary fidelity while penalising squared impurity
         for measure_idx=1:2
             control.fidelity=measures{measure_idx};
+            if fixture==1&&strcmp(control.fidelity,'square')
+                control.gamma_groups=1;
+            end
             local_system=optimcon(spin_system,control);
             [traj_data,fidelity,gradient]=grape_coop(phase_pair,local_system);
             gradient=gradient(:,:,1);

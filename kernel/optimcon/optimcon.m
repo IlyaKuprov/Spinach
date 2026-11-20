@@ -1496,6 +1496,9 @@ if isfield(control,'gamma_groups')
        ~strcmp(spin_system.control.fid_type,'terminal')
         error('gamma_groups requires terminal square fidelity and a first-derivative method.');
     end
+    if ~isempty(spin_system.control.traj_pen)
+        error('Spinach:optimcon:gammaTrajectoryPenalty','gamma_groups does not support trajectory penalties.');
+    end
     groups=control.gamma_groups;
     if ~isnumeric(groups)||~isreal(groups)||~isrow(groups)||...
        numel(groups)~=spin_system.control.ndrifts||...
@@ -1522,6 +1525,16 @@ end
  spin_system.control.ens_sizes,...
  spin_system.control.case_weights]=ens_catalog(spin_system.control);
 n_cases=size(spin_system.control.catalog,1);
+
+% Preserve all non-drift catalog coordinates when grouping gamma samples
+if isfield(spin_system.control,'gamma_groups')
+
+    % Replace only the drift column and compile a group index per retained row
+    group_catalog=spin_system.control.catalog;
+    group_catalog(:,2)=spin_system.control.gamma_groups(group_catalog(:,2));
+    [~,~,spin_system.control.gamma_groups]=unique(group_catalog,'rows');
+
+end
 
 % Match the state pair list to the correlated ensemble
 if ismember('rho_ens',spin_system.control.ens_corrs)&&...

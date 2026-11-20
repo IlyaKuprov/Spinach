@@ -6,7 +6,7 @@
 
 ## Purpose and objective
 
-Evaluates the GRAPE figure of merit for every selected case in the ensemble catalog, distributes cases across the workers, and reduces their outputs on the client. Each case is passed the configured `control.fidelity` method. The returned fidelity is the dot product of the raw fidelities in catalog order with the normalised case weights. Workers apply the same weights to the transformed derivatives before reduction. Without explicit drift weights, this is the arithmetic mean over the retained cases. The gradient has the waveform shape and the Hessian is a square matrix with one row and column per waveform sample.
+Evaluates the GRAPE figure of merit for every selected case in the ensemble catalog, distributes cases across the workers, and reduces their outputs on the client. In ungrouped mode, each case is passed the configured `control.fidelity` method. In that mode, the returned fidelity is the dot product of the raw fidelities in catalog order with the normalised case weights. Workers apply the same weights to the transformed derivatives before reduction. Without explicit drift weights, this is the arithmetic mean over the retained cases. The gradient has the waveform shape and the Hessian is a square matrix with one row and column per waveform sample.
 
 The cases are defined by the catalog built in `optimcon.m`: state-target pairs, drift generators, power levels, resonance-offset combinations, phase-cycle rows and distortion functions. Per-case transformations and the chain rule for distortions are handled by `ens_block.m`.
 
@@ -23,3 +23,5 @@ Call on the same parallel pool that was open when `optimcon.m` ran. Inside a `pa
 - `fidelity`: scalar mean figure of merit over catalog cases.
 - `gradient`: mean fidelity derivative with respect to waveform samples, with the same dimensions as `waveform`, returned when requested.
 - `hessian`: mean fidelity Hessian with dimensions `numel(waveform) x numel(waveform)`, returned when requested and supported.
+
+For terminal squared overlap, set `control.gamma_groups` to one physical group label per drift. Only cases that match on all other catalog coordinates interfere. Grouped objectives support first-derivative methods, not Hessians or trajectory penalties. Cooperative impurity gradients still use linear auxiliary overlaps. Diagnostic plots display individual squared overlaps, not complex amplitudes.

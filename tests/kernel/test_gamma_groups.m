@@ -66,6 +66,38 @@ delta=eps^(1/3);
 result=test_close(result,'coherent objective derivative',grad(1),(plus(1)-minus(1))/(2*delta),...
                   1e-8,1e-8,'the squared mean differentiates the raw complex overlap');
 
+% Keep independent state-target pairs separate even with identical drift labels
+control=rmfield(control,'drift_weights');
+control.drifts={{(pi/2)*S.z}};
+control.gamma_groups=1;
+control.rho_init={S.x,S.x};
+control.rho_targ={S.y,-S.y};
+independent=optimcon(spin_system,control);
+[~,separate]=grape_xy(0,independent);
+result=test_close(result,'independent state pairs',separate(1),preserved(1),1e-12,0,...
+                  'opposite targets in different catalog rows do not interfere');
+
+% Refuse trajectory penalties before building grouped worker data
+control.traj_pen={S.z};
+try
+    optimcon(spin_system,control);
+    refused=false;
+catch err
+    refused=strcmp(err.identifier,'Spinach:optimcon:gammaTrajectoryPenalty');
+end
+result=test_true(result,'trajectory penalty rejected',refused,...
+                 'grouped overlap must not square a trajectory penalty');
+
+% Run the plotting path with a purely imaginary case overlap
+control=rmfield(control,'traj_pen');
+control.rho_init={S.x};
+control.rho_targ={1i*S.y};
+control.plotting={'xy_controls'};
+cleaner=test_graphics(); %#ok<NASGU>
+plotted=optimcon(spin_system,control);
+[~,plot_score]=grape_xy(0,plotted);
+result=test_close(result,'complex overlap diagnostics',plot_score(1),preserved(1),1e-12,0,...
+                  'the plotted scores are real but the complex group overlap is retained');
 end
 
 

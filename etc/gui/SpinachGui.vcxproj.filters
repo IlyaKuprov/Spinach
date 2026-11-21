@@ -1,0 +1,275 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="IO Formats">
+      <UniqueIdentifier>{40a1ebfb-c4a9-4c18-b528-5ebd3984a15e}</UniqueIdentifier>
+      <Extensions>
+      </Extensions>
+    </Filter>
+    <Filter Include="3D Engine">
+      <UniqueIdentifier>{e7c547bf-79a3-4ff1-a887-6591528b6731}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="System Core">
+      <UniqueIdentifier>{84d4faa0-e10d-4b3d-8106-22e102eaaffa}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SpinachGUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssemblyInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OrientationDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainForm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FilterFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\Castep.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\SpinXML.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\Spinach.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\EasySpin.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\IOSpinSystem.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\Simpson.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\XYZ.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="3D Engine\ArcBall.cpp">
+      <Filter>3D Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="3D Engine\MetaBall.cpp">
+      <Filter>3D Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="3D Engine\OpenGL.cpp">
+      <Filter>3D Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\MOL.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\Orca.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="ShieldingtoShift.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\ADF.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\GAMESS.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\SpinEvolution.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\COSMOS.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="RefFrameOrientationDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IO Formats\Gauss.cpp">
+      <Filter>IO Formats</Filter>
+    </ClCompile>
+    <ClCompile Include="OrientationExport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="System Core\isotopes.cpp">
+      <Filter>System Core</Filter>
+    </ClCompile>
+    <ClCompile Include="System Core\Model.cpp">
+      <Filter>System Core</Filter>
+    </ClCompile>
+    <ClCompile Include="System Core\orientation.cpp">
+      <Filter>System Core</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InteractionTrackBar.h" />
+    <ClInclude Include="MainForm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OrientationDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IsotopesDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FilterFile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="About.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\Castep.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\SpinXML.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\Spinach.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\EasySpin.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\IOSpinSystem.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\Simpson.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\XYZ.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="3D Engine\ArcBall.h">
+      <Filter>3D Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="3D Engine\MetaBall.h">
+      <Filter>3D Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="3D Engine\OpenGL.h">
+      <Filter>3D Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="3D Engine\VECTOR3D.h">
+      <Filter>3D Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="BalloonToolTip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\MOL.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\Orca.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="ShieldingtoShift.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\ADF.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\GAMESS.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\SpinEvolution.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\COSMOS.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\spinxml_schema.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\spinxml_schema_reference_frame.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="RefFrameOrientationDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IO Formats\Gauss.h">
+      <Filter>IO Formats</Filter>
+    </ClInclude>
+    <ClInclude Include="OrientationExport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="System Core\isotopes.h">
+      <Filter>System Core</Filter>
+    </ClInclude>
+    <ClInclude Include="System Core\Model.h">
+      <Filter>System Core</Filter>
+    </ClInclude>
+    <ClInclude Include="System Core\unit.h">
+      <Filter>System Core</Filter>
+    </ClInclude>
+    <ClInclude Include="System Core\orientation.h">
+      <Filter>System Core</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MainForm.resX">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrientationDialog.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IsotopesDialog.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterFile.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="About.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IO Formats\Spinach.resx">
+      <Filter>IO Formats</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IO Formats\EasySpin.resx">
+      <Filter>IO Formats</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IO Formats\Simpson.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BalloonToolTip.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ShieldingtoShift.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IO Formats\SpinEvolution.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RefFrameOrientationDialog.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrientationExport.resx">
+      <Filter>Resource Files</Filter>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="app.ico">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

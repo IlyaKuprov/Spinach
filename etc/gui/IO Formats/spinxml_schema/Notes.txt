@@ -1,0 +1,10 @@
+SpinXML schema maintenance
+
+spinxml_schema_total.xsd describes the complete format. The two partial schemas,
+spinxml_schema.xsd and spinxml_schema_reference_frame.xsd, are used to generate
+the typed DataSet headers in the parent directory.
+
+After changing a schema, regenerate its header in Visual Studio. Compare with
+the previous header and retain local changes not produced by the generator.
+Do not leave the XSD as an automatic project input: rebuilding would overwrite
+those changes.

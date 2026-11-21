@@ -1,0 +1,252 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{2C4DA40A-DAC0-4F99-A90A-4E985A41EAF0}</ProjectGuid>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <Keyword>ManagedCProj</Keyword>
+    <RootNamespace>SpinachGUI</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CLRSupport>true</CLRSupport>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(ProjectDir)..\..\build\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IgnoreImportLibrary>false</IgnoreImportLibrary>
+    <OutDir>$(ProjectDir)..\..\build\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\build\obj\$(ProjectName)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;EIGEN_DONT_VECTORIZE;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <ExceptionHandling>Async</ExceptionHandling>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\SpinachGUI;$(ProjectDir)..\..\src\SpinachGUI\IO Formats;$(ProjectDir)..\..\src\SpinachGUI\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CompileAsManaged>true</CompileAsManaged>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>main</EntryPointSymbol>
+      <RegisterOutput>false</RegisterOutput>
+      <LinkStatus>false</LinkStatus>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <PreprocessorDefinitions>WIN32;EIGEN_DONT_VECTORIZE;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\SpinachGUI;$(ProjectDir)..\..\src\SpinachGUI\IO Formats;$(ProjectDir)..\..\src\SpinachGUI\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <Optimization>Full</Optimization>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Windows</SubSystem>
+      <EntryPointSymbol>main</EntryPointSymbol>
+      <Profile>true</Profile>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy /Y "$(TargetPath)" "$(ProjectDir)..\..\release\SpinachGui.exe"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="3D Engine\ArcBall.cpp" />
+    <ClCompile Include="3D Engine\MetaBall.cpp" />
+    <ClCompile Include="3D Engine\OpenGL.cpp" />
+    <ClCompile Include="AssemblyInfo.cpp" />
+    <ClCompile Include="IO Formats\COSMOS.cpp" />
+    <ClCompile Include="FilterFile.cpp" />
+    <ClCompile Include="IO Formats\ADF.cpp" />
+    <ClCompile Include="IO Formats\Castep.cpp" />
+    <ClCompile Include="IO Formats\EasySpin.cpp" />
+    <ClCompile Include="IO Formats\Gauss.cpp" />
+    <ClCompile Include="IO Formats\GAMESS.cpp" />
+    <ClCompile Include="IO Formats\IOSpinSystem.cpp" />
+    <ClCompile Include="IO Formats\MOL.cpp" />
+    <ClCompile Include="IO Formats\Orca.cpp" />
+    <ClCompile Include="IO Formats\Simpson.cpp" />
+    <ClCompile Include="IO Formats\Spinach.cpp" />
+    <ClCompile Include="IO Formats\SpinEvolution.cpp" />
+    <ClCompile Include="IO Formats\SpinXML.cpp" />
+    <ClCompile Include="IO Formats\XYZ.cpp" />
+    <ClCompile Include="MainForm.cpp" />
+    <ClCompile Include="OrientationDialog.cpp" />
+    <ClCompile Include="OrientationExport.cpp" />
+    <ClCompile Include="RefFrameOrientationDialog.cpp" />
+    <ClCompile Include="ShieldingtoShift.cpp" />
+    <ClCompile Include="SpinachGUI.cpp" />
+    <ClCompile Include="System Core\isotopes.cpp" />
+    <ClCompile Include="System Core\Model.cpp" />
+    <ClCompile Include="System Core\orientation.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="3D Engine\ArcBall.h" />
+    <ClInclude Include="3D Engine\MetaBall.h" />
+    <ClInclude Include="3D Engine\OpenGL.h" />
+    <ClInclude Include="3D Engine\VECTOR3D.h" />
+    <ClInclude Include="About.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="BalloonToolTip.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="IO Formats\COSMOS.h" />
+    <ClInclude Include="FilterFile.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="IO Formats\ADF.h" />
+    <ClInclude Include="IO Formats\Castep.h" />
+    <ClInclude Include="IO Formats\EasySpin.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="IO Formats\Gauss.h" />
+    <ClInclude Include="IO Formats\GAMESS.h" />
+    <ClInclude Include="IO Formats\IOSpinSystem.h" />
+    <ClInclude Include="IO Formats\MOL.h" />
+    <ClInclude Include="IO Formats\Orca.h" />
+    <ClInclude Include="IO Formats\Simpson.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="IO Formats\Spinach.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="IO Formats\SpinEvolution.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="IO Formats\SpinXML.h" />
+    <ClInclude Include="IO Formats\spinxml_schema.h" />
+    <ClInclude Include="IO Formats\spinxml_schema_reference_frame.h" />
+    <ClInclude Include="IO Formats\XYZ.h" />
+    <ClInclude Include="IsotopesDialog.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="InteractionTrackBar.h" />
+    <ClInclude Include="MainForm.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="OrientationDialog.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="OrientationExport.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="RefFrameOrientationDialog.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ShieldingtoShift.h">
+      <FileType>CppForm</FileType>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="System Core\isotopes.h" />
+    <ClInclude Include="System Core\Model.h" />
+    <ClInclude Include="System Core\orientation.h" />
+    <ClInclude Include="System Core\unit.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="app.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="About.resx">
+      <DependentUpon>About.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="BalloonToolTip.resx">
+      <DependentUpon>BalloonToolTip.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FilterFile.resx">
+      <DependentUpon>FilterFile.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IO Formats\EasySpin.resx" />
+    <EmbeddedResource Include="IO Formats\Simpson.resx">
+      <DependentUpon>Simpson.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IO Formats\Spinach.resx" />
+    <EmbeddedResource Include="IO Formats\SpinEvolution.resx">
+      <DependentUpon>IO Formats\SpinEvolution.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="IsotopesDialog.resx">
+      <DependentUpon>IsotopesDialog.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resX">
+      <DependentUpon>MainForm.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrientationDialog.resx">
+      <DependentUpon>OrientationDialog.h</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrientationExport.resx">
+      <DependentUpon>OrientationExport.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RefFrameOrientationDialog.resx">
+      <DependentUpon>RefFrameOrientationDialog.h</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ShieldingtoShift.resx">
+      <DependentUpon>ShieldingtoShift.h</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="app.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

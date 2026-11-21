@@ -6,4 +6,4 @@ The calculation is the analytical high-field limit of projected CCE-2: the proto
 
 The simulation evaluates the real, normalised echo on a 2048-point grid from zero to 40 microseconds.
 
-`trityl_finland.mat` adapts the archived DFT tensors, geometry, tunnel splittings, and experimental trace (G. Jeschke et al., [Zenodo 13850793](https://doi.org/10.5281/zenodo.13850793), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)). No archived simulation output is needed to run the example. The original three-proton disjoint-CCE illustration is retained as a dense-reference regression fixture.
+The labelled proton and echo CSV files reproduce the archived DFT tensors, geometry, and experimental trace (G. Jeschke et al., [Zenodo 13850793](https://doi.org/10.5281/zenodo.13850793), [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)). The two tunnel splittings are specified directly in the example. No archived simulation output is needed to run the example. The original three-proton disjoint-CCE illustration is retained as a dense-reference regression fixture.

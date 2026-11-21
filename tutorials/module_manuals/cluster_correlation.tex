@@ -1019,7 +1019,7 @@ On a grid, \code{diagnostics.grid} holds retained angles and weights, and \code{
 The convergence driver returns its status in \code{convergence}: \code{converged}, \code{not\_converged}, or \code{limit\_reached}. Inspect \code{convergence\_report} for comparisons and work, and \code{input\_parameters} for the original request.
 
 \subsection{Utilities and specialised calls}
-Use \code{clexpn} and the registered handles for simulations. The following separate interfaces construct inputs, assess computed data, or move data between programs. An analysis or import specification is \emph{not} a field to pass through \code{clexpn}.
+Use \code{clexpn} and the registered handles for simulations. The following separate interfaces construct inputs or assess computed data. An analysis specification is \emph{not} a field to pass through \code{clexpn}.
 
 \begingroup\small
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
@@ -1037,7 +1037,6 @@ Function & Arguments in call order; result\\
 \code{cce\_converge} & \code{(spin\_system,parameters,pulse\_sequence,assumptions)} returns baseline answer and finite-ladder diagnostics. Note the argument order differs from \code{clexpn}.\\
 \code{cce\_spectrum} & \code{(times,correlation,parameters)} transforms a finite $T$-row correlation on a strictly increasing time vector, using \code{parameters.spectrum} above. Returns a structure, not just transformed values.\\
 \code{cce\_analyse} & \code{(result,parameters)} requires \code{result.times}, \code{value}, and matching logical \code{valid}. Omit \code{analysis} for no fit. Otherwise \code{analysis.fit} is logical. For a fit, choose the observable column, \code{envelope} (\code{magnitude}/\code{real}), \code{model} (\code{exponential}/\code{stretched\_exponential}), \code{interval} in seconds, a positive \code{weights} vector on all times, \code{confidence} (\code{none}/\code{linearized}), and \code{confidence\_level} in $(0,1)$. Inspect returned status and warnings; an envelope fit does not establish a relaxation mechanism.\\
-\code{cce\_import} & \code{(filename,format,units)} reads \code{csv}, \code{xyz}, \code{tensor}, or \code{cube}. For external geometry specify \code{length} (\code{angstrom}, \code{nm}, \code{m}, \code{bohr}) and \code{frame}; tensor units are \code{Hz}, \code{kHz}, \code{MHz}, \code{rad/s}, \code{T}, \code{mT}, or \code{G} (\code{gyro\_rad\_s\_T} for field units). Optional proper \code{rotation} maps input to lab axes. External spin/tensor data are canonicalised to \AA{} and Hz, not the rad/s of compiled tensors.\\
 \end{longtable}
 \endgroup
 

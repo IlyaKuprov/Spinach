@@ -67,9 +67,9 @@ zticks(0:0.5:1);
 pbaspect([1 1 0.5]);
 set(gca,'YDir','reverse','Projection','perspective');
 view(-21,35);
-kxlabel('hyperfine detuning, $E_{-1,k}$ / Hz');
-kylabel('flip-flop coupling, $C_{\alpha k}$ / Hz');
-kzlabel('pair-induced loss, $g_k$');
+kxlabel('$E_{-1,k}$ / Hz');
+kylabel('$C_{\alpha k}$ / Hz');
+kzlabel('$g_k$');
 box on;
 grid off;
 

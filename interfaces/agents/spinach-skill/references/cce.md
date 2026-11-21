@@ -81,7 +81,7 @@ A dissipative noise estimate includes source and trace arithmetic even at zero e
 
 Inspect numerical error, denominator conditioning, density validity, and sampling error separately. A converged cluster order does not prove bath-radius, graph-cutoff, partition or sample-count convergence. For controlled comparisons, hold the bath realisation, physical spin ordering, transition phase, pulse schedule, and normalisation fixed; compare complete-bath raw responses with an independently constructed small-system calculation.
 
-`cce_analyse` fits only an explicitly declared observable, envelope, model, interval and weighting. `cce_import` reads external spin tables, tensors, and cube samples with explicit physical units and frames. `cce_spectrum` may be called explicitly, or requested through `parameters.spectrum` for post-processing the completed context correlation; no per-cluster Fourier transform is performed. Call `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)` for independent native refinement ladders.
+`cce_analyse` fits only an explicitly declared observable, envelope, model, interval and weighting. `cce_spectrum` may be called explicitly, or requested through `parameters.spectrum` for post-processing the completed context correlation; no per-cluster Fourier transform is performed. Call `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)` for independent native refinement ladders.
 
 ## Orientation grids
 

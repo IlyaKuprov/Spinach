@@ -1,6 +1,6 @@
 ---
 name: spinach-skill
-description: "Sets up, runs, validates, debugs, and extends MATLAB Spinach simulations for NMR, EPR, DNP, MRI, relaxation, and optimal control. Use for Spinach scripts, pulse sequences, simulation results, basis/context choices, or repository changes. Not for unrelated MATLAB work or another package unless Spinach is part of the task."
+description: "Sets up, runs, validates, debugs, and extends MATLAB Spinach simulations for NMR, EPR, DNP, MRI, relaxation, and optimal control. Use for the Windows SpinachGUI editor, Spinach scripts, pulse sequences, simulation results, basis/context choices, or repository changes. Not for unrelated MATLAB work or another package unless Spinach is part of the task."
 compatibility: Requires a local Spinach checkout and MATLAB supported by that checkout; use MATLAB R2026b or later for the current repository. Runtime requirements are checked by fix_path. Source-only review is possible without MATLAB.
 ---
 
@@ -209,3 +209,9 @@ Use clexpn for the native context and experiments/cce for free_evolution, hahn_e
 For pinned finite-bath inputs and native single-orientation or grid calculations, see [Cluster correlation expansions](references/cce.md).
 
 The clexpn native boundary rejects parameters.sequence, including empty arrays. Use finite_drive, refocusing_train, or a named echo experiment with native physical descriptors; free_evolution is uncontrolled.
+
+## Windows spin-system editor
+
+For building the standalone GUI, importing a structure, editing tensors and
+frames, or exporting a spin system, use [the GUI workflow](references/gui.md).
+The executable edits model data; MATLAB runs the resulting Spinach calculation.

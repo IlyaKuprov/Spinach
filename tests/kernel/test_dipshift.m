@@ -1,3 +1,4 @@
+% Test: kernel/dipshift | DIPSHIFT echoes
 % Tests DIPSHIFT echo timing, simultaneous RF, and the matched
 % zero-width limit with a separate dense two-spin calculation.
 %

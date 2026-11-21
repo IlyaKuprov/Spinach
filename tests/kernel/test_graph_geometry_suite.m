@@ -1,3 +1,4 @@
+% Test: kernel/graph_geometry_suite | Graph, geometry, and coordinate utilities
 % Tests graph, geometry, lattice, and coordinate utilities. Syntax:
 %
 %                    result=test_graph_geometry_suite()

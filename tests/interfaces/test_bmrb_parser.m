@@ -1,3 +1,4 @@
+% Test: interfaces/bmrb_parser | BMRB shift parser
 % Tests tagged NMR-STAR chemical shift import and legacy tables. Syntax:
 %
 %                       result=test_bmrb_parser()

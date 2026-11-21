@@ -1,3 +1,4 @@
+% Test: kernel/zeeman_hamiltonian | Zeeman Hamiltonian sign and units
 % Tests the one-spin Zeeman Hamiltonian. Syntax:
 %
 %                    result=test_zeeman_hamiltonian()

@@ -1,3 +1,4 @@
+% Test: kernel/cuda_product | CUDA sparse matrix product
 % Compares the CUDA sparse-product MEX with independent CPU products.
 % Tests three shapes and all four real/complex operand combinations.
 % The tolerance bounds roundoff in both CPU and GPU complex dot products.

@@ -1,3 +1,4 @@
+% Test: kernel/states_composite_suite | Composite state generators
 % Tests composite state generators in kernel/states. Syntax:
 %
 %                    result=test_states_composite_suite()

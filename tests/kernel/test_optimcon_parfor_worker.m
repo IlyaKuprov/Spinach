@@ -1,3 +1,4 @@
+% Test: optimcon/parfor_worker | Optimal control inside an external parfor loop
 % Tests optimal control launched inside an external parfor loop. Syntax:
 %
 %                   result=test_optimcon_parfor_worker()

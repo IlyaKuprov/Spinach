@@ -1,3 +1,4 @@
+% Test: kernel/fourlap_poly | Implicit periodic Fourier Laplacian
 % Tests switch-aware periodic Fourier Laplacians. Syntax:
 %
 %                      result=test_fourlap_poly()

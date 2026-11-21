@@ -1,3 +1,4 @@
+% Test: kernel/cce_units | CCE canonical units
 % Tests CCE canonical units against independent spin-half formulas. Syntax:
 %
 %                         result=test_cce_units()

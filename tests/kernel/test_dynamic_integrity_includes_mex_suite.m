@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_integrity_includes_mex | Dynamic integrity, include, and MEX helper coverage
 % Tests difficult dynamic coverage for includes, integrity, and MEX helpers. Syntax:
 %
 %              result=test_dynamic_integrity_includes_mex_suite()

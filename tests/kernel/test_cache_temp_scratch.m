@@ -1,3 +1,4 @@
+% Test: kernel/cache_temp_scratch | Temporary scratch cache management
 % Tests cache management in a temporary scratch directory. Syntax:
 %
 %                    result=test_cache_temp_scratch()

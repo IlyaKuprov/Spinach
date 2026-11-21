@@ -1,5 +1,6 @@
 % Generates Hilbert space operators or Liouville space superoperators from
-% their human-readable descriptions. Syntax:
+% their human-readable descriptions. A single compiled summation term is
+% constructed on the caller; multiple terms use parallel dispatch. Syntax:
 %
 %        A=operator(spin_system,operators,spins,operator_type,format)
 %
@@ -142,6 +143,9 @@ end
 % Parse the human specification into Spinach notation
 [opspecs,coeffs]=human2opspec(spin_system,operators,spins);
 
+% A single summation term has no independent work to distribute
+nworkers=Inf; if isscalar(opspecs), nworkers=0; end
+
 % Start a cell array
 A=cell(numel(opspecs),1);
 
@@ -152,7 +156,7 @@ switch spin_system.bas.formalism
     case 'sphten-liouv'
 
         % Build summation terms
-        parfor n=1:numel(opspecs)
+        parfor (n=1:numel(opspecs),nworkers)
 
             % Get the superoperator
             A{n}=superop(spin_system,opspecs{n},operator_type);
@@ -183,34 +187,13 @@ switch spin_system.bas.formalism
         end
         formalism=spin_system.bas.formalism;
         
-        % Build summation terms
-        parfor n=1:numel(opspecs)
-
-            % Start the kron
-            B=sparse(coeffs(n));
-            
-            % Over particles
-            for k=1:numel(opspecs{n})
-
-                % Get state indices
-                [L,M]=lin2lm(opspecs{n}(k));
-
-                % Get irreducible spherical tensors
-                IST=irr_sph_ten(mults(k),L); %#ok<PFBNS>
-
-                % Update the kron
-                B=kron(B,IST{L-M+1});
-
+        % Construct a singleton directly; distribute independent summation terms
+        if isscalar(opspecs)
+            A{1}=zeeman_term(opspecs{1},coeffs(1),mults,formalism,operator_type,offset);
+        else
+            parfor n=1:numel(opspecs)
+                A{n}=zeeman_term(opspecs{n},coeffs(n),mults,formalism,operator_type,offset);
             end
-            
-            % Move to Liouville space if necessary
-            if strcmp(formalism,'zeeman-liouv')
-                B=hilb2liouv(B,operator_type);
-            end
-
-            % Convert sparse array from CSC to XYZ indexing
-            [rows,cols,vals]=find(B); A{n}=[rows+offset cols+offset vals];
-
         end
         
     otherwise
@@ -243,6 +226,36 @@ if ismember('op_cache',spin_system.sys.enable)
     end
 
 end
+
+end
+
+% Construct one coefficient-weighted Zeeman product in XYZ indexing
+function A=zeeman_term(opspec,coefficient,mults,formalism,operator_type,offset)
+
+% Start the kron
+B=sparse(coefficient);
+
+% Over particles
+for k=1:numel(opspec)
+
+    % Get state indices
+    [L,M]=lin2lm(opspec(k));
+
+    % Get irreducible spherical tensors
+    IST=irr_sph_ten(mults(k),L);
+
+    % Update the kron
+    B=kron(B,IST{L-M+1});
+
+end
+
+% Move to Liouville space if necessary
+if strcmp(formalism,'zeeman-liouv')
+    B=hilb2liouv(B,operator_type);
+end
+
+% Convert sparse array from CSC to XYZ indexing
+[rows,cols,vals]=find(B); A=[rows+offset cols+offset vals];
 
 end
 
@@ -297,4 +310,5 @@ end
 % problem. But I would like to understand it too.
 %
 % Eugene Wigner
+
 

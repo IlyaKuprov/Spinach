@@ -342,7 +342,12 @@ and `parameters.ez_oper` (`Lz`). Relaxation is the Weizmann model:
 `weiz_r1d`/`weiz_r2d` dipolar matrices, with `inter.temperature` in kelvin.
 Field scans are `solid_effect_field_scan_1.m` and
 `cross_effect_field_scan_1.m`; pulsed schemes live in the `top_dnp`,
-`xix_dnp` and `novel_dnp` subdirectories.
+`xix_dnp` and `novel_dnp` subdirectories. For repeating a piecewise-constant
+microwave waveform, use `@dnp_train` in static `powder` with `'esr'`
+assumptions. `dnp_sol/plato_profile.m` and `dnp_sol/crw_opt_profile.m`
+show build-up at fixed detuning and terminal transfer versus detuning.
+Use Cartesian RF amplitudes in rad/s and slice durations in seconds; the
+first signal entry is before irradiation.
 
 MAS-DNP has a dedicated non-context driver, `masdnp`, returning the
 steady-state enhancement directly (`dnp_mas/solid_effect_mas_powder.m`), with

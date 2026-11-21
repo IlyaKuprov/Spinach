@@ -1,0 +1,122 @@
+[
+  {
+    "id": "runtime-path",
+    "responsibility": "Make the production MATLAB trees visible and check installation requirements.",
+    "entry_points": [
+      "fix_path.m",
+      "kernel/integrity/existentials.m"
+    ],
+    "contracts": [
+      "reset restores MATLAB's default path first; add preserves existing entries. Both prepend etc, experiments, interfaces and kernel recursively. Neither adds examples or tests."
+    ],
+    "change_guidance": [
+      "For missing or shadowed functions, inspect MATLAB path resolution before changing numerical code. Examples that read sibling data via relative paths expect the example directory as the working directory."
+    ],
+    "verification": [
+      "examples/nmr_liquids/cosy90_sucrose.m"
+    ]
+  },
+  {
+    "id": "isotope-data",
+    "responsibility": "Separate audited physical constants from numerical lookup and from the model that uses them.",
+    "entry_points": [
+      "etc/isotopes.tsv",
+      "etc/isotopes_sources.md",
+      "etc/build_isotopes.m",
+      "etc/isotopes.mat",
+      "kernel/spin.m"
+    ],
+    "contracts": [
+      "The offline builder prepares the typed MAT payload. Physical isotope lookup returns signed angular magnetogyric ratio and multiplicity; missing properties are not zero. Table metadata do not automatically apply abundance weights or radioactive decay."
+    ],
+    "change_guidance": [
+      "Change the sourced table and rebuild its payload together. Clear spin in each process used to test the new data: numerical lookup caches the table in persistent storage."
+    ],
+    "verification": [
+      "tests/kernel/test_spin_table.m"
+    ]
+  },
+  {
+    "id": "model-import",
+    "responsibility": "Translate external scientific data into model inputs without tying the spin kernel to a file format.",
+    "entry_points": [
+      "interfaces/gaussian/gparse.m",
+      "interfaces/orca/oparse.m",
+      "interfaces/g2spinach.m",
+      "interfaces/gissmo/gissmo2spinach.m"
+    ],
+    "contracts": [
+      "Gaussian and ORCA readers produce property records; g2spinach maps the requested nuclei, references and isotope-dependent tensors into sys and inter. GISSMO builds those inputs directly from a selected XML coupling matrix."
+    ],
+    "change_guidance": [
+      "Change format-specific parsing in the reader and shared physical conversions in the mapper. Check signed isotope scaling and both halves of the stored coupling tensor, not just parsed text."
+    ],
+    "verification": [
+      "tests/interfaces/test_orca_parser.m",
+      "tests/interfaces/test_hfc_isotopes.m",
+      "examples/nmr_liquids/cosy90_sucrose.m"
+    ]
+  },
+  {
+    "id": "signal-output",
+    "responsibility": "Turn acquired samples into displayed or exchangeable data without redefining the simulated experiment.",
+    "entry_points": [
+      "kernel/utilities/apodisation.m",
+      "kernel/plotting/plot_2d.m",
+      "kernel/plotting/ft_axis.m",
+      "interfaces/jcamp/jcamp_nmr.m",
+      "interfaces/jcamp/jcamp_export.m"
+    ],
+    "contracts": [
+      "The COSY example windows and Fourier-transforms the FID before selecting the real component for display. A JCAMP adapter takes the supplied signal and explicit domains; it does not perform that processing.",
+      "For jcamp_nmr the 2D signal array is [F2,F1], while domains are specified in physical [F1,F2] order. Preserve complex components and sampling coordinates across the format boundary."
+    ],
+    "change_guidance": [
+      "Change spectral axes in the shared axis routines when the convention is common to plotting and export; change JCAMP encoding in the writer. Validate axes with asymmetric dimensions and offsets."
+    ],
+    "verification": [
+      "examples/nmr_liquids/cosy90_sucrose.m",
+      "tests/interfaces/test_jcamp_spinach.m",
+      "tests/interfaces/test_jcamp_export.m"
+    ]
+  },
+  {
+    "id": "native-kernels",
+    "responsibility": "Build and call selected native accelerators alongside MATLAB implementations and callers.",
+    "entry_points": [
+      "etc/mex/compile_mex.m",
+      "kernel/overloads/cuda_sparse_by_sparse.m",
+      "kernel/overloads/cuda_sparse_by_sparse_mex.cu"
+    ],
+    "contracts": [
+      "The build targets include line-shape convolution, cubic roots and sparse indexing as well as a separate sparse GPU multiply. Each binary is written beside its source."
+    ],
+    "change_guidance": [
+      "Distinguish testing the MATLAB dispatch/fallback from testing the compiled operation against CPU products. A skipped GPU check is not a numerical pass."
+    ],
+    "verification": [
+      "tests/kernel/test_cuda_product.m",
+      "tests/kernel/test_alg3_fallback.m"
+    ]
+  },
+  {
+    "id": "regression-harness",
+    "responsibility": "Discover registered physical and numerical checks and run a targeted selection.",
+    "entry_points": [
+      "tests/list_tests.m",
+      "tests/run_test.m",
+      "tests/run_tests.m",
+      "tests/lib/discover_tests.m"
+    ],
+    "contracts": [
+      "run_test requires one match by ID or name; run_tests can filter multiple entries. Individual test headers declare their IDs and names; manual-only tests are not scheduled."
+    ],
+    "change_guidance": [
+      "Register new regressions beside tests for the affected boundary. Use a physical invariant or an independent reference; an example reproduces a workflow but is not automatically a registered test."
+    ],
+    "verification": [
+      "tests/kernel/test_pauli_spin_half_algebra.m",
+      "tests/interfaces/test_hfc_isotopes.m"
+    ]
+  }
+]

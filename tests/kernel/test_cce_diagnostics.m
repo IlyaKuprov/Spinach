@@ -1,3 +1,4 @@
+% Test: kernel/cce_diagnostics | CCE numerical diagnostics
 % Coverage and unmodified density physicality diagnostics acceptance test. Syntax:
 %
 %                    result=test_cce_diagnostics()

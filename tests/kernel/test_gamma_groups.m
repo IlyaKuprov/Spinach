@@ -1,3 +1,4 @@
+% Test: kernel/gamma_groups | Gamma-coherent GRAPE
 % Tests coherent gamma-group reduction through the GRAPE objective.
 % Syntax:
 %

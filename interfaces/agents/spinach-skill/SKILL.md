@@ -36,6 +36,8 @@ independent copies or paraphrases in this skill or its references.
 2. Use the Spinach root established by the mandatory instructions above.
    Inspect branch, revision, and local changes. Do not overwrite another task
    file. For code changes, use [development](references/development.md).
+   Locate the owning subsystem and its regression tests in the distribution's
+   [machine-readable architecture map](../spinach-arch/architecture.json).
 3. Find the closest shipped example and read it, its pulse sequence, and the
    relevant context. Use [recipes](references/recipes.md) as a search map, not
    as a replacement for the current source.

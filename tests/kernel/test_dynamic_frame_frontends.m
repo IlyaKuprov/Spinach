@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_frame_frontends | Dynamic frame and averaging front ends
 % Tests frame-transformation and averaging front-end kernels. Syntax:
 %
 %                    result=test_dynamic_frame_frontends()

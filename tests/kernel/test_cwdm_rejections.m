@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_rejections | CWDM cross-substance rejections
 % Tests rejection of cross-substance physical specifications. Syntax:
 %
 %                       result=test_cwdm_rejections()
@@ -41,11 +42,35 @@ by_columns=basis(columns,bas);
 result=test_true(result,'column partition',isequal(by_columns.bas.basis,s.bas.basis),...
                  'partition coverage does not depend on spin-index vector orientation');
 
-% Reject a scalar coupling between different substances
+% No coupling survives at zero cutoff when the two contributions cancel
+cutoff_sys=sys;
+cutoff_sys.tols.inter_cutoff=0;
+pair=inter;
+pair.coupling.scalar=cell(4);
+pair.coupling.matrix=cell(4);
+pair.coupling.scalar{2,3}=4;
+pair.coupling.matrix{2,3}=-4*eye(3);
+uncoupled=test_spin_system(cutoff_sys,pair,bas);
+result=test_true(result,'zero at zero cutoff',isempty(uncoupled.inter.coupling.matrix{2,3}),...
+                 'an exactly cancelled cross-substance tensor is absent');
+
+% Retain an assembled tensor exactly at a positive cutoff within a substance
+cutoff_sys.tols.inter_cutoff=1;
+pair=inter;
+pair.coupling.scalar=cell(4);
+pair.coupling.matrix=cell(4);
+pair.coupling.scalar{1,2}=3;
+pair.coupling.matrix{1,2}=-2*eye(3);
+coupled=test_spin_system(cutoff_sys,pair,bas);
+result=test_true(result,'positive cutoff equality',isequal(coupled.inter.coupling.matrix{1,2},2*pi*eye(3)),...
+                 'a nonzero tensor at the final cutoff is retained');
+
+% Reject a scalar coupling between different substances even at zero cutoff
+cutoff_sys.tols.inter_cutoff=0;
 bad=inter; bad.coupling.scalar=cell(4); bad.coupling.scalar{2,3}=10;
 rejected=false;
 try
-    test_spin_system(sys,bad,bas);
+    test_spin_system(cutoff_sys,bad,bas);
 catch err
     rejected=strcmp(err.identifier,'Spinach:create:crossSubstanceCoupling')&&...
              contains(err.message,'couplings detected between spins in different chemical species');
@@ -271,3 +296,5 @@ for n=1:2
 end
 
 end
+
+

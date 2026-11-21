@@ -1,3 +1,4 @@
+% Test: kernel/cce_isotopologues | CCE isotope configurations
 % Finite and sampled H/D isotopologue probability tests. Syntax:
 %
 %                    result=test_cce_isotopologues()

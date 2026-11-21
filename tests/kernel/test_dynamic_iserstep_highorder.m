@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_iserstep_highorder | Nonlinear high-order iserstep branches
 % Tests nonlinear high-order iserstep branches. Syntax:
 %
 %               result=test_dynamic_iserstep_highorder()

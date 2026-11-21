@@ -20,7 +20,7 @@ addpath(fullfile(root_dir,'lib'));
 
 % Parse options
 options=test_options(varargin{:});
-manifest=test_manifest();
+manifest=discover_tests();
 
 % Apply substring filter
 if ~isempty(options.pattern)
@@ -35,3 +35,5 @@ for n=1:numel(manifest)
 end
 
 end
+
+

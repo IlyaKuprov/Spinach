@@ -1,3 +1,4 @@
+% Test: kernel/step_matches_expm | Hilbert propagation against expm
 % Tests Hilbert-space propagation against matrix exponentiation. Syntax:
 %
 %                    result=test_step_matches_expm()

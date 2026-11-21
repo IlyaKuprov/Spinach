@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_rlx_split_suite | Relaxation component splitting
 % Tests relaxation-superoperator component splitting. Syntax:
 %
 %              result=test_dynamic_rlx_split_suite()

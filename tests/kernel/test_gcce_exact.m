@@ -1,3 +1,4 @@
+% Test: kernel/gcce_exact | gCCE exact validation
 % Independent full-Hilbert gCCE validation with transverse exchange. Syntax:
 %
 %                         result=test_gcce_exact()

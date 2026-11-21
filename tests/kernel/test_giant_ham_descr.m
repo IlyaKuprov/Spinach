@@ -1,3 +1,4 @@
+% Test: kernel/giant_ham_descr | Giant spin Hamiltonian descriptor
 % Tests the giant spin Hamiltonian descriptor route. Syntax:
 %
 %                    result=test_giant_ham_descr()

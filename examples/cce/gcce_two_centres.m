@@ -1,56 +1,72 @@
-% Two electron centres: density evolution from a selected transition.
-% doi:10.1063/5.0303171 motivates the category; geometry is illustrative.
-% This small illustrative model is not a published material reproduction.
-% Independent density and negativity checks are in test_cce_examples.
+% Proton-pair contribution to the Hahn echo of two electron spins:
+% Fig. 3(b) of Chen et al. (https://doi.org/10.1063/5.0303171).
+% The two polarised triplets select the branches in Eq. (29). In the
+% antiparallel proton subspace the flip-flop matrix element is C and
+% the diagonal energy difference is D+E or D-E. Common Zeeman and
+% exchange energies do not enter this pair echo.
 % Syntax:
 %
-%             [answer,diagnostics]=gcce_two_centres()
+%               [loss,axes_hz]=gcce_two_centres()
 %
-% Returns one row of column-vectorised observed density per time point
-% in answer, and the cluster-expansion diagnostics structure in diagnostics.
+% loss is 1-|L| at total echo time 40 us, with one row per flip-flop
+% coupling and one column per hyperfine detuning. The corresponding
+% signed axes in Hz are returned in axes_hz.flip and axes_hz.detuning.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=gcce_two_centres()
+function [loss,axes_hz]=gcce_two_centres()
 
-% Magnet and isotopes; zero electron g isolates the model energy scales
-sys.magnet=0;
-sys.isotopes={'E','E','13C','13C'};
+% Electron pair and antiparallel proton pair in the secular Hamiltonian
+sys.isotopes={'E','E','1H','1H'};
+sys.magnet=0.01;
+sys.parallel={'processes',1};
 sys.output='hush';
-sys.parallel={'local',1};
-inter.zeeman.matrix=repmat({zeros(3)},1,4);
+inter.zeeman.scalar={0,0,hz2ppm(5000,sys.magnet,'1H'),0};
 inter.coupling.matrix=cell(4);
 
-% Standard Spinach coupling and zero-field-splitting tensors in Hz
-inter.coupling.matrix{1,2}=diag([700 500 1200]);
-inter.coupling.matrix{1,3}=diag([1700 900 2000]);
-inter.coupling.matrix{2,4}=diag([1300 800 1600]);
-inter.coupling.matrix{3,4}=diag([100 100 -200]);
-
-% Basis formalism for retained clusters
-bas.formalism='zeeman-hilb';
-
-% Experiment parameters
+% Refocus the double-quantum coherence between the two polarised triplets
 parameters.observed=[1 2];
 parameters.transition=struct('spins',[1 2],'ms',[0.5 -0.5;0.5 -0.5]);
-parameters.output='density';
-parameters.times=linspace(0,200e-6,31);
-parameters.cce.approximation='generalized';
+parameters.times=40e-6;
 parameters.cce.order=2;
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
+parameters.cce.approximation='generalized';
+parameters.cce.basis.formalism='zeeman-hilb';
+parameters.cce.bath_state=struct('mode','explicit_product',...
+                                 'rho',{{diag([1 0]),diag([0 1])}});
 
-% Run the named experiment in the cluster-expansion context
-spin_system=create(sys,inter);
-[answer,diagnostics]=clexpn(spin_system,@free_evolution,parameters,'labframe');
+% Sweep the independent quadrant of the pair-correlation surface
+flip=0:500:4000;
+detuning=0:2500:100000;
+loss=zeros(numel(flip),numel(detuning));
+for n=2:numel(flip)
 
-% Plot the physical observed-spin response
-populations=real(answer(:,1:sqrt(size(answer,2))+1:end));
+    % Secular proton dipolar coupling with flip-flop matrix element C
+    inter.coupling.matrix{3,4}=diag([2 2 -4])*flip(n);
+    for k=2:numel(detuning)
+
+        % Equal electron couplings produce opposite detunings on the two branches
+        inter.coupling.matrix{1,3}=diag([0 0 detuning(k)]);
+        inter.coupling.matrix{2,3}=diag([0 0 detuning(k)]);
+        spin_system=create(sys,inter);
+        echo=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+        loss(n,k)=1-abs(echo);
+
+    end
+
+end
+
+% Reversing C rephases one proton state; reversing E interchanges the branches
+loss=[flipud(loss(2:end,:));loss];
+loss=[fliplr(loss(:,2:end)) loss];
+axes_hz.flip=[-flip(end:-1:2) flip];
+axes_hz.detuning=[-detuning(end:-1:2) detuning];
+
+% Display the pair contribution to triplet decoherence
 kfigure();
-plot(1e6*parameters.times,populations);
-xlabel('time / microseconds');
-ylabel('observed populations');
+surf(axes_hz.detuning,axes_hz.flip,loss);
+kxlabel('hyperfine detuning, Hz');
+kylabel('flip-flop coupling, Hz');
+kzlabel('pair decoherence');
 kgrid();
 
 end

@@ -1,3 +1,4 @@
+% Test: kernel/prop_cache | Propagator cache policy
 % Tests propagator cache separation by numerical policy. Syntax:
 %
 %                     result=test_prop_cache()

@@ -1,3 +1,4 @@
+% Test: kernel/respdor | R- and S-RESPDOR echoes
 % Tests R- and S-RESPDOR against direct time-dependent propagation
 % of a single 13C-14N crystallite. Syntax:
 %

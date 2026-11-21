@@ -1,3 +1,4 @@
+% Test: kernel/pulses_propagation_suite | Pulse coordinate and propagation helpers
 % Tests pulse-coordinate and propagation helpers. Syntax:
 %
 %                    result=test_pulses_propagation_suite()

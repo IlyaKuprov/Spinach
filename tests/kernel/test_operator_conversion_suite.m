@@ -1,3 +1,4 @@
+% Test: kernel/operator_conversion_suite | Hilbert/Liouville conversion helpers
 % Tests Hilbert-to-Liouville operator conversion utilities. Syntax:
 %
 %                    result=test_operator_conversion_suite()

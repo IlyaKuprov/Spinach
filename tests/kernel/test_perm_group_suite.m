@@ -1,3 +1,4 @@
+% Test: kernel/perm_group_suite | Permutation group metadata
 % Tests permutation group database metadata. Syntax:
 %
 %                    result=test_perm_group_suite()
@@ -140,3 +141,5 @@ end
 
 
 end
+
+

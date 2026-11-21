@@ -1,3 +1,4 @@
+% Test: kernel/sparse_tensor_utility_suite | Sparse, tensor, and numerical utility functions
 % Tests sparse, tensor, and numerical utility helpers. Syntax:
 %
 %                    result=test_sparse_tensor_utility_suite()
@@ -67,3 +68,5 @@ result=test_close(result,'svd_shrink reconstruction',vec*cov',diag([4 1 0]),1e-1
                   'svd_shrink returns vector/covector factors for singular values above threshold');
 
 end
+
+

@@ -1,3 +1,4 @@
+% Test: kernel/srsk_thermal | SRSK thermalisation
 % Tests once-only thermalisation of additive SRSK relaxation. Syntax:
 %
 %                    result=test_srsk_thermal()

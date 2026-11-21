@@ -1,3 +1,4 @@
+% Test: kernel/cce_sampling | CCE sampling
 % Exhaustive product-state sampling and clock-transition regression tests.
 % Syntax:
 %

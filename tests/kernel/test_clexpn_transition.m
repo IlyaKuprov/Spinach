@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_transition | Observed transition selection
 % Native observed-transition selection, units, ordering, and degeneracy tests.
 %
 %                         result=test_clexpn_transition()

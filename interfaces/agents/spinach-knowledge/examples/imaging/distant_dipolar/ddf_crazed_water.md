@@ -1,0 +1,3 @@
+# examples/imaging/distant_dipolar/ddf_crazed_water.m
+
+Models water as one on-resonance proton species, with a prescribed dipolar time of 0.1 s rather than fitted thermodynamic parameters. Instantaneous x pulses separated by one gradient kick and followed by a second kick wind one and two pitches in a periodic centimetre. Both the grating and uniform mode use the axial angular factor. The figure compares the echo magnitude, in units of a separate single-pulse response, with |2 J₂(a)/a|, where a=t/τd. The zero-time limit is zero. This is the ideal, lossless analytical comparison of [Chen, Branca and Warren, Eq. (13)](https://doi.org/10.1063/1.4721637), not a fit to experimental data or a test of complex phase.

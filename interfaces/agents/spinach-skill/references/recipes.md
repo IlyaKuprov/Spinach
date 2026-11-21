@@ -187,6 +187,7 @@ together. `gridfree` takes the same three but no grid, `doublerot` handles DOR.
 Cross polarisation is `cp_powder_static_nh.m` and
 `cp_contact_mas_nh_fplanck.m`; recoupling is `redor_curve.m` and
 `pdsd_simple.m`.
+Use `pisema_tilt.m`: Computes the complex proton trace for an oriented nitrogen–proton pair using the source two-channel preparation and FSLG offset.
 
 For a direct single-crystal MAS route check, run
 `examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced

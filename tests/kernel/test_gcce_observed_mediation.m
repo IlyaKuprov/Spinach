@@ -1,3 +1,4 @@
+% Test: kernel/gcce_observed_mediation | Observed-spin mediated gCCE
 % Test bath-disconnected but observed-mediated gCCE correlations. Syntax:
 %
 %                  result=test_gcce_observed_mediation()

@@ -1,3 +1,4 @@
+% Test: kernel/giant_cache | Giant-spin cache identity
 % Tests giant-spin cache identity in both insertion orders. Syntax:
 %
 %                    result=test_giant_cache()

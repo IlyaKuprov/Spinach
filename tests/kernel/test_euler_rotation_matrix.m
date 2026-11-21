@@ -1,3 +1,4 @@
+% Test: kernel/euler_rotation_matrix | Euler active rotation matrix
 % Tests active ZYZ Euler rotation matrices. Syntax:
 %
 %                    result=test_euler_rotation_matrix()

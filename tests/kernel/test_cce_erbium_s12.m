@@ -1,3 +1,4 @@
+% Test: kernel/cce_erbium_s12 | Er:CaWO4 secular pair reduction
 % Compare the analytical Er:CaWO4 CCE-2 pair product to dense, full pair
 % Hahn propagation. Returns the standard Spinach test result record.
 %

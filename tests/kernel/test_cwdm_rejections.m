@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_rejections | CWDM cross-substance rejections
 % Tests rejection of cross-substance physical specifications. Syntax:
 %
 %                       result=test_cwdm_rejections()
@@ -295,3 +296,5 @@ for n=1:2
 end
 
 end
+
+

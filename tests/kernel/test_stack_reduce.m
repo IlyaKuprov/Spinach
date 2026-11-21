@@ -1,3 +1,4 @@
+% Test: kernel/stack_reduce | Stacked-state reduction
 % Tests reduction of true state columns with permutation symmetry. Syntax:
 %
 %                      result=test_stack_reduce()

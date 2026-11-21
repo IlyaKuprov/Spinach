@@ -1,3 +1,4 @@
+% Test: kernel/spunicols_mex_suite | Sparse unique-column MEX helper
 % Tests the sparse unique-column MEX helper. Syntax:
 %
 %                    result=test_spunicols_mex_suite()

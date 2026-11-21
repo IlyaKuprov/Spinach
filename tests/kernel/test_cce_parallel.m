@@ -1,3 +1,4 @@
+% Test: kernel/cce_parallel | CCE deterministic scheduling
 % Deterministic serial/parallel scheduling and resource acceptance test. Syntax:
 %
 %                    result=test_cce_parallel()

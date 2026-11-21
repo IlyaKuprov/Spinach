@@ -1,3 +1,4 @@
+% Test: kernel/ctx_singlerot_acquire | Single-rotor acquire path
 % Tests the single-rotor context with acquire(). Syntax:
 %
 %                    result=test_ctx_singlerot_acquire()

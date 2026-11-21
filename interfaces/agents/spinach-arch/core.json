@@ -1,0 +1,273 @@
+[
+  {
+    "id": "system-construction",
+    "responsibility": "Compile the physical specification and execution settings into the spin_system consumed by basis() and the simulation kernels.",
+    "entry_points": [
+      "kernel/create.m",
+      "kernel/spin.m",
+      "kernel/utilities/tolerances.m",
+      "etc/build_isotopes.m"
+    ],
+    "contracts": [
+      "create(sys,inter) resolves isotope labels, signed angular magnetogyric ratios, and multiplicities in global spin order. Nuclear shifts in ppm and couplings in Hz are input conventions; the compiled Zeeman and coupling matrices are in rad/s. The signed reference angular frequency is -gamma*B0.",
+      "chem.parts contains global spin indices for each substance; create sorts the indices within each part. It also compiles reaction records into chem and relaxation settings into rlx. It does not choose a basis or a rotating frame."
+    ],
+    "change_guidance": [
+      "Add physical input validation and unit conversion in create, not in individual experiments. For an isotope change use the sourced table and its build script; spin() also handles abstract modes, which are not physical isotope records.",
+      "For changes to spin ordering or substance membership, follow the compiled fields through basis(), operator(), and kinetics(); changing a user's field name alone does not change the internal representation."
+    ],
+    "verification": [
+      "tests/kernel/test_spin_table.m",
+      "tests/kernel/test_zeeman_hamiltonian.m",
+      "tests/kernel/test_cwdm_records.m",
+      "tests/kernel/test_liquid_single_spin_fid.m"
+    ]
+  },
+  {
+    "id": "basis-representations",
+    "responsibility": "Choose state coordinates within each substance and lay out their direct sum; compile tensor-product descriptors, symmetry information, and lookup tables where needed.",
+    "entry_points": [
+      "kernel/basis.m",
+      "kernel/utilities/symmetry.m",
+      "kernel/indexing/lin2lm.m",
+      "kernel/utilities/sphten2zeeman.m",
+      "kernel/utilities/sim2liouv.m"
+    ],
+    "contracts": [
+      "bas.formalism is shared; other input basis fields are cells indexed by substance. In sphten-liouv, basis{s} has one row per retained tensor product and one column per local spin; an empty substance has one identity row and zero spin columns. Truncation changes these rows, not the list of physical spins.",
+      "In Zeeman representations there is no explicit tensor-descriptor table. If d is the product of local multiplicities, a block has d rows in zeeman-hilb or zeeman-wavef and d² in zeeman-liouv. offsets=[0;cumsum(nstates)] addresses blocks without inter-substance coherences."
+    ],
+    "change_guidance": [
+      "Do not index a local descriptor column by a global spin number. Keep descriptor ordering, row_hash, symmetry projectors, block dimensions, and basis_hash consistent; superop() and coil_state() look up projected states rather than assuming a complete product basis.",
+      "To adapt a Hilbert-space sequence to Liouville coordinates inspect sim2liouv(): changing formalism alone leaves the generators, prepared state, detection state, and block dimensions in the old representation."
+    ],
+    "verification": [
+      "tests/kernel/test_basis_hash.m",
+      "tests/kernel/test_cwdm_formalisms.m",
+      "tests/kernel/test_sim2liouv_cache.m",
+      "examples/fundamentals/state_spaces_2.m"
+    ]
+  },
+  {
+    "id": "states-operators",
+    "responsibility": "Translate physical state and operator labels into the active representation for preparation, pulses, and detection.",
+    "entry_points": [
+      "kernel/state.m",
+      "kernel/states/coil_state.m",
+      "kernel/states/equilibrium.m",
+      "kernel/operator.m",
+      "kernel/utilities/human2opspec.m",
+      "kernel/operators/superop.m",
+      "kernel/operators/hilb2liouv.m"
+    ],
+    "contracts": [
+      "state() weights density matrices and Liouville vectors by substance concentration. coil_state() is the unweighted detector constructor, including for zero-concentration blocks. A single-substance wavefunction is an unweighted ket; state() rejects a segmented wavefunction.",
+      "For operator(), a label with an isotope or numeric vector sums single-spin terms; matching cells of labels and spin indices specify one product on one substance. Liouville left/right actions act on a density operator from the specified side; comm and acomm take their difference and sum. Hilbert output is the operator itself."
+    ],
+    "change_guidance": [
+      "For a new operator label, inspect human2opspec and both the spherical-tensor and Zeeman construction paths. Form the commutator of the whole product: multiplying individual commutator superoperators is a different operation.",
+      "Use hilb2liouv() on a small full-space matrix as a reference for action side and column-vector ordering. Check an operator on one substance and a coil on another to detect spurious cross-block support."
+    ],
+    "verification": [
+      "tests/kernel/test_liouville_commutator.m",
+      "tests/kernel/test_hilbert_operator.m",
+      "tests/kernel/test_cwdm_states.m",
+      "tests/kernel/test_cwdm_blocks.m"
+    ]
+  },
+  {
+    "id": "hamiltonian-assembly",
+    "responsibility": "Select frame and secular approximations, then assemble isotropic and orientation-dependent coherent generators.",
+    "entry_points": [
+      "kernel/assume.m",
+      "kernel/hamiltonian.m",
+      "kernel/orientation.m",
+      "kernel/rotframe.m",
+      "kernel/contexts/crystal.m"
+    ],
+    "contracts": [
+      "assume() sets per-interaction strength and retention rules. hamiltonian() with one output builds the rotationally invariant part I; [I,Q] also builds the anisotropic spin terms. A crystal orientation uses I+orientation(Q,[alpha beta gamma]) with angles in radians.",
+      "Q{r} contains a (2*r+1)-by-(2*r+1) array of matrices for Wigner rank r. inter.modes terms go into I at the input orientation, not the spin rotation array. In Liouville space the default coherent generator is a commutation superoperator."
+    ],
+    "change_guidance": [
+      "For a new interaction, trace create's physical units, assume's term retention, and hamiltonian's operator coefficients together. Compare the lab-frame and intended rotating-frame cases; a zero-orientation comparison alone cannot test the indexing of Q.",
+      "Keep single-output assembly usable without constructing Q. When a new term affects a cached Hamiltonian, include its independent inputs in the Hamiltonian cache identity."
+    ],
+    "verification": [
+      "tests/kernel/test_scalar_coupling_hamiltonian.m",
+      "tests/kernel/test_zeeman_hamiltonian.m",
+      "tests/kernel/test_orientation_average_suite.m",
+      "tests/kernel/test_giant_ham_descr.m"
+    ]
+  },
+  {
+    "id": "relaxation",
+    "responsibility": "Construct the dissipative contribution R from the compiled relaxation theories, retention rules, and equilibrium prescription.",
+    "entry_points": [
+      "kernel/relaxation.m",
+      "kernel/includes/redfield_integral_serial.m",
+      "kernel/includes/redfield_integral_async.m",
+      "kernel/utilities/rlx_t1_t2.m",
+      "kernel/thermalize.m",
+      "kernel/utilities/rlx_flux.m"
+    ],
+    "contracts": [
+      "In Liouville space R is a rate generator: a transverse decay at R2 gives R*rho=-R2*rho. The coherent and dissipative generators combine as L=H+1i*R+1i*K, not H+R+K.",
+      "Redfield relaxation builds the lab-frame [L0,Q] even when the experiment Hamiltonian is in a rotating frame. Orientation can enter the phenomenological T1/T2 model. Point-to-point flux is added after ordinary retention, thermalisation, and relaxation clean-up."
+    ],
+    "change_guidance": [
+      "Add theory-specific physics at the existing relaxation model boundary and inspect create's rlx settings. Check supported formalisms and block layout rather than treating a Hilbert damping matrix as a Liouville superoperator.",
+      "If changing a rotational-diffusion integral, check both serial and asynchronous implementations. For thermalisation, test the action on the specified equilibrium state as well as a decaying coherence."
+    ],
+    "verification": [
+      "tests/kernel/test_relaxation_t2_rate.m",
+      "tests/kernel/test_dynamic_relaxation_models_suite.m",
+      "tests/kernel/test_cwdm_thermalisation.m",
+      "tests/kernel/test_cwdm_flux.m"
+    ]
+  },
+  {
+    "id": "chemical-kinetics",
+    "responsibility": "Compile stoichiometry and atom matching into loss and transfer of spin order between substance blocks.",
+    "entry_points": [
+      "kernel/kinetics/kinetics.m",
+      "kernel/kinetics/react_gen.m",
+      "kernel/kinetics/hilb_action.m",
+      "kernel/kinetics/chem_concs.m"
+    ],
+    "contracts": [
+      "In Liouville space fixed first-order reactions give a matrix K. Active higher-order or time-dependent reactions give K(t,eta), a generator evaluated at the stage state, not the derivative itself. The Hilbert reaction handle instead returns the block density-matrix derivative and supports first-order reactions only.",
+      "react_gen() matches local spherical-tensor descriptors across global reaction spin labels. Spins present only in a product arrive at identity; unmatched source orders are traced out. Reactions transfer between direct-sum substance blocks, not a joint Hilbert space."
+    ],
+    "change_guidance": [
+      "Compile immutable atom maps outside the step loop. Distinguish additive from product closure for bimolecular reactions, and check atom-equivalent conservation rather than assuming total molecule count is fixed.",
+      "Do not pass a nonlinear K to a fixed-matrix acquisition. For Liouville chemistry, use a stage-dependent generator with step()/iserstep(); do not hand that solver a Hilbert derivative as if it were a generator."
+    ],
+    "verification": [
+      "tests/kernel/test_kinetics_invariants_suite.m",
+      "tests/kernel/test_cwdm_kinetics.m",
+      "tests/kernel/test_cwdm_zeeman_kin.m",
+      "examples/kinetics/nonlinear/bimolecular_closures.m"
+    ]
+  },
+  {
+    "id": "trajectory-reduction",
+    "responsibility": "Screen a specified initial state or destination against a generator and expose independently evolving subspaces to evolution().",
+    "entry_points": [
+      "kernel/reduce.m",
+      "kernel/utilities/path_trace.m",
+      "kernel/utilities/zte.m",
+      "kernel/evolution.m"
+    ],
+    "contracts": [
+      "reduce() returns a cell of projectors P. Use P'*L*P for a generator, P'*rho for a state, and P to lift the result. A scalar 1 denotes no projection. This stage is separate from physical basis truncation in basis().",
+      "Liouville reduction can use permutation symmetry, optional zero-track elimination, and graph connectivity. Reaction records or active point-to-point flux invalidate the assumption that the spin-only symmetry blocks suffice; reduce() bypasses those symmetry blocks."
+    ],
+    "change_guidance": [
+      "Keep the direction of screening: evolution() can screen forward from rho or backward with the adjoint generator from coil/destination. Test both against unscreened observables and retain the identity directions used by substance populations."
+    ],
+    "verification": [
+      "tests/kernel/test_dynamic_propagation_frontends.m",
+      "tests/kernel/test_dac_symmetry.m",
+      "tests/kernel/test_cwdm_flux.m"
+    ]
+  },
+  {
+    "id": "time-propagation",
+    "responsibility": "Apply constant or time-dependent generators, or return the requested trajectory or observable without storing unrequested states.",
+    "entry_points": [
+      "kernel/evolution.m",
+      "kernel/propagator.m",
+      "kernel/step.m",
+      "kernel/krylov.m",
+      "kernel/multiprop.m",
+      "kernel/pulses/iserstep.m",
+      "experiments/acquire.m"
+    ],
+    "contracts": [
+      "The evolution convention is P=exp(-1i*L*dt), with dt in seconds. A Liouville vector evolves as P*rho; a Hilbert density matrix under a Hamiltonian evolves as P*rho*P'. A wavefunction detector gives a ket overlap, not a density-operator expectation.",
+      "propagator() forms the exponential; step() computes its action. Numeric generator samples in step() can specify one-, two-, or three-point quadrature; {generator_handle,t,method} instead selects iserstep(). An evolution() call with a polyadic generator goes directly to krylov() rather than materialising a propagator."
+    ],
+    "change_guidance": [
+      "Match the API to the observable: acquire() requests npoints-1 evolution steps to return npoints samples including time zero. Preserve Hilbert trajectories as cells of density matrices and Liouville trajectories as columns of a matrix.",
+      "For quadrature changes include a noncommuting, time-dependent case; a constant-generator exponential cannot distinguish quadrature rules. Check output ordering with more than one detector or initial state when changing evolution()."
+    ],
+    "verification": [
+      "tests/kernel/test_dynamic_propagation_frontends.m",
+      "tests/kernel/test_dynamic_iserstep_highorder.m",
+      "tests/kernel/test_multiprop_adaptive.m",
+      "tests/kernel/test_ctx_liquid_acquire.m"
+    ]
+  },
+  {
+    "id": "snapshot-reduction",
+    "responsibility": "Build a reduced model from weighted state snapshots for repeated evolution of an affine family of Liouvillians.",
+    "entry_points": [
+      "kernel/utilities/pod_basis.m",
+      "kernel/utilities/pod_project.m",
+      "kernel/utilities/pod_evolve.m"
+    ],
+    "contracts": [
+      "pod_basis() returns an orthonormal basis in Euclidean state coordinates. pod_project() projects every affine generator term, initial state, and coil into that same basis. This is a user-selected approximation, not the symmetry/path reduction inside evolution()."
+    ],
+    "change_guidance": [
+      "Check a held-out observable against full-space evolution. A small snapshot projection residual describes the supplied training data; it does not guarantee a small observable error or preserve positivity."
+    ],
+    "verification": [
+      "tests/kernel/test_snapshot_pod.m",
+      "examples/fundamentals/snapshot_pod_nmr.m"
+    ]
+  },
+  {
+    "id": "caches",
+    "responsibility": "Reuse algebraic tables across constructions and reuse computed operators, Hamiltonians, or propagators within a parallel pool.",
+    "entry_points": [
+      "kernel/cache/ist_product_table.m",
+      "kernel/cache/cacheman.m",
+      "kernel/operator.m",
+      "kernel/hamiltonian.m",
+      "kernel/propagator.m"
+    ],
+    "contracts": [
+      "The multiplicity-indexed IST coefficient tables under kernel/cache are distinct from job scratch and the pool ValueStore. basis() sorts and indexes the coefficients for repeated left/right multiplication. cacheman() ages spinach_* entries in sys.scratch and excludes the current pool directory.",
+      "The op_cache, ham_cache, and prop_cache flags select ValueStore records in their respective builders. Operator identity includes the label specification, operator side, output format, isotopes, and compiled basis hash. Hamiltonians cache I and Q separately; propagator records include the generator, timestep, and numerical policy."
+    ],
+    "change_guidance": [
+      "When changing an object's dependence on basis, physical inputs, or numerical cutoffs, update its cache key at the producer. Exercise both an actual cache hit and a changed input with the same dimensions; compare to uncached output."
+    ],
+    "verification": [
+      "tests/kernel/test_basis_hash.m",
+      "tests/kernel/test_giant_cache.m",
+      "tests/kernel/test_prop_cache.m",
+      "tests/kernel/test_cache_temp_scratch.m"
+    ]
+  },
+  {
+    "id": "numerical-backends",
+    "responsibility": "Supply structured and sparse matrix operations, numerical cutoffs, and compiled accelerators to higher-level kernels.",
+    "entry_points": [
+      "kernel/utilities/clean_up.m",
+      "kernel/overloads/@polyadic/polyadic.m",
+      "kernel/overloads/@ttclass/ttclass.m",
+      "kernel/overloads/@rcv/rcv.m",
+      "kernel/overloads/cuda_sparse_by_sparse.m",
+      "kernel/overloads/cuda_sparse_by_sparse_mex.cu",
+      "etc/mex/compile_mex.m"
+    ],
+    "contracts": [
+      "A polyadic is a sum of unopened Kronecker products. An implicit core supplies forward action, adjoint action, and dimensions; it cannot be materialised with full() or inflate(). ttclass is a tensor-train representation with truncation tolerances; rcv stores row/column/value sparse data.",
+      "The CUDA sparse-product wrapper takes compatible sparse double gpuArrays and a nonnegative absolute dropping tolerance. A missing or unloadable MEX has a native multiplication path; an unrecognised storage layout is an error, not a request to silently change backend."
+    ],
+    "change_guidance": [
+      "Test a structured action and its adjoint against a small explicit matrix; avoid materialising cores to obtain dimensions or apply a generator. Keep chopping thresholds distinct from representation/storage decisions.",
+      "For native changes, inspect compile_mex() for the source/binary locations and check the wrapper, not just the compiled entry point. A CPU reference tests numerical output but does not exercise CUDA dispatch."
+    ],
+    "verification": [
+      "tests/kernel/test_dynamic_overload_sparse_polyadic_suite.m",
+      "tests/kernel/test_dynamic_overload_ttclass_suite.m",
+      "tests/kernel/test_fft_polyadic.m",
+      "tests/kernel/test_cuda_product.m",
+      "tests/kernel/test_step_sparse_gpu.m"
+    ]
+  }
+]

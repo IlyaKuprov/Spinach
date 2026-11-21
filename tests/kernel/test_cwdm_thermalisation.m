@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_thermalisation | CWDM thermalisation
 % Tests block-local IME recovery and the shared-identity artefact (T5-T7).
 % Syntax:
 %

@@ -1,3 +1,4 @@
+% Test: kernel/ctx_powder_crystal | Powder and crystal single orientation
 % Tests static powder and crystal contexts at one orientation. Syntax:
 %
 %                    result=test_ctx_powder_crystal()

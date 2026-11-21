@@ -33,7 +33,6 @@ result=test_cce_pycce_fixtures()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_pycce_fixtures.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 The native projected and generalised experiments both request normalised detected amplitude explicitly. All raw-trace and final-complex-signal comparisons remain unchanged.
 

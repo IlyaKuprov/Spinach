@@ -1,3 +1,4 @@
+% Test: kernel/ctx_floquet_acquire | Floquet acquire path
 % Tests the Floquet context with acquire(). Syntax:
 %
 %                    result=test_ctx_floquet_acquire()

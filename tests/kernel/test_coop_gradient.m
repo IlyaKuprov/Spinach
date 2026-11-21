@@ -1,3 +1,4 @@
+% Test: kernel/coop_gradient | Cooperative phase gradients
 % Tests cooperative phase gradients and the initial gradient guard.
 % Syntax:
 %

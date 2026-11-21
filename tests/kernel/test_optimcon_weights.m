@@ -1,3 +1,4 @@
+% Test: kernel/optimcon_weights | Weighted ensemble objectives
 % Checks drift-weighted ensemble objectives and derivatives. Syntax:
 %
 %                  result=test_optimcon_weights()

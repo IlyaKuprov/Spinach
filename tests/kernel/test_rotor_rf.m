@@ -1,3 +1,4 @@
+% Test: kernel/rotor_rf | Rotor RF map
 % Tests the RF gain map, its Jacobian, and linked catalog rows.
 % Syntax: result=test_rotor_rf()
 %

@@ -1,3 +1,4 @@
+% Test: interfaces/hfc_isotopes | EPR isotope conversion
 % Tests isotope-resolved Gaussian and ORCA hyperfine imports. Syntax:
 %
 %                       result=test_hfc_isotopes()

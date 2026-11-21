@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_spatial | CWDM spatial chemistry
 % Spatial reaction transport with a spin-free solvent pool. Syntax:
 %
 %                    result=test_cwdm_spatial()

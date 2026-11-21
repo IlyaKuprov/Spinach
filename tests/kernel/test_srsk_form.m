@@ -1,3 +1,4 @@
+% Test: kernel/srsk_form | SRSK formalism restriction
 % Tests SRSK formalism restrictions and supported source relaxation. Syntax:
 %
 %                         result=test_srsk_form()

@@ -1,3 +1,4 @@
+% Test: interfaces/jcamp_export | JCAMP NMR/EPR exporter
 % Tests faithful NMR/EPR JCAMP export and refusal of ambiguous inputs.
 % Syntax:
 %

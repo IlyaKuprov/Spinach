@@ -30,7 +30,9 @@ must not explicitly close caller-owned figures. MATLAB's capture does not
 intercept native process stderr, including JVM startup diagnostics on some
 MATLAB/Java installations; those messages are outside the test reporter.
 
-The CUDA sparse-product comparison is registered in the main manifest:
+Add a standalone `test_*.m` function under `tests/kernel` or `tests/interfaces`. On its first line, write `% Test: category/stable_id | Display name`, or `% Test: manual` for a manual-only check. No other file needs editing. IDs and function names must be unique.
+
+For example, run the CUDA sparse-product comparison with:
 
 ```matlab
 run_test('kernel/cuda_product');
@@ -44,7 +46,7 @@ gateway is unavailable, following the existing GPU coverage convention.
 With both prerequisites present, numerical and non-loader CUDA errors fail
 the test. Build the gateway with `compile_mex()` before running GPU coverage.
 
-GPU-dependent custom CUDA sparse-product regressions (not part of the CPU manifest):
+GPU-dependent custom CUDA sparse-product regressions (not part of the ordinary suite):
 
 ```matlab
 addpath('kernel/overloads','tests/kernel');

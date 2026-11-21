@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_state_equilibrium_suite | Thermal equilibrium constructors
 % Tests thermal equilibrium state construction paths. Syntax:
 %
 %              result=test_dynamic_state_equilibrium_suite()

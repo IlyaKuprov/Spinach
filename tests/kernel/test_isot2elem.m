@@ -1,3 +1,4 @@
+% Test: kernel/isot2elem | Isotope-to-element conversion
 % Tests isotope-number stripping and cell-array shape preservation.
 % Syntax:
 %

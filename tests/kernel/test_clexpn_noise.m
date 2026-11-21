@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_noise | Native noise correlation
 % Native noise moments, connected ensembles, and Fourier convention tests.
 % Syntax:
 %

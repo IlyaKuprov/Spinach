@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_chem_geometry_suite | Chemistry and geometry utilities
 % Tests deterministic chemistry and geometry utility helpers. Syntax:
 %
 %                    result=test_dynamic_chem_geometry_suite()

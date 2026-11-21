@@ -1,3 +1,4 @@
+% Test: kernel/hilbert_operator | Hilbert-space operator generation
 % Tests Hilbert-space operator generation. Syntax:
 %
 %                    result=test_hilbert_operator()

@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_options | Native CCE inputs and bath construction
 % Deterministic lattice, occupancy, geometry, and frame tests.
 %
 %                         result=test_clexpn_options()

@@ -37,6 +37,5 @@ result=test_gcce_observed_mediation()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_gcce_observed_mediation.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 The unitary and master-equation checks explicitly select `parameters.cce.basis.formalism` as `zeeman-hilb` and `zeeman-liouv`, respectively. An empty jump list does not itself select a representation. The zero-rate Liouville case retains the original joint-observable response and arithmetic-error bound, including internal bath averaging.

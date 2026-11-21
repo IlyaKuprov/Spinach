@@ -1,3 +1,4 @@
+% Test: kernel/flux_relaxation | Explicit flux relaxation
 % Explicit flux relaxation regression. Syntax:
 %
 %                    result=test_flux_relaxation()

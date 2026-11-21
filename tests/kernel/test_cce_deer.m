@@ -1,3 +1,4 @@
+% Test: kernel/cce_deer | Bath-pumped Hahn spectral selection
 % Strict DEER frequency-window and species selection regression. Syntax:
 %
 %                    result=test_cce_deer()

@@ -358,6 +358,8 @@ analytical two-spin trace `deer=deer_analyt(D,J,t)`, plus `eseem`,
 **EPR hyperfine** (`experiments/esr_hyperfine/`) - `endor_cw` (fast
 isotropic CW-ENDOR), `endor_davies` (explicit soft pulses, orientation
 selection), `endor_mims`, `endor_mims_ideal`, `endor_mims_echo`, `hyscore`.
+In `endor_mims_ideal`, the spectrum has the same shape as the RF offset grid
+`parameters.n_frq`.
 
 **Hyperpolarisation** (`experiments/hyperpol/`) - `dnp_field_scan`,
 `dnp_freq_scan`, `dnp_time_dep`, `beamdnp`, and the pairs `noveldnp`,

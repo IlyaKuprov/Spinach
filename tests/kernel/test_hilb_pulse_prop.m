@@ -1,3 +1,4 @@
+% Test: kernel/hilb_pulse_prop | Hilbert shaped-pulse propagators
 % Tests Hilbert shaped-pulse propagators and density-state reuse. Syntax:
 %
 %                    result=test_hilb_pulse_prop()

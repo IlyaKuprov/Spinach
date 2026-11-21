@@ -1,3 +1,4 @@
+% Test: kernel/cce_no_legacy | Native CCE interface only
 % Absence of the retired CCE interface and its executable callers. Syntax:
 %
 %                    result=test_cce_no_legacy()

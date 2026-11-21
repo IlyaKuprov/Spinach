@@ -1,3 +1,4 @@
+% Test: kernel/step_zero_time | Zero-duration propagation identity
 % Tests zero-duration propagation. Syntax:
 %
 %                    result=test_step_zero_time()

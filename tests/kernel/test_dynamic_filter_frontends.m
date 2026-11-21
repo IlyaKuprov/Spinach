@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_filter_frontends | Dynamic state-filter front ends
 % Tests dynamic state-filter front-end kernels on compact spin systems. Syntax:
 %
 %                    result=test_dynamic_filter_frontends()

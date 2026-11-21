@@ -1,3 +1,4 @@
+% Test: kernel/periodic_acquire | Periodic complex acquisition
 % Compares periodic acquisition with direct chronological evolution.
 % Syntax: result=test_periodic_acquire()
 %

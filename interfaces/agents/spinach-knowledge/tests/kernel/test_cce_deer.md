@@ -36,7 +36,6 @@ result=test_cce_deer()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_deer.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
 The registered test also checks seven unsupported-controls entry points, ignored nested options, projected second-order applicability, unsupported Lindblad noise and noise weights, explicit raw suppression, and driver postprocessing parity.

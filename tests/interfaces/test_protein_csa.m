@@ -1,3 +1,4 @@
+% Test: interfaces/protein_csa | Protein CSA file import
 % Tests canonical protein CSA import and peptide N/H overrides. Syntax:
 %
 %                       result=test_protein_csa()

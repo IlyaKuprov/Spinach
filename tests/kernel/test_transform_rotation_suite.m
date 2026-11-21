@@ -1,3 +1,4 @@
+% Test: kernel/transform_rotation_suite | Rotation transform helpers
 % Tests rotation transform helpers. Syntax:
 %
 %                    result=test_transform_rotation_suite()

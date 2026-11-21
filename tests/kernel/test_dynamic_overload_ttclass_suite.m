@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_overload_ttclass_suite | Tensor-train overload dispatch
 % Tests dynamic dispatch of tensor-train class overloads. Syntax:
 %
 %              result=test_dynamic_overload_ttclass_suite()
@@ -214,3 +215,5 @@ catch err
 end
 
 end
+
+

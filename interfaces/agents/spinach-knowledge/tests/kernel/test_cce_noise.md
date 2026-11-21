@@ -31,7 +31,6 @@ result=test_cce_noise()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_noise.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Checks sparse unconnected noise for independent polarised sites, time-dependent ordered/symmetrised moments, and connected covariance of an explicitly constructed finite sampled mixture under both averaging estimators.
 

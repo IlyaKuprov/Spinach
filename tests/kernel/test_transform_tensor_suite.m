@@ -1,3 +1,4 @@
+% Test: kernel/transform_tensor_suite | Tensor transform helpers
 % Tests tensor transform helpers. Syntax:
 %
 %                    result=test_transform_tensor_suite()

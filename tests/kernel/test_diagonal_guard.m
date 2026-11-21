@@ -1,3 +1,4 @@
+% Test: kernel/diagonal_guard | Diagonal relaxation retention guard
 % Tests diagonal relaxation retention formalism boundaries. Syntax:
 %
 %                    result=test_diagonal_guard()

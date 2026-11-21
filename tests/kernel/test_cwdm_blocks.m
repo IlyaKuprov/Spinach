@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_blocks | CWDM direct-sum blocks
 % Tests exact direct-sum sparsity of spin generators and detection states.
 % Syntax:
 %
@@ -172,3 +173,5 @@ result=test_true(result,'cross-substance partners',rejected,...
                  'active and partner spins must share a substance');
 
 end
+
+

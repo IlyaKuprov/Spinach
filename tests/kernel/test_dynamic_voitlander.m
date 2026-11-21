@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_voitlander | Voitlander spherical-triangle integration
 % Tests voitlander() on an isotropic one-electron field-swept line. Syntax:
 %
 %                    result=test_dynamic_voitlander()

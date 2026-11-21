@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_overload_cell_struct_suite | Cell and structure overload dispatch
 % Tests dynamic dispatch of cheap cell, struct, and double overloads. Syntax:
 %
 %              result=test_dynamic_overload_cell_struct_suite()

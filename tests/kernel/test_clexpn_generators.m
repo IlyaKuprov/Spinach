@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_generators | Native CCE generators
 % Tests native generators, branch propagation, dissipation, and finite pulses.
 % Syntax:
 %

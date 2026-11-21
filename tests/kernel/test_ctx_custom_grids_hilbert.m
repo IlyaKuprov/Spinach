@@ -1,3 +1,4 @@
+% Test: kernel/ctx_custom_grids_hilbert | Custom Hilbert rotor grids
 % Tests explicit grids in both Hilbert-space rotor contexts. Syntax:
 %
 %                    result=test_ctx_custom_grids_hilbert()

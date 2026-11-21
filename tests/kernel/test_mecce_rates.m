@@ -1,3 +1,4 @@
+% Test: kernel/mecce_rates | ME analytic rates
 % Analytic Lindblad rates, vectorisation, and projected limitations.
 % Density answers are time-by-column-vectorised observed matrices.
 % Projected no-bath generators are scalars; an empty dissipator is zero.

@@ -1,3 +1,4 @@
+% Test: kernel/transition_filter | STMAS transition support projector
 % Checks the STMAS transition support projector for spin 3/2 and
 % spin 5/2, including spectators on both sides of the selected spin.
 % Syntax:

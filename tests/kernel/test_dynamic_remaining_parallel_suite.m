@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_remaining_parallel_suite | Remaining parallel and stochastic utilities
 % Tests remaining parallel, stochastic, and diagnostic utilities. Syntax:
 %
 %                    result=test_dynamic_remaining_parallel_suite()

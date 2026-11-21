@@ -1,3 +1,4 @@
+% Test: kernel/pauli_spin_half_algebra | Spin-half angular momentum algebra
 % Tests spin-half angular momentum matrices. Syntax:
 %
 %                    result=test_pauli_spin_half_algebra()

@@ -1,3 +1,4 @@
+% Test: kernel/stmas | Shifted-echo STMAS
 % Tests shifted-echo STMAS time ordering, complex detection, and
 % frequency calibration against explicit spin-3/2 matrices.
 % Syntax:

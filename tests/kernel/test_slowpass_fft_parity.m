@@ -1,3 +1,4 @@
+% Test: kernel/slowpass_fft_parity | Slowpass FFT amplitude parity
 % Tests slowpass amplitude normalisation against time-domain FFT. Syntax:
 %
 %                    result=test_slowpass_fft_parity()

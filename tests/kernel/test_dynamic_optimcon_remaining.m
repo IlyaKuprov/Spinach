@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_optimcon_remaining | Remaining optimal-control dynamic helpers
 % Tests remaining dynamic optimal-control helper paths. Syntax:
 %
 %              result=test_dynamic_optimcon_remaining()

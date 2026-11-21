@@ -1,3 +1,4 @@
+% Test: kernel/quad_iso_shift | Quadrupolar powder shifts
 % Checks second-order powder shifts with exact oriented energies.
 % Syntax:
 %

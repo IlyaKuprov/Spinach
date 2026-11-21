@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_fixtures | Pinned CCE physical inputs
 % Validate the immutable NV physical fixture and its explicit model choices.
 % Syntax:
 %

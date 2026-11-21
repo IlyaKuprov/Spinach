@@ -1,3 +1,4 @@
+% Test: kernel/ctx_gridfree_acquire | Grid-free acquire path
 % Tests the grid-free Fokker-Planck context with acquire(). Syntax:
 %
 %                    result=test_ctx_gridfree_acquire()

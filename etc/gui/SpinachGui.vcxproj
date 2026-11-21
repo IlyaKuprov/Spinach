@@ -60,7 +60,7 @@
       <PreprocessorDefinitions>WIN32;EIGEN_DONT_VECTORIZE;NOMINMAX;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <ExceptionHandling>Async</ExceptionHandling>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\SpinachGUI;$(ProjectDir)..\..\src\SpinachGUI\IO Formats;$(ProjectDir)..\..\src\SpinachGUI\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)IO Formats;$(ProjectDir)Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <CompileAsManaged>true</CompileAsManaged>
     </ClCompile>
@@ -78,7 +78,7 @@
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>WIN32;EIGEN_DONT_VECTORIZE;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\src\SpinachGUI;$(ProjectDir)..\..\src\SpinachGUI\IO Formats;$(ProjectDir)..\..\src\SpinachGUI\Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)IO Formats;$(ProjectDir)Eigen;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>Full</Optimization>
@@ -90,9 +90,6 @@
       <EntryPointSymbol>main</EntryPointSymbol>
       <Profile>true</Profile>
     </Link>
-    <PostBuildEvent>
-      <Command>copy /Y "$(TargetPath)" "$(ProjectDir)..\..\release\SpinachGui.exe"</Command>
-    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -242,6 +239,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <Target Name="CopyReleaseExecutable" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ProjectDir)..\..\release\" SkipUnchangedFiles="true" />
+  </Target>
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
   <ProjectExtensions>

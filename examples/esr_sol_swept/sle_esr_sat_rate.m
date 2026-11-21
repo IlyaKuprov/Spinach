@@ -90,6 +90,7 @@ larmor_e=abs(spin('E'))*sys.magnet/(2*pi);
 centre_freq=-(g_iso-free_g)/free_g*larmor_e;
 
 % Frequency interval corresponding to the displayed 3300 to 3420 Gauss
+parameters.mode='saturated';
 parameters.sweep=centre_freq+1e6*gauss2mhz(1,g_iso)*[-60 60];
 parameters.npoints=512;
 
@@ -113,7 +114,7 @@ for n=1:numel(r_grid)
     parameters.tau_c=1/(6*r_grid(n));
 
     % Steady state of the driven stochastic Liouville equation
-    spectrum=gridfree(spin_system,@slowpass_sat,parameters,'esr');
+    spectrum=gridfree(spin_system,@slowpass,parameters,'esr');
 
     % Absorption, differentiated with respect to the magnetic field
     spectra(:,n)=gradient(-imag(spectrum),field_axis);

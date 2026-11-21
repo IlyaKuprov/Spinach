@@ -15,7 +15,14 @@
 %
 %    parameters.npoints       number of points in the spectrum
 %
-%    parameters.rho0          initial state
+%    parameters.mode          'linear' (default) or 'saturated'
+%
+%    parameters.spins         saturated mode: one irradiated isotope
+%                             in a cell array
+%
+%    parameters.irr_powers    saturated mode: nutation frequency in Hz
+%
+%    parameters.rho0          initial state (linear mode only)
 %
 %    parameters.coil          detection state
 %
@@ -31,7 +38,13 @@
 %                starting state detected on the specified coil
 %                state within the frequency interval requested
 %
-% Note: relaxation must be present in the system dynamics, or the 
+% Saturated mode returns the stationary detector expectation without FFT
+% scaling. Use thermalised relaxation, explicit spherical-tensor Liouville
+% matrices, and a basis retaining populations and both transverse orders.
+% Substance populations must be conserved. For gridfree the equilibrium
+% distribution must be uniform. See doi:10.1007/s00723-021-01390-7.
+%
+% Linear mode: relaxation must be present in the system dynamics, or the
 %       matrix inversion operation would fail to converge. The re-
 %       laxation matrix R must *not* be thermalized.
 %
@@ -44,6 +57,7 @@
 %       Coupled identity sectors, including selective reactions,
 %       and wavefunction inputs retain their original resolvent.
 %
+% alexey.bogdanov@weizmann.ac.il
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=slowpass.m>
@@ -51,12 +65,19 @@
 function spectrum=slowpass(spin_system,parameters,H,R,K)
 
 % Check consistency
-grumble(parameters,H,R,K);
+if ~isfield(parameters,'mode'), parameters.mode='linear'; end
+grumble(spin_system,parameters,H,R,K);
 
 % Get the frequency grid
 freq_grid=2*pi*linspace(parameters.sweep(1),...
                         parameters.sweep(2),...
                         parameters.npoints)';
+
+% A finite drive requires the stationary density rather than a free-induction resolvent
+if strcmp(parameters.mode,'saturated')
+    spectrum=saturated_cw(spin_system,parameters,H,R,K,freq_grid);
+    return;
+end
 
 % Preallocate the answer
 spectrum=zeros(size(freq_grid),'like',1i);
@@ -178,8 +199,102 @@ spectrum=spectrum*sample_rate;
 
 end
 
+% Solve the driven steady state at each irradiation offset
+function spectrum=saturated_cw(spin_system,parameters,H,R,K,freq_grid)
+
+% Build the irradiation and the sweep superoperators in spin space
+irr_op=operator(spin_system,'Lx',parameters.spins{1});
+sweep_op=operator(spin_system,'Lz',parameters.spins{1});
+
+% Embed the spin superoperators in every spatial basis coordinate
+if isfield(parameters,'spc_dim')
+    irr_op=kron(speye(parameters.spc_dim),irr_op);
+    sweep_op=kron(speye(parameters.spc_dim),sweep_op);
+end
+
+% Compose the part of the Liouvillian that does not depend on the sweep
+L=H+1i*R+1i*K+2*pi*parameters.irr_powers*irr_op;
+
+% Locate the rank-zero unit coordinate of every substance
+unit_idx=spin_system.bas.offsets(1:end-1)+1;
+
+% Require a thermal source
+if norm(L(:,unit_idx),1)<=spin_system.tols.liouv_zero
+    error('relaxation superoperator is not thermalised, set inter.equilibrium.');
+end
+
+% Refuse to run when the unit coordinate is not a conserved quantity
+if norm(L(unit_idx,:),1)>spin_system.tols.liouv_zero
+    error('the unit coordinate is not conserved, check relaxation and kinetics.');
+end
+
+% Pin the conserved substance concentrations
+active=true(size(L,1),1);
+active(unit_idx)=false;
+
+% Thermal source term, independent of the sweep and of the irradiation
+source=-L(active,unit_idx)*spin_system.chem.concs(:);
+
+% Project the Liouvillian, the sweep generator, and the detection state
+L=L(active,active);
+sweep_op=sweep_op(active,active);
+coil=parameters.coil(active);
+
+% Include the known contribution of the pinned coordinates
+spectrum=(parameters.coil(unit_idx)'*spin_system.chem.concs(:))*ones(size(freq_grid));
+
+% Use the iterative solver for large active spaces
+if size(L,1)>1e5
+
+    % Inform the user
+    report(spin_system,'using preconditioned CPU GMRES path...');
+
+    % Get the scale of the problem from the nonzero diagonal elements
+    diag_mags=full(abs(diag(L)));
+    diag_scale=median(diag_mags(diag_mags>0));
+
+    % Scale the equation before iterative solution
+    L=L/diag_scale;
+    sweep_op=sweep_op/diag_scale;
+    source=source/diag_scale;
+
+    % Factor each shifted field point and measure the physical residual
+    parfor n=1:numel(freq_grid)
+        A=L+freq_grid(n)*sweep_op;
+        [M1,M2]=ilu(A+1e-6*speye(size(A)),struct('type','crout','droptol',1e-3));
+        action=@(x)A*(M2\(M1\x));
+        [rho,flag]=gmres(action,full(source),10,1e-6,numel(source));
+        rho=M2\(M1\rho);
+        residual=norm(A*rho-source);
+        if (flag~=0)||(residual>1e-6*norm(source))
+            error('steady-state GMRES did not converge at offset %g Hz.',freq_grid(n)/(2*pi));
+        end
+        spectrum(n)=spectrum(n)+coil'*rho;
+    end
+
+else
+
+    % Inform the user
+    report(spin_system,'using CPU backslash path...');
+
+    % Run the sweep in parallel
+    parfor n=1:numel(freq_grid)
+        spectrum(n)=spectrum(n)+coil'*((L+freq_grid(n)*sweep_op)\source);
+    end
+
+end
+
+% Refuse a non-finite stationary solution
+if any(~isfinite(spectrum)), error('steady-state solve returned non-finite values.'); end
+
+end
+
 % Consistency enforcement
-function grumble(parameters,H,R,K)
+function grumble(spin_system,parameters,H,R,K)
+if (~ischar(parameters.mode))||(~isrow(parameters.mode))||...
+   (~ismember(parameters.mode,{'linear','saturated'}))
+    error('parameters.mode must be either linear or saturated.');
+end
 if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
    (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
     error('H, R and K arguments must be matrices.');
@@ -200,15 +315,6 @@ if (~isnumeric(parameters.npoints))||(numel(parameters.npoints)~=1)||...
    (~isreal(parameters.npoints))||(parameters.npoints<2)||(mod(parameters.npoints,1)~=0)
     error('parameters.npoints should be an integer greater than one.');
 end
-if ~isfield(parameters,'rho0')
-    error('the initial state must be specified in parameters.rho0 variable.');
-end
-if (~isnumeric(parameters.rho0))||(~ismatrix(parameters.rho0))
-    error('parameters.rho0 must be a numeric matrix.');
-end
-if size(parameters.rho0,1)~=size(H,2)
-    error('parameters.rho0 must have the same number of rows as H.');
-end
 if ~isfield(parameters,'coil')
     error('the detection state must be specified in parameters.coil variable.');
 end
@@ -218,10 +324,48 @@ end
 if size(parameters.coil,1)~=size(H,2)
     error('parameters.coil must have the same number of rows as H.');
 end
+if strcmp(parameters.mode,'linear')
+    if ~isfield(parameters,'rho0')
+        error('the initial state must be specified in parameters.rho0 variable.');
+    end
+    if (~isnumeric(parameters.rho0))||(~ismatrix(parameters.rho0))
+        error('parameters.rho0 must be a numeric matrix.');
+    end
+    if size(parameters.rho0,1)~=size(H,2)
+        error('parameters.rho0 must have the same number of rows as H.');
+    end
+else
+    if size(H,1)~=size(H,2)
+        error('saturated mode requires square generators.');
+    end
+    if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
+        error('saturated mode requires spherical-tensor Liouville space.');
+    end
+    if any(~isfinite(parameters.sweep))
+        error('parameters.sweep must contain finite offsets.');
+    end
+    if (~iscolumn(parameters.coil))||any(~isfinite(nonzeros(parameters.coil)))
+        error('saturated mode requires a single finite detection column.');
+    end
+    if ~isfield(parameters,'spins')
+        error('the irradiated isotope must be specified in parameters.spins variable.');
+    end
+    if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+        error('parameters.spins must be a cell array with one character string.');
+    end
+    if ~isfield(parameters,'irr_powers')
+        error('the nutation frequency must be specified in parameters.irr_powers variable.');
+    end
+    if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
+       (~isscalar(parameters.irr_powers))||(parameters.irr_powers<0)||(~isfinite(parameters.irr_powers))
+        error('parameters.irr_powers must be a finite non-negative real scalar.');
+    end
+end
 end
 
 % "Our first rule here, Miss Taggart," he answered, "is that
 %  one must always see for oneself."
 %
 % Ayn Rand, "Atlas Shrugged"
+
 

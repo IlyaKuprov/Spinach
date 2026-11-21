@@ -33,3 +33,13 @@ Wavefunction inputs do not have a Liouville identity sector and bypass unit-stat
 
 - [Canonical MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/slowpass.m)
 - [Spinach Wiki: slowpass.m](https://spindynamics.org/wiki/index.php?title=slowpass.m)
+
+## Saturated mode
+
+Set `parameters.mode='saturated'` to solve the driven steady state at each offset. Select one isotope with `parameters.spins` and specify its nutation frequency in Hz with `parameters.irr_powers`. The thermal source replaces `rho0`. The complex detector expectation includes the pinned populations and has no FFT scaling.
+
+Requires sphten-liouv, explicit matrices, thermalised relaxation, and a unique stationary solution after each substance population is fixed. Population-changing kinetics are rejected. Spin-only contexts and gridfree with its uniform orientational distribution are supported; other spatial contexts and orienting potentials are outside the contract. Keep longitudinal and both transverse coherence orders in the basis. No trajectory reduction is applied.
+
+The CPU path uses direct backslash up to 100000 active coordinates and scaled, shifted-ILU right-preconditioned GMRES above that. Factors are recomputed at each offset; the shift affects only the preconditioner. Iterative convergence and the unpreconditioned relative residual are checked at 1e-6. There is no GPU or polyadic path.
+
+The three sle_esr_sat examples in examples/esr_sol_swept illustrate nitroxide microwave saturation and rotational diffusion using the parameters of Gupta, Dzikovski, and Freed, DOI 10.1007/s00723-021-01390-7. Their headers distinguish the adopted relaxation, sampling, and amplitude conventions from exact published numerical reproduction.

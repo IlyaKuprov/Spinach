@@ -251,12 +251,11 @@ assumptions and a common line width. Slow tumbling needs the stochastic
 Liouville equation: `relaxation_theory/sle_esr_nitroxide_1.m`.
 
 For microwave saturation in tumbling nitroxides, use gridfree with
-slowpass_sat and the three esr_sol_swept/sle_esr_sat examples. Require
+`@slowpass` with `parameters.mode='saturated'` and the three esr_sol_swept/sle_esr_sat examples. Require
 thermalised relaxation, sphten-liouv, and a basis retaining longitudinal
 and both transverse orders. parameters.irr_powers is one non-negative
 nutation frequency in Hz, not microwave power in watts. The output is
-an unscaled complex stationary expectation; rho0 is ignored. The signature
-matches slowpass, but neither its FFT scaling nor its zero-equilibrium
+an unscaled complex stationary expectation; rho0 is ignored. Neither the linear mode’s FFT scaling nor its zero-equilibrium
 relaxation convention carries over. This solver supports spin-only and
 uniform-equilibrium gridfree inputs, not general MOMD orienting potentials
 or population-changing chemistry.

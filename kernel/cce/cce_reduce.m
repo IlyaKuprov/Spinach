@@ -251,19 +251,18 @@ for o=0:max_order
     % Compile exact signed powers of this order's downward-closed family
     active=find([clusters.order]<=o);
     powers=zeros(1,nc,'int64');
+    powers(active)=1;
     for k=fliplr(active)
-        power=int64(1);
-        for j=active(active>k)
-            if ismember(k,clusters(j).proper_subsets)
-                term=powers(j);
-                if (term>0&&power<intmin('int64')+term)||...
-                   (term<0&&power>intmax('int64')+term)
-                    error('cce_reduce:overflow','signed power overflow.');
-                end
-                power=power-term;
-            end
+
+        % Subtract each supercluster contribution from its actual subsets
+        term=powers(k);
+        subsets=clusters(k).proper_subsets;
+        if (term>0&&any(powers(subsets)<intmin('int64')+term))||...
+           (term<0&&any(powers(subsets)>intmax('int64')+term))
+            error('cce_reduce:overflow','signed power overflow.');
         end
-        powers(k)=power;
+        powers(subsets)=powers(subsets)-term;
+
     end
 
     % Evaluate independent times and observable elements in canonical order

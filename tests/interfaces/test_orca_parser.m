@@ -1,3 +1,4 @@
+% Test: interfaces/orca_parser | ORCA log parser
 % Tests the ORCA log parser on the logs bundled with the examples. Syntax:
 %
 %                    result=test_orca_parser()

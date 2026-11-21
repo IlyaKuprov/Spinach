@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_remaining_regularisation_suite | Remaining regularisation utilities
 % Tests remaining regularisation and inverse-problem utilities. Syntax:
 %
 %                    result=test_dynamic_remaining_regularisation_suite()

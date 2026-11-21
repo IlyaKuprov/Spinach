@@ -1,3 +1,4 @@
+% Test: kernel/epr_orisel | EPR orientation selection
 % Focused orientation-selection regression tests. Syntax:
 %
 %                   result=test_epr_orisel()

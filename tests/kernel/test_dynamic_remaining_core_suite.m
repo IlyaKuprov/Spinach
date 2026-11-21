@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_remaining_core_suite | Remaining deterministic utility helpers
 % Tests remaining deterministic utility helpers. Syntax:
 %
 %                    result=test_dynamic_remaining_core_suite()

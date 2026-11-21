@@ -1,3 +1,4 @@
+% Test: kernel/hydro_fft | Implicit spectral flow and diffusion
 % Tests implicit Fourier flow and diffusion operators. Syntax:
 %
 %                       result=test_hydro_fft()

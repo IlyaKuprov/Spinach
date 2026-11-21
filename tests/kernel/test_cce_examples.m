@@ -1,3 +1,4 @@
+% Test: kernel/cce_examples | Native CCE examples and independent references
 % Smoke and independent-reference checks for the CCE application examples. Syntax:
 %
 %                    [result,reference_capture]=test_cce_examples()

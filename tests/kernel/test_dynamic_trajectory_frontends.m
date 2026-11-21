@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_trajectory_frontends | Dynamic trajectory analysis front ends
 % Tests trajectory-analysis dynamic front-end kernels. Syntax:
 %
 %                    result=test_dynamic_trajectory_frontends()

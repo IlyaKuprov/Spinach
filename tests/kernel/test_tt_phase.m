@@ -1,3 +1,4 @@
+% Test: kernel/tt_phase | Tensor-train coefficient phases
 % Tests phase-independent tensor-train compression error budgets. Syntax:
 %
 %                         result=test_tt_phase()

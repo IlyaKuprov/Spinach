@@ -1,3 +1,4 @@
+% Test: kernel/cce_interlacing | CCE interlacing
 % Exact W12 conditioning-set and probability regression tests. Syntax:
 %
 %                    result=test_cce_interlacing()

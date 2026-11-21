@@ -1,3 +1,4 @@
+% Test: kernel/hilbert_state | Hilbert-space state generation
 % Tests Hilbert-space state generation. Syntax:
 %
 %                    result=test_hilbert_state()

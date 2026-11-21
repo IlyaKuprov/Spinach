@@ -1,3 +1,4 @@
+% Test: kernel/plotting_remaining_suite | Remaining offscreen plotting helpers
 % Tests remaining Spinach plotting helper gaps under offscreen graphics. Syntax:
 %
 %                    result=test_plotting_remaining_suite()
@@ -331,7 +332,46 @@ close(fig);
 bad_call=@()slice_2d(spin_system,spectrum,parameters,0,[0.1 0.8 0.1 0.8],1,32,2,'both');
 result=local_expect_error(result,'slice_2d invalid ncont',bad_call,'ncont parameter must be a positive integer',...
                           'slice_2d rejects invalid contour counts before entering its mouse-driven loop');
-result.messages{end+1}='SKIP: slice_2d full extraction loop requires live ginput interaction and is intentionally not driven in offscreen automation.';
+
+% Supply one click at (3,2) without putting the fixture on the usual test path
+fixture=fullfile(fileparts(mfilename('fullpath')),'private','slice_click');
+path_before=path;
+path_cleaner=onCleanup(@()path(path_before));
+addpath(fixture,'-begin');
+parameters.axis_units='points';
+for n=[10 8]
+
+    % Use two distinct axes on the rectangle and shared parameters on the square
+    parameters.zerofill=[n 8];
+    if n==8
+        parameters.spins={'1H'};
+        parameters.offset=0;
+        parameters.sweep=1000;
+        parameters.zerofill=8;
+    end
+
+    % Plot one click and let only the fixture terminate the interaction
+    spectrum=reshape(1:(8*n),8,n);
+    fig=figure('Visible','off');
+    clear ginput
+    try
+        slice_2d(spin_system,spectrum,parameters,4,[0.1 0.8 0.1 0.8],1,32,2,'positive');
+    catch exception
+        if ~strcmp(exception.identifier,'test:clickComplete')
+            rethrow(exception);
+        end
+    end
+
+    % The F1 slice follows row three and the F2 slice follows column two
+    f1=findobj(subplot(1,3,2),'Type','line');
+    f2=findobj(subplot(1,3,3),'Type','line');
+    result=test_close(result,'slice_2d F1',f1.YData(:),transpose(spectrum(3,:)),1e-12,0,...
+                      'the horizontal click position selects the row');
+    result=test_close(result,'slice_2d F2',f2.YData(:),spectrum(:,2),1e-12,0,...
+                      'the vertical click position selects the column');
+    close(fig);
+
+end
 
 % Guard write_movie cheaply through input validation
 movie_bad_call=@()write_movie(17);

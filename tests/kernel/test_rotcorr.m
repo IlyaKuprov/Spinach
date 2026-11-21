@@ -1,3 +1,4 @@
+% Test: kernel/rotcorr | Surface ellipsoid diffusion
 % Checks solvent-aware rigid-body surface-ellipsoid diffusion against
 % sphere limits, solvent scaling, and coordinate invariants. Syntax:
 %

@@ -74,6 +74,9 @@ end
 if isscalar(parameters.sweep)
     parameters.sweep= [parameters.sweep  parameters.sweep];
 end
+if isscalar(parameters.zerofill)
+    parameters.zerofill=[parameters.zerofill parameters.zerofill];
+end
 
 % Do contour plotting
 loc=get(0,'defaultfigureposition'); subplot(1,3,1); 
@@ -102,8 +105,8 @@ while true()
     S_int=griddedInterpolant(F1,F2,transpose(S),'spline');
     
     % Compute the traces
-    trace_f1=S_int(ones(size(f2))*x,f2);
-    trace_f2=S_int(f1,ones(size(f1))*y);
+    trace_f1=transpose(S_int({x,f2}));
+    trace_f2=S_int({f1,y});
     
     % Call the 1D plotting routine for F1
     parameters_f1=parameters;

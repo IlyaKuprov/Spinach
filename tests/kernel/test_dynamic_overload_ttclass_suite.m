@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_overload_ttclass_suite | Tensor-train overload dispatch
 % Tests dynamic dispatch of tensor-train class overloads. Syntax:
 %
 %              result=test_dynamic_overload_ttclass_suite()
@@ -196,6 +197,19 @@ result=test_close(result,'ttclass vec two-core',full(vec(T2)),2*kron(A(:),B(:)),
 result=test_close(result,'ttclass revert two-core',full(revert(T2)),2*kron(B,A),1e-15,1e-15,...
                   'ttclass revert must reverse the tensor-train core order');
 
+% Read every entry after compressing the sum to a single rank-two train
+compressed=shrink(T2+U2);
+result=test_close(result,'ttclass compressed ranks',compressed.ranks,[1;2;1],0,0,...
+                  'the compressed sum must have bond rank two');
+entries=zeros(size(two_ref));
+for k=1:size(entries,1)
+    for n=1:size(entries,2)
+        entries(k,n)=compressed(k,n);
+    end
+end
+result=test_close(result,'ttclass compressed scalar indexing',entries,two_ref+u_two_ref,1e-12,1e-12,...
+                  'scalar access to a compressed train must match the explicit Kronecker sum of products');
+
 % Exercise AMEn solve on the smallest deterministic tensor train system
 lhs=ttclass(2,{1},0);
 rhs=ttclass(6,{1},0);
@@ -214,3 +228,5 @@ catch err
 end
 
 end
+
+

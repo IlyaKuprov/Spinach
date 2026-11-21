@@ -1,3 +1,4 @@
+% Test: kernel/cce_spectrum | Noise Fourier spectra
 % Fourier normalisation, Lorentzian, odd/even lengths, and filter units.
 % Syntax:
 %

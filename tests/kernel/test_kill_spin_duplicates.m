@@ -1,3 +1,4 @@
+% Test: kernel/kill_spin_duplicates | Repeated particle indices
 % Tests rejection of repeated particle indices. Syntax:
 %
 %                    result=test_kill_spin_duplicates()

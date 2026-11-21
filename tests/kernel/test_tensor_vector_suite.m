@@ -1,3 +1,4 @@
+% Test: kernel/tensor_vector_suite | Tensor, vector, and relaxation utilities
 % Tests tensor, vector, distribution, and relaxation utilities. Syntax:
 %
 %                    result=test_tensor_vector_suite()

@@ -17,7 +17,8 @@
 %
 %       aa_typ - nspins x 1 cell array of strings giving 
 %                the PDB identifier of the amino acid to 
-%                which each spin belongs (e.g. 'TYR')
+%                which each spin belongs (e.g. 'TYR'), prefixed
+%                by the alternate-location identifier if present
 %
 %       pdb_id - nspins x 1 cell array of strings giving 
 %                the PDB identifier of the protein atom 
@@ -64,6 +65,24 @@ pdb_id={}; coords={}; pdb_ser=[];
 while ~feof(file_id)
     data_line=fgetl(file_id);
     if (numel(data_line)>=6)&&strcmp('ENDMDL',data_line(1:6)), break; end
+    if (numel(data_line)>=54)&&strcmp(data_line(1:6),'ATOM  ')&&...
+       all(data_line([12 21 27:30])==' ')
+
+        % Read deposited ATOM records by column, not by whitespace
+        fields=str2double({data_line(7:11),data_line(23:26),...
+                           data_line(31:38),data_line(39:46),data_line(47:54)});
+        if all(isfinite(fields))
+            aa_num(end+1)=fields(2);                    %#ok<AGROW>
+            aa_typ{end+1}=strtrim(data_line(17:20));    %#ok<AGROW>
+            pdb_id{end+1}=strtrim(data_line(13:16));    %#ok<AGROW>
+            coords{end+1}=fields(3:5);                  %#ok<AGROW>
+            pdb_ser(end+1)=fields(1);                   %#ok<AGROW>
+            continue
+        end
+
+    end
+
+    % Retain support for historical space-delimited records
     if ~isempty(data_line)
         parsed_string=textscan(data_line,'ATOM %f %s %s %s %f %f %f %f %f %f','delimiter',' ','MultipleDelimsAsOne',1); 
         if all(~cellfun(@isempty,parsed_string))

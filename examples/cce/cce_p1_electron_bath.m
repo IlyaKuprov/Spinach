@@ -1,83 +1,84 @@
-% Sparse electron bath with an explicit internal nitrogen hyperfine group.
-% doi:10.1103/PhysRevB.110.134106; one P1-like group, not a concentration fit.
-% The deliberately small model is not a published material reproduction.
-% Syntax:
-%
-%             [answer,diagnostics]=cce_p1_electron_bath()
-%
-% Returns the normalised complex signal column in answer and the calculation
-% diagnostics structure in diagnostics, with one entry per time point.
+% P1 pair energies and resonant electron flip-flops at 500 G along [111],
+% from Park et al., Fig. 5a,c,d (doi:10.1038/s41534-022-00605-4).
+% The level diagrams use the diagonal high-field Zeeman and hyperfine
+% terms of the product-state picture, without quadrupolar splittings
+% or a common energy offset. The diagrams use the Fig. 5b nuclear state
+% numbering and do not calculate the bath ensemble of Fig. 4.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_p1_electron_bath()
+function cce_p1_electron_bath()
 
-% Magnet and isotopes
-sys.magnet=0.01;
-sys.isotopes={'E','E','14N'};
-sys.output='hush';
-sys.parallel={'local',1};
+% NV frame and the aligned and tilted Jahn-Teller axes
+magnet=0.05;
+z_axis=[1 1 1]/sqrt(3);
+x_axis=[1 -1 0]/sqrt(2);
+frame=[x_axis;cross(z_axis,x_axis);z_axis];
+jt_axes=[1 1 1;1 -1 -1]*frame.'/sqrt(3);
 
-% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
-inter.coordinates={[0 0 0];[35 0 0];[35 0 1]};
-inter.zeeman.matrix=repmat({zeros(3)},1,3);
-inter.coupling.matrix=cell(3);
+% Experimental hyperfine tensors from Supplementary Note 2
+hyperfine=cell(1,2);
+for n=1:2
 
-% Explicit illustrative hyperfine and bath coupling tensors in Hz
-inter.coupling.matrix{1,2}=diag([2000 2000 -4000]);
-inter.coupling.matrix{2,3}=diag([81 81 114])*1e6;
-inter.coupling.matrix{1,3}=[0 0 0;0 0 0;400 0 200].';
-
-% Declare observed-Sz projection for this projected electron-bath model
-for n=2:numel(sys.isotopes)
-
-    % Remove transverse observed-spin coupling components
-    if ~isempty(inter.coupling.matrix{1,n})
-        inter.coupling.matrix{1,n}(:,1:2)=0;
-    end
+    % Rotate each axial tensor into the field frame
+    axis_proj=jt_axes(n,:).'*jt_axes(n,:);
+    hyperfine{n}=81.312*eye(3)+(114.0264-81.312)*axis_proj;
 
 end
 
-% Coordinates define the toy geometry; all couplings above are explicit
-inter=rmfield(inter,'coordinates');
+% Spin operators and the nuclear product basis in Fig. 5b order
+S=pauli(2);
+I=pauli(3);
+projections=[-1 -1; 0 -1; -1 0; 1 -1; 0 0; -1 1; 1 0; 0 1; 1 1];
+nuc_idx=3*(1-projections(:,1))+2-projections(:,2);
+Z=full(diag(I.z));
+z_nuc=[repelem(Z,3) repmat(Z,3,1)];
+z_nuc=z_nuc(nuc_idx,:);
+electron_idx=[2 3];
+z_elec=[kron(diag(S.z),ones(2,1)) kron(ones(2,1),diag(S.z))];
+z_elec=full(z_elec(electron_idx,:));
+F=kron(kron(S.p,S.m)+kron(S.m,S.p),kron(I.u,I.u));
+allowed=full(F(9*(electron_idx(1)-1)+nuc_idx,9*(electron_idx(2)-1)+nuc_idx)~=0);
 
-% Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
+% Model choices in panel order a, c, d
+axis_ids=[1 1;1 1;1 2];
+hf_on=[false true true];
+model_names={'(a) Hyperfine off','(c) Aligned JT axes','(d) One tilted JT axis'};
+omega_n=-spin('14N')*magnet/(2*pi*1e6);
+energies=zeros(9,2,3);
+channels=false(9,9,3);
+for n=1:3
 
-% Spinach housekeeping
-spin_system=create(sys,inter);
+    % Diabatic pair energies and resonances to floating-point precision
+    azz=hf_on(n)*cellfun(@(tensor) tensor(3,3),hyperfine(axis_ids(n,:)));
+    levels=omega_n*sum(z_nuc,2)+(z_nuc.*azz)*z_elec.';
+    energies(:,:,n)=levels;
+    channels(:,:,n)=allowed&(abs(levels(:,1)-levels(:,2).')<=eps(max(abs(levels),[],'all')));
 
-% Projected transition and total echo times in seconds
-parameters.observed=1;
-parameters.cce.bath_spins=2:3;
-parameters.transition.spins=1;
-parameters.transition.ms=[1/2 -1/2];
-parameters.times=linspace(0,200e-6,41);
-parameters.cce.order=1;
-parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...
-                               'max_memory_bytes',2^28);
+end
 
-% Keep the electron and its nitrogen in the same physical group
-parameters.cce.expansion='partition';
-parameters.cce.groups={[2 3]};
-parameters.cce.partition=struct('mode','user','max_dimension',6);
+% Plot both electron configurations at each nuclear product state
+kfigure('Position',[100 100 1200 380]);
+tiledlayout(1,3);
+for n=1:3
 
-% Execute the named Hahn experiment through the cluster context
-[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+    % Blue segments mark resonant pairs linked by the flip-flop operator
+    nexttile();
+    hold on;
+    [left,right]=find(channels(:,:,n));
+    plot([left-0.26 right+0.26].', ...
+         [energies(left,1,n) energies(right,2,n)].','b-','LineWidth',1);
+    plot((1:9)-0.26,energies(:,1,n),'k_','MarkerSize',6,'LineWidth',1.5);
+    plot((1:9)+0.26,energies(:,2,n),'r_','MarkerSize',6,'LineWidth',1.5);
+    hold off;
+    xlim([0.5 9.5]);
+    ylim padded;
+    xticks(1:9);
+    kxlabel('Fig. 5b state index (black: unprimed; red: primed)');
+    kylabel('Relative energy / MHz');
+    ktitle(sprintf('%s (%d active)',model_names{n},nnz(channels(:,:,n))));
 
-% Plot the measured complex echo amplitude
-kfigure();
-plot(1e6*parameters.times,real(answer),'b-',...
-     1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
-kgrid();
+end
 
 end
 

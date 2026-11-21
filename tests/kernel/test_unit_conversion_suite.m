@@ -1,3 +1,4 @@
+% Test: kernel/unit_conversion_suite | Unit-conversion functions
 % Tests scalar unit-conversion functions. Syntax:
 %
 %                    result=test_unit_conversion_suite()

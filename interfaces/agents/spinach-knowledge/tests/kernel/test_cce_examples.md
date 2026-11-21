@@ -4,19 +4,20 @@
 
 ## Purpose
 
-Run the CCE application examples and check their independent small-system references.
+Check compact CCE application models against independent small-system references. The test does not run public figure examples.
 
 ## Behaviour
 
-- Executes the CCE, gCCE, ME-CCE, and partitioned-CCE examples with figures hidden, then restores the original figure-visibility setting.
-- Checks finite numerical results and validity returned by the examples against independently evaluated references in this test.
+- Discovers public MATLAB functions in `examples/cce` and checks that each takes no arguments and returns no results. Private helpers are excluded and the figure calculations are not run.
+- Executes CCE, gCCE, ME-CCE, and partitioned-CCE regression fixtures without plotting or needing the public examples on the MATLAB path.
+- Checks finite numerical results and validity against independently evaluated references.
 - Uses observed-spin density matrices and selected-transition signals with the same contracts as the CCE kernel.
 - The reduced application models illustrate algorithms; they are not material fits or converged powder calculations.
 
 ## Calling convention
 
 ```matlab
-result=test_cce_examples()
+[result,reference_capture]=test_cce_examples()
 ```
 
 **Inputs**
@@ -26,34 +27,28 @@ result=test_cce_examples()
 **Outputs**
 
 - `result` — standard test-harness record containing checks, failure messages, and diagnostics.
+- `reference_capture` — independent physical arrays and numerical diagnostics keyed by the original case names. The ordinary test runner needs only `result`.
 
 ## References
 
-- [Registered tests](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 - [CCE application examples](../../examples/cce/)
 
-The DEER example check also excludes the pump resonance and requires an empty selected event, guarding frequency selection rather than a fixed physical target.
+The DEER check compares direct three-spin density-matrix propagation with a selected bath pulse and observed-spin refocusing. Moving the spectral window away verifies the no-pump limit and verifies that `allow_empty=false` rejects the empty selector.
 
 Powder checks require response/value equality, the averaged final-order response, weighted numerical bounds, and diagnostics consistent with those averaged bounds.
 
-The generalised high-spin examples gcce_sic_clock, gcce_highspin_siv, and gcce_votpp return numeric density arrays and separate clexpn diagnostics. Their independent dense references are local functions of this registered test. Its optional second output, reference_capture, retains the independently constructed physical arrays for numerical-regression capture; the ordinary test-runner first output is unchanged.
+The generalised SiC clock, high-spin SiV, and VO(TPP) fixtures compare density arrays with independent dense references. The Er:CaWO₄, hBN quadrupole, coherent methyl exchange, SiC divacancy, and Si:P donor fixtures retain their dense bath Hamiltonians, branch propagators, complex amplitudes, and diagnostics for reference capture.
 
-The Er:CaWO4, hBN quadrupole, coherent methyl exchange, SiC divacancy, and Si:P donor examples return numeric clexpn answers and separate diagnostics. Their unchanged independent dense bath Hamiltonians, branch propagators, complex amplitudes, and diagnostic arrays are retained in local reference companions and the optional reference_capture output.
+The single-nucleus, NV, P1, and partitioned-electron-layer fixtures exercise `clexpn` and `hahn_echo`, with analytic, pinned external, or dense references. The electron-layer case compares partitioned against full-order propagation.
 
-The single-nucleus, NV, P1, and partitioned-electron-layer examples return `[answer,diagnostics]` through clexpn and hahn_echo. Analytic/source-pinned/dense references, including the partitioned versus full-order comparison, live in test_cce_examples. The retired entry points are not used.
+The polarised-bath fixture compares sampled against exhaustive averaging and checks the weighted-summation arithmetic bound. The two-observed-centre and dissipative-bath fixtures check dense propagation and density physicality, including negativity for the two centres and positive stock-Liouville arithmetic estimates for the dissipative bath.
 
-The native polarised-bath, two-observed-centre, and dissipative-bath examples return [answer,diagnostics]. Their exhaustive sampling comparison, independent dense propagations, negativity, and physical reference arrays live here. The optional reference_capture records those quantities. Assertions explicitly verify the weighted-summation arithmetic bound and transport of positive stock-Liouville arithmetic estimates. Every application example uses the native interface.
+The noise fixture uses native operator descriptors and captures the analytic cosine reference and original transverse operator. The separate native noise tests compare descriptors and explicit Hermitian matrices before connected ensemble reduction and reject invalid descriptor fields.
 
-The noise example uses native operator descriptors. The cosine reference and original transverse operator are retained in the example-test capture. Native noise tests compare descriptors and explicit Hermitian matrices before connected ensemble reduction and reject invalid descriptor fields.
-
-gcce_finite_drive returns native answer/diagnostics. Its independent two-spin expm propagation and frozen physical reference arrays now live in the test, not in the example.
-
-The migrated cce_deer_bandwidth example returns [answer,diagnostics]. Its independent test uses direct three-spin density-matrix expm propagation with an observed refocusing pulse and selected bath pulse. A native clexpn check moves the spectral window away, verifies the no-pump limit, and verifies allow_empty=false rejects the empty selector. No legacy parameter assembly is used for this example.
+The finite-drive fixture uses native physical control descriptors and checks independent two-spin `expm` propagation.
 
 ## Native molecular powder
 
-cce_molecular_powder returns numeric answer and separate native diagnostics. Its independent full-bath reference assembles rotated physical tensors with Cartesian spin matrices, the stock ordered-pair tensor convention and expm, then averages completed Hahn echoes. Tests cover agreement, the analytic unit initial signal, the final expansion order, and orientation-resolved numerical bounds. There is no legacy entry-point call in any examples/cce file.
-
-Finite-control invocations use finite_drive with native physical descriptors, not a raw sequence field. Independent references retain their physical inputs and assertions; unused raw-event declarations are not part of the reference construction.
+The powder fixture assembles rotated physical tensors using Cartesian spin matrices and the stock ordered-pair tensor convention. Independent full-bath `expm` propagation is performed before averaging the completed Hahn echoes. Tests cover agreement, the analytic unit initial signal, the final expansion order, and orientation-resolved numerical bounds.
 
 Projected Hahn signals use the fixed physical receiver, matching generalised density detection without an extra conjugation of the returned signal. Historical manifold-overlap reference expressions are converted at the reference boundary; pinned external source arrays are retained unchanged.

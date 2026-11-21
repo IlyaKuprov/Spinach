@@ -19,7 +19,7 @@ The source notes that Gauss is used for the hyperfine coupling because this conv
 
 ## Calculation
 
-Before multiplying the tensors, the function converts each to spherical-tensor components and reconstructs it from rank 2 only. Thus the calculation uses the anisotropic components of both inputs to form the PCS tensor and excludes the contact contribution. With `A2` and `chi2` denoting those reconstructed rank-2 tensors, the implemented calculation is `pcs_tensor = 1e6*(1/(4*pi))*A2*chi2/C`, followed by `pcs = trace(pcs_tensor)/3`.
+Before multiplying the tensors, the function converts the hyperfine tensor to spherical-tensor components and reconstructs it from rank 2 only. This removes the contact contribution. The susceptibility tensor is used in full. With `A2` denoting the reconstructed rank-2 hyperfine tensor, the implemented calculation is `pcs_tensor = 1e6*(1/(4*pi))*A2*chi/C`, followed by `pcs = trace(pcs_tensor)/3`. Because `A2` is traceless, the isotropic part equals that of `A2*chi2`. Adding the contact tensor `1e6*(1/(4*pi))*(trace(A)/3)*chi/C` to `pcs_tensor` gives the `pms_tensor` returned by `hfc2pms`.
 
 The code obtains `gamma_n=spin(isotope)`, and uses `hbar=1.05457173e-34` and `mu0=4*pi*1e-7`. Its conversion factor is `C=10^4*gamma_n*hbar*mu0/(4*pi*(1e-10)^3)`.
 

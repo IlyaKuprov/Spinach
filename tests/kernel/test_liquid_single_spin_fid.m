@@ -1,3 +1,4 @@
+% Test: kernel/liquid_single_spin_fid | Single-spin liquid-state FID
 % Tests a one-spin liquid-state free induction decay. Syntax:
 %
 %                    result=test_liquid_single_spin_fid()

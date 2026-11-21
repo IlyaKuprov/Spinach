@@ -1,3 +1,4 @@
+% Test: kernel/wigner_angular_suite | Angular-momentum coefficient functions
 % Tests angular-momentum coefficient and spherical-function helpers. Syntax:
 %
 %                    result=test_wigner_angular_suite()

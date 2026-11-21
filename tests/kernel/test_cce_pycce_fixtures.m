@@ -1,3 +1,4 @@
+% Test: kernel/cce_pycce_fixtures | PyCCE fixture parity
 % Reproduce pinned PyCCE raw singleton/pair fixtures and reductions. Syntax:
 %
 %                    result=test_cce_pycce_fixtures()

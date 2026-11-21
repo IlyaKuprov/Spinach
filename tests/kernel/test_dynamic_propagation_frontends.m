@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_propagation_frontends | Dynamic propagation front ends
 % Tests dynamic propagation front-end kernels on tiny systems. Syntax:
 %
 %                    result=test_dynamic_propagation_frontends()

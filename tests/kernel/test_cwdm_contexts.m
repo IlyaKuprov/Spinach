@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_contexts | CWDM static context boundaries
 % Tests rejection of state-dependent chemistry in static contexts. Syntax:
 %
 %                    result=test_cwdm_contexts()

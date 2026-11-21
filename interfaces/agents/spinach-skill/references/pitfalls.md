@@ -231,6 +231,8 @@ spectrum (missing multiplet components, distorted powder lineshapes, phase
 errors). Convergence is established by refinement, never by appearance - see
 the validation procedure below.
 
+Disabling `clean-up` or setting `prop_chop=0` leaves Taylor terms unrounded; `propagator()` then checks numerical nonzeros so that explicitly stored sparse zeros do not prevent termination. This does not enable an approximation tolerance for the unrounded series.
+
 With `prop_cache`, `propagator()` separates cache entries by cleanup, storage-threshold, and GPU policy as well as generator, timestep, and chop tolerance; changing those settings within a pool cannot retrieve an entry built under a different policy.
 
 ## Scaling and memory
@@ -263,6 +265,11 @@ and `trajlevel`-disabled calculations do not use ZTE. A shaped-pulse call alone
 is insufficient: its selected method must reach `evolution`, or a subsequent
 acquisition must do so. Path tracing and symmetry can be disabled
 with `sys.disable={'pt','symmetry'}` for debugging, potentially at a large cost.
+
+Horizontal wavefunction and Liouville-state stacks are screened using their
+actual columns; enabled ZTE retains the union of their populated coordinates.
+ZTE propagates columns in bounded batches and scales each separately, so weak
+columns above `zte_tol` are not judged against another column's scale.
 
 Matrices switch to sparse algebra automatically, and above a state-space
 dimension of 10000 (a tunable tolerance) Spinach uses Krylov propagation

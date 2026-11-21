@@ -156,7 +156,8 @@ inter.coupling.matrix{1,2}=A;
 All three are `nspins x nspins` cell arrays. `eigs` and `euler` must have the
 same dimensions and identical non-empty patterns. Only one triangle needs
 filling for a given pair; the kernel handles the rest. Couplings whose norm is
-below `sys.tols.inter_cutoff` are dropped, as are all couplings involving ghost
+below `sys.tols.inter_cutoff` are dropped. Exactly zero assembled tensors are
+absent even at zero cutoff, as are all couplings involving ghost
 spins. Couplings between spins that belong to different chemical subsystems are
 a hard error.
 
@@ -483,7 +484,10 @@ acids, taking shifts from an ASCII file formatted as
 `[residue_number atom_id shift]`. `options.deut_list` marks deuterated atoms and
 reduces the affected J-couplings; `options.noshift` behaves as above.
 `read_pdb_pro(pdb_file_name,mod_id)`, `read_pdb_nuc(pdb_file_name)` and
-`read_bmrb(bmrb_file_name)` are the underlying record readers.
+`read_bmrb(bmrb_file_name)` are the underlying record readers. The protein reader uses fixed PDB
+columns for standard ATOM records and accepts historical space-delimited
+records. Resolve alternate locations before BMRB matching: the reader retains
+the alternate-location character as a prefix on the residue label.
 
 `[sys,inter]=gissmo2spinach(filename,subsystem)` reads a GISSMO XML file and
 returns a ready-to-use liquid-state NMR spin system. GISSMO supplies only

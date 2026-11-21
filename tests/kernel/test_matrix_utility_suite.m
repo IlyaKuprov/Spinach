@@ -1,3 +1,4 @@
+% Test: kernel/matrix_utility_suite | Matrix utility functions
 % Tests small matrix utility functions. Syntax:
 %
 %                    result=test_matrix_utility_suite()
@@ -116,3 +117,5 @@ result=test_close(result,'clean_up sparse tolerance',C_obs,sparse([0 1;0 2]),1e-
                   'clean_up removes elements below the requested non-zero tolerance');
 
 end
+
+

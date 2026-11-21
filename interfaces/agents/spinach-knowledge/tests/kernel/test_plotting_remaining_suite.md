@@ -40,7 +40,7 @@ Regression test for the remaining Spinach plotting helper functions that are not
 ### Interactive guard tests (`local_test_interactive_guards`)
 
 - `int_2d` is driven through its file-based path: a temporary `.mat` file containing `ranges={[-100;100],[-80;80]}` is saved with `tempname`, and `int_2d(spin_system,spectrum,parameters,4,[0.1 0.8 0.1 0.8],1,32,2,'both',range_file)` must create exactly one contour object and leave the range file in place. The spectrum is an 8-by-10 synthetic two-Gaussian grid built with `ndgrid(linspace(-1,1,8),linspace(-1,1,10))`.
-- `slice_2d` is called with `ncont=0`; it must fail with an error containing `ncont parameter must be a positive integer` before entering its mouse-driven loop. A skip message records that the full extraction loop requires live `ginput` interaction and is intentionally not driven in offscreen automation.
+- `slice_2d` is called with `ncont=0`; it must fail with an error containing `ncont parameter must be a positive integer` before entering its mouse-driven loop. A one-click fixture also checks both displayed traces against the selected row and column of rectangular and square spectra, including a single spin and scalar zero-fill on the square.
 - `write_movie(17)` must fail with an error containing `file_name must be a character string` before opening `VideoWriter`. The full MP4 generation path (`local_test_write_movie`) runs only when the environment variable `SPINACH_RUN_SLOW_PLOTTING` equals `1`; otherwise a skip message notes that it is slow, codec-dependent, and gated by that variable. When run, it plots a line in 3D, writes to a temporary `.mp4` file, and requires the file to exist with non-zero size.
 
 ## Inputs and outputs

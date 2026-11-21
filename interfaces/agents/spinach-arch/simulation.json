@@ -1,0 +1,230 @@
+[
+  {
+    "id": "static-contexts",
+    "responsibility": "Supply the spin generator and initial conditions for an isotropic liquid, one crystal orientation, or an orientational powder average.",
+    "entry_points": [
+      "kernel/contexts/liquid.m",
+      "kernel/contexts/crystal.m",
+      "kernel/contexts/powder.m",
+      "kernel/grids/grid_check.m"
+    ],
+    "contracts": [
+      "The context applies the requested assumptions and offsets, then calls sequence(spin_system,parameters,H,R,K). liquid normally uses the isotropic Hamiltonian; its rdc option uses residual alignment. crystal combines the isotropic and anisotropic terms at parameters.orientation (Euler angles in radians).",
+      "powder calls the sequence separately at each orientation, with the current angles and orientation-specific relaxation. A named or explicit grid supplies alphas, betas, gammas, and weights. sum_up=true weights the sequence outputs as supplied; false returns their unweighted cell array in grid order.",
+      "These contexts accept static kinetics matrices, not state-dependent kinetics handles. Equilibrium and auxiliary operators requested in parameters.needs are context-specific."
+    ],
+    "change_guidance": [
+      "For an error present at one orientation, compare crystal with powder on the single_crystal grid before changing the quadrature. For an error confined to the average, compare the weighted cells with the summed result. A timing or detection change belongs in the sequence, not in this loop."
+    ],
+    "verification": [
+      "tests/kernel/test_ctx_liquid_acquire.m",
+      "tests/kernel/test_ctx_powder_crystal.m",
+      "tests/kernel/test_ctx_powder_average.m"
+    ]
+  },
+  {
+    "id": "bosonic-device",
+    "responsibility": "Prepare the fixed-orientation spin and bosonic mode dynamics for a cavity, vibrational mode, or transmon experiment.",
+    "entry_points": [
+      "kernel/contexts/device.m",
+      "experiments/traject.m"
+    ],
+    "contracts": [
+      "device passes H, R, and K to the ordinary five-argument sequence. Spin channel offsets follow parameters.spins; mode_offset is a separate list in bosonic particle order, in Hz. Mode detuning enters H as minus 2*pi times the offset times the number operator.",
+      "The context requires at least one C, V, or T particle and the labframe, cavity, or spin-phonon assumption set. Modes with damping or dephasing require Liouville space."
+    ],
+    "change_guidance": [
+      "Put drive timing and readout in the experiment. Change offset interpretation in device; for a change to the underlying mode energy, coupling, or dissipation, inspect the Hamiltonian or relaxation builder that device calls before it applies offsets."
+    ],
+    "verification": [
+      "examples/quantum_tech/spin_cavity_vacuum_rabi.m",
+      "examples/quantum_tech/spin_phonon_dephasing.m"
+    ]
+  },
+  {
+    "id": "rotating-solids",
+    "responsibility": "Represent sample rotation explicitly on rotor phase grids, in a Floquet harmonic basis, or in a grid-free Wigner basis.",
+    "entry_points": [
+      "kernel/contexts/singlerot.m",
+      "kernel/contexts/doublerot.m",
+      "kernel/contexts/floquet.m",
+      "kernel/contexts/gridfree.m"
+    ],
+    "contracts": [
+      "singlerot and doublerot supply a rotor-transport generator in the H argument in Liouville space, together with expanded R and K. In Hilbert or wavefunction space they supply a cell of spin Hamiltonians at sampled rotor phases; the sequence must implement the time dependence. In the double-rotor stack the inner phase varies fastest.",
+      "The rotor phase index is not the powder orientation index. In single-rotor Liouville space the named single_crystal grid starts a supplied spin state at the first rotor phase; a powder starts it uniformly over phases. A supplied detector sums over phases.",
+      "floquet uses rotor harmonics and projects a supplied state and detector onto the central harmonic; it requires a named powder grid. gridfree instead uses Wigner functions, embeds a supplied spin state and detector in the isotropic mode, and can include rotational diffusion. Both require Liouville space."
+    ],
+    "change_guidance": [
+      "Match the callback to its generator representation: a matrix-only acquisition cannot propagate a Hilbert rotor stack. For rotor sign or projection changes, compare the same anisotropic system across singlerot and floquet, then exercise a stack consumer such as echo_sweep separately.",
+      "Keep powder-grid refinement separate from rotor-phase or harmonic-rank refinement: they change different dimensions of the calculation."
+    ],
+    "verification": [
+      "tests/kernel/test_ctx_custom_grids_hilbert.m",
+      "tests/kernel/test_ctx_singlerot_acquire.m",
+      "tests/kernel/test_ctx_doublerot_acquire.m",
+      "tests/kernel/test_ctx_floquet_acquire.m",
+      "tests/kernel/test_ctx_gridfree_acquire.m",
+      "examples/esr_sol_pulsed/mas_diamond_p1.m"
+    ]
+  },
+  {
+    "id": "spatial-transport",
+    "responsibility": "Combine spin evolution with gradients, diffusion, and flow on a Cartesian imaging grid or an unstructured microfluidic mesh.",
+    "entry_points": [
+      "kernel/contexts/imaging.m",
+      "kernel/utilities/g2fplanck.m",
+      "kernel/utilities/v2fplanck.m",
+      "kernel/contexts/meshflow.m",
+      "kernel/kinetics/flow_gen.m",
+      "experiments/imaging/spin_echo.m",
+      "experiments/microfluidics/simple_flow.m"
+    ],
+    "contracts": [
+      "Both contexts call sequence(spin_system,parameters,H,R,K,G,F). For Cartesian imaging the product order is Z x Y x X x Spin: a spatial phantom is flattened columnwise, with spin indices varying fastest in the product. A relaxation phantom weights a spin operator; state and coil phantoms weight spin vectors.",
+      "In imaging, G contains linear gradient operators per T/m; F already has the generator convention used in H+F+1i*R+1i*K. g2fplanck builds G, while v2fplanck builds F from the velocity and diffusion fields. The Fourier/polyadic transport representation is action-only.",
+      "meshflow takes its geometry from spin_system.mesh, its local H/R/K terms from phantom/operator pairs, and transport from flow_gen on Voronoi cells. G is a placeholder, not the Cartesian gradient array; simple_flow ignores it."
+    ],
+    "change_guidance": [
+      "Change gradient waveforms and readout timing in the imaging experiment; change spatial operators in the grid or mesh builder. Verify a transport change through the matching context with a spatially varying phantom rather than only a spin-space acquisition."
+    ],
+    "verification": [
+      "tests/kernel/test_dynamic_fp_contexts.m",
+      "tests/kernel/test_hydro_fft.m",
+      "examples/imaging/spin_echo_1d.m",
+      "examples/microfluidics/plain_flow.m"
+    ]
+  },
+  {
+    "id": "experiment-sequences",
+    "responsibility": "Translate an experiment's pulses, delays, coherence selection, and detection into calls on the prepared spin system.",
+    "entry_points": [
+      "experiments/acquire.m",
+      "experiments/nmr_liquids/cosy.m",
+      "experiments/esr_hyperfine/hyscore.m",
+      "experiments/hyperpol/dnp_field_scan.m",
+      "experiments/singlets/m2s.m"
+    ],
+    "contracts": [
+      "acquire composes L=H+1i*R+1i*K, applies the requested decoupling, and detects parameters.coil from parameters.rho0. A dwell of 1/sweep seconds and npoints-1 steps produce npoints time samples. Other sequences may construct their own initial and detection states.",
+      "Outputs are experiment-specific: cosy selects a coherence from its indirect-time trajectory and detects a second time dimension; dnp_field_scan returns steady-state expectation values at specified field offsets rather than an FID. Not everything under experiments is a context callback: m2s is a reusable transfer block that takes a state, L, and pulse operators directly."
+    ],
+    "change_guidance": [
+      "Place reusable pulse timing, pathway selection, and acquisition changes in the relevant experiment subdirectory; follow a caller in the corresponding examples family for system parameters, Fourier transforms, and plotting. Check both acquisition axes against that caller before changing 2D array ordering."
+    ],
+    "verification": [
+      "tests/kernel/test_dynamic_examples_smoke.m",
+      "examples/nmr_liquids/cosy90_sucrose.m",
+      "examples/esr_sol_pulsed/hyscore_nitroxide_powder.m",
+      "examples/dnp_sol/solid_effect_field_scan_1.m",
+      "examples/singlet_states/m2s_example.m"
+    ]
+  },
+  {
+    "id": "pulse-waveforms",
+    "responsibility": "Generate or read pulse waveforms separately from applying their finite-duration controls in the presence of drift.",
+    "entry_points": [
+      "kernel/pulses/pulse_shape.m",
+      "kernel/pulses/chirp_pulse.m",
+      "kernel/pulses/read_wave.m",
+      "kernel/pulses/shaped_pulse_xy.m",
+      "kernel/pulses/shaped_pulse_af.m",
+      "kernel/pulses/iserstep.m"
+    ],
+    "contracts": [
+      "shaped_pulse_xy pairs each control operator with one amplitude vector (rad/s) and takes durations in seconds. A piecewise-constant pulse uses one amplitude per slice; a piecewise-linear pulse uses both endpoints and therefore one extra amplitude. The input drift includes the background offset.",
+      "shaped_pulse_af takes per-slice frequencies in Hz relative to the supplied drift, amplitudes in rad/s, and an initial phase. It evolves in an enlarged RF-phase space rather than treating frequency as a Cartesian amplitude. The effective propagator output is available only with its expm method.",
+      "iserstep is for a generator supplied as L(t,rho), including state dependence; it is not a waveform generator."
+    ],
+    "change_guidance": [
+      "For a pulse-shape change compare the generated samples, durations, and units first. For a propagation change compare the final state under the same sampled pulse, retaining drift during the pulse. Request a trajectory or full propagator only when the caller needs it."
+    ],
+    "verification": [
+      "tests/kernel/test_pulses_waveform_suite.m",
+      "tests/kernel/test_dynamic_shaped_pulses_deep.m",
+      "tests/kernel/test_dynamic_iserstep_highorder.m",
+      "examples/shaped_pulses/shaped_pulse_chirp_xy.m",
+      "examples/shaped_pulses/shaped_pulse_chirp_af.m"
+    ]
+  },
+  {
+    "id": "field-swept-epr",
+    "responsibility": "Find resonance fields and integrate a field-swept powder EPR spectrum at a fixed microwave frequency.",
+    "entry_points": [
+      "experiments/fieldsweep.m",
+      "kernel/eigenfields/eigenfields.m",
+      "kernel/eigenfields/rootmatch.m",
+      "kernel/eigenfields/voitlander.m",
+      "experiments/echo_sweep.m",
+      "experiments/rapidscan.m"
+    ],
+    "contracts": [
+      "fieldsweep is called directly, not via powder. It requires sys.magnet=1 T so that Hc+B*Hz uses a field-independent coupling part and a Zeeman part per tesla. The frequency is in Hz; the field window and linewidth are in tesla. The second output contains parameters.b_axis.",
+      "The initial beta/gamma nodes define a spherical triangulation, not a weighted sum of vertex spectra. eigenfields supplies resonance fields, transition identities, moments, population differences, widths, and sweep Jacobians. voitlander integrates the triangles adaptively and uses rootmatch for branch correspondence."
+    ],
+    "change_guidance": [
+      "Route resonance positions to eigenfields and branch association or powder lineshapes to rootmatch or voitlander. An echo-detected carrier scan belongs to the echo_sweep sequence, and a time-dependent field ramp in rapid-scan EPR belongs to rapidscan; neither is the fieldsweep quadrature."
+    ],
+    "verification": [
+      "tests/kernel/test_fieldsweep_custom_grid.m",
+      "tests/kernel/test_dynamic_voitlander.m",
+      "tests/kernel/test_echo_sweep_liouv.m",
+      "examples/esr_sol_swept/fieldsweep_nitroxide.m",
+      "examples/esr_liq_pulsed/rapidscan_nitroxide.m"
+    ]
+  },
+  {
+    "id": "cluster-experiments",
+    "responsibility": "Run registered experiments on retained central-spin and bath clusters without constructing a full-bath basis.",
+    "entry_points": [
+      "kernel/contexts/clexpn.m",
+      "kernel/cce/cce_capabilities.m",
+      "kernel/cce/cce_options.m",
+      "kernel/cce/cce_compile.m",
+      "kernel/cce/cce_subsystem.m",
+      "kernel/cce/cce_generators.m",
+      "experiments/cce/hahn_echo.m"
+    ],
+    "contracts": [
+      "clexpn accepts the output of create, physical observed-spin IDs, elapsed times in seconds, and the interaction assumptions. Experiment settings stay in parameters; algorithm controls live in parameters.cce. cce_capabilities registers exact function handles, supported generators, output types, and reduction rules.",
+      "The evaluator builds only the retained subsystem and calls its experiment as [answer,aux]=sequence(cluster_system,parameters,H,R,K). Projected generators are tagged branch objects, not numeric H+1i*R+1i*K. Signal, density, noise, and dissipative evolution are not interchangeable capabilities."
+    ],
+    "change_guidance": [
+      "For a new CCE sequence, declare its supported contracts and evaluator in cce_capabilities and implement the physical pulse protocol in experiments/cce. For a wrong single-cluster response, inspect physical-to-retained ordering and the selected generator representation before changing the expansion."
+    ],
+    "verification": [
+      "tests/kernel/test_clexpn_context.m",
+      "tests/kernel/test_clexpn_subsystem.m",
+      "tests/kernel/test_clexpn_generators.m",
+      "tests/kernel/test_clexpn_experiments.m",
+      "tests/kernel/test_clexpn_master.m",
+      "examples/cce/cce_nv_diamond.m"
+    ]
+  },
+  {
+    "id": "cluster-expansion",
+    "responsibility": "Select a cluster family, schedule its raw evaluations, then reduce and average their responses with the experiment's algebra.",
+    "entry_points": [
+      "kernel/cce/cce_graph.m",
+      "kernel/cce/cce_clusters.m",
+      "kernel/cce/cce_schedule.m",
+      "kernel/cce/cce_checkpoint.m",
+      "kernel/cce/cce_reduce.m",
+      "kernel/cce/cce_spectrum.m"
+    ],
+    "contracts": [
+      "The scheduler owns the checkpoint and emits the observed-only reference plus cluster-indexed raw responses with validity and absolute error bounds. cce_reduce requires the reference and every family member; proper subsets precede their parent in the cluster family. Noise uses additive rather than multiplicative reduction.",
+      "clexpn normally averages completed expansions. Internal averaging instead reduces averaged raw records and requires a common physical cluster family. Unlike powder, clexpn omits zero-weight nodes and normalises positive weights; sum_up=false returns the individual completed outputs. A requested noise spectrum is computed after ensemble reduction."
+    ],
+    "change_guidance": [
+      "Change neighbourhood selection in the graph or cluster builder; change batching and resumption in the scheduler; change zero-denominator handling, error propagation, or cluster combination in the reducer. Keep per-cluster diagnostics separate from the public experiment answer."
+    ],
+    "verification": [
+      "tests/kernel/test_cce_clusters.m",
+      "tests/kernel/test_cce_reduction.m",
+      "tests/kernel/test_cce_checkpoint.m",
+      "tests/kernel/test_clexpn_orientation.m",
+      "tests/kernel/test_clexpn_noise.m"
+    ]
+  }
+]

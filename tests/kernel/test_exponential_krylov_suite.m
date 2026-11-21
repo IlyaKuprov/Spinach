@@ -1,3 +1,4 @@
+% Test: kernel/exponential_krylov_suite | Exponential and Krylov numerical utilities
 % Tests exponential, Chebyshev, and Krylov numerical utilities. Syntax:
 %
 %                    result=test_exponential_krylov_suite()

@@ -42,7 +42,7 @@
 %
 % Outputs:
 %
-%     endor_spec - Mims ENDOR spectrum, a vector of the same
+%     endor_spec - Mims ENDOR spectrum, an array of the same
 %                  size as parameters.n_frq
 %
 % ilya.kuprov@weizmann.ac.il
@@ -56,6 +56,11 @@ function endor_spec=endor_mims_ideal(spin_system,parameters,H,R,K)
 
 % Check consistency
 grumble(spin_system,parameters,H,R,K);
+
+% An empty frequency grid has no echoes to propagate
+if isempty(parameters.n_frq)
+    endor_spec=zeros(size(parameters.n_frq)); return
+end
 
 % Compose Liouvillian
 L=H+1i*R+1i*K;
@@ -111,7 +116,7 @@ rho=step(spin_system,Ey,rho,-pi/2);
 rho=step(spin_system,L,rho,parameters.tau);
 
 % Detect echo tips
-endor_spec=coil'*rho;
+endor_spec=reshape(coil'*rho,size(parameters.n_frq));
                                            
 end
 

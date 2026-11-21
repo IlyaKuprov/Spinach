@@ -35,9 +35,8 @@ function [pcs,pcs_tensor]=hfc2pcs(A,chi,isotope)
 % Check consistency
 grumble(A,chi,isotope);
 
-% Keep rank 2 to generate only the pseudocontact part
-[~,~,rank2]=mat2sphten(A);     A=sphten2mat(0,[0 0 0],rank2);
-[~,~,rank2]=mat2sphten(chi); chi=sphten2mat(0,[0 0 0],rank2);
+% Keep rank 2 of the hyperfine tensor to drop the contact part
+[~,~,rank2]=mat2sphten(A); A=sphten2mat(0,[0 0 0],rank2);
 
 % Fundamental constants
 gamma_n=spin(isotope); 
@@ -47,7 +46,7 @@ mu0=4*pi*1e-7;
 % Collect fundamental constants
 C=10^4*gamma_n*hbar*mu0/(4*pi*(1e-10)^3);
 
-% Compute the full paramagnetic shift tensor
+% Compute the pseudocontact shift tensor
 pcs_tensor=1e6*(1/(4*pi))*A*chi/C;
 
 % Compute the isotropic part

@@ -358,6 +358,8 @@ analytical two-spin trace `deer=deer_analyt(D,J,t)`, plus `eseem`,
 **EPR hyperfine** (`experiments/esr_hyperfine/`) - `endor_cw` (fast
 isotropic CW-ENDOR), `endor_davies` (explicit soft pulses, orientation
 selection), `endor_mims`, `endor_mims_ideal`, `endor_mims_echo`, `hyscore`.
+In `endor_mims_ideal`, the spectrum has the same shape as the RF offset grid
+`parameters.n_frq`.
 
 **Hyperpolarisation** (`experiments/hyperpol/`) - `dnp_field_scan`,
 `dnp_freq_scan`, `dnp_time_dep`, `beamdnp`, and the pairs `noveldnp`,
@@ -493,7 +495,7 @@ plot_2d(spin_system,real(spectrum),parameters,20,[0.02 0.2 0.02 0.2],2,256,6,'bo
 ```
 
 `plot_2d` transposes internally and reverses both axes, so the F2-in-dimension-1
-convention above comes out the right way round. Related plotters:
+convention above comes out the right way round. In `slice_2d`, clicking a point selects a row for the F1 trace and a column for the F2 trace. Related plotters:
 `plot_3d(spin_system,spectrum,parameters,nsurf,delta,k,signs)`,
 `stack_2d(spin_system,spectrum,parameters,stack_dim,alpha_fun)`, `slice_2d`
 and `int_2d` (as `plot_2d`, `int_2d` with a trailing filename), `plot_uf`,

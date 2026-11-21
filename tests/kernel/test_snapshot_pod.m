@@ -1,3 +1,4 @@
+% Test: kernel/snapshot_pod | Snapshot POD model reduction
 % Tests weighted snapshot POD, complex affine Galerkin projection, and
 % reduced observables against known subspaces, a triangular dissipative
 % solution, and ordinary Spinach evolution. Syntax:

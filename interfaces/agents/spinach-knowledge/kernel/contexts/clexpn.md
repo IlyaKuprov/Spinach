@@ -33,7 +33,7 @@ The experiment owns cce.numerics.propagator; graph and cluster-selection calls r
 
 Before propagation, the resolved representation validates the numerical preference: eig for Hilbert dynamics, stock for Liouville dynamics, with expm additionally available for generalised Hahn echo. Unknown or incompatible preferences are rejected rather than discarded.
 
-The disjoint and disjoint_inter expansion families fix the retained physical-group order at one and two, respectively, independently of a supplied generic order. This resolution precedes cluster enumeration and reduction: disjoint_inter must retain inter-group pairs even when the caller supplied order one. The resolved order is visible in diagnostics.parameters.cce.order.
+The disjoint and disjoint_inter expansion families fix the retained physical-group order at one and two, respectively, capped by the number of bath spins, independently of a supplied generic order. This resolution precedes cluster enumeration and reduction: disjoint_inter must retain inter-group pairs even when the caller supplied order one. The resolved order is visible in diagnostics.parameters.cce.order.
 
 A projected request is rejected before subsystem construction when its registered experiment does not support projected generators. Finite_drive and refocusing_train therefore cannot silently discard driven observed-spin population transfer.
 

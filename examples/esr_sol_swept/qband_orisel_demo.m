@@ -49,13 +49,13 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Compute and display the three orientation selections
-figure(); tiledlayout(1,3);
+kfigure(); scale_figure([numel(fields) 1.0]);
 for n=1:numel(fields)
-    parameters.magnetic=fields(n);
+    parameters.magnetic=fields(n); subplot(1,numel(fields),n);
     [selection_grid,selection]=epr_orisel_grid(spin_system,parameters);
-    nexttile();
     plot_orisel(selection.grid,selection.selected_weights,1);
-    title(sprintf('%.4f T (%d orientations)',fields(n),numel(selection_grid.weights)));
+    ktitle(sprintf('%.4f T (%d pts)',fields(n),...
+           numel(selection_grid.weights))); drawnow;
 end
 
 end

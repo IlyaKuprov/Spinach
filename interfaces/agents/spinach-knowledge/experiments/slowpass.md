@@ -40,6 +40,8 @@ Set `parameters.mode='saturated'` to solve the driven steady state at each offse
 
 Requires sphten-liouv, explicit matrices, thermalised relaxation, and a unique stationary solution after each substance population is fixed. Population-changing kinetics are rejected. Spin-only contexts and gridfree with its uniform orientational distribution are supported; other spatial contexts and orienting potentials are outside the contract. Keep longitudinal and both transverse coherence orders in the basis. No trajectory reduction is applied.
 
-The CPU path uses direct backslash up to 100000 active coordinates and scaled, shifted-ILU right-preconditioned GMRES above that. Factors are recomputed at each offset; the shift affects only the preconditioner. Iterative convergence and the unpreconditioned relative residual are checked at 1e-6. There is no GPU or polyadic path.
+Both modes sweep systems of the form `(A + omega*B)*rho = source`. In linear mode the shift acts as the identity (with the resolvent factor of i); in saturated mode it acts as the irradiated isotope’s longitudinal commutator on the unpinned coordinates.
+
+The saturated CPU path uses direct backslash up to 100000 active coordinates and scaled, shifted-ILU right-preconditioned GMRES above that. Factors are recomputed at each offset; the shift affects only the preconditioner. Iterative convergence and the unpreconditioned relative residual are checked at 1e-6. There is no GPU or polyadic path.
 
 The three sle_esr_sat examples in examples/esr_sol_swept illustrate nitroxide microwave saturation and rotational diffusion using the parameters of Gupta, Dzikovski, and Freed, DOI 10.1007/s00723-021-01390-7. Their headers distinguish the adopted relaxation, sampling, and amplitude conventions from exact published numerical reproduction.

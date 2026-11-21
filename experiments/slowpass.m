@@ -66,15 +66,16 @@ function spectrum=slowpass(spin_system,parameters,H,R,K)
 
 % Check consistency
 if ~isfield(parameters,'mode'), parameters.mode='linear'; end
-grumble(spin_system,parameters,H,R,K);
+grumble('inputs');
 
 % Get the frequency grid
 freq_grid=2*pi*linspace(parameters.sweep(1),...
                         parameters.sweep(2),...
                         parameters.npoints)';
 
-% A finite drive requires the stationary density rather than a free-induction resolvent
-if strcmp(parameters.mode,'saturated')
+% Prepare the offset-independent quantities for each experiment
+saturated=strcmp(parameters.mode,'saturated');
+if saturated
 
     % Build the irradiation and the sweep superoperators in spin space
     irr_op=operator(spin_system,'Lx',parameters.spins{1});
@@ -92,270 +93,232 @@ if strcmp(parameters.mode,'saturated')
     % Locate the rank-zero unit coordinate of every substance
     unit_idx=spin_system.bas.offsets(1:end-1)+1;
 
-    % Require a thermal source
-    if norm(L(:,unit_idx),1)<=spin_system.tols.liouv_zero
-        error('relaxation superoperator is not thermalised, set inter.equilibrium.');
-    end
-
-    % Refuse to run when the unit coordinate is not a conserved quantity
-    if norm(L(unit_idx,:),1)>spin_system.tols.liouv_zero
-        error('the unit coordinate is not conserved, check relaxation and kinetics.');
-    end
-
     % Pin the conserved substance concentrations
     active=true(size(L,1),1);
     active(unit_idx)=false;
 
     % Thermal source term, independent of the sweep and of the irradiation
-    source=-L(active,unit_idx)*spin_system.chem.concs(:);
+    rho0_subs=-L(active,unit_idx)*spin_system.chem.concs(:);
 
     % Project the Liouvillian, the sweep generator, and the detection state
-    L=L(active,active);
+    L_subs=L(active,active);
     sweep_op=sweep_op(active,active);
-    coil=parameters.coil(active);
+    coil_subs=parameters.coil(active);
 
     % Include the known contribution of the pinned coordinates
     spectrum=(parameters.coil(unit_idx)'*spin_system.chem.concs(:))*ones(size(freq_grid));
 
-    % Use the iterative solver for large active spaces
-    if size(L,1)>1e5
+    nblocks=1;
 
-        % Inform the user
-        report(spin_system,'using preconditioned CPU GMRES path...');
+else
 
-        % Get the scale of the problem from the nonzero diagonal elements
-        diag_mags=full(abs(diag(L)));
-        diag_scale=median(diag_mags(diag_mags>0));
+    % Move into adjoint representation if needed
+    [spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K);
 
-        % Scale the equation before iterative solution
-        L=L/diag_scale;
-        sweep_op=sweep_op/diag_scale;
-        source=source/diag_scale;
+    % Compose the Liouvillian
+    L=H+1i*R+1i*K;
 
-        % Factor each shifted field point and measure the physical residual
-        parfor n=1:numel(freq_grid)
-            A=L+freq_grid(n)*sweep_op;
-            [M1,M2]=ilu(A+1e-6*speye(size(A)),struct('type','crout','droptol',1e-3));
-            action=@(x)A*(M2\(M1\x));
-            [rho,flag]=gmres(action,full(source),10,1e-6,numel(source));
-            rho=M2\(M1\rho);
-            residual=norm(A*rho-source);
-            if (flag~=0)||(residual>1e-6*norm(source))
-                error('steady-state GMRES did not converge at offset %g Hz.',freq_grid(n)/(2*pi));
-            end
-            spectrum(n)=spectrum(n)+coil'*rho;
+    % Compute subspace projectors
+    projectors=reduce(spin_system,L,parameters.coil);
+
+    % Get identity directions only in Liouville-space formalisms
+    U=sparse(size(L,1),0);
+    if ~strcmp(spin_system.bas.formalism,'zeeman-wavef')
+
+        % Get normalised unit states, one per substance
+        U=cell(1,spin_system.bas.nsubst);
+        for n=1:spin_system.bas.nsubst
+            unit_system=spin_system; unit_system.chem.concs(:)=0;
+            unit_system.chem.concs(n)=1; U{n}=unit_state(unit_system);
         end
+        U=[U{:}];
 
-    else
-
-        % Inform the user
-        report(spin_system,'using CPU backslash path...');
-
-        % Run the sweep in parallel
-        parfor n=1:numel(freq_grid)
-            spectrum(n)=spectrum(n)+coil'*((L+freq_grid(n)*sweep_op)\source);
+        % Embed the spin identities in every spatial basis coordinate
+        if isfield(parameters,'spc_dim')
+            U=kron(speye(parameters.spc_dim),U);
         end
-
     end
 
-    % Refuse a non-finite stationary solution
-    if any(~isfinite(spectrum)), error('steady-state solve returned non-finite values.'); end
-    return;
+    spectrum=zeros(size(freq_grid),'like',1i);
+    nblocks=numel(projectors);
 
 end
 
-% Preallocate the answer
-spectrum=zeros(size(freq_grid),'like',1i);
+% Solve the same shifted system in every contributing block
+for k=1:nblocks
 
-% Move into adjoint representation if needed
-[spin_system,parameters,H,R,K]=sim2liouv(spin_system,parameters,H,R,K);
+    % Linear response uses a projected resolvent in each detection subspace
+    if ~saturated
 
-% Compose the Liouvillian
-L=H+1i*R+1i*K;
+        % Project into the current subspace
+        rho0_subs=projectors{k}'*parameters.rho0;
+        coil_subs=projectors{k}'*parameters.coil;
+        L_subs=projectors{k}'*L*projectors{k};
 
-% Compute subspace projectors
-projectors=reduce(spin_system,L,parameters.coil);
+        % Normalise the projected identity directions
+        U_subs=projectors{k}'*U; U_subs=U_subs(:,any(U_subs,1));
+        U_subs=U_subs./sqrt(sum(abs(U_subs).^2,1));
 
-% Get identity directions only in Liouville-space formalisms
-U=sparse(size(L,1),0);
-if ~strcmp(spin_system.bas.formalism,'zeeman-wavef')
+        % Remove identities only when they decouple from spin order in both directions
+        unit_block=U_subs'*L_subs*U_subs;
+        if norm(L_subs*U_subs-U_subs*unit_block,1)<=spin_system.tols.liouv_zero&&...
+           norm(U_subs'*L_subs-unit_block*U_subs',1)<=spin_system.tols.liouv_zero
+            rho0_subs=rho0_subs-U_subs*(U_subs'*rho0_subs);
+            coil_subs=coil_subs-U_subs*(U_subs'*coil_subs);
+            L_subs=L_subs-1i*(U_subs*U_subs');
+        end
 
-    % Get normalised unit states, one per substance
-    U=cell(1,spin_system.bas.nsubst);
-    for n=1:spin_system.bas.nsubst
-        unit_system=spin_system; unit_system.chem.concs(:)=0;
-        unit_system.chem.concs(n)=1; U{n}=unit_state(unit_system);
+        L_subs=1i*L_subs;
+        sweep_op=1i*speye(size(L_subs));
+
     end
-    U=[U{:}];
 
-    % Embed the spin identities in every spatial basis coordinate
-    if isfield(parameters,'spc_dim')
-        U=kron(speye(parameters.spc_dim),U);
-    end
-end
-
-% Loop over subspaces
-for k=1:numel(projectors)
-    
-    % Project into the current subspace
-    rho0_subs=projectors{k}'*parameters.rho0;
-    coil_subs=projectors{k}'*parameters.coil;
-    L_subs=projectors{k}'*L*projectors{k};
-    Id_subs=speye(size(L_subs));
-
-    % Normalise the projected identity directions
-    U_subs=projectors{k}'*U; U_subs=U_subs(:,any(U_subs,1));
-    U_subs=U_subs./sqrt(sum(abs(U_subs).^2,1));
-
-    % Remove identities only when they decouple from spin order in both directions
-    unit_block=U_subs'*L_subs*U_subs;
-    if norm(L_subs*U_subs-U_subs*unit_block,1)<=spin_system.tols.liouv_zero&&...
-       norm(U_subs'*L_subs-unit_block*U_subs',1)<=spin_system.tols.liouv_zero
-        rho0_subs=rho0_subs-U_subs*(U_subs'*rho0_subs);
-        coil_subs=coil_subs-U_subs*(U_subs'*coil_subs);
-        L_subs=L_subs-1i*(U_subs*U_subs');
-    end
-    
-    % Run backslash on the GPU if instructed
-    if ismember('gpu',spin_system.sys.enable)
-        
-        % Inform the user
+    % Select the backend before sweeping the offsets
+    use_gpu=~saturated&&ismember('gpu',spin_system.sys.enable);
+    iterative=~use_gpu&&(size(rho0_subs,2)==1)&&...
+              ((saturated&&(size(L_subs,1)>1e5))||(~saturated&&(size(L_subs,1)>5000)));
+    M1=[]; M2=[];
+    if use_gpu
         report(spin_system,'using GPU backslash path...');
-        
-        % Move the objects to GPU
-        rho0_subs=gpuArray(full(rho0_subs)); L_subs=gpuArray(full(L_subs));
-        coil_subs=gpuArray(full(coil_subs)); Id_subs=gpuArray(Id_subs);
-        
-        % Run the calculation using backslash
-        parfor n=1:numel(freq_grid)
-            spectrum_subs=dot(coil_subs,((1i*L_subs+1i*freq_grid(n)*Id_subs)\rho0_subs));
-            spectrum(n)=spectrum(n)+gather(spectrum_subs);
+        L_subs=gpuArray(full(L_subs)); sweep_op=gpuArray(sweep_op);
+        rho0_subs=gpuArray(full(rho0_subs)); coil_subs=gpuArray(full(coil_subs));
+    elseif iterative
+        report(spin_system,'using preconditioned CPU GMRES path...');
+        if saturated
+            diag_mags=full(abs(diag(L_subs)));
+            diag_scale=median(diag_mags(diag_mags>0));
+            L_subs=L_subs/diag_scale; sweep_op=sweep_op/diag_scale;
+            rho0_subs=full(rho0_subs/diag_scale);
+        else
+            [M1,M2]=ilu(L_subs+mean(freq_grid)*sweep_op,struct('type','crout','droptol',1e-3));
         end
-        
     else
-       
-        % For large problems use GMRES
-        if (size(rho0_subs,1)>5000)&&(size(rho0_subs,2)==1)
-            
-            % Inform the user
-            report(spin_system,'using preconditioned CPU GMRES path...');
-            
-            % Get preconditioners
-            [M1,M2]=ilu(1i*L_subs+1i*mean(freq_grid)*Id_subs,...
-                        struct('type','crout','droptol',1e-3));
-            report(spin_system,['nnz(L)='    num2str(nnz(L_subs)) ...
-                                ', nnz(M1)=' num2str(nnz(M1))     ...
-                                ', nnz(M2)=' num2str(nnz(M2))]);
-
-            % Run the calculation in parallel
-            parfor n=1:numel(freq_grid)
-            
-                % Run using preconditioned GMRES
-                spectrum(n)=spectrum(n)+coil_subs'*gmres(1i*L_subs+1i*freq_grid(n)*Id_subs,...
-                                        rho0_subs,10,1e-6,numel(rho0_subs),M1,M2);
-                
-            end
-            
-        else   
-            
-            % Inform the user
-            report(spin_system,'using CPU backslash path...');
-            
-            % Run the calculation in parallel
-            parfor n=1:numel(freq_grid)
-                
-                % Run using backslash on CPU
-                spectrum(n)=spectrum(n)+dot(coil_subs,((1i*L_subs+1i*freq_grid(n)*Id_subs)\rho0_subs));
-                
-            end
-            
-        end
-    
+        report(spin_system,'using CPU backslash path...');
     end
-    
+
+    % Solve, detect, and accumulate each frequency point
+    flags=zeros(size(freq_grid)); residuals=zeros(size(freq_grid));
+    parfor n=1:numel(freq_grid)
+        A=L_subs+freq_grid(n)*sweep_op;
+        if iterative
+            if saturated
+                [P,Q]=ilu(A+1e-6*speye(size(A)),struct('type','crout','droptol',1e-3));
+                action=@(x)A*(Q\(P\x));
+            else
+                action=A;
+            end
+            [rho,flag]=gmres(action,rho0_subs,10,1e-6,numel(rho0_subs),M1,M2);
+            if saturated
+                rho=Q\(P\rho);
+                flags(n)=flag; residuals(n)=norm(A*rho-rho0_subs);
+            end
+        else
+            rho=A\rho0_subs;
+        end
+        response=dot(coil_subs,rho);
+        if use_gpu, response=gather(response); end
+        spectrum(n)=spectrum(n)+response;
+    end
+
 end
 
-% Get the sampling rate implied by the frequency grid
-sample_rate=abs(parameters.sweep(2)-parameters.sweep(1))*...
-            parameters.npoints/(parameters.npoints-1);
-
-% Match the unnormalised FFT amplitude convention
-spectrum=spectrum*sample_rate;
-
+% Only the linear resolvent uses the unnormalised FFT convention
+if saturated
+    grumble('solution');
+else
+    spectrum=spectrum*(abs(parameters.sweep(2)-parameters.sweep(1))*...
+                       parameters.npoints/(parameters.npoints-1));
 end
 
 % Consistency enforcement
-function grumble(spin_system,parameters,H,R,K)
-if (~ischar(parameters.mode))||(~isrow(parameters.mode))||...
-   (~ismember(parameters.mode,{'linear','saturated'}))
-    error('parameters.mode must be either linear or saturated.');
-end
-if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
-   (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
-    error('H, R and K arguments must be matrices.');
-end
-if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
-    error('H, R and K matrices must have the same dimension.');
-end
-if ~isfield(parameters,'sweep')
-    error('spectral range must be specified in parameters.sweep variable.');
-end
-if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||(numel(parameters.sweep)~=2)
-    error('parameters.sweep vector must have two real elements');
-end
-if ~isfield(parameters,'npoints')
-    error('number of points must be specified in parameters.npoints variable.');
-end
-if (~isnumeric(parameters.npoints))||(numel(parameters.npoints)~=1)||...
-   (~isreal(parameters.npoints))||(parameters.npoints<2)||(mod(parameters.npoints,1)~=0)
-    error('parameters.npoints should be an integer greater than one.');
-end
-if ~isfield(parameters,'coil')
-    error('the detection state must be specified in parameters.coil variable.');
-end
-if (~isnumeric(parameters.coil))||(~ismatrix(parameters.coil))
-    error('parameters.coil must be a numeric matrix.');
-end
-if size(parameters.coil,1)~=size(H,2)
-    error('parameters.coil must have the same number of rows as H.');
-end
-if strcmp(parameters.mode,'linear')
-    if ~isfield(parameters,'rho0')
-        error('the initial state must be specified in parameters.rho0 variable.');
+    function grumble(stage)
+        if strcmp(stage,'solution')
+            failed=find((flags~=0)|(residuals>1e-6*norm(rho0_subs)),1);
+            if ~isempty(failed)
+                error('steady-state GMRES did not converge at offset %g Hz.',freq_grid(failed)/(2*pi));
+            end
+            if any(~isfinite(spectrum)), error('steady-state solve returned non-finite values.'); end
+            return;
+        end
+        if (~ischar(parameters.mode))||(~isrow(parameters.mode))||...
+           (~ismember(parameters.mode,{'linear','saturated'}))
+            error('parameters.mode must be either linear or saturated.');
+        end
+        if (~isnumeric(H))||(~isnumeric(R))||(~isnumeric(K))||...
+           (~ismatrix(H))||(~ismatrix(R))||(~ismatrix(K))
+            error('H, R and K arguments must be matrices.');
+        end
+        if (~all(size(H)==size(R)))||(~all(size(R)==size(K)))
+            error('H, R and K matrices must have the same dimension.');
+        end
+        if ~isfield(parameters,'sweep')
+            error('spectral range must be specified in parameters.sweep variable.');
+        end
+        if (~isnumeric(parameters.sweep))||(~isreal(parameters.sweep))||(numel(parameters.sweep)~=2)
+            error('parameters.sweep vector must have two real elements');
+        end
+        if ~isfield(parameters,'npoints')
+            error('number of points must be specified in parameters.npoints variable.');
+        end
+        if (~isnumeric(parameters.npoints))||(numel(parameters.npoints)~=1)||...
+           (~isreal(parameters.npoints))||(parameters.npoints<2)||(mod(parameters.npoints,1)~=0)
+            error('parameters.npoints should be an integer greater than one.');
+        end
+        if ~isfield(parameters,'coil')
+            error('the detection state must be specified in parameters.coil variable.');
+        end
+        if (~isnumeric(parameters.coil))||(~ismatrix(parameters.coil))
+            error('parameters.coil must be a numeric matrix.');
+        end
+        if size(parameters.coil,1)~=size(H,2)
+            error('parameters.coil must have the same number of rows as H.');
+        end
+        if strcmp(parameters.mode,'linear')
+            if ~isfield(parameters,'rho0')
+                error('the initial state must be specified in parameters.rho0 variable.');
+            end
+            if (~isnumeric(parameters.rho0))||(~ismatrix(parameters.rho0))
+                error('parameters.rho0 must be a numeric matrix.');
+            end
+            if size(parameters.rho0,1)~=size(H,2)
+                error('parameters.rho0 must have the same number of rows as H.');
+            end
+        else
+            if size(H,1)~=size(H,2)
+                error('saturated mode requires square generators.');
+            end
+            if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
+                error('saturated mode requires spherical-tensor Liouville space.');
+            end
+            if any(~isfinite(parameters.sweep))
+                error('parameters.sweep must contain finite offsets.');
+            end
+            if (~iscolumn(parameters.coil))||any(~isfinite(nonzeros(parameters.coil)))
+                error('saturated mode requires a single finite detection column.');
+            end
+            if ~isfield(parameters,'spins')
+                error('the irradiated isotope must be specified in parameters.spins variable.');
+            end
+            if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
+                error('parameters.spins must be a cell array with one character string.');
+            end
+            if ~isfield(parameters,'irr_powers')
+                error('the nutation frequency must be specified in parameters.irr_powers variable.');
+            end
+            if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
+               (~isscalar(parameters.irr_powers))||(parameters.irr_powers<0)||(~isfinite(parameters.irr_powers))
+                error('parameters.irr_powers must be a finite non-negative real scalar.');
+            end
+            unit_idx=spin_system.bas.offsets(1:end-1)+1;
+            if norm(H(:,unit_idx)+1i*R(:,unit_idx)+1i*K(:,unit_idx),1)<=spin_system.tols.liouv_zero
+                error('relaxation superoperator is not thermalised, set inter.equilibrium.');
+            end
+            if norm(H(unit_idx,:)+1i*R(unit_idx,:)+1i*K(unit_idx,:),1)>spin_system.tols.liouv_zero
+                error('the unit coordinate is not conserved, check relaxation and kinetics.');
+            end
+        end
     end
-    if (~isnumeric(parameters.rho0))||(~ismatrix(parameters.rho0))
-        error('parameters.rho0 must be a numeric matrix.');
-    end
-    if size(parameters.rho0,1)~=size(H,2)
-        error('parameters.rho0 must have the same number of rows as H.');
-    end
-else
-    if size(H,1)~=size(H,2)
-        error('saturated mode requires square generators.');
-    end
-    if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
-        error('saturated mode requires spherical-tensor Liouville space.');
-    end
-    if any(~isfinite(parameters.sweep))
-        error('parameters.sweep must contain finite offsets.');
-    end
-    if (~iscolumn(parameters.coil))||any(~isfinite(nonzeros(parameters.coil)))
-        error('saturated mode requires a single finite detection column.');
-    end
-    if ~isfield(parameters,'spins')
-        error('the irradiated isotope must be specified in parameters.spins variable.');
-    end
-    if (~iscell(parameters.spins))||(numel(parameters.spins)~=1)||(~ischar(parameters.spins{1}))
-        error('parameters.spins must be a cell array with one character string.');
-    end
-    if ~isfield(parameters,'irr_powers')
-        error('the nutation frequency must be specified in parameters.irr_powers variable.');
-    end
-    if (~isnumeric(parameters.irr_powers))||(~isreal(parameters.irr_powers))||...
-       (~isscalar(parameters.irr_powers))||(parameters.irr_powers<0)||(~isfinite(parameters.irr_powers))
-        error('parameters.irr_powers must be a finite non-negative real scalar.');
-    end
-end
+
 end
 
 % "Our first rule here, Miss Taggart," he answered, "is that

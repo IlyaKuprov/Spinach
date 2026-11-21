@@ -1,3 +1,4 @@
+% Test: manual
 % Tests optional SpGEMM MEX loading without modifying shipped binaries. Syntax:
 %
 %                       test_alg3_fallback()

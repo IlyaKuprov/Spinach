@@ -1,3 +1,4 @@
+% Test: kernel/fft_echo | Matrix-free MAS echo parity
 % Compare small MAS echoes with explicit and FFT rotor derivatives.
 % Syntax:
 %

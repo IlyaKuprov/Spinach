@@ -106,10 +106,10 @@
       "tests/list_tests.m",
       "tests/run_test.m",
       "tests/run_tests.m",
-      "tests/lib/test_manifest.m"
+      "tests/lib/discover_tests.m"
     ],
     "contracts": [
-      "run_test requires one match by ID or name; run_tests can filter multiple entries. Registration in test_manifest, not merely placing a function under tests, makes it part of the ordinary suite."
+      "run_test requires one match by ID or name; run_tests can filter multiple entries. Individual test headers declare their IDs and names; manual-only tests are not scheduled."
     ],
     "change_guidance": [
       "Register new regressions beside tests for the affected boundary. Use a physical invariant or an independent reference; an example reproduces a workflow but is not automatically a registered test."

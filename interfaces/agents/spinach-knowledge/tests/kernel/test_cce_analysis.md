@@ -32,7 +32,6 @@ result=test_cce_analysis()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_analysis.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Native parameter structures preserve fitted amplitude, time constant and exponent bitwise. A misspelled analysis option is rejected by the local analysis contract.
 

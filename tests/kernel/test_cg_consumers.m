@@ -1,3 +1,4 @@
+% Test: kernel/cg_consumers | CG consumer conventions
 % Tests CG phases and their SLE and PCS consumers. Syntax:
 %
 %                      result=test_cg_consumers()

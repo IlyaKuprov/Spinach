@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_filters | CWDM per-substance basis filters
 % Tests substance-local basis settings and direct-sum descriptor invariants.
 % Syntax:
 %
@@ -174,3 +175,5 @@ for formalism={'zeeman-hilb','zeeman-wavef','zeeman-liouv'}
 end
 
 end
+
+

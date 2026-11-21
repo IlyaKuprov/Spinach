@@ -1,3 +1,4 @@
+% Test: kernel/oia_pulse | Offset-independent adiabaticity pulses
 % Tests offset-independent adiabaticity pulses. Syntax:
 %
 %                    result=test_oia_pulse()

@@ -1,3 +1,4 @@
+% Test: kernel/remtrace_tensor | Traceless rank-two tensor construction
 % Tests removal of the isotropic tensor trace. Syntax:
 %
 %                    result=test_remtrace_tensor()

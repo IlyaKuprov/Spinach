@@ -1,3 +1,4 @@
+% Test: kernel/multiprop_adaptive | Adaptive repeated propagator application
 % Tests adaptive repeated propagator application. Syntax:
 %
 %                    result=test_multiprop_adaptive()

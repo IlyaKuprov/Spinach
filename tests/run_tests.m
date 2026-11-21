@@ -49,7 +49,7 @@ addpath(genpath(fullfile(spinach_root,'kernel')));
 options=test_options(varargin{:});
 
 % Get the manifest
-manifest=test_manifest();
+manifest=discover_tests();
 
 % Apply substring filter
 if ~isempty(options.pattern)

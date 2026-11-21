@@ -1,6 +1,6 @@
-# cce_p1_electron_bath
+# p1_pair_levels
 
-`cce_p1_electron_bath()` plots the relative
+`p1_pair_levels()` plots the relative
 P1-pair energies and active electron flip-flop channels of Park et al.,
 [Fig. 5a,c,d](https://doi.org/10.1038/s41534-022-00605-4), at 500 G along
 [111]. A P1 centre comprises an electron and a co-located ¹⁴N nucleus.

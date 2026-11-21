@@ -64,6 +64,11 @@ change physics rather than performance are `inter_cutoff`, below which coupling
 tensors are discarded (2-norm, in Hz), and `prox_cutoff`, which bounds the
 distance over which spins count as proximate.
 
+Use `[sys,inter]=s2spinach(filename)` for a single literal `spinsys` block.
+Add `sys.magnet` before `create`; nonzero chemical shifts must be in ppm
+with the `p` suffix. The reader does not evaluate pulse programs or set the
+Hamiltonian approximation.
+
 ## Isotope naming
 
 `spin(name)` is the database behind `sys.isotopes`; it returns the magnetogyric

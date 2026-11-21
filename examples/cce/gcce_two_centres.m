@@ -23,6 +23,7 @@ parameters.observed=[1 2];
 parameters.transition=struct('spins',[1 2],'ms',[0.5 -0.5;0.5 -0.5]);
 parameters.times=40e-6;
 parameters.cce.order=2;
+parameters.cce.numerics.max_memory_bytes=2^24;
 parameters.cce.approximation='generalized';
 parameters.cce.basis.formalism='zeeman-hilb';
 parameters.cce.bath_state=struct('mode','explicit_product',...

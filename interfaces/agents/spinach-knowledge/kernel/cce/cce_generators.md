@@ -24,7 +24,7 @@ First-order projected Hamiltonians are conditional approximations, not a require
 
 Coherent projected generators additionally expose the compiled Hamiltonian round-off estimate and full retained Hamiltonian Frobenius norm for experiment-owned propagation error accounting.
 
-Zero-rate records are omitted before support and manifold-closure checks. An active jump split across retained and exterior spins is rejected with cce:jumpSupport. A wholly exterior active jump is omitted only when it does not drive a declared static exterior field; otherwise cce:exteriorJump is raised. The projected jump and loss-operator leakage checks retain their relative operator-norm bounds, without an absolute scale floor.
+Zero-rate records are omitted before support and manifold-closure checks. An active jump split across retained and exterior spins is rejected with cce:jumpSupport. A wholly exterior active jump is omitted only when it does not drive a declared static exterior field; otherwise cce:exteriorJump is raised. The explicit periodic-segment approximation is the exception: it freezes the exterior and omits wholly exterior jumps without allowing split supports. The projected jump and loss-operator leakage checks retain their relative operator-norm bounds, without an absolute scale floor.
 
 Resident jump and superoperator storage is checked before Hamiltonian construction and projected-manifold closure. An insufficient allocation budget is therefore rejected before building matrices or examining leakage, on both projected and generalised direct-service paths. Storage admission does not change the physical jump algebra.
 

@@ -36,7 +36,9 @@
 % Canonical tensors and declared pump frequencies are not converted.
 % noise.descriptors contains operators, spins, and coefficient; its physical
 % validation and retained-cluster matrix construction belong to noise_correlation.
-% New experiment-specific fields must be added explicitly to this contract.
+% Periodic segments require fixed-order projected free induction, a single
+% cycle, and an explicit static exterior product state. Exterior jumps are
+% omitted in this approximation; active jumps with split support are refused.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -300,7 +302,7 @@ if ~isempty(intersect(ids,bath))
     error('cce_options:ownership','Observed and bath spin IDs must be disjoint.');
 end
 choice(c.approximation,{'projected','generalized'},'cce.approximation');
-choice(c.expansion,{'standard','partition','disjoint','disjoint_inter'},'cce.expansion');
+choice(c.expansion,{'standard','partition','disjoint','disjoint_inter','periodic_segments'},'cce.expansion');
 choice(c.averaging,{'after_expansion','internal_then_expansion'},'cce.averaging');
 choice(c.reducer,{'powers','direct'},'cce.reducer');
 choice(c.backend,{'auto','direct','stock'},'cce.backend');
@@ -364,7 +366,17 @@ if isfield(c,'groups')
         error('cce_options:groups','Groups must partition the selected bath exactly once.');
     end
 end
-if ~strcmp(c.expansion,'standard')&&~isfield(c,'groups')&&~isfield(c,'partition')
+if strcmp(c.expansion,'periodic_segments')
+    if (~isequal(experiment,@free_evolution)&&~isequal(experiment,@cce_compile))||...
+       ~strcmp(c.approximation,'projected')||~strcmp(c.meanfield,'static')||...
+       ~strcmp(c.bath_state.mode,'explicit_product')||~strcmp(c.reducer,'powers')||...
+       isempty(c.order)||c.order<1||c.order>=numel(bath)||...
+       any(isfield(c,{'groups','partition','convergence','meanfield_radius'}))||...
+       (isfield(p,'output')&&~strcmp(p.output,'signal'))
+        error('cce_options:periodicSegments',...
+              'Periodic segments require a truncated, projected free-induction signal with fixed exterior states.');
+    end
+elseif ~strcmp(c.expansion,'standard')&&~isfield(c,'groups')&&~isfield(c,'partition')
     error('cce_options:partition','Partitioned expansion needs groups or an explicit partition policy.');
 end
 if ~isfield(c.graph,'mode')

@@ -12,7 +12,8 @@
 % parameters.bath_jumps uses support, operator, and rate; supported spin
 % descriptors are L+, L-, Lx, Ly, and Lz, or explicit ordered matrices.
 % Zero-rate jumps are omitted before closure checks; active split supports
-% and exterior jumps driving a frozen mean field are refused.
+% and exterior jumps driving a frozen mean field are refused, except that
+% periodic_segments explicitly freezes the exterior and omits exterior jumps.
 % Projected H has kind='cce_projected', left/right Hamiltonians and a
 % dissipator acting on column-vectorised bath coherence. R and K are []:
 % the tagged object, not numeric addition, goes to cce_evolution. Swap
@@ -49,6 +50,7 @@ ids=cluster_system.physical_ids;
 d=cluster_system.dimension;
 db=cluster_system.bath_dimension;
 projected=strcmp(parameters.cce.approximation,'projected');
+periodic=strcmp(model.parameters.cce.expansion,'periodic_segments');
 jumps=[];
 if isfield(parameters,'bath_jumps')
     jumps=parameters.bath_jumps;
@@ -190,7 +192,12 @@ if projected
     H.hamiltonian_abs_error_bound=meta.roundoff_bound;
     H.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)||strcmp(cluster_system.formalism,'zeeman-liouv')
-        [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb);
+        [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb,periodic);
+        if periodic
+            H.left=sparse(H.left);
+            H.right=sparse(H.right);
+            H.dissipator=sparse(H.dissipator);
+        end
 
         % Map each column-major bath entry to its transposed position
         labels=reshape(1:db^2,db,db).';
@@ -204,7 +211,7 @@ elseif strcmp(cluster_system.formalism,'zeeman-liouv')
     % Column-major vectorisation fixes the transposes and the relaxation sign
     memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*d^4));
     H=kron(eye(d),ham)-kron(ham.',eye(d));
-    [R,jump_records]=dissipator(cluster_system,jumps,[],[]);
+    [R,jump_records]=dissipator(cluster_system,jumps,[],[],false);
     K=zeros(size(H));
 else
     H=ham;
@@ -476,7 +483,7 @@ meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
 end
 
 % Assemble loss and jump terms for conventional or conditional density blocks
-function [R,records]=dissipator(system,jumps,va,vb)
+function [R,records]=dissipator(system,jumps,va,vb,omit_exterior)
 
 % Select the density dimension after the caller's allocation preflight
 ids=system.physical_ids;
@@ -498,7 +505,7 @@ for k=1:numel(jumps)
     end
     included=ismember(jump.support,ids);
     if ~any(included)
-        if any(ismember(jump.support,system.configuration.exterior_ids))
+        if ~omit_exterior&&any(ismember(jump.support,system.configuration.exterior_ids))
             error('cce:exteriorJump','An active exterior jump cannot drive a frozen mean field.');
         end
         continue

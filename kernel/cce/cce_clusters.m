@@ -1,4 +1,4 @@
-% Compile a downward-closed family of physical bath groups. Syntax:
+% Compile cluster families of physical bath groups. Syntax:
 %
 %             clusters=cce_clusters(model,graph,parameters)
 %
@@ -13,7 +13,8 @@
 % Output is sorted by (order,group IDs); proper_subsets are array indices,
 % mobius_power is signed int64, dimension includes the observed-spin system,
 % and bath_dimension excludes it. Empty-cluster raw data are separate.
-% All nonempty subsets are retained, including disconnected subsets.
+% All nonempty subsets are retained, including disconnected subsets, except
+% periodic_segments, which keeps only connected segments of one cycle.
 % selected_counts, actual_counts, and cap_overrun report closure costs;
 % family_id is the exact canonical family string, not a collision-prone
 % numeric hash. config_id=0 denotes the shared unconditioned spin_config.
@@ -156,9 +157,13 @@ for order=1:max_order
 
 end
 
-% Close the selected family by successive immediate-subset deletion
+% Close the selected family unless the model uses only periodic segments
 family=selected;
-for order=max_order:-1:2
+closure_order=max_order;
+if strcmp(parameters.expansion,'periodic_segments')
+    closure_order=1;
+end
+for order=closure_order:-1:2
 
     % Add immediate subsets and remove duplicate group combinations
     rows=family(cellfun(@numel,family)==order);
@@ -275,6 +280,9 @@ for k=1:numel(family)
         for n=1:size(rows,1)
             subkeys(n)=string(sprintf('%u,',rows(n,:)));
         end
+        if strcmp(parameters.expansion,'periodic_segments')
+            subkeys=subkeys(isKey(index,subkeys));
+        end
         children=sort(index(subkeys)).';
         subsets=[subsets children]; %#ok<AGROW>
     end
@@ -365,7 +373,7 @@ if ~isstruct(parameters)||~isscalar(parameters)||...
    ~isnumeric(parameters.order)||~isreal(parameters.order)||...
    ~isscalar(parameters.order)||~isfinite(parameters.order)||...
    parameters.order<0||parameters.order~=fix(parameters.order)||...
-   ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter'})
+   ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter','periodic_segments'})
     error('cce_clusters:parameters','nonnegative order and explicit expansion are required.');
 end
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
@@ -386,6 +394,14 @@ if isfield(parameters,'groups')&&~isempty(parameters.groups)
     ng=numel(parameters.groups);
 else
     ng=n;
+end
+if strcmp(parameters.expansion,'periodic_segments')
+    [~,~,components,~]=dmperm(speye(n)+graph.adjacency);
+    if n<3||any(sum(graph.adjacency,2)~=2)||numel(components)~=2||...
+       parameters.order<1||parameters.order>=n||...
+       any(isfield(parameters,{'groups','clusters','cluster_cap'}))
+        error('cce_clusters:periodicSegments','Periodic segments require all contiguous subsets of one cycle up to a truncated order.');
+    end
 end
 limit=parameters.order;
 if strcmp(parameters.expansion,'disjoint')

@@ -1,3 +1,4 @@
+% Test: kernel/ctx_powder_average | Powder weighted sum path
 % Tests powder averaging against explicit weighted summation. Syntax:
 %
 %                    result=test_ctx_powder_average()

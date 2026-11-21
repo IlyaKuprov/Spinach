@@ -1,3 +1,4 @@
+% Test: kernel/eseem_3p | Stimulated-echo ESEEM
 % Checks stimulated-echo ESEEM against dense Hilbert-space propagation
 % for an electron and a proton, with and without anisotropic hyperfine
 % coupling. Syntax:

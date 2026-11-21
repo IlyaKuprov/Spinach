@@ -1,70 +1,32 @@
-% A three-proton methyl-like group with coherent cyclic exchange.
-% doi:10.5194/mr-6-15-2025 motivates grouping, not these chosen tensors.
-% The deliberately small model is not a published material reproduction.
-% Syntax:
+% Recomputes the 36-proton Finland trityl core APPA curve in Fig. 7 of
+% Jeschke et al., doi:10.5194/mr-6-15-2025. Methyl tunnelling enters as
+% coherent intramethyl exchange, not as stochastic jumps. The measured
+% echo is overlaid with the scale factor used by the authors.
 %
-%             [answer,diagnostics]=cce_methyl_molecular()
+% Syntax: [answer,diagnostics]=cce_methyl_molecular()
 %
-% Returns the normalised complex signal column in answer and the calculation
-% diagnostics structure in diagnostics, with one entry per time point.
+% answer is the 2048-by-1 normalised Hahn echo. diagnostics contains the
+% total echo times in seconds and the powder quadrature and node traces.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function [answer,diagnostics]=cce_methyl_molecular()
 
-% Magnet and isotopes
-sys.magnet=0.01;
-sys.isotopes={'E','1H','1H','1H'};
-sys.output='hush';
-sys.parallel={'local',1};
+% Finland trityl core inputs from doi:10.5281/zenodo.13850793
+data=load(fullfile(fileparts(mfilename('fullpath')),'trityl_finland.mat'));
 
-% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
-inter.coordinates={[0 0 0];[5 1 0];[5 -0.5 0.866];[5 -0.5 -0.866]};
-inter.zeeman.matrix=repmat({zeros(3)},1,4);
-inter.coupling.matrix=cell(4);
+% Evaluate the pair expansion before averaging the powder
+times=linspace(0,40e-6,2048).';
+[answer,diagnostics]=trityl_appa(data.coords,data.hyperfine,data.tunnel,times);
 
-% Explicit illustrative hyperfine and bath coupling tensors in Hz
-inter.coupling.matrix{1,2}=[0 0 0;0 0 0;7000 0 5000].';
-inter.coupling.matrix{1,3}=[0 0 0;0 0 0;5000 0 4000].';
-inter.coupling.matrix{1,4}=[0 0 0;0 0 0;6000 0 3000].';
-inter.coupling.matrix{2,3}=2000*eye(3);
-inter.coupling.matrix{2,4}=2000*eye(3);
-inter.coupling.matrix{3,4}=2000*eye(3);
-
-% Coordinates define the toy geometry; all couplings above are explicit
-inter=rmfield(inter,'coordinates');
-
-% Basis policy for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
-
-% Projected transition and total echo times in seconds
-parameters.observed=1;
-parameters.cce.bath_spins=2:4;
-parameters.transition.spins=1;
-parameters.transition.ms=[1/2 -1/2];
-parameters.times=linspace(0,200e-6,41);
-parameters.cce.order=3;
-parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
-parameters.cce.expansion='disjoint';
-parameters.cce.groups={[2 3 4]};
-
-% Execute the named Hahn echo through the cluster-expansion context
-spin_system=create(sys,inter);
-[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
-
-% Plot the complex echo amplitude
-figure();
-plot(1e6*parameters.times,real(answer),'b-',...
-     1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
+% Compare with the measured trace in deuterated o-terphenyl
+kfigure();
+plot(1e6*times,answer,'b-',data.exp_time,data.exp_echo,'k.');
+xlim([0 max(data.exp_time)]);
+ylim([0 1]);
+kxlabel('Total echo time / $\mu$s');
+kylabel('Normalised Hahn echo');
+klegend('APPA (36 protons)','Experiment');
 kgrid();
 
 end

@@ -1,3 +1,4 @@
+% Test: manual
 % Tests the custom CUDA sparse product against independent CPU products.
 % Requires a supported GPU and the compiled gateway. Covers real/complex
 % combinations, rectangular shapes, cancellation, stored zeros, wide sparse

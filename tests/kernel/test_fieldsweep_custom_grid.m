@@ -1,3 +1,4 @@
+% Test: kernel/fieldsweep_custom_grid | Custom-grid field spectra
 % Tests named and explicit initial grids through adaptive fieldsweep. Syntax:
 %
 %                    result=test_fieldsweep_custom_grid()

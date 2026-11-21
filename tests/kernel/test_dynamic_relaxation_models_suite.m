@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_relaxation_models_suite | Dynamic relaxation model helpers
 % Tests dynamic relaxation model helper paths. Syntax:
 %
 %              result=test_dynamic_relaxation_models_suite()

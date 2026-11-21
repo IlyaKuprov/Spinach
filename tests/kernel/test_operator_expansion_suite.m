@@ -1,3 +1,4 @@
+% Test: kernel/operator_expansion_suite | Operator expansion and conversion helpers
 % Tests operator expansion and conversion helpers. Syntax:
 %
 %                    result=test_operator_expansion_suite()

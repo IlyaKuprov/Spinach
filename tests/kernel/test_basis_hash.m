@@ -1,3 +1,4 @@
+% Test: kernel/basis_hash | Cached basis row hashes
 % Tests cached full-row hashes and spherical-tensor consumers. Syntax:
 %
 %                       result=test_basis_hash()

@@ -1,6 +1,7 @@
 % Planar high-spin 11B/14N bath with explicit quadrupolar tensors.
-% doi:10.1038/s41563-024-01869-4; isotope and EFG material inputs are gated.
-% The deliberately small model is not a published material reproduction.
+% For material-specific Hahn echoes, see Haykal et al., Fig. 4a,b,
+% doi:10.1038/s41467-022-31743-0. This is a two-nucleus model, not a
+% reproduction of the bulk gCCE3 calculation.
 % Syntax:
 %
 %             [answer,diagnostics]=cce_hbn_quadrupoles()

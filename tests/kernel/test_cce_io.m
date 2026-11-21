@@ -1,3 +1,4 @@
+% Test: kernel/cce_io | CCE input and output
 % Versioned complex result round trips and explicit physical input units. Syntax:
 %
 %                    result=test_cce_io()

@@ -13,18 +13,14 @@ function cce_erbium_cawo4()
 cell_size=1e-10*[5.2429 5.2429 11.3737];
 radius=11e-9;
 abundance=0.145;
-field_axis=[cosd(46.5);sind(46.5);0];
-times=(0:60)'*1e-3;
-abs_tol=1e-4;
+parameters.observed=1;
+parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
+parameters.orientation=deg2rad([0 90 133.5]);
+parameters.times=(0:60)*1e-3;
+parameters.cce.approximation='projected';
+parameters.cce.order=2;
+parameters.cce.numerics=struct('atol',1e-4,'max_memory_bytes',2^27);
 n_configs=50;
-pool=gcp('nocreate');
-n_workers=0;
-if ~isempty(pool)
-
-    % Use the Spinach pool if the caller has started one
-    n_workers=pool.NumWorkers;
-
-end
 
 % Four W sites relative to a Ca site in the authors' conventional cell
 sites=[0.0 0.5 -0.25;...
@@ -40,14 +36,18 @@ lattice=(repmat(cells,4,1)+repelem(sites,size(cells,1),1)).*cell_size;
 lattice=lattice(vecnorm(lattice,2,2)<=radius,:);
 n_amorphous=10346;
 
-% Evaluate the paper's dipolar prefactors in rad s^-1 m^3
+% Express the paper's dipolar prefactors in Hz Angstrom cubed
 mu0=1.25663706127e-6;
 hbar=6.62607015e-34/(2*pi);
 mu_bohr=9.2740100657e-24;
 gamma_w=spin('183W');
 g_perp=8.38;
-hyperfine=mu0/(4*pi)*g_perp*mu_bohr*gamma_w;
-dipolar=mu0/(4*pi)*hbar*gamma_w^2;
+convert=1e30/(2*pi);
+inter.dipolar_geometry.hyperfine=convert*mu0/(4*pi)*g_perp*mu_bohr*gamma_w;
+inter.dipolar_geometry.nuclear=convert*mu0/(4*pi)*hbar*gamma_w^2;
+sys.magnet=0.067;
+sys.parallel={'processes',8};
+sys.output='hush';
 
 % Prepare independent isotope occupancies and continuum configurations
 occupied=cell(n_configs,1);
@@ -63,25 +63,44 @@ for n=1:n_configs
 
 end
 
-% Propagate each independently sampled bath before averaging the echoes
-realisations=zeros(numel(times),n_configs,2);
-parfor (n=1:n_configs,n_workers)
+% Set up the first physical bath on the head node so create configures the pool
+first_bath=bath_system(sys,inter,occupied{1});
 
-    % Evaluate the two independent bath configurations assigned to this worker
-    lattice_echo=cce_secular_pairs(occupied{n},field_axis,hyperfine,dipolar,times,abs_tol);
-    random_echo=cce_secular_pairs(amorphous{n},field_axis,hyperfine,dipolar,times,abs_tol);
-    realisations(:,n,:)=reshape([lattice_echo random_echo],numel(times),1,2);
+% Evaluate each independently created bath on a worker
+realisations=zeros(numel(parameters.times),n_configs,2);
+parfor n=1:n_configs
+
+    % Reuse the first created system instead of creating it again
+    if n==1
+        lattice_bath=first_bath;
+    else
+        lattice_bath=bath_system(sys,inter,occupied{n});
+    end
+    continuum_bath=bath_system(sys,inter,amorphous{n});
+    lattice_echo=clexpn(lattice_bath,@hahn_echo,parameters,'labframe');
+    random_echo=clexpn(continuum_bath,@hahn_echo,parameters,'labframe');
+    realisations(:,n,:)=reshape([lattice_echo random_echo],numel(parameters.times),1,2);
 
 end
-echo=reshape(mean(realisations,2),numel(times),2);
+echo=reshape(mean(realisations,2),numel(parameters.times),2);
 
 % Plot the normalised amplitude, not its square
 kfigure();
-plot(1e3*times,echo,'LineWidth',1.5);
+plot(1e3*parameters.times,echo,'LineWidth',1.5);
 kxlabel('total echo time, $2\tau$ / ms');
 kylabel('normalised Hahn echo amplitude');
 klegend({'lattice bath','amorphous bath'},'Location','northeast');
 kgrid();
+
+end
+
+% Create one compact physical bath with the central electron first
+function spin_system=bath_system(sys,inter,coords)
+
+% Assign physical IDs with the central electron first
+sys.isotopes=[{'E'} repmat({'183W'},1,size(coords,1))];
+inter.coordinates=num2cell([zeros(1,3); 1e10*coords],2);
+spin_system=create(sys,inter);
 
 end
 

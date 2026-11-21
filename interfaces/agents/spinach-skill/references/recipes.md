@@ -190,7 +190,9 @@ Cross polarisation is `cp_powder_static_nh.m` and
 
 For coherent periodic FIDs use `periodic_acquire` with Hilbert-space
 `singlerot`. `periodic_mas_trace.m` checks direct propagation and rotor-grid
-refinement at fixed acquisition dwell.
+refinement at fixed acquisition dwell. For discrete periodic spectra use
+`periodic_lines` with `sum_up=false`; the line frequencies are folded to the
+tick Nyquist interval.
 
 For a direct single-crystal MAS route check, run
 `examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced

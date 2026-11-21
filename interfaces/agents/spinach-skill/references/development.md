@@ -41,7 +41,7 @@ scalar placeholder expansion for nonempty output construction; the shipped
 Windows binary requires rebuilding to obtain this optimisation. Memory tests
 must include constructor temporaries, not just numerical-kernel workspace.
 
-Select tests from `tests/README.md` and `tests/lib/test_manifest.m`; add a
+Select tests from `tests/README.md` and `list_tests()`; add a
 focused regression when behaviour changes. Run affected examples when they
 exercise a different regime from the unit tests. Capture assertions and
 observable comparisons, not only screenshots or log tails. Follow
@@ -76,4 +76,4 @@ authorise merging it.
 
 ## Cluster-expansion contract checks
 
-Read `cce_capabilities` for supported experiment handles and representations, `cce_options` for public field ownership, and `tests/lib/test_manifest.m` for registered test IDs. Retained internal engine records are not alternative public parameter forms. Preserve physical IDs, complex receiver convention, total elapsed time, both ensemble/reduction orders, and numerical validity/error channels when changing this boundary. Test a new public-field rejection at `clexpn`, not only at a low-level service. Use the existing source-matched regression notes rather than creating a knowledge copy of the test registry.
+Read `cce_capabilities` for supported experiment handles and representations, `cce_options` for public field ownership, and `list_tests()` for registered test IDs. Retained internal engine records are not alternative public parameter forms. Preserve physical IDs, complex receiver convention, total elapsed time, both ensemble/reduction orders, and numerical validity/error channels when changing this boundary. Test a new public-field rejection at `clexpn`, not only at a low-level service. Use the existing source-matched regression notes rather than creating a knowledge copy of the test registry.

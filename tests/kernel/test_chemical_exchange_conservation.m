@@ -1,3 +1,4 @@
+% Test: kernel/chemical_exchange_conservation | Chemical exchange conservation
 % Tests two-site chemical exchange conservation. Syntax:
 %
 %                    result=test_chemical_exchange_conservation()

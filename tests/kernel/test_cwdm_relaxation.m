@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_relaxation | CWDM relaxation direct sums
 % Tests substance-local relaxation against independently built spin systems.
 % Syntax:
 %
@@ -371,8 +372,7 @@ expected=repmat(parameters.coil'*parameters.rho0,3,1);
 result=test_close(result,'single field scan zero drive',actual,expected,...
                   1e-12,1e-12,'longitudinal equilibrium survives a zero-drive field scan');
 
-% A spin-free pool has no active rows and must not be mistaken for an
-% unthermalised substance: its steady state is its unit coordinate
+% A spin-free pool has no active rows and must not be mistaken for an unthermalised substance: its steady state is its unit coordinate
 sys=struct('magnet',1,'isotopes',{{'1H'}});
 inter=struct(); inter.chem.parts={1,[]}; inter.chem.concs=[0.7 0.3];
 inter.relaxation={'t1_t2'}; inter.r1_rates={1}; inter.r2_rates={3};

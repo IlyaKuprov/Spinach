@@ -1,3 +1,4 @@
+% Test: kernel/dac_solvent | Diels-Alder solvent
 % Tests the spin-bearing acetonitrile in the shared Diels-Alder model.
 % Syntax:
 %

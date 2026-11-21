@@ -1,3 +1,4 @@
+% Test: kernel/fourier_poly | Spectral derivatives and RF pulses
 % Tests spectral polyadics and shaped RF pulse integration. Syntax:
 %
 %                       result=test_fourier_poly()

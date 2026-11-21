@@ -1,3 +1,4 @@
+% Test: kernel/kinetics_generator_suite | Kinetics and flow generator functions
 % Tests kinetics and flow generator helpers. Syntax:
 %
 %                    result=test_kinetics_generator_suite()
@@ -90,3 +91,5 @@ result=test_close(result,'flow_gen column sums',sum(full(F),1),[0 0],1e-14,1e-14
                   'hydrodynamic flow/diffusion generator conserves total population');
 
 end
+
+

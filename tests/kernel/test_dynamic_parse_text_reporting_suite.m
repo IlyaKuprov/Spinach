@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_parse_text_reporting_suite | Parsing, text, and reporting utilities
 % Tests deterministic parsing, text, and safe reporting utilities. Syntax:
 %
 %                    result=test_dynamic_parse_text_reporting_suite()

@@ -1,3 +1,4 @@
+% Test: kernel/prop_unrounded | Unrounded Taylor termination
 % Tests numerical termination of unrounded Taylor propagation. Syntax:
 %
 %                    result=test_prop_unrounded()

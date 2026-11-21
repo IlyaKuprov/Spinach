@@ -1,3 +1,4 @@
+% Test: kernel/cce_ccex_fixtures | CCEX fixture parity
 % Pinned CCEX analytic and reduced-basic01 reference comparisons. Syntax:
 %
 %                    result=test_cce_ccex_fixtures()

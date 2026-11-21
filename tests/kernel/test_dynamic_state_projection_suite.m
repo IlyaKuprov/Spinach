@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_state_projection_suite | Dynamic state projection helpers
 % Tests dynamic state projection helper paths. Syntax:
 %
 %              result=test_dynamic_state_projection_suite()

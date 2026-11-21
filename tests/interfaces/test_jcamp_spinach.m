@@ -1,3 +1,4 @@
+% Test: interfaces/jcamp_spinach | Spinach JCAMP wrappers
 % Tests Spinach-facing JCAMP export of native magnetic resonance results.
 % Syntax:
 %

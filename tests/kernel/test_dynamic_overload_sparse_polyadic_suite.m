@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_overload_sparse_polyadic_suite | Sparse, polyadic, and OPIUM overload dispatch
 % Tests dynamic dispatch of sparse, polyadic, and OPIUM overloads. Syntax:
 %
 %          result=test_dynamic_overload_sparse_polyadic_suite()

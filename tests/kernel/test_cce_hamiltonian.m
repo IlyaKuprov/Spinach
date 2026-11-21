@@ -1,3 +1,4 @@
+% Test: kernel/cce_hamiltonian | CCE Hamiltonians
 % Tests direct and stock CCE cluster Hamiltonians. Syntax:
 %
 %                    result=test_cce_hamiltonian()

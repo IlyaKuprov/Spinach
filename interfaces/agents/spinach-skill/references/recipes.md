@@ -912,3 +912,7 @@ acquisition. Check convergence under refinement, not just agreement with a port
 using the same grid. For integrator comparisons, retain
 `examples/fundamentals/quadratures/product_quadratures_2.m` as the companion
 example; it compares numerical methods rather than providing an analytic truth.
+
+For a stationary 1D sample, `field_profile_echo` compares the imaging
+context to a discrete analytic gradient echo. `interaction_switch`
+compares a piecewise scalar coupling to its accumulated on-time phase.

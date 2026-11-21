@@ -92,6 +92,9 @@ spin_system.control.case_targets=dirt_sum;
 
 % The squared impurity norm requires a real linear overlap
 spin_system.control.fidelity='real';
+if isfield(spin_system.control,'gamma_groups')
+    spin_system.control=rmfield(spin_system.control,'gamma_groups');
+end
 
 % Impurity cancellation gradients
 spin_system.control.freeze=freeze_a;

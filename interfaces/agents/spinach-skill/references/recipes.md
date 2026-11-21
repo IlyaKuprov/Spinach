@@ -511,6 +511,9 @@ spin_system=optimcon(spin_system,control);
 pulse=fmaxnewton(spin_system,@grape_xy,guess);
 ```
 
+For terminal squared overlap, set `control.gamma_groups` to one physical group label per drift. Only cases that match on all other catalog coordinates interfere. Grouped objectives support first-derivative methods, not Hessians or trajectory penalties. Cooperative impurity gradients still use linear auxiliary overlaps. Diagnostic plots display individual squared overlaps, not complex amplitudes.
+
+
 The state normalisation is not cosmetic: the fidelity functional assumes unit
 norm. `optimcon` distributes the drift generators over the workers of the pool
 that is open when it runs and records that pool's identity; each worker then

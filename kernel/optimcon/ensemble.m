@@ -51,6 +51,9 @@ control.return_traj=isfield(control,'return_traj')&&control.return_traj;
 
 % Count the outputs (fidelity always computed) and the cases
 n_outputs=max(nargout,2); n_cases=size(control.catalog,1);
+if isfield(control,'gamma_groups')&&n_outputs>3
+    error('gamma-coherent fidelity does not return a Hessian.');
+end
 
 % Run the ensemble loop, each worker over its own case block
 spmd (poolsize)
@@ -82,7 +85,32 @@ else
 end
 
 % Ensemble averages of fidelity, gradient, and Hessian
-fidelity=fidelities*control.case_weights;
+if isfield(control,'gamma_groups')
+
+    % Sum complex overlaps within each physical group, then average group scores
+    groups=control.gamma_groups;
+    group_count=max(control.gamma_groups);
+    weights=accumarray(groups,control.case_weights,[group_count 1]);
+    overlaps=accumarray(groups,fidelities(:).*control.case_weights,[group_count 1]);
+    means=zeros(size(weights));
+    populated=weights>0;
+    means(populated)=overlaps(populated)./weights(populated);
+    fidelity=sum(weights.*abs(means).^2);
+
+    % Differentiate the squared group means after the coherent sum
+    if n_outputs>2
+        gradient=2*real(gradient*conj(means));
+    end
+
+    % Plot individual squared overlap magnitudes, not complex amplitudes
+    fidelities=abs(fidelities).^2;
+
+else
+
+    % Incoherently average individual case scores
+    fidelity=fidelities*control.case_weights;
+
+end
 if n_outputs>2
     gradient=reshape(gradient,size(waveform));
 end

@@ -861,6 +861,11 @@ end
 
 % Fidelity and its derivatives
 switch fidelity_type
+
+    case 'complex'
+
+        % Return the terminal overlap before any nonlinear objective
+        fidelity=overlap;
     
     case {'real'}
         
@@ -1010,8 +1015,8 @@ end
 if (~isnumeric(rho_targ))||(~iscolumn(rho_targ))
     error('rho_targ must be a column vector.');
 end
-if (~ischar(fidelity_type))||(~ismember(fidelity_type,{'real','imag','square'}))
-    error('fidelity_type must be ''real'', ''imag'', or ''square''.');
+if (~ischar(fidelity_type))||(~ismember(fidelity_type,{'real','imag','square','complex'}))
+    error('fidelity_type must be ''real'', ''imag'', ''square'', or ''complex''.');
 end
 if (~ischar(spin_system.control.fid_type))||...
    (~ismember(spin_system.control.fid_type,{'terminal','average'}))

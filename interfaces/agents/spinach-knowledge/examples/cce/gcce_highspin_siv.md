@@ -1,15 +1,11 @@
 # examples/cce/gcce_highspin_siv.m
 
-A spin-3/2 vacancy-like centre with carbon-13 and silicon-29 spin-half bath nuclei undergoes free evolution at generalised CCE order two.
+Reconstructs the Hahn-echo calculation of Fazio et al., [Phys. Rev. A 109, 022603 (2024), Fig. 12](https://doi.org/10.1103/PhysRevA.109.022603), for the negatively charged silicon vacancy in 3C-SiC. The spin-3/2 electron is restricted to the $m_s=+3/2,+1/2$ transition because the paper's Hamiltonian conserves electron $S_z$. The projected CCE2 calculation uses the 200 G [001] field, a midpoint transition swap, and an unpolarised nuclear bath. The plotted duration is the sum of both free intervals. Electron Zeeman and axial zero-field energies multiply both Hahn arms by the same phase and are omitted from propagation; the nuclear Zeeman terms are retained.
 
-## Interface
+The bath is ideal zinc blende with a 4.3596 Å cubic lattice constant (Taylor and Jones, as tabulated by the [Ioffe Institute](https://www.ioffe.ru/SVA/NSM/Semicond/SiC/basic.html)). The 5 nm bath sphere is independently populated 50 times at 4.7% ²⁹Si and 1.1% ¹³C; dipolar pairs are retained out to 0.8 nm. Hyperfine interactions outside the first two shells are point dipoles. Inside those shells, the published $A_{zz}$ terms from Table II are used and unreported transverse hyperfine terms are set to zero. The original relaxed site positions, complete hyperfine tensors, and isotope draws are not available in the paper or its arXiv source. This reconstruction does not quantitatively reproduce the published trace: the pointwise RMS discrepancy against the author’s vector curve was 0.190 and the 0.1 ms binned RMS discrepancy was 0.158. The model and paper give 0.238 and 0.0311 coherence at 2 ms, respectively.
 
-`[answer,diagnostics]=gcce_highspin_siv()` returns numeric rows of column-major observed density matrices. `diagnostics.parameters.times` gives elapsed times; `diagnostics.reduction` contains order-resolved answers, validity masks, and numerical error bounds. No clipping or positivity repair is applied.
+`[answer,diagnostics]=gcce_highspin_siv()` returns the mean magnitude of the normalised echo as a column, with total free-evolution times in seconds in `diagnostics.times`. `diagnostics.curves` stores one magnitude column per realisation and `diagnostics.counts` gives the singleton and pair counts in that order. The per-bath absolute error bounds and CCE validity reasons are retained. It builds no full-bath basis. The reported calculation took 291 seconds including pool startup on Elminster with 64 process workers; the example requests eight for general use. Spinach and EasySpin must not share the MATLAB path.
 
-The example uses standard sys/inter/bas/parameters blocks, a product-ms transition selector, and `clexpn(spin_system,@free_evolution,parameters,'labframe')`. The selected manifolds define the equal coherent preparation; no state or operator matrix is assembled in the example. The plot shows observed populations.
+The original three-spin generalised CCE density check is preserved separately in [cce_siv_three_spin.m](../../../../../tests/lib/cce_siv_three_spin.m); it is not a model of the 3C-SiC material.
 
-The independent dense Hamiltonian, preparation, propagation, and reduced-density comparison live in `tests/kernel/test_cce_examples.m`.
-
-The example takes no inputs and uses times in seconds and coupling tensors in Hz. It creates the spin system without a full-bath basis and uses a local one-worker pool; do not put Spinach and EasySpin on the same MATLAB path. This deliberately small illustrative model is not a publication-scale material reproduction. Quantitative comparisons require material structures, tensor frames, defect provenance, and source licences; the finite bath does not establish a thermodynamic T2 or microscopic T1.
-
-[MATLAB source](../../../../../examples/cce/gcce_highspin_siv.m) · [Independent reference tests](../../../../../tests/kernel/test_cce_examples.m)
+[MATLAB source](../../../../../examples/cce/gcce_highspin_siv.m)

@@ -1,3 +1,4 @@
+% Test: kernel/dnp_train | Repeated DNP train
 % Checks repeated DNP transfer against chronological propagation of a
 % detuned electron-proton density matrix. Syntax:
 %

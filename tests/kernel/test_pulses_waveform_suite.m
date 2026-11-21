@@ -1,3 +1,4 @@
+% Test: kernel/pulses_waveform_suite | Pulse waveform generators
 % Tests deterministic pulse waveform generators. Syntax:
 %
 %                    result=test_pulses_waveform_suite()

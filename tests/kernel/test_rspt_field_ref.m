@@ -1,3 +1,4 @@
+% Test: kernel/rspt_field_ref | RSPT Zeeman reference fields
 % Tests Zeeman reference fields in perturbative eigensystems. Syntax:
 %
 %                    result=test_rspt_field_ref()

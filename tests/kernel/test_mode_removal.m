@@ -1,3 +1,4 @@
+% Test: kernel/mode_removal | Retained mode reindexing
 % Tests retained mode data after removing spins or bosonic modes. Syntax:
 %
 %                    result=test_mode_removal()

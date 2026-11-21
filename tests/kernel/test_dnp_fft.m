@@ -1,3 +1,4 @@
+% Test: kernel/dnp_fft | Implicit Fourier DNP steady-state scans
 % Tests implicit Fourier steady-state DNP scans. Syntax:
 %
 %                         result=test_dnp_fft()

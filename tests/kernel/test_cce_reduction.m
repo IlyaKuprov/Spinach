@@ -1,3 +1,4 @@
+% Test: kernel/cce_reduction | CCE deterministic reduction
 % Complex CCE algebra, gather ordering, and additive polynomial tests.
 %
 %                     result=test_cce_reduction()

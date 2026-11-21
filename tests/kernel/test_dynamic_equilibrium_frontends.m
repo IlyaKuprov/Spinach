@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_equilibrium_frontends | Dynamic equilibrium front ends
 % Tests equilibrium and residual-order dynamic front-end kernels. Syntax:
 %
 %                    result=test_dynamic_equilibrium_frontends()

@@ -1,3 +1,4 @@
+% Test: kernel/slowpass_unit_states | Slowpass unit states per substance
 % Slow passage spectrum with several substances: every substance has
 % its own stationary unit state, and the frequency grid contains the
 % exact zero frequency where the unit states used to make the linear

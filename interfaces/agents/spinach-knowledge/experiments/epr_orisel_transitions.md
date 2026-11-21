@@ -1,0 +1,9 @@
+# experiments/epr_orisel_transitions.m
+
+The optional rspt_eig population input rho0 may be a retained-system density matrix or a callback rho0(B,alpha,beta,gamma); callbacks receive the current powder orientation, not a stale caller-supplied orientation. Basis reconstruction preserves all chemical-substance entries, including spin-free entries left after exclusions.
+
+Returns orientation-resolved EPR transition frequencies (Hz), intensities, field derivatives (Hz/T), approximate electron-mS row labels, and raw excitation weights. The input reference field is left in the Zeeman Hamiltonian; rspt_eig scales it once to parameters.magnetic. Exact diagonalisation is the default; orders 1–4 remain available.
+
+bandwidth_EPR is the Gaussian full width at half maximum in Hz. The frequency profile has unit area (units Hz^-1), using the existing Spinach gaussfun normalization, and is applied once to |Sx|² times the thermal population difference. It is a spectral excitation profile, not a microwave pulse-amplitude model. This preserves the source helper’s area normalization while changing its linewidth convention. Parameters mw_frq and magnetic are Hz and tesla. Quadrature weights are not included here.
+
+exclude_from_EPR accepts indices, masks, isotopes, labels, or mixed cell selectors. selection_spin must name exactly one retained electron. The selector-only spin_selector entry point is retained. Approximate rows follow rounded laboratory-Z expectation values and are not exact quantum numbers under strong mixing. Fixed laboratory-x polarization, no pulse saturation, no strain, and no relaxation are modeled. Full Hilbert-space scaling limits system size. Strongly mixed transitions can be omitted even when all rows are requested. Output names remain frequencies, intensities, transition_rows, dfdb_hz_per_t, orientation_weights, selection_weights, and parameters. Supplied grid fields are column vectors.

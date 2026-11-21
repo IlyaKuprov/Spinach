@@ -258,6 +258,14 @@ Liouville equation: `relaxation_theory/sle_esr_nitroxide_1.m`.
 destination-state screen that prunes the propagation. Apodisation is applied to
 `mean(fid)-fid`: subtracting the mean removes the unmodulated component so the
 envelope modulation is visible, and this step is specific to ESEEM.
+
+For stimulated-echo ESEEM, see `esr_sol_pulsed/eseem_3p_powder.m`: call
+`powder` with `@eseem_3p` and `'esr'` assumptions on a complete Liouville basis.
+Supply a prepared transverse electron state; only the two 90° pulses flanking
+storage are explicit. Use `parameters.pulse_duration=0` for hard pulses or a
+positive duration in seconds for rectangular pulses. Average the complex echo
+over orientations and carrier offsets before taking the plotted quadrature.
+
 Two-dimensional correlation is `hyscore_nitroxide_powder.m` and echoes are
 `hpa_nitroxide_powder.m`. ENDOR files
 (`endor_davies_nox_powder.m`, `endor_mims_nox_powder.m`) are brute-force

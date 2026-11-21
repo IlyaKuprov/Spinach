@@ -1,0 +1,7 @@
+# Stimulated-echo ESEEM (`eseem_3p`)
+
+`fid=eseem_3p(spin_system,parameters,H,R,K)` is a static-context pulse sequence for a complete single-substance `sphten-liouv` or `zeeman-liouv` basis. Use `powder` or `crystal` with `'esr'` to combine an electron rotating frame with laboratory-frame nuclei.
+
+The preparation pulse is implicit: supply a prepared transverse electron state in `parameters.rho0`. Two explicit 90° rotations about `parameters.pulse_op` flank the variable storage interval. The fixed delays on either side are both `parameters.tau` in seconds. Set `parameters.pulse_duration` to zero for hard pulses or to a positive duration in seconds for rectangular pulses with the static generator active during irradiation. The flip angle is the same in both cases.
+
+The projector after the first explicit pulse retains electron order zero with any of nuclear orders −1, 0, or +1. These are total orders within the respective electron and nuclear groups, not orders for each individual spin. The complex column `fid` is acquired through `parameters.coil` at storage delays from zero to `(parameters.npoints-1)*parameters.timestep`; the increment is in seconds. The sequence does not rescale the receiver or the initial state: when comparing formalisms, match the state and coil normalisation explicitly. For detuning or an offset distribution, pass offsets through the context and average the complex echoes before taking any quadrature or magnitude.

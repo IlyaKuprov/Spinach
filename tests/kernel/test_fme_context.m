@@ -1,3 +1,4 @@
+% Test: kernel/fme_context | Floquet-Magnus native FP reference
 % Tests Floquet-Magnus averaging against native Fokker-Planck generators.
 % Syntax:
 %

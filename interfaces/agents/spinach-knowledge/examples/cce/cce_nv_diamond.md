@@ -1,7 +1,7 @@
 # cce_nv_diamond
 
-Syntax: [answer,diagnostics]=cce_nv_diamond(). The numeric answer is the projected Hahn-echo amplitude; diagnostics is the separate clexpn record.
+The inset of Onizhuk and Galli, [Figure 3(a)](https://doi.org/10.1002/adts.202100254), distinguishes Hahn-echo modulation by isolated nuclei from the effect of coupled nuclear pairs. The example calculates both orders, not the longer-time ensemble-averaged decay in the main panel. The field is 500 G along [111], the electron transition is 0/−1, and the nuclear bath is initially maximally mixed.
 
-cce_fixture('nv_four_c13','6f7282b6') supplies the original full physical tensors, four fixed 13C coordinates, source metadata, and literal 41-point grid through 0.5 ms. The example visibly applies observed-Sz projection, sets the mS=-1/+1 transition, mixed-product bath, order two, graph, and numerical policy, and calls clexpn(spin_system,@hahn_echo,parameters,'labframe'). This is a fixed numerical fixture, not natural-abundance diamond.
+The input file contains only positions: the seed-5 realisation of the authors’ [diamond ensemble generator](https://github.com/MICCoMpy/PyCCE/blob/5ed9c197f7dd1267099c58c3bc7c4745764259e9/examples/nv_ensemble/nv_ensemble.py), restricted to 40 Å. The 493 carbon-13 nuclei provide 422 pairs at the 6 Å connectivity cutoff. The projected electron hyperfine and the full carbon–carbon dipolar tensors are computed from those positions. The plotted line is Eq. (29) evaluated from the singleton Hamiltonians, not digitised figure data.
 
-The independent projected PyCCE complex reference remains in tests/kernel/test_cce_examples.m and now matches the fixed physical receiver without conjugation. Source tensors, total times, and physical-site order are unchanged.
+`[answer,diagnostics]=cce_nv_diamond()` returns the 501-point CCE2 echo; `diagnostics.cce1` is the CCE1 result, `diagnostics.isolated` the independent analytic product, and `diagnostics.times` the total echo times in seconds.

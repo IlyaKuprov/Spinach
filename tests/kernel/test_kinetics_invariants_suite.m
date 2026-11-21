@@ -1,3 +1,4 @@
+% Test: kernel/kinetics_invariants_suite | Chemical kinetics invariants
 % Tests deterministic chemical kinetics helpers. Syntax:
 %
 %                    result=test_kinetics_invariants_suite()

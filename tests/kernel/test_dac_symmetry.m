@@ -1,3 +1,4 @@
+% Test: kernel/dac_symmetry | Diels-Alder symmetry
 % Tests valid and rejected permutations of the shared Diels-Alder model.
 % Syntax:
 %

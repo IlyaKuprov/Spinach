@@ -32,7 +32,6 @@ result=test_cce_exact()
 ## References
 
 - [Source file](../../../../../tests/kernel/test_cce_exact.m)
-- [Test manifest](../../../../../tests/lib/test_manifest.m)
 
 ## Native interface
 

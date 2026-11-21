@@ -23,5 +23,7 @@ The path edits use `genpath` over each managed tree. The reset modes therefore r
 
 ## Links
 
+- [Development architecture map](../spinach-arch/architecture.json): responsibilities and interfaces of the trees made visible by this setup.
+
 - MATLAB source: https://github.com/IlyaKuprov/Spinach/blob/main/fix_path.m
 - [Spinach Wiki: fix_path.m](https://spindynamics.org/wiki/index.php?title=fix_path.m)

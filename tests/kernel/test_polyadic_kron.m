@@ -1,3 +1,4 @@
+% Test: kernel/polyadic_kron | Affixed polyadic tensor products
 % Tests affixed polyadic tensor products and spin-space flow lifting. Syntax:
 %
 %                    result=test_polyadic_kron()

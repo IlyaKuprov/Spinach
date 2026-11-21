@@ -475,18 +475,18 @@ With \lstinline|parameters.sum_up=false|, a grid calculation returns a column ce
 \end{description}
 
 \subsection{Which supplied example should I open?}
-The files below are in \lstinline|examples/cce/|. Call a file by its basename after adding the examples directory to the MATLAB path. These are small, inspectable calculations, not converged material simulations. In particular, a three-node powder illustrates tensor rotation; it is not a generally adequate integration grid.
+The files below are in \lstinline|examples/cce/|. Call a file by its basename after adding the examples directory to the MATLAB path. Material examples identify their target figure in the header. Distinguish agreement with archived numerical data from reconstruction with a different isotope realisation. The single-nucleus, bandwidth, noise, and finite-drive examples are controls rather than material fits.
 \begin{longtable}{@{}p{0.36\linewidth}p{0.58\linewidth}@{}}
 \toprule Example & What to inspect \\ \midrule\endfirsthead
 \toprule Example (continued) & What to inspect \\ \midrule\endhead
 \texttt{cce\_single\_nucleus} & Analytic one-nucleus modulation of a projected echo; a first check on times and couplings. \\
 \texttt{cce\_nv\_diamond} & Fixed-receiver NV echo on pinned inputs; inspect the imaginary as well as the real quadrature. \\
-\texttt{cce\_molecular\_powder} & A direct native grid call for two deuterons with anisotropic interactions. \\
+\texttt{cce\_molecular\_powder} & OX063 powder echo from 48 protons, Jeschke Fig.~9. \\
 \texttt{cce\_deer\_bandwidth} & Selection of a pumped bath site by a finite spectral window. \\
 \texttt{cce\_noise\_spectrum} & Ordered time-domain correlation and the consequences of a finite observation window. \\
 \texttt{cce\_polarized\_bath} & Polarisation and sampling of a product-state nuclear bath. \\
 \texttt{cce\_hbn\_quadrupoles} & Explicit quadrupolar tensors in a planar high-spin bath. \\
-\texttt{cce\_methyl\_molecular} & Grouping a three-proton motif with coherent cyclic exchange. \\
+\texttt{cce\_methyl\_molecular} & Finland trityl powder echo from 36 protons, Jeschke Fig.~7. \\
 \texttt{cce\_p1\_electron\_bath} & An electron bath with a nitrogen hyperfine group. \\
 \texttt{cce\_erbium\_cawo4} & Anisotropic tungsten couplings around an effective central electron. \\
 \texttt{cce\_sic\_divacancy} & Different nuclear species in a divacancy-like environment. \\
@@ -494,10 +494,10 @@ The files below are in \lstinline|examples/cce/|. Call a file by its basename af
 \texttt{gcce\_finite\_drive} & A finite spin-lock drive propagated with the coupled drift. \\
 \texttt{gcce\_highspin\_siv} & Explicit spin-3/2 dynamics in a vacancy-like environment. \\
 \texttt{gcce\_sic\_clock} & A low-field transition where transverse zero-field splitting matters. \\
-\texttt{gcce\_two\_centres} & A joint observed subsystem and its reduced density matrix. \\
+\texttt{gcce\_two\_centres} & Proton-pair Hahn modulation for two triplet centres, Chen Fig.~3(b). \\
 \texttt{gcce\_votpp} & An electron and vanadium nucleus in the observed subsystem. \\
-\texttt{mecce\_dissipative\_bath} & A relaxing bath spin and a small-system master-equation reference. \\
-\texttt{pcce\_electron\_layer} & A strongly coupled electron pair treated as a group. \\
+\texttt{mecce\_dissipative\_bath} & Dissipative XXZ ring coherence through ME-CCE order five, Onizhuk Fig.~1(c). \\
+\texttt{pcce\_electron\_layer} & Five planar lattice partition curves; the normally averaged dimer curve differs from the published result. \\
 \bottomrule\end{longtable}
 
 \section{Getting started: the echo of one nucleus}\label{sec:start}
@@ -611,7 +611,7 @@ powder.sum_up=true;
 powder_echo=clexpn(spin_system,@hahn_echo,powder,'labframe');
 fprintf('Weighted-sum difference: %.3g\n',max(abs(manual_sum-powder_echo)));
 \end{lstlisting}
-Here the returned index column is $[1,3]^{\mathsf T}$ and the corresponding weights are $[0.25,0.75]^{\mathsf T}$. With \code{sum\_up=false}, \code{nodes\{1\}} and \code{nodes\{2\}} are the \emph{unweighted} complex echoes at those two nodes, not at original nodes 1 and 2. The first reproduces the quick-start orientation. The maximum difference between orientations was $0.929$; the difference between the manual sum and the default summed result was zero in this run. Sum the complex amplitudes before taking a real part for display or a magnitude for analysis. Two directions demonstrate the interface, not a converged powder. For a molecular example with deuterium quadrupoles, see \code{cce\_molecular\_powder.m} in \code{examples/cce/}.
+Here the returned index column is $[1,3]^{\mathsf T}$ and the corresponding weights are $[0.25,0.75]^{\mathsf T}$. With \code{sum\_up=false}, \code{nodes\{1\}} and \code{nodes\{2\}} are the \emph{unweighted} complex echoes at those two nodes, not at original nodes 1 and 2. The first reproduces the quick-start orientation. The maximum difference between orientations was $0.929$; the difference between the manual sum and the default summed result was zero in this run. Sum the complex amplitudes before taking a real part for display or a magnitude for analysis. Two directions demonstrate the interface, not a converged powder. For a proton powder echo calculated from a molecular crystal, see \code{cce\_molecular\_powder.m} in \code{examples/cce/}.
 
 \subsection{Replace an ideal echo by a finite pulse}
 An ideal Hahn pulse interchanges two states instantaneously. To ask what a real pulse does \emph{during} the drive, use \code{@finite\_drive}, a generalised propagator, and a density output. This example starts the electron in its $m_S=+1$ state and drives the physical electron about $x$, not just the selected two-state subspace. It samples before, during, at the end of, and after the four-microsecond pulse.

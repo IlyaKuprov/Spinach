@@ -1,3 +1,4 @@
+% Test: kernel/scalar_coupling_hamiltonian | Scalar coupling Hamiltonian
 % Tests the two-spin scalar-coupling Hamiltonian. Syntax:
 %
 %                    result=test_scalar_coupling_hamiltonian()

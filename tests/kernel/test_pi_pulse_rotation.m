@@ -1,3 +1,4 @@
+% Test: kernel/pi_pulse_rotation | Hard pi pulse rotation
 % Tests hard pi-pulse rotation. Syntax:
 %
 %                    result=test_pi_pulse_rotation()

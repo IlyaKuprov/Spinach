@@ -38,7 +38,7 @@
     ],
     "verification": [
       "examples/quantum_tech/spin_cavity_vacuum_rabi.m",
-      "examples/quantum_tech/spin_cavity_purcell_effect.m"
+      "examples/quantum_tech/spin_phonon_dephasing.m"
     ]
   },
   {

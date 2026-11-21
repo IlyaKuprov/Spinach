@@ -31,7 +31,6 @@ result=test_gcce_exact()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_gcce_exact.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Native preparation and observation are tested with independent receiver scales from 1e-20 to 1e20, true zero-reference rejection, and both row and column detector cells. The same 64 row/column comparisons cover free, directly exponentiated Hahn, finite-drive, master-equation, and raw interlaced evaluations; physical inputs and assertion tolerances are fixed.
 

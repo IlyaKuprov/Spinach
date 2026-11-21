@@ -1,3 +1,4 @@
+% Test: kernel/sparse_tensor_graph_suite | Sparse, tensor, and graph helper functions
 % Tests sparse, tensor-product, and simple graph utilities. Syntax:
 %
 %                    result=test_sparse_tensor_graph_suite()

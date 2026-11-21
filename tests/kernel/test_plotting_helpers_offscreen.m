@@ -1,3 +1,4 @@
+% Test: kernel/plotting_helpers_offscreen | Offscreen plotting helpers
 % Tests offscreen execution of Spinach plotting helpers. Syntax:
 %
 %                    result=test_plotting_helpers_offscreen()

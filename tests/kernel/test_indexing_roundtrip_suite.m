@@ -1,3 +1,4 @@
+% Test: kernel/indexing_roundtrip_suite | Indexing conversion functions
 % Tests angular-momentum and matrix indexing helpers. Syntax:
 %
 %                    result=test_indexing_roundtrip_suite()
@@ -62,3 +63,5 @@ result=test_close(result,'lin2kq/kq2lin base zero',kq2lin(N,K0,Q0,0),idx0,0,0,..
                   'base-zero serpentine matrix indexing must round-trip exactly');
 
 end
+
+

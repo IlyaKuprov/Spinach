@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_orientation | Native CCE orientation averaging
 % Validate native CCE quadrature, averaging order, and input rejection.
 % Syntax:
 %

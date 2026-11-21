@@ -1,3 +1,4 @@
+% Test: kernel/cce_checkpoint | CCE atomic restart
 % Atomic checkpoint identity, interruption, and corruption acceptance test. Syntax:
 %
 %                    result=test_cce_checkpoint()

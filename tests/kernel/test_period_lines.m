@@ -1,3 +1,4 @@
+% Test: kernel/period_lines | Complex periodic spectral lines
 % Checks signed Floquet lines against native complex time acquisition.
 % Syntax: result=test_period_lines()
 %

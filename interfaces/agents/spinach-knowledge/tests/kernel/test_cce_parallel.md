@@ -39,7 +39,6 @@ result=test_cce_parallel()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_parallel.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Checks resident-memory refusal for 200 observable columns on both gCCE and generalised master-equation paths; the four raw output records alone require 6,020,000 bytes against a 5,000,000-byte cap.
 

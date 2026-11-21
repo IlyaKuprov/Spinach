@@ -1,3 +1,4 @@
+% Test: kernel/rotor_assume | Rotor-stack assumptions
 % Tests explicit assumptions throughout rotor-stack construction. Syntax:
 %
 %                    result=test_rotor_assume()

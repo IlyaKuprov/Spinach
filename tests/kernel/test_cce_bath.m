@@ -1,3 +1,4 @@
+% Test: kernel/cce_bath | Physical spin-bath construction
 % Deterministic lattice, occupancy, geometry, and frame tests. Syntax:
 %
 %                    result=test_cce_bath()

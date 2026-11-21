@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_selectors | CWDM selectors and CIDNP T14-T15
 % Selector loss and CIDNP product transport tests T14-T15. Syntax:
 %
 %                   result=test_cwdm_selectors()

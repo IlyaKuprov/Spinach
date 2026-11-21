@@ -1,3 +1,4 @@
+% Test: interfaces/s2spinach | literal spin-system reader
 % Tests literal spin-system input against the bundled examples,
 % independently evaluated rank-two projections, and native Hamiltonians.
 % Syntax:

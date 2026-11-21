@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_zeeman | CWDM Zeeman T16-T17
 % Tests Zeeman direct-sum operators and thermal states (T16 and T17).
 % Syntax:
 %

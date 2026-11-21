@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_physics_formulae_suite | Physical formula utilities
 % Tests deterministic physical formula utility helpers. Syntax:
 %
 %                    result=test_dynamic_physics_formulae_suite()

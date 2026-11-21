@@ -1,3 +1,4 @@
+% Test: kernel/spin_table | Literature isotope table
 % Tests sourced isotope metadata and numerical simulation boundaries. Syntax:
 %
 %                         result=test_spin_table()

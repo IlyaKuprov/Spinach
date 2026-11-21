@@ -1,3 +1,4 @@
+% Test: kernel/cce_projection | CCE observed-spin projection
 % Tests observed expectations and virtual-level corrections. Syntax:
 %
 %                    result=test_cce_projection()

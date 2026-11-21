@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_observation | Native CCE observation
 % Tests native preparation, receiver phase, coils, and reference normalisation.
 % Syntax:
 %

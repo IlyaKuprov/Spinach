@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_spin_edit_suite | Spin-system editing utilities
 % Tests deterministic spin-system editing support utilities. Syntax:
 %
 %                    result=test_dynamic_spin_edit_suite()

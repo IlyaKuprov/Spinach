@@ -1,3 +1,4 @@
+% Test: kernel/cce_controls | Native finite pulses and refocusing trains
 % Finite controls, named timestamps, and exterior-field regression tests. Syntax:
 %
 %                    result=test_cce_controls()

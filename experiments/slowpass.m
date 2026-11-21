@@ -75,8 +75,93 @@ freq_grid=2*pi*linspace(parameters.sweep(1),...
 
 % A finite drive requires the stationary density rather than a free-induction resolvent
 if strcmp(parameters.mode,'saturated')
-    spectrum=saturated_cw(spin_system,parameters,H,R,K,freq_grid);
+
+    % Build the irradiation and the sweep superoperators in spin space
+    irr_op=operator(spin_system,'Lx',parameters.spins{1});
+    sweep_op=operator(spin_system,'Lz',parameters.spins{1});
+
+    % Embed the spin superoperators in every spatial basis coordinate
+    if isfield(parameters,'spc_dim')
+        irr_op=kron(speye(parameters.spc_dim),irr_op);
+        sweep_op=kron(speye(parameters.spc_dim),sweep_op);
+    end
+
+    % Compose the part of the Liouvillian that does not depend on the sweep
+    L=H+1i*R+1i*K+2*pi*parameters.irr_powers*irr_op;
+
+    % Locate the rank-zero unit coordinate of every substance
+    unit_idx=spin_system.bas.offsets(1:end-1)+1;
+
+    % Require a thermal source
+    if norm(L(:,unit_idx),1)<=spin_system.tols.liouv_zero
+        error('relaxation superoperator is not thermalised, set inter.equilibrium.');
+    end
+
+    % Refuse to run when the unit coordinate is not a conserved quantity
+    if norm(L(unit_idx,:),1)>spin_system.tols.liouv_zero
+        error('the unit coordinate is not conserved, check relaxation and kinetics.');
+    end
+
+    % Pin the conserved substance concentrations
+    active=true(size(L,1),1);
+    active(unit_idx)=false;
+
+    % Thermal source term, independent of the sweep and of the irradiation
+    source=-L(active,unit_idx)*spin_system.chem.concs(:);
+
+    % Project the Liouvillian, the sweep generator, and the detection state
+    L=L(active,active);
+    sweep_op=sweep_op(active,active);
+    coil=parameters.coil(active);
+
+    % Include the known contribution of the pinned coordinates
+    spectrum=(parameters.coil(unit_idx)'*spin_system.chem.concs(:))*ones(size(freq_grid));
+
+    % Use the iterative solver for large active spaces
+    if size(L,1)>1e5
+
+        % Inform the user
+        report(spin_system,'using preconditioned CPU GMRES path...');
+
+        % Get the scale of the problem from the nonzero diagonal elements
+        diag_mags=full(abs(diag(L)));
+        diag_scale=median(diag_mags(diag_mags>0));
+
+        % Scale the equation before iterative solution
+        L=L/diag_scale;
+        sweep_op=sweep_op/diag_scale;
+        source=source/diag_scale;
+
+        % Factor each shifted field point and measure the physical residual
+        parfor n=1:numel(freq_grid)
+            A=L+freq_grid(n)*sweep_op;
+            [M1,M2]=ilu(A+1e-6*speye(size(A)),struct('type','crout','droptol',1e-3));
+            action=@(x)A*(M2\(M1\x));
+            [rho,flag]=gmres(action,full(source),10,1e-6,numel(source));
+            rho=M2\(M1\rho);
+            residual=norm(A*rho-source);
+            if (flag~=0)||(residual>1e-6*norm(source))
+                error('steady-state GMRES did not converge at offset %g Hz.',freq_grid(n)/(2*pi));
+            end
+            spectrum(n)=spectrum(n)+coil'*rho;
+        end
+
+    else
+
+        % Inform the user
+        report(spin_system,'using CPU backslash path...');
+
+        % Run the sweep in parallel
+        parfor n=1:numel(freq_grid)
+            spectrum(n)=spectrum(n)+coil'*((L+freq_grid(n)*sweep_op)\source);
+        end
+
+    end
+
+    % Refuse a non-finite stationary solution
+    if any(~isfinite(spectrum)), error('steady-state solve returned non-finite values.'); end
     return;
+
 end
 
 % Preallocate the answer
@@ -196,96 +281,6 @@ sample_rate=abs(parameters.sweep(2)-parameters.sweep(1))*...
 
 % Match the unnormalised FFT amplitude convention
 spectrum=spectrum*sample_rate;
-
-end
-
-% Solve the driven steady state at each irradiation offset
-function spectrum=saturated_cw(spin_system,parameters,H,R,K,freq_grid)
-
-% Build the irradiation and the sweep superoperators in spin space
-irr_op=operator(spin_system,'Lx',parameters.spins{1});
-sweep_op=operator(spin_system,'Lz',parameters.spins{1});
-
-% Embed the spin superoperators in every spatial basis coordinate
-if isfield(parameters,'spc_dim')
-    irr_op=kron(speye(parameters.spc_dim),irr_op);
-    sweep_op=kron(speye(parameters.spc_dim),sweep_op);
-end
-
-% Compose the part of the Liouvillian that does not depend on the sweep
-L=H+1i*R+1i*K+2*pi*parameters.irr_powers*irr_op;
-
-% Locate the rank-zero unit coordinate of every substance
-unit_idx=spin_system.bas.offsets(1:end-1)+1;
-
-% Require a thermal source
-if norm(L(:,unit_idx),1)<=spin_system.tols.liouv_zero
-    error('relaxation superoperator is not thermalised, set inter.equilibrium.');
-end
-
-% Refuse to run when the unit coordinate is not a conserved quantity
-if norm(L(unit_idx,:),1)>spin_system.tols.liouv_zero
-    error('the unit coordinate is not conserved, check relaxation and kinetics.');
-end
-
-% Pin the conserved substance concentrations
-active=true(size(L,1),1);
-active(unit_idx)=false;
-
-% Thermal source term, independent of the sweep and of the irradiation
-source=-L(active,unit_idx)*spin_system.chem.concs(:);
-
-% Project the Liouvillian, the sweep generator, and the detection state
-L=L(active,active);
-sweep_op=sweep_op(active,active);
-coil=parameters.coil(active);
-
-% Include the known contribution of the pinned coordinates
-spectrum=(parameters.coil(unit_idx)'*spin_system.chem.concs(:))*ones(size(freq_grid));
-
-% Use the iterative solver for large active spaces
-if size(L,1)>1e5
-
-    % Inform the user
-    report(spin_system,'using preconditioned CPU GMRES path...');
-
-    % Get the scale of the problem from the nonzero diagonal elements
-    diag_mags=full(abs(diag(L)));
-    diag_scale=median(diag_mags(diag_mags>0));
-
-    % Scale the equation before iterative solution
-    L=L/diag_scale;
-    sweep_op=sweep_op/diag_scale;
-    source=source/diag_scale;
-
-    % Factor each shifted field point and measure the physical residual
-    parfor n=1:numel(freq_grid)
-        A=L+freq_grid(n)*sweep_op;
-        [M1,M2]=ilu(A+1e-6*speye(size(A)),struct('type','crout','droptol',1e-3));
-        action=@(x)A*(M2\(M1\x));
-        [rho,flag]=gmres(action,full(source),10,1e-6,numel(source));
-        rho=M2\(M1\rho);
-        residual=norm(A*rho-source);
-        if (flag~=0)||(residual>1e-6*norm(source))
-            error('steady-state GMRES did not converge at offset %g Hz.',freq_grid(n)/(2*pi));
-        end
-        spectrum(n)=spectrum(n)+coil'*rho;
-    end
-
-else
-
-    % Inform the user
-    report(spin_system,'using CPU backslash path...');
-
-    % Run the sweep in parallel
-    parfor n=1:numel(freq_grid)
-        spectrum(n)=spectrum(n)+coil'*((L+freq_grid(n)*sweep_op)\source);
-    end
-
-end
-
-% Refuse a non-finite stationary solution
-if any(~isfinite(spectrum)), error('steady-state solve returned non-finite values.'); end
 
 end
 

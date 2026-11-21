@@ -70,18 +70,18 @@ for m=1:numel(D) % Build drift Hamiltonians
 end
 
 % Define control parameters
-control.isotopes={'1H','13C'};           % Isotopes
-control.channels=[1; 1; 2; 2];           % Channel map
-control.drifts=D;                        % Drift array
-control.operators={LxH,LyH,LxC,LyC};     % Control operators
-control.rho_init=sources;                % Initial states
-control.rho_targ=targets;                % Destination states
-control.pwr_levels=2*pi*500*[0.9 1 1.1]; % RF amplitude ensemble
-control.pulse_dt=5e-4*ones(1,275);       % Interval grid
-control.penalties={'NS','SNS'};          % Penalty
-control.p_weights=[1 100];               % Penalty weight
-control.method='lbfgs';                  % Optimisation method
-control.max_iter=200;                    % Termination condition
+control.isotopes={'1H','13C'};          % Isotopes
+control.channels=[1; 1; 2; 2];          % Channel map
+control.drifts=D;                       % Drift array
+control.operators={LxH,LyH,LxC,LyC};    % Control operators
+control.rho_init=sources;               % Initial states
+control.rho_targ=targets;               % Destination states
+control.pwr_levels=2*pi*[450 500 550];  % RF amplitude ensemble
+control.pulse_dt=5e-4*ones(1,275);      % Interval grid
+control.penalties={'NS','SNS'};         % Penalty
+control.p_weights=[1 100];              % Penalty weight
+control.method='lbfgs';                 % Optimisation method
+control.max_iter=200;                   % Termination condition
 
 % Control trajectory analysis plots
 control.plotting={'correlation_order','local_each_spin',...

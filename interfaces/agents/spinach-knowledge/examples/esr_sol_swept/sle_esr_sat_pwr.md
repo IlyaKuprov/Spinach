@@ -1,0 +1,5 @@
+# examples/esr_sol_swept/sle_esr_sat_pwr.m
+
+Calculates a fixed-central-window derivative peak-to-peak amplitude of a driven X-band nitroxide over 20 logarithmically spaced microwave amplitudes from 0.02 to 2 G. Fits positive coefficients in I0*B1/(1+P*B1^2)^eps with fminsearch and reports the coefficients and R-squared. The equation and comparison values are from Figure 2 and Table 1 of Gupta, Dzikovski, and Freed, DOI 10.1007/s00723-021-01390-7.
+
+Uses rotational diffusion 1e8 per second, electron R1=2e5 and R2=1e5 per second, and IME thermalisation at 298 K. It samples 3300–3420 G and searches the central 20% of the sampled interval. At strong driving, overlapping lines can move an extremum to the window boundary; the reported quantity remains this explicitly defined window estimator. I0 depends on the detection normalisation; P and eps are independently computed, not imposed to match the publication. The B1 sampling and optimiser differ from the published fitting protocol. Do not describe a successful fit or high R-squared as numerical reproduction of the published coefficients.

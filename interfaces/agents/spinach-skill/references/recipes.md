@@ -482,6 +482,8 @@ experiments are `nmr_spen/ufcosy_2spin.m` and `ufdosy_1spin.m`.
 
 ## Optimal control
 
+Use `rotor_rf` for sampled complex RF gains, with `dist_drift` to link each map to its physical drift.
+
 For unequal drift quadrature, pass `control.drift_weights` in drift order to
 `optimcon`. Keep the full correlated catalog and equal replication per drift.
 The same normalised case weights apply to fidelity, derivatives, and averaged

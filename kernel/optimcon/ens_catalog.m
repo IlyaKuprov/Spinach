@@ -58,7 +58,17 @@ catalog=[kron(ones(n_ens_systems,1),catalog) kron((1:n_ens_systems)',ones(size(c
 catalog=[kron(ones(n_power_levls,1),catalog) kron((1:n_power_levls)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_offset_vals,1),catalog) kron((1:n_offset_vals)',ones(size(catalog,1),1))];
 catalog=[kron(ones(n_phase_specs,1),catalog) kron((1:n_phase_specs)',ones(size(catalog,1),1))];
-catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
+if ismember('dist_drift',control.ens_corrs)
+
+    % Match the drift and distortion without forming unavailable pairs
+    catalog=sortrows([catalog catalog(:,2)],6);
+
+else
+
+    % Enumerate the independent distortion dimension
+    catalog=[kron(ones(n_distortions,1),catalog) kron((1:n_distortions)',ones(size(catalog,1),1))];
+
+end
 
 % Ensemble correlation: own state pair for each member
 if ismember('rho_ens',control.ens_corrs)

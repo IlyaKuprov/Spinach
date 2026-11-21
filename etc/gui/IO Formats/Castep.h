@@ -17,7 +17,6 @@ public:
 
 private:
 	bool OldFormat(String^ );
-	bool NewFormat(String^ );
-	bool CheckImportAtom(cli::array<String^>^ , int & );
+	bool NewFormat(String^ block);
 };
 

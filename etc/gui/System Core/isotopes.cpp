@@ -44,6 +44,7 @@ void Isotopes::Init_Isotopes()
 	isotope=gcnew Isotope("S",   16,  33,  100, 1.0f, 198.0f*rev, 40.0f*rev, 1.5f, -0.064f, 2.0557e7);   Isotopes_Collection->Add(isotope);
 	isotope=gcnew Isotope("Cl",  17,  35,  100, 25.0f*rev, 239.0f*rev, 25.0f*rev, 1.5f, 0.0f, 2.6242e7);   Isotopes_Collection->Add(isotope);
 	isotope=gcnew Isotope("Cl",  17,  37,  100, 25.0f*rev, 239.0f*rev, 25.0f*rev, 1.5f, -0.06493f, 2.1844e7);   Isotopes_Collection->Add(isotope);
+	isotope=gcnew Isotope("Ar", 18, 40, 71, 0.5f, 0.8f, 0.8f, 0.0f, 0.0f, 0.0); Isotopes_Collection->Add(isotope);
 	isotope=gcnew Isotope("K",   19,  39,  220, 142.0f*rev, 63.0f*rev, 211.0f*rev, 1.5f, 0.049f, 1.2499e7);   Isotopes_Collection->Add(isotope);
 	isotope=gcnew Isotope("K",   19,  41,  220, 142.0f*rev, 63.0f*rev, 211.0f*rev, 1.5f, 0.06f, 0.6861e7);   Isotopes_Collection->Add(isotope);
 	isotope=gcnew Isotope("Ca",  20,  43,  180, 153.0f*rev, 153.0f*rev, 0.0f, 3.5f, -0.043f, -1.8028e7);   Isotopes_Collection->Add(isotope);
@@ -160,6 +161,46 @@ void Isotopes::Init_Isotopes()
 
 
 	isotope=gcnew Isotope("Am",  95,  243, 175, 84.0f*rev, 91.0f*rev, 242.0f*rev, 2.5f, 2.86f, 1.54e7);   Isotopes_Collection->Add(isotope);
+	isotope=gcnew Isotope("Sg", 106, 266, 175, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0); Isotopes_Collection->Add(isotope);
+
+	// Extra elements required by Cartesian imports. Choose the most abundant ground-state nuclide,
+	// otherwise the longest lived in etc/isotopes.tsv; Mc through Og use IUPAC (4 May 2022).
+	// Nuclear constants follow etc/build_isotopes.m. Unconfirmed or unavailable values stay NaN.
+	// Radius and grey colour are display defaults only.
+	const float unknown=System::Single::NaN;
+	Isotopes_Collection->Add(gcnew Isotope("Ce", 58, 140, 175, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0));
+	Isotopes_Collection->Add(gcnew Isotope("Pm", 61, 145, 175, 0.5f, 0.5f, 0.5f, 2.5f, 0.21f, 72799131.89));
+	Isotopes_Collection->Add(gcnew Isotope("Po", 84, 209, 175, 0.5f, 0.5f, 0.5f, 0.5f, 0.0f, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("At", 85, 210, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Rn", 86, 222, 175, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0));
+	Isotopes_Collection->Add(gcnew Isotope("Fr", 87, 223, 175, 0.5f, 0.5f, 0.5f, 1.5f, 1.17f, 37357449.26));
+	Isotopes_Collection->Add(gcnew Isotope("Ra", 88, 226, 175, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0));
+	Isotopes_Collection->Add(gcnew Isotope("Ac", 89, 227, 175, 0.5f, 0.5f, 0.5f, 1.5f, 1.7f, 35122388.19));
+	Isotopes_Collection->Add(gcnew Isotope("Th", 90, 232, 175, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0));
+	Isotopes_Collection->Add(gcnew Isotope("Pa", 91, 231, 175, 0.5f, 0.5f, 0.5f, 1.5f, -1.72f, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Np", 93, 237, 175, 0.5f, 0.5f, 0.5f, 2.5f, 3.886f, 60155072.14));
+	Isotopes_Collection->Add(gcnew Isotope("Cm", 96, 247, 175, 0.5f, 0.5f, 0.5f, 4.5f, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Bk", 97, 247, 175, 0.5f, 0.5f, 0.5f, 1.5f, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Cf", 98, 251, 175, 0.5f, 0.5f, 0.5f, 0.5f, 0.0f, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Es", 99, 252, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Fm", 100, 257, 175, 0.5f, 0.5f, 0.5f, 4.5f, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Md", 101, 258, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("No", 102, 259, 175, 0.5f, 0.5f, 0.5f, 4.5f, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Lr", 103, 266, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Rf", 104, 267, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Db", 105, 268, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Bh", 107, 270, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Hs", 108, 269, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Mt", 109, 277, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Ds", 110, 282, 175, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0));
+	Isotopes_Collection->Add(gcnew Isotope("Rg", 111, 282, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Cn", 112, 285, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Nh", 113, 286, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Fl", 114, 290, 175, 0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0));
+	Isotopes_Collection->Add(gcnew Isotope("Mc", 115, 290, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Lv", 116, 293, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Ts", 117, 294, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
+	Isotopes_Collection->Add(gcnew Isotope("Og", 118, 294, 175, 0.5f, 0.5f, 0.5f, unknown, unknown, unknown));
 };
 
 /**

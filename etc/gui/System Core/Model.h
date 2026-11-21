@@ -721,6 +721,12 @@ public:
 	* @brief Getter for the number of electrons in the collection.
 	* @result Return number of electrons
 	*/
+	static void CheckAtomCount(int count)
+	{
+		if(count>4096)
+			throw gcnew System::InvalidOperationException("Spinach GUI supports at most 4096 atoms.");
+	}
+
 	int get_electron_number(){return electron_number;};
 
 	//Other functions

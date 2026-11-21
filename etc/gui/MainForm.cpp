@@ -205,11 +205,8 @@ System::Void SpinachGUI::MainForm::Importbutton_Click(System::Object^  sender, S
 	OpenFilesDialog->Filter="Gaussian3 File|*.log;*.out|"+
 		                     "mol File|*.mol|"+
 							 "xyz File|*.xyz|"+
-							 "CASTEP File|*.magres|"+
-							 "Orca File|*.log;*.out|"+
-							 "ADF File|*.out|"+
-	                         "GAMESS File|*.out|"+
-							 "COSMOS File|*.coo";
+							 "CASTEP File|*.magres;*.castep|"+
+							 "Orca File|*.log;*.out";
 
 	//|All Files|*.*
 	if (OpenFilesDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK )
@@ -250,28 +247,6 @@ System::Void SpinachGUI::MainForm::Importbutton_Click(System::Object^  sender, S
 			this->Enabled=false;
 			ImportbackgroundWorker->RunWorkerAsync(OpenedFile);
 		}
-		else if(OpenFilesDialog->FilterIndex==6) //ADF
-		{
-			ADF^ OpenedFile= gcnew ADF(OpenFilesDialog->FileName, gcnew Model());
-			this->Enabled=false;
-			ImportbackgroundWorker->RunWorkerAsync(OpenedFile);	
-			
-		}
-		else if(OpenFilesDialog->FilterIndex==7) //GAMESS
-		{
-			GAMESS^ OpenedFile= gcnew GAMESS(OpenFilesDialog->FileName, gcnew Model());
-			this->Enabled=false;
-			ImportbackgroundWorker->RunWorkerAsync(OpenedFile);	
-		}
-		else if(OpenFilesDialog->FilterIndex==8) //COSMOS
-		{
-			COSMOS^ OpenedFile= gcnew COSMOS(OpenFilesDialog->FileName, gcnew Model());
-			this->Enabled=false;
-			ImportbackgroundWorker->RunWorkerAsync(OpenedFile);
-		}
-
-	
-		
 	};
 
 

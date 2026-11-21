@@ -353,6 +353,15 @@ end
 if (~isnumeric(guess))||(~isreal(guess))
     error('guess must be an array of real numbers.');
 end
+if isequal(cost_function,@grape_repeat)
+    if isempty(guess)||mod(spin_system.control.pulse_ntpts,size(guess,2))~=0
+        error('the tied guess must have a block length dividing the full waveform length.');
+    end
+    if ~isempty(spin_system.control.basis)||~isempty(spin_system.control.freeze)
+        error('tied repetition requires explicit samples without a freeze mask.');
+    end
+    return
+end
 switch spin_system.control.integrator
     case 'rectangle'
         if isempty(spin_system.control.basis)

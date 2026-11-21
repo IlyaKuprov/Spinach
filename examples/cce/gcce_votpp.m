@@ -6,18 +6,10 @@
 % coordinates and tensors, retaining the entire proton bath inside 20 A.
 % For Figure 3 the companion input swaps x and z in g and A only;
 % the scalar vanadium quadrupolar splitting remains axial along z.
-% Syntax:
-%
-%                    [energies,fields,echo,times]=gcce_votpp()
-%
-% Rows of energies contain the 16 ascending energy levels in GHz
-% at the corresponding entries of the field row vector fields in tesla.
-% echo and times are rows of complex normalised coherence and total
-% Hahn echo times (seconds) at 0.33 T.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [energies,fields,echo,times]=gcce_votpp()
+function gcce_votpp()
 
 % The unique axis is x in the crystal frame; the applied field is along z
 sys.isotopes={'E','51V'};
@@ -68,7 +60,7 @@ kgrid();
 [echo,times]=votpp_proton_echo();
 kfigure();
 plot(1e6*times,real(echo));
-kxlabel('total echo time / microseconds');
+kxlabel('total echo time / $\mu$s');
 kylabel('normalised coherence');
 kgrid();
 

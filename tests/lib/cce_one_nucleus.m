@@ -3,14 +3,14 @@
 % Eq. (29) of https://doi.org/10.1002/adts.202100254. Frequencies below
 % are chosen model parameters, not a material-specific fit. Syntax:
 %
-%                     [answer,diagnostics]=cce_single_nucleus()
+%                     [answer,diagnostics]=cce_one_nucleus()
 %
 % Returns the normalised complex signal column in answer and the calculation
 % diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_single_nucleus()
+function [answer,diagnostics]=cce_one_nucleus()
 
 % Magnet and isotopes
 sys.magnet=0.01;
@@ -51,15 +51,6 @@ parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,...
 
 % Execute the named Hahn experiment through the cluster context
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
-
-% Plot the measured complex echo amplitude
-kfigure();
-plot(1e6*parameters.times,real(answer),'b-',...
-     1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
-kgrid();
 
 end
 

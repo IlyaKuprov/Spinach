@@ -1,13 +1,9 @@
-% Import versioned CCE results, spin tables, and Cartesian tensors. Syntax:
+% Import spin tables, Cartesian tensors, and cube density samples. Syntax:
 %
 %                 imported=cce_import(filename,format,units)
 %
-% format: mat/json (cce_export envelopes returning model/result),
-% including registered native experiment contracts. Import rejects a
-% capability-version mismatch; sparse storage is preserved.
-% csv (export sidecar or table
-% id,isotope,x,y,z), xyz, tensor (CSV id1,id2,value or id1,id2,xx,...,zz),
-% or cube. Scalars denote isotropic tensors.
+% format: csv (id,isotope,x,y,z), xyz, tensor (CSV id1,id2,value or
+% id1,id2,xx,...,zz), or cube. Scalars denote isotropic tensors.
 % External coordinates require units.length='angstrom','nm','m','bohr'.
 % Tensors require units.tensor='Hz','kHz','MHz','rad/s','T','mT','G'; field
 % units also require units.gyro_rad_s_T. units.frame is mandatory ('lab'
@@ -18,17 +14,16 @@
 %
 % Parameters:
 %
-%   filename, format, units - input path; mat/json/csv/xyz/tensor/cube;
+%   filename, format, units - input path; csv/xyz/tensor/cube;
 %   external length unit angstrom/nm/m/bohr, tensor unit
 %   Hz/kHz/MHz/rad/s/T/mT/G. Field units also require gyro_rad_s_T;
 %   frame names the input frame, and optional rotation is a proper matrix.
 %
 % Outputs:
 %
-%   imported - recovered model/result or canonical spin/tensor/cube data with
-%              explicit metadata.
+%   imported - canonical spin/tensor/cube data with explicit metadata.
 %
-% See also cce_export, spin_bath.
+% See also spin_bath.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -36,27 +31,6 @@ function imported=cce_import(filename,format,units)
 
 % Validate external unit declarations before parsing physical quantities
 grumble(filename,format,units);
-
-% Recover the complete versioned result where the file carries its schema
-if ismember(format,{'json','mat'})||...
-   (strcmp(format,'csv')&&isfile([filename '.json']))
-    if strcmp(format,'mat')
-        loaded=load(filename,'envelope');
-        envelope=loaded.envelope;
-    else
-        if strcmp(format,'csv')
-            filename=[filename '.json'];
-        end
-        envelope=unpack(jsondecode(fileread(filename)));
-    end
-    if ~isstruct(envelope)||~all(isfield(envelope,{'schema','version','payload'}))||...
-       ~strcmp(envelope.schema,'spinach-cce')||envelope.version~=1||...
-       ~isfield(envelope,'model')||~isfield(envelope,'payload')
-        error('cce_import:version','Unsupported CCE file schema.');
-    end
-    imported=struct('model',envelope.model,'result',envelope.payload);
-    return;
-end
 
 % Apply the declared frame for non-self-describing physical input
 rotation=eye(3);
@@ -189,106 +163,19 @@ end
 
 end
 
-% Recover the typed arrays and structures from the encoded envelope
-function value=unpack(encoded)
-
-% Reconstitute each numeric component and the original MATLAB array shape
-switch encoded.kind
-    case 'contract'
-        value=cce_capabilities(str2func(encoded.name));
-        if value.version~=encoded.version
-            error('cce_import:contract','The stored experiment capability version differs.');
-        end
-    case 'function'
-        value=str2func(encoded.name);
-        if ~isequal(value,@clexpn)
-            cce_capabilities(value);
-        end
-    case 'sparse'
-        value=sparse(unpack(encoded.rows),unpack(encoded.columns),...
-                     unpack(encoded.entries),encoded.shape(1),encoded.shape(2));
-        value=cast(value,encoded.class);
-    case 'integer'
-        if prod(encoded.shape)==0
-            value=zeros(encoded.shape.',encoded.class);
-            return;
-        end
-        value=reshape(typecast(uint8(encoded.bytes),encoded.class),encoded.shape.');
-    case 'array'
-        if prod(encoded.shape)==0
-            value=zeros(encoded.shape.',encoded.class);
-            return;
-        end
-        re=str2double(encoded.real);
-        im=str2double(encoded.imag);
-        if all(im==0)
-            data=re;
-        else
-            data=complex(re,im);
-        end
-        value=reshape(cast(data,encoded.class),encoded.shape.');
-    case 'char'
-        value=encoded.value;
-        if isfield(encoded,'shape')
-            value=reshape(value,encoded.shape.');
-        end
-    case 'string'
-        value=reshape(string(encoded.items),encoded.shape.');
-        if isfield(encoded,'missing')
-            value(unpack(encoded.missing))=missing;
-        end
-    case 'cell'
-        items=encoded.items;
-        if isempty(items)
-            items=cell(0,1);
-        end
-        if isstruct(items)
-            items=num2cell(items);
-        end
-        value=reshape(cellfun(@unpack,items,'UniformOutput',false),encoded.shape.');
-    case 'struct'
-        names=encoded.fields;
-        items=encoded.items;
-        if isempty(names)
-            names=cell(0,1);
-        end
-        if isempty(items)
-            items=cell(0,1);
-        end
-        if isstruct(items)
-            items=num2cell(items);
-        end
-        value=repmat(cell2struct(cell(size(names)),names),encoded.shape.');
-        for j=1:numel(names)
-            for k=1:numel(value)
-                value(k).(names{j})=unpack(items{k+(j-1)*numel(value)});
-            end
-        end
-    otherwise
-        error('Unknown serialization type.');
-end
-
-end
-
 % Validate file format, unit fields, and an optional frame rotation
 function grumble(filename,format,units)
 if ~ischar(filename)||~isfile(filename)||~ischar(format)||...
-   ~ismember(format,{'mat','json','csv','xyz','tensor','cube'})||...
+   ~ismember(format,{'csv','xyz','tensor','cube'})||...
    ~isstruct(units)||~isscalar(units)
     error('Invalid CCE import arguments.');
 end
-allowed={};
-if ismember(format,{'xyz','csv','cube'})
-    allowed={'length','rotation','frame'};
-end
+allowed={'length','rotation','frame'};
 if strcmp(format,'tensor')
     allowed={'tensor','rotation','gyro_rad_s_T','frame'};
 end
 if strcmp(format,'cube')
     allowed=[allowed {'density'}];
-end
-if strcmp(format,'csv')&&isfile([filename '.json'])
-    allowed={};
 end
 unknown=setdiff(fieldnames(units),allowed);
 if ~isempty(unknown)
@@ -302,9 +189,6 @@ if isfield(units,'rotation')&&(~isequal(size(units.rotation),[3 3])||...
    any(~isfinite(units.rotation),'all')||norm(units.rotation.'*units.rotation-eye(3),'fro')>100*eps||...
    abs(det(units.rotation)-1)>100*eps)
     error('Invalid frame rotation.');
-end
-if ismember(format,{'mat','json'})||(strcmp(format,'csv')&&isfile([filename '.json']))
-    return
 end
 if ~isfield(units,'frame')||~ischar(units.frame)||isempty(units.frame)
     error('External physical input requires a declared frame.');

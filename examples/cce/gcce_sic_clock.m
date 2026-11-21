@@ -3,14 +3,11 @@
 % Fig. 4(c) of Onizhuk and Galli, doi:10.1002/adts.202100254, using
 % mixed nuclear states and 40 Angstrom bath and 8 Angstrom pair cutoffs.
 %
-% Returns the normalised complex gCCE2 coherence and diagnostics,
-% including the gCCE1 coherence and numerical error bounds.
-%
 % Calculation time: about 3 minutes on one Xeon Platinum 8270 worker.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=gcce_sic_clock()
+function gcce_sic_clock()
 
 % Read the fixed atomistic configuration and tensors in Angstrom and Hz
 bath=load(fullfile(fileparts(mfilename('fullpath')),'sic_clock_kh_bath.mat'));
@@ -67,11 +64,11 @@ parameters.cce.numerics=struct('atol',0.03,'rtol',1e-8,...
 
 % Calculate the signal without building the full bath basis
 spin_system=create(sys,inter);
-[answer,diagnostics]=clexpn(spin_system,@free_evolution,parameters,'labframe');
+[~,details]=clexpn(spin_system,@free_evolution,parameters,'labframe');
 
 % Compare the first two cluster orders
 kfigure();
-plot(1e3*parameters.times,abs(squeeze(diagnostics.reduction.by_order(:,1,2:3))));
+plot(1e3*parameters.times,abs(squeeze(details.reduction.by_order(:,1,2:3))));
 kxlabel('time / ms');
 kylabel('normalised coherence magnitude');
 klegend({'gCCE1','gCCE2'});

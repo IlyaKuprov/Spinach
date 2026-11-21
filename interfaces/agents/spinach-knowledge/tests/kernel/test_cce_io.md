@@ -4,27 +4,7 @@
 
 ## Purpose
 
-Complex shape/type round trips, scalar/tensor units, and cubes.
-
-## Behaviour
-
-Checks the following named assertions in the source:
-
-- `XYZ units and active rotation`.
-- `Scalar frequency is isotropic tensor`.
-- `Row-major tensor and angular frequency`.
-- `Field units require an explicit gyro`.
-- `Unspecified field gyromagnetic units are refused`.
-- `Cube z-fastest order`.
-- `Cube explicit bohr conversion`.
-- `Scalar kHz tensor`.
-- `Angular to cyclic frequency`.
-- `CSV SI coordinate boundary`.
-- `CSV physical isotope labels`.
-- `Missing frame refused`.
-- `Unsupported export refused`.
-
-The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
+Checks the external CCE input boundary: coordinate and frequency unit conversion, active XYZ rotation, scalar and Cartesian tensor conventions, and cube voxel ordering. The spin-CSV test checks that a neighbouring JSON file does not override the table or its declared units. Missing frame and field gyromagnetic declarations, and unsupported MAT/JSON result formats, are rejected.
 
 ## Inputs and outputs
 
@@ -43,6 +23,3 @@ result=test_cce_io()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_io.m)
-
-Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
-MAT/JSON/CSV-sidecar empty-container checks include empty cells and structs, fieldless struct arrays, integer/logical/string/character arrays, and nontrivial zero-sized dimensions.

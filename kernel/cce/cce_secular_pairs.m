@@ -1,13 +1,29 @@
 % Secular CCE-2 Hahn echo for an unpolarised bath of identical spin-1/2
-% nuclei. The first argument is an N-by-3 array of centre-relative
-% coordinates in metres; field_axis is the 3-by-1 field unit vector.
-% hyperfine and dipolar are the longitudinal point-dipole prefactors
-% in rad s^-1 m^3. times and echo are column vectors (times in seconds).
-% abs_tol bounds the total echo change due to omitted pairs.
+% nuclei with longitudinal dipolar hyperfine couplings. Syntax:
+%
+%  echo=cce_secular_pairs(xyz,field_axis,hyperfine,dipolar,times,abs_tol)
+%
+% Parameters:
+%
+%     xyz        - N-by-3 array of centre-relative nuclear sites, in metres
+%
+%     field_axis - 3-by-1 magnetic field unit vector
+%
+%     hyperfine  - point-dipole hyperfine prefactor, in rad s^-1 m^3
+%
+%     dipolar    - nuclear point-dipole prefactor, in rad s^-1 m^3
+%
+%     times      - column of total Hahn echo times, in seconds
+%
+%     abs_tol    - upper bound on echo loss omitted by pair screening
+%
+% Outputs:
+%
+%     echo       - column of dimensionless normalised echo amplitudes
 %
 % ilya.kuprov@weizmann.ac.il
 
-function echo=cce_erbium_cawo4_pairs(xyz,field_axis,hyperfine,dipolar,times,abs_tol)
+function echo=cce_secular_pairs(xyz,field_axis,hyperfine,dipolar,times,abs_tol)
 
 % Check consistency
 grumble(xyz,field_axis,hyperfine,dipolar,times,abs_tol);

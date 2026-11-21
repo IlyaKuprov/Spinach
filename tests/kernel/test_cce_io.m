@@ -1,5 +1,5 @@
-% Test: kernel/cce_io | CCE input and output
-% Versioned complex result round trips and explicit physical input units. Syntax:
+% Test: kernel/cce_io | CCE external input
+% External spin tables, tensor units, and cube geometry. Syntax:
 %
 %                    result=test_cce_io()
 %
@@ -12,62 +12,11 @@
 function result=test_cce_io()
 
 % Make isolated temporary files and standard harness output
-result=new_test_result('kernel/cce_io','CCE input and output',...
-                       'Complex shape/type round trips, scalar/tensor units and cubes.');
+result=new_test_result('kernel/cce_io','CCE external input',...
+                       'Explicit spin coordinates, scalar/tensor units, and voxel geometry.');
 folder=tempname;
 mkdir(folder);
 cleanup=onCleanup(@()rmdir(folder,'s'));
-original=struct('value',[1+2i NaN;3-4i Inf],'validity',logical([1 0;1 0]),...
-                'diagnostics',struct('bounds',[eps 2*eps],'reason',{{'valid','zero'}}),...
-                'empty',zeros(0,2),'tensor',reshape(1:24,2,3,4),...
-                'id',intmax('uint64'),'powers',[intmin('int64') intmax('int64')]);
-
-% Test each versioned representation, including its complete diagnostics
-original.integer_extremes={intmin('int64'),intmax('int64'),intmax('uint64')};
-for format={'mat','json','csv'}
-    file=fullfile(folder,['result.' format{1}]);
-    model=struct('coordinates_A',[1 2 3]);
-    cce_export(file,model,original);
-    restored=cce_import(file,format{1},struct());
-    result=test_true(result,['Exact complex round trip: ' format{1}],isequaln(original,restored.result)&&isequaln(model,restored.model),['Exact complex round trip: ' format{1}]);
-end
-
-% Preserve all empty container and numeric shapes in the tagged JSON envelope
-empty_model=struct('observed',{{}},'empty_struct',struct([]));
-empty_model.manifolds=cell(0,2);
-empty_model.no_fields=repmat(struct(),2,1);
-empty_model.values=zeros(2,0,3);
-empty_model.flags=false(0,2);
-empty_model.integers=zeros(0,2,'uint64');
-empty_model.strings=strings(0,2);
-empty_model.characters=repmat('a',0,2);
-empty_model.text='';
-empty_model.nested={cell(0,1),[],struct('value',{{}})};
-for extension={'mat','json','csv'}
-    filename=fullfile(folder,['empty.' extension{1}]);
-    cce_export(filename,empty_model,struct());
-    recovered=false;
-    try
-        payload=cce_import(filename,extension{1},struct());
-        recovered=isequaln(payload.model,empty_model);
-    catch
-    end
-    result=test_true(result,['Empty containers round trip: ' extension{1}],recovered,...
-                     'An exporter must import its own empty cells, arrays and fieldless structures.');
-end
-
-% Compare each decoded field to identify any empty-shape loss
-filename=fullfile(folder,'empty.json');
-payload=struct('model',struct());
-try
-    payload=cce_import(filename,'json',struct());
-catch
-end
-for name=fieldnames(empty_model).'
-    result=test_true(result,['Empty JSON field: ' name{1}],...
-                     isfield(payload.model,name{1})&&isequaln(payload.model.(name{1}),empty_model.(name{1})),...
-                     'Empty container type and complete dimensions must survive JSON.');
-end
 
 % Verify declared coordinate units and active Cartesian rotations
 file=fullfile(folder,'sites.xyz');
@@ -118,16 +67,17 @@ a=cce_import(file,'tensor',struct('tensor','rad/s','frame','lab'));
 result=test_close(result,'Angular to cyclic frequency',a.pairs_Hz.tensor,...
                   2.5*eye(3)/(2*pi),eps,eps,'Angular frequencies cross the native Hz boundary.');
 
-% Preserve explicit labels and SI coordinates through tabular import
+% Read the spin table even when a matching JSON filename is present
 file=fullfile(folder,'sites.csv');
 put(file,sprintf('id,isotope,x,y,z\n17,13C,1e-10,2e-10,3e-10\n'));
+put([file '.json'],'{}');
 a=cce_import(file,'csv',struct('length','m','frame','lab'));
 result=test_close(result,'CSV SI coordinate boundary',a.coordinates_A,[1 2 3],4*eps,4*eps,...
                   'Metres convert once into Angstrom.');
 result=test_true(result,'CSV physical isotope labels',isequal(a.ids,17)&&...
                  isequal(a.isotopes,{'13C'}),'Physical site IDs are not renumbered on import.');
 
-% Refuse omitted frame and invalid explicit export extension
+% Refuse an omitted frame
 rejected=false;
 try
     cce_import(file,'csv',struct('length','m'));
@@ -135,59 +85,20 @@ catch
     rejected=true;
 end
 result=test_true(result,'Missing frame refused',rejected,'No silent frame inference.');
-rejected=false;
-try
-    cce_export(fullfile(folder,'data.txt'),model,original);
-catch
-    rejected=true;
-end
-result=test_true(result,'Unsupported export refused',rejected,'Fixed signature infers only documented extensions.');
 
-disp('CCE IO: MAT/JSON/CSV round trips exact; tensor and voxel conversions passed.');
+% Reject the removed MAT and JSON result formats
+for format={'mat','json'}
 
-% Round-trip actual native diagnostics and registered experiment contracts
-sys.isotopes={'13C','13C'};
-sys.magnet=0;
-sys.output='hush';
-sys.disable={'hygiene'};
-sys.parallel={'processes',1};
-inter.zeeman.matrix={zeros(3),zeros(3)};
-system=create(sys,inter);
-p.observed=1;
-p.times=[0 0.001];
-p.cce.order=1;
-p.transition=struct('spins',1,'ms',[0.5 -0.5]);
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^26);
-[answer,details]=clexpn(system,@free_evolution,p,'labframe');
-p.grid=struct('alphas',[0 0],'betas',[0 pi/2],'gammas',[0 0],'weights',[1 2]);
-[grid_answer,grid_data]=clexpn(system,@free_evolution,p,'labframe');
-native=struct('answer',answer,'diagnostics',details,...
-              'grid_request',struct('parameters',p,'pulse_sequence',@free_evolution),...
-              'grid_diagnostics',grid_data,'noise_contract',cce_capabilities(@noise_correlation),...
-              'sparse_data',sparse([1 2],[2 1],[1+2i 3],2,2),...
-              'empty_sparse',sparse(false(0,2)),'characters',['ab';'cd'],...
-              'strings',["value" missing],...
-              'literal_contract',struct('pulse_sequence','description','evaluator',17));
-for format={'mat','json','csv'}
-    file=fullfile(folder,['native.' format{1}]);
-    cce_export(file,struct(),native);
-    restored=cce_import(file,format{1},struct());
-    result=test_true(result,['Native contracts round trip: ' format{1}],...
-                     isequaln(restored.result,native)&&issparse(restored.result.sparse_data)&&...
-                     issparse(restored.result.empty_sparse),...
-                     'Native diagnostics retain registered evaluators, sparse arrays, character shapes, and missing strings.');
-    contract=restored.result.diagnostics.contract;
-    native_model=cce_compile(system,details.parameters,'labframe');
-    schedule=struct('pulse_sequence',contract.pulse_sequence,'contract',contract);
-    record=contract.evaluator(native_model,struct('id',0,'sites',[]),...
-                              details.ensemble.spin_config(1),schedule,details.parameters);
-    result=test_close(result,['Imported evaluator replay: ' format{1}],...
-                      record.value,details.raw{1}(1).value,0,0,...
-                      'The registry restores the actual local evaluator, not an uncallable name.');
-    request=restored.result.grid_request;
-    replay=clexpn(system,request.pulse_sequence,request.parameters,'labframe');
-    result=test_close(result,['Imported experiment replay: ' format{1}],replay,grid_answer,0,0,...
-                      'The reconstructed registered experiment remains callable.');
+    % Present an existing file so the error must be about the format
+    rejected=false;
+    try
+        cce_import(file,format{1},struct());
+    catch err
+        rejected=strcmp(err.message,'Invalid CCE import arguments.');
+    end
+    result=test_true(result,['Removed format refused: ' format{1}],rejected,...
+                     'Only external physical input formats are accepted.');
+
 end
 
 end

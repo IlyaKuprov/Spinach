@@ -198,7 +198,7 @@
       "tests/kernel/test_clexpn_generators.m",
       "tests/kernel/test_clexpn_experiments.m",
       "tests/kernel/test_clexpn_master.m",
-      "examples/cce/cce_single_nucleus.m"
+      "examples/cce/cce_nv_diamond.m"
     ]
   },
   {

@@ -1,14 +1,13 @@
 % Reconstructs the lattice and amorphous Er:CaWO4 Hahn echoes in Fig. S12
-% of Le Dantec et al., doi:10.1126/sciadv.abj9786. Returns an array of
-% ensemble mean echoes (time by bath, lattice first), and a structure
-% with the total echo times in seconds and the individual realisations.
+% of Le Dantec et al., doi:10.1126/sciadv.abj9786. The curves are
+% ensemble means over 50 independently sampled baths of each type.
 % Numerical inputs are from the authors' Fortran and supplemental theory
 % in doi:10.7910/DVN/9VSAUT. Original bath realisations and seeds were not
 % archived; the continuum is sampled uniformly with no hard core.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_erbium_cawo4()
+function cce_erbium_cawo4()
 
 % Experimental geometry and total Hahn echo times
 cell_size=1e-10*[5.2429 5.2429 11.3737];
@@ -53,7 +52,6 @@ dipolar=mu0/(4*pi)*hbar*gamma_w^2;
 % Prepare independent isotope occupancies and continuum configurations
 occupied=cell(n_configs,1);
 amorphous=cell(n_configs,1);
-counts=zeros(n_configs,2);
 for n=1:n_configs
 
     % Select isotope sites by Bernoulli occupancy and sample uniform continuum positions
@@ -62,7 +60,6 @@ for n=1:n_configs
     occupied{n}=lattice(rand(stream,size(lattice,1),1)<abundance,:);
     directions=randn(stream,n_amorphous,3);
     amorphous{n}=radius*rand(stream,n_amorphous,1).^(1/3).*directions./vecnorm(directions,2,2);
-    counts(n,:)=[size(occupied{n},1) n_amorphous];
 
 end
 
@@ -71,17 +68,16 @@ realisations=zeros(numel(times),n_configs,2);
 parfor (n=1:n_configs,n_workers)
 
     % Evaluate the two independent bath configurations assigned to this worker
-    lattice_echo=cce_erbium_cawo4_pairs(occupied{n},field_axis,hyperfine,dipolar,times,abs_tol);
-    random_echo=cce_erbium_cawo4_pairs(amorphous{n},field_axis,hyperfine,dipolar,times,abs_tol);
+    lattice_echo=cce_secular_pairs(occupied{n},field_axis,hyperfine,dipolar,times,abs_tol);
+    random_echo=cce_secular_pairs(amorphous{n},field_axis,hyperfine,dipolar,times,abs_tol);
     realisations(:,n,:)=reshape([lattice_echo random_echo],numel(times),1,2);
 
 end
-answer=reshape(mean(realisations,2),numel(times),2);
-diagnostics=struct('times',times,'realisations',realisations,'counts',counts);
+echo=reshape(mean(realisations,2),numel(times),2);
 
 % Plot the normalised amplitude, not its square
 kfigure();
-plot(1e3*times,answer,'LineWidth',1.5);
+plot(1e3*times,echo,'LineWidth',1.5);
 kxlabel('total echo time, $2\tau$ / ms');
 kylabel('normalised Hahn echo amplitude');
 klegend({'lattice bath','amorphous bath'},'Location','northeast');

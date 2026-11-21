@@ -53,15 +53,6 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
 spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
-% Plot the complex echo amplitude
-figure();
-plot(1e6*parameters.times,real(answer),'b-',...
-     1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
-kgrid();
-
 end
 
 

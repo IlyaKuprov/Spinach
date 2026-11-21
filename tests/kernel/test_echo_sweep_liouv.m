@@ -1,3 +1,4 @@
+% Test: kernel/echo_sweep_liouv | Liouville echo-detected frequency sweep
 % Compare echo_sweep in Hilbert and Fokker-Planck Liouville spaces.
 % Syntax:
 %

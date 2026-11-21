@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_shaped_pulses_deep | Dynamic shaped pulse propagation paths
 % Tests dynamic shaped-pulse propagation paths. Syntax:
 %
 %               result=test_dynamic_shaped_pulses_deep()

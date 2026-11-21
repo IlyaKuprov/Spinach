@@ -1,3 +1,4 @@
+% Test: kernel/linear_perturbation_suite | Linear algebra and perturbation utilities
 % Tests linear-algebra, angular-momentum, and perturbation utilities. Syntax:
 %
 %                    result=test_linear_perturbation_suite()

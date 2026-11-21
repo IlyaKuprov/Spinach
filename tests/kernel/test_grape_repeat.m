@@ -1,3 +1,4 @@
+% Test: kernel/grape_repeat | Tied GRAPE repetition
 % Tests tied Cartesian repetition through the full GRAPE objective.
 % Syntax:
 %

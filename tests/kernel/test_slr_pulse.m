@@ -1,3 +1,4 @@
+% Test: kernel/slr_pulse | Shinnar-Le Roux pulse design
 % Tests Shinnar-Le Roux selective excitation pulse design. Syntax:
 %
 %                         result=test_slr_pulse()

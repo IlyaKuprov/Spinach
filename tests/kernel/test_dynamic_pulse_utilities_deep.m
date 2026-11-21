@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_pulse_utilities_deep | Dynamic pulse utility paths
 % Tests dynamic pulse utility paths. Syntax:
 %
 %               result=test_dynamic_pulse_utilities_deep()

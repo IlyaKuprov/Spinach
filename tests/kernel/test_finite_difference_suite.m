@@ -1,3 +1,4 @@
+% Test: kernel/finite_difference_suite | Finite-difference and spectral differentiation functions
 % Tests finite-difference and spectral differentiation helpers. Syntax:
 %
 %                    result=test_finite_difference_suite()

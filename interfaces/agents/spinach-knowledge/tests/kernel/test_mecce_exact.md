@@ -39,7 +39,6 @@ result=test_mecce_exact()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_mecce_exact.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 Supplied-spin_config regression checks compare gCCE and ME-gCCE density, signal, and observables (raw and normalised) with an independent diagonal Hamiltonian solution. They also verify projected bath phases and swapped user projections, and require informative rejection of unsupported spin_config state/projection/reference aliases.
 

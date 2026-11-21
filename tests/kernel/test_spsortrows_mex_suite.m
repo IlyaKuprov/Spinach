@@ -1,3 +1,4 @@
+% Test: kernel/spsortrows_mex_suite | Sparse sortrows MEX helper
 % Tests the sparse sortrows MEX helper. Syntax:
 %
 %                    result=test_spsortrows_mex_suite()

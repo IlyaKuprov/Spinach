@@ -128,7 +128,7 @@ for n=1:numel(r_grid)
     % Derivative spectrum on the ascending field axis
     subplot(2,2,n); plot(field_axis,spectra(:,n));
     kxlabel('magnetic field, Gauss'); kylabel('first derivative, a.u.');
-    title(['R = ' num2str(r_grid(n),'%.4g') ' s^{-1}']);
+    ktitle(['$R$ = ' num2str(r_grid(n),'%.4g') ' s$^{-1}$']);
     xlim([min(field_axis) max(field_axis)]); box on;
 
 end

@@ -2,7 +2,7 @@
 
 [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/optimcon/ens_catalog.m) · [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=ens_catalog.m)
 
-- Signature: `[catalog,ens_sizes]=ens_catalog(control)`
+- Signature: `[catalog,ens_sizes,case_weights]=ens_catalog(control)`
 
 ## Purpose and layout
 
@@ -19,3 +19,5 @@ The source applies these named correlation filters when present in `control.ens_
 - `power_drift` retains rows whose power-level and drift indices match.
 
 Budgeting is applied after filtering. A finite budget at most 1 is treated as a fraction of the filtered case count, rounded to a sample count and clamped to at least 1. Otherwise the budget is used as a case count. If the resulting budget is smaller than the catalog, a subset is selected with a fixed Twister seed; the caller's prior MATLAB RNG state is restored afterward.
+
+The optional third output is a column of normalised case weights in catalog row order. Explicit drift weights are indexed by column two after correlation filtering; each drift must have the same number of retained rows, the retained mass must be positive, and stochastic subsampling is not allowed. Without explicit weights, retained rows share equal weight.

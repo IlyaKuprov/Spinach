@@ -12,6 +12,9 @@
 %     control      - control data structure described
 %                    in detail in the online manual
 %
+%     control.drift_weights - optional finite nonnegative weight per drift;
+%                             weights require the full correlated ensemble
+%
 % Outputs:
 %
 %     spin_system  - updated Spinach data structure
@@ -819,6 +822,22 @@ if isfield(control,'amplitudes')
  
 end
 
+% Read the optional quadrature weights in drift order
+if isfield(control,'drift_weights')
+
+    % Require one weight per physical drift
+    weights=control.drift_weights;
+    if ~isnumeric(weights)||~isvector(weights)||~isreal(weights)||...
+       numel(weights)~=spin_system.control.ndrifts||...
+       any(~isfinite(weights))||any(weights<0)
+        error('Spinach:optimcon:badDriftWeights',...
+              'control.drift_weights must contain one finite nonnegative real weight per drift.');
+    end
+    spin_system.control.drift_weights=double(weights(:));
+    control=rmfield(control,'drift_weights');
+
+end
+
 % Process freeze mask
 if isfield(control,'freeze')
 
@@ -1477,7 +1496,8 @@ end
 
 % Build the ensemble case catalog
 [spin_system.control.catalog,...
- spin_system.control.ens_sizes]=ens_catalog(spin_system.control);
+ spin_system.control.ens_sizes,...
+ spin_system.control.case_weights]=ens_catalog(spin_system.control);
 n_cases=size(spin_system.control.catalog,1);
 
 % Match the state pair list to the correlated ensemble

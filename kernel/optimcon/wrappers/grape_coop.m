@@ -55,6 +55,7 @@ end
 
 % Make sure final states are available
 spin_system.control.return_traj=true();
+spin_system.control.traj_opts={};
 
 % Run both experiments
 spin_system.control.freeze=freeze_a;
@@ -87,20 +88,12 @@ dirt_sum=cell(size(dirt_a));
 for n=1:numel(dirt_sum)
     dirt_sum{n}=dirt_a{n}+dirt_b{n};
 end
-spin_system.control.rho_targ=dirt_sum;
-
-% Replicate the initial state
-rho=spin_system.control.rho_init{1};
-spin_system.control.rho_init=cell(size(spin_system.control.rho_targ));
-spin_system.control.rho_init(:)={rho};
+spin_system.control.case_targets=dirt_sum;
 
 % The squared impurity norm requires a real linear overlap
 spin_system.control.fidelity='real';
 
 % Impurity cancellation gradients
-spin_system.control.ens_corrs={'rho_ens'};
-[spin_system.control.catalog,...
- spin_system.control.ens_sizes]=ens_catalog(spin_system.control);
 spin_system.control.freeze=freeze_a;
 [~,~,gradient_c]=grape_phase(profile_a,spin_system);
 spin_system.control.freeze=freeze_b;
@@ -112,10 +105,12 @@ fidelity=(fidelity_a+fidelity_b)/2;
 % Penalty on the squared norm of the dirt
 switch spin_system.bas.formalism
     case 'zeeman-hilb'
-        fidelity(1)=fidelity(1)-mean(cellfun(@(x)real(hdot(x,x)),dirt_sum));
+        impurity=cellfun(@(x)real(hdot(x,x)),dirt_sum);
     otherwise
-        fidelity(1)=fidelity(1)-mean(cellfun(@(x)norm(x,2)^2,dirt_sum));
+        impurity=cellfun(@(x)norm(x,2)^2,dirt_sum);
 end
+
+fidelity(1)=fidelity(1)-spin_system.control.case_weights.'*impurity;
 
 % Assemble the gradient, impurity term only enters the fidelity slice
 gradient=cat(1,gradient_a,gradient_b)/2;

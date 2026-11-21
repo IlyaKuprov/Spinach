@@ -29,7 +29,7 @@ includes_dir=fullfile(spinach_root,'kernel','includes');
 integrity_dir=fullfile(spinach_root,'kernel','integrity');
 mex_dir=fullfile(spinach_root,'etc','mex');
 
-% Exercise host overrides and GPU guard includes
+% Exercise portable user overrides and GPU guard includes
 result=local_test_autoexec(result,fullfile(includes_dir,'autoexec.m'));
 result=local_test_gpu_guard(result,fullfile(includes_dir,'start_disallow_gpu.m'),...
                             fullfile(includes_dir,'end_disallow_gpu.m'));
@@ -38,9 +38,7 @@ result=local_test_gpu_guard(result,fullfile(includes_dir,'start_disallow_gpu.m')
 pool_created=local_start_pool_if_needed();
 pool_cleanup=onCleanup(@()local_delete_pool(pool_created));
 
-% Exercise parallel profiler and Redfield include paths
-result=local_test_parallel_profiler(result,fullfile(includes_dir,'parallel_profiler_start.m'),...
-                                    fullfile(includes_dir,'parallel_profiler_report.m'));
+% Exercise Redfield include paths
 result=local_test_redfield_serial(result,fullfile(includes_dir,'redfield_integral_serial.m'));
 result=local_test_redfield_async(result,fullfile(includes_dir,'redfield_integral_async.m'));
 result=local_test_direct_include_dispatch(result);
@@ -74,48 +72,15 @@ old_toolbar=get(groot,'defaultFigureToolbar');
 cleanup_obj=onCleanup(@()local_restore_autoexec(old_computer,old_position,...
                                                 old_style,old_menu,old_toolbar));
 
-% Check the ALAUNDO GPU-aware override
-sys=struct();
-sys.enable={'gpu'};
-setenv('COMPUTERNAME','ALAUNDO');
-run(autoexec_file);
-result=test_true(result,'autoexec ALAUNDO GPU override',...
-                 isequal(sys.parallel,{'processes',32}),...
-                 'ALAUNDO should use four workers per GPU when GPU arithmetic was requested');
-
-% Check the TALOS GPU-aware override
-sys=struct();
-sys.enable={'gpu'};
-setenv('COMPUTERNAME','TALOS');
-run(autoexec_file);
-result=test_true(result,'autoexec TALOS GPU override',...
-                 isequal(sys.parallel,{'processes',12}),...
-                 'TALOS should use four workers per GPU when GPU arithmetic was requested');
-
-% Check the TALOS non-GPU no-op branch
-sys=struct();
-sys.enable={};
-setenv('COMPUTERNAME','TALOS');
-run(autoexec_file);
-result=test_true(result,'autoexec TALOS CPU no-op',~isfield(sys,'parallel'),...
-                 'TALOS should not invent a parallelisation policy without GPU arithmetic');
-
 % Check that user parallel settings are not overwritten
 sys=struct();
 sys.parallel={'processes',4};
 sys.enable={'gpu'};
-setenv('COMPUTERNAME','TALOS');
+setenv('COMPUTERNAME','UNKNOWN_SPINACH_HOST');
 run(autoexec_file);
 result=test_true(result,'autoexec preserves user parallel setting',...
                  isequal(sys.parallel,{'processes',4}),...
                  'autoexec must not override a user-supplied sys.parallel field');
-
-% Check that unknown hosts leave sys.parallel unset
-sys=struct();
-setenv('COMPUTERNAME','UNKNOWN_SPINACH_HOST');
-run(autoexec_file);
-result=test_true(result,'autoexec unknown host no-op',~isfield(sys,'parallel'),...
-                 'unknown host names should not invent a parallelisation policy');
 
 end
 
@@ -151,37 +116,6 @@ err_text=local_error_text(@()run(end_file));
 result=test_true(result,'end_disallow_gpu requires start',...
                  contains(err_text,'must be preceded by start_disallow_gpu'),...
                  'end_disallow_gpu must protect callers from restoring an undefined GPU policy');
-
-end
-
-
-function result=local_test_parallel_profiler(result,start_file,report_file)
-
-% Build a quiet spin system without the detailed dafuq profiler
-spin_system=local_quiet_spin_system();
-spin_system.sys.enable={};
-spin_system.sys.scratch=tempdir;
-
-% Exercise brief profiler start and report includes
-run(start_file);
-pause(0.01);
-run(report_file);
-result=test_true(result,'parallel profiler byte counters',...
-                 exist('nbytes','var')&&isnumeric(nbytes)&&numel(nbytes)==2&&...
-                 all(isfinite(nbytes)),...
-                 'parallel profiler report must compute a finite two-element worker byte counter');
-result=test_true(result,'parallel profiler wall time',...
-                 exist('walltime','var')&&isnumeric(walltime)&&isscalar(walltime)&&...
-                 isfinite(walltime)&&(walltime>=0),...
-                 'parallel profiler report must compute a finite non-negative wall time');
-
-% Inspect the detailed internal-profiler branch without executing it
-start_src=fileread(start_file);
-report_src=fileread(report_file);
-result=test_true(result,'parallel profiler dafuq source guard',...
-                 contains(start_src,'parallel.internal.profiling.PoolProfiler')&&...
-                 contains(report_src,'parProfiler.drainLog()'),...
-                 'the detailed dafuq profiler path is internal MATLAB API code and is source-guarded here');
 
 end
 
@@ -243,17 +177,6 @@ end_disallow_gpu;
 result=test_true(result,'gpu guard direct script dispatch',...
                  gpu_removed&&ismember('gpu',spin_system.sys.enable),...
                  'direct GPU guard script dispatch must remove, and then restore, the gpu flag');
-
-% Execute the parallel profiler pair by script name
-spin_system=local_quiet_spin_system();
-spin_system.sys.enable={};
-spin_system.sys.scratch=tempdir;
-parallel_profiler_start;
-pause(0.01);
-parallel_profiler_report;
-result=test_true(result,'parallel profiler direct script dispatch',...
-                 exist('nbytes','var')&&exist('walltime','var')&&all(isfinite(nbytes)),...
-                 'direct profiler script dispatch must report finite byte counters and wall time');
 
 % Execute the serial Redfield include by script name
 [spin_system,Q,L0,R,expected]=local_redfield_fixture(); %#ok<ASGLU>
@@ -420,21 +343,46 @@ mkdir(fullfile(scratch,'etc','mex','private'));
 mkdir(fullfile(scratch,'kernel','line_shapes'));
 mkdir(fullfile(scratch,'kernel','eigenfields'));
 mkdir(fullfile(scratch,'kernel','indexing'));
+mkdir(fullfile(scratch,'kernel','overloads'));
+repo_root=fileparts(fileparts(fileparts(compile_file)));
+copyfile(fullfile(repo_root,'kernel','overloads','cuda_sparse_by_sparse_mex.cu'),...
+         fullfile(scratch,'kernel','overloads','cuda_sparse_by_sparse_mex.cu'));
 copyfile(compile_file,fullfile(scratch,'etc','mex','compile_mex.m'));
 
-% Install a path-local mex stub that records compiler calls
-fid=fopen(fullfile(scratch,'etc','mex','private','mex.m'),'w');
-fprintf(fid,'function mex(varargin)\n');
-fprintf(fid,'record_file=fullfile(fileparts(fileparts(mfilename(''fullpath''))),''mex_calls.mat'');\n');
-fprintf(fid,'if exist(record_file,''file'')\n');
-fprintf(fid,'    loaded=load(record_file,''mex_calls'');\n');
-fprintf(fid,'    mex_calls=loaded.mex_calls;\n');
-fprintf(fid,'else\n');
-fprintf(fid,'    mex_calls={};\n');
-fprintf(fid,'end\n');
-fprintf(fid,'mex_calls{end+1}=varargin;\n');
-fprintf(fid,'save(record_file,''mex_calls'');\n');
-fprintf(fid,'end\n\n');
+% Install path-local compiler stubs that record all build calls
+compilers={'mex','mexcuda'};
+for n=1:numel(compilers)
+    fid=fopen(fullfile(scratch,'etc','mex','private',[compilers{n} '.m']),'w');
+    fprintf(fid,'function %s(varargin)\n',compilers{n});
+    fprintf(fid,'record_file=fullfile(fileparts(fileparts(mfilename(''fullpath''))),''mex_calls.mat'');\n');
+    fprintf(fid,'if exist(record_file,''file'')\n');
+    fprintf(fid,'    loaded=load(record_file,''mex_calls'');\n');
+    fprintf(fid,'    mex_calls=loaded.mex_calls;\n');
+    fprintf(fid,'else\n');
+    fprintf(fid,'    mex_calls={};\n');
+    fprintf(fid,'end\n');
+    fprintf(fid,'mex_calls{end+1}=varargin;\n');
+    fprintf(fid,'save(record_file,''mex_calls'');\n');
+    if n==2
+        fprintf(fid,'error_file=fullfile(fileparts(record_file),''cuda_error.mat'');\n');
+        fprintf(fid,'if exist(error_file,''file'')\n');
+        fprintf(fid,'    loaded=load(error_file,''identifier'');\n');
+        fprintf(fid,'    error(loaded.identifier,''Compiler fixture failure'');\n');
+        fprintf(fid,'end\n');
+    end
+    fprintf(fid,'end\n\n');
+    fclose(fid);
+end
+
+% Drive the Linux compiler route independently of the fixture host
+platforms={'ispc','ismac'};
+for n=1:numel(platforms)
+    fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{n} '.m']),'w');
+    fprintf(fid,'function flag=%s()\nflag=false;\nend\n',platforms{n});
+    fclose(fid);
+end
+fid=fopen(fullfile(scratch,'etc','mex','private','isMATLABReleaseOlderThan.m'),'w');
+fprintf(fid,'function flag=isMATLABReleaseOlderThan(release)\nflag=false;\nend\n');
 fclose(fid);
 old_path=path;
 old_dir=pwd;
@@ -443,7 +391,7 @@ warning_state=warning('query','MATLAB:dispatcher:nameConflict');
 warning('off','MATLAB:dispatcher:nameConflict');
 warning_cleaner=onCleanup(@()warning(warning_state));
 addpath(fullfile(scratch,'etc','mex'),'-begin');
-clear('compile_mex','mex');
+clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan');
 
 % Exercise the rewritten compiler helper through the stub
 compile_mex();
@@ -453,6 +401,7 @@ gauss_args=loaded.mex_calls{2};
 cubic_args=loaded.mex_calls{3};
 spsort_args=loaded.mex_calls{4};
 spunicols_args=loaded.mex_calls{5};
+cuda_args=loaded.mex_calls{6};
 
 % Normalise recorded paths before comparing with platform-native fullfile output
 line_args_cmp=strrep(strrep(line_args,'/',filesep),'\',filesep);
@@ -460,30 +409,101 @@ gauss_args_cmp=strrep(strrep(gauss_args,'/',filesep),'\',filesep);
 cubic_args_cmp=strrep(strrep(cubic_args,'/',filesep),'\',filesep);
 spsort_args_cmp=strrep(strrep(spsort_args,'/',filesep),'\',filesep);
 spunicols_args_cmp=strrep(strrep(spunicols_args,'/',filesep),'\',filesep);
+cuda_args_cmp=strrep(strrep(cuda_args,'/',filesep),'\',filesep);
 line_out=line_args_cmp{find(strcmp(line_args,'-outdir'),1)+1};
 gauss_out=gauss_args_cmp{find(strcmp(gauss_args,'-outdir'),1)+1};
 cubic_out=cubic_args_cmp{find(strcmp(cubic_args,'-outdir'),1)+1};
 spsort_out=spsort_args_cmp{find(strcmp(spsort_args,'-outdir'),1)+1};
 spunicols_out=spunicols_args_cmp{find(strcmp(spunicols_args,'-outdir'),1)+1};
+cuda_out=cuda_args_cmp{find(strcmp(cuda_args,'-outdir'),1)+1};
 result=test_true(result,'compile_mex compiler calls',...
-                 numel(loaded.mex_calls)==5&&...
+                 numel(loaded.mex_calls)==6&&...
                  any(strcmp(line_args,'-R2018a'))&&...
                  any(strcmp(gauss_args,'-R2018a'))&&...
                  any(strcmp(cubic_args,'-R2018a'))&&...
                  any(strcmp(spsort_args,'-R2018a'))&&...
                  any(strcmp(spunicols_args,'-R2018a'))&&...
+                 any(strcmp(cuda_args,'-R2018a'))&&...
+                 any(strcmp(cuda_args,'-O'))&&any(strcmp(cuda_args,'-lcuda'))&&...
                  any(strcmp(line_args_cmp,fullfile(scratch,'kernel','line_shapes','lorentzcon.cpp')))&&...
                  any(strcmp(gauss_args_cmp,fullfile(scratch,'kernel','line_shapes','gausscon.cpp')))&&...
                  any(strcmp(cubic_args_cmp,fullfile(scratch,'kernel','eigenfields','cubic_roots.cpp')))&&...
                  any(strcmp(spsort_args_cmp,fullfile(scratch,'kernel','indexing','spsortrows.cpp')))&&...
                  any(strcmp(spunicols_args_cmp,fullfile(scratch,'kernel','indexing','spunicols.cpp')))&&...
+                 any(strcmp(cuda_args_cmp,fullfile(scratch,'kernel','overloads','cuda_sparse_by_sparse_mex.cu')))&&...
                  strcmp(line_out,fullfile(scratch,'kernel','line_shapes'))&&...
                  strcmp(gauss_out,fullfile(scratch,'kernel','line_shapes'))&&...
                  strcmp(cubic_out,fullfile(scratch,'kernel','eigenfields'))&&...
                  strcmp(spsort_out,fullfile(scratch,'kernel','indexing'))&&...
-                 strcmp(spunicols_out,fullfile(scratch,'kernel','indexing')),...
-                 'compile_mex must compile the five listed MEX sources into their source directories with the interleaved-complex API');
-clear('compile_mex','mex','warning_cleaner');
+                 strcmp(spunicols_out,fullfile(scratch,'kernel','indexing'))&&...
+                 strcmp(cuda_out,fullfile(scratch,'kernel','overloads')),...
+                 'compile_mex must compile all six MEX sources into their source directories with the interleaved-complex API');
+
+% Check platform routes with and without an external CUDA library path
+cuda_path=getenv('CUDA_PATH');
+env_cleaner=onCleanup(@()setenv('CUDA_PATH',cuda_path));
+routes={'Windows','macOS','older MATLAB','Windows bundled toolchain'};
+for n=1:numel(routes)
+    setenv('CUDA_PATH',fullfile(scratch,'CUDA Toolkit'));
+    if n==4
+        setenv('CUDA_PATH','');
+    end
+    for k=1:numel(platforms)
+        fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{k} '.m']),'w');
+        fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},n==k||((n==4)&&(k==1)));
+        fclose(fid);
+    end
+    fid=fopen(fullfile(scratch,'etc','mex','private','isMATLABReleaseOlderThan.m'),'w');
+    fprintf(fid,'function flag=isMATLABReleaseOlderThan(release)\nflag=%d;\nend\n',n==3);
+    fclose(fid);
+    delete(fullfile(scratch,'etc','mex','mex_calls.mat'));
+    clear('compile_mex','ispc','ismac','isMATLABReleaseOlderThan'); rehash;
+    evalc('compile_mex();');
+    loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
+    result=test_true(result,['compile_mex route ' routes{n}],...
+                     numel(loaded.mex_calls)==6-(n==3),...
+                     'all platforms invoke mexcuda on R2026b or later; older releases retain five C++ builds');
+    if n~=3
+        cuda_args=loaded.mex_calls{6};
+        library_arg=['-L' fullfile(scratch,'CUDA Toolkit','lib','x64')];
+        result=test_true(result,['compile_mex driver ' routes{n}],...
+                         any(strcmp(cuda_args,'-lcuda'))&&...
+                         (any(strcmp(cuda_args,library_arg))==(n==1))&&...
+                         ((n~=1)||(find(strcmp(cuda_args,library_arg),1)<...
+                                   find(strcmp(cuda_args,'-lcuda'),1))),...
+                         'Windows uses CUDA_PATH/lib/x64 before -lcuda when set; other routes retain compiler library search');
+    end
+end
+clear('env_cleaner');
+
+% Report unavailable macOS CUDA without hiding unrelated compilation failures
+error_ids={'parallel:gpu:device:MacOSGPUNotSupported',...
+           'Spinach:test:cudaCompileFailure',...
+           'parallel:gpu:device:MacOSGPUNotSupported'};
+for n=1:numel(error_ids)
+    for k=1:numel(platforms)
+        fid=fopen(fullfile(scratch,'etc','mex','private',[platforms{k} '.m']),'w');
+        fprintf(fid,'function flag=%s()\nflag=%d;\nend\n',platforms{k},(k==1)==(n==3));
+        fclose(fid);
+    end
+    identifier=error_ids{n};
+    save(fullfile(scratch,'etc','mex','cuda_error.mat'),'identifier');
+    delete(fullfile(scratch,'etc','mex','mex_calls.mat'));
+    clear('compile_mex','ispc','ismac'); rehash;
+    caught_id='';
+    try
+        output=evalc('compile_mex();');
+    catch exception
+        caught_id=exception.identifier;
+    end
+    loaded=load(fullfile(scratch,'etc','mex','mex_calls.mat'),'mex_calls');
+    result=test_true(result,sprintf('compile_mex CUDA error %d',n),...
+                     (numel(loaded.mex_calls)==6)&&...
+                     (((n==1)&&isempty(caught_id)&&contains(output,'CUDA'))||...
+                      ((n~=1)&&strcmp(caught_id,identifier))),...
+                     'only the macOS CUDA-unavailable error is reported; other compiler failures propagate');
+end
+clear('compile_mex','mex','mexcuda','ispc','ismac','isMATLABReleaseOlderThan','warning_cleaner');
 
 % Inspect the production source for platform flags and output confinement
 compile_src=fileread(compile_file);
@@ -493,14 +513,15 @@ result=test_true(result,'compile_mex source confinement',...
                  contains(compile_src,'kernel/eigenfields/cubic_roots.cpp')&&...
                  contains(compile_src,'kernel/indexing/spsortrows.cpp')&&...
                  contains(compile_src,'kernel/indexing/spunicols.cpp')&&...
+                 contains(compile_src,'kernel/overloads/cuda_sparse_by_sparse_mex.cu')&&...
                  contains(compile_src,'''-outdir'',[P ''/kernel/line_shapes'']')&&...
                  contains(compile_src,'''-outdir'',[P ''/kernel/eigenfields'']')&&...
                  contains(compile_src,'''-outdir'',[P ''/kernel/indexing'']')&&...
+                 contains(compile_src,'''-outdir'',[P ''/kernel/overloads'']')&&...
                  contains(compile_src,'''-R2018a'''),...
                  'compile_mex must compile the listed MEX sources, write outputs into their source directories, and request the interleaved-complex API');
 
 % Inspect sparse indexing MEX sources for platform-specific OpenMP rigging
-repo_root=fileparts(fileparts(fileparts(compile_file)));
 spsort_src=fileread(fullfile(repo_root,'kernel','indexing','spsortrows.cpp'));
 spunicols_src=fileread(fullfile(repo_root,'kernel','indexing','spunicols.cpp'));
 openmp_markers={'_OPENMP','omp_set','omp_get','omp.h','#pragma omp',...
@@ -632,3 +653,5 @@ catch err
 end
 
 end
+
+

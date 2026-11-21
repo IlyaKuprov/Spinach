@@ -8,6 +8,7 @@
 - [Scalar relaxation](#scalar-relaxation)
 - [Which terms of R survive](#which-terms-of-r-survive)
 - [Thermal equilibrium and temperature](#thermal-equilibrium-and-temperature)
+- [Relaxation superoperators from SLE generators](#relaxation-superoperators-from-sle-generators)
 - [Chemical kinetics](#chemical-kinetics)
 - [Powder grids](#powder-grids)
 
@@ -31,6 +32,21 @@ by theories supporting relaxation anisotropy: `powder` recomputes `R` at
 every grid orientation and `crystal` passes `parameters.orientation`, but
 `liquid` and `singlerot` call `relaxation` without angles, so anisotropic
 rates have no effect there.
+
+For a rigid molecular geometry without measured tumbling data,
+`rotcorr(atom_symbols,xyz,solvent,temperature)` provides a surface-ellipsoid
+estimate with shipped elemental radii and temperature-dependent pure-water
+or chloroform viscosity. `atom_symbols` is an N-by-1 cell array, `xyz` is
+N-by-3 in Angstrom, and `solvent` is the character string `'water'` or
+`'chloroform'`. Surface sampling refines automatically to 1% successive-grid
+self-consistency, not 1% physical accuracy. Water uses a protein-derived
+hydration layer; chloroform uses an uncalibrated bare van der Waals envelope.
+The scalar output is an isotropic-equivalent rank-2 time, while the tensor
+retains anisotropy in the input frame. Do not interpret the scalar as every
+anisotropic correlation time or transfer the protein model's accuracy to
+small molecules. Read `etc/rotcorr_sources.md` for parameters, temperature
+ranges, sources, and applicability, and the `kernel/utilities/rotcorr`
+knowledge entry for usage.
 
 In the sphten direct sum, `unit_state` populates every substance unit coordinate,
 and `equilibrium` returns independently normalised, unweighted blocks. IME acts
@@ -271,6 +287,46 @@ Run `[r1,r2,t1,t2,R]=relaxan(spin_system)` before trusting any of this: it
 prints longitudinal and transverse rates and times for every spin, dynamic
 frequency shifts dropped. Compare against measurement first.
 
+## Relaxation superoperators from SLE generators
+
+`sle2rlx` projects a stochastic Liouville equation generator back onto the
+spin Liouville space and returns the Redfield-type relaxation superoperator
+that the lattice dynamics induces there:
+
+```matlab
+capture=@(spin_system,parameters,H,R,K)struct('L',H+1i*R+1i*K,...
+                                              'spc_dim',parameters.spc_dim);
+sle=gridfree(spin_system,capture,parameters,'labframe');
+P=sparse(1,1,1,sle.spc_dim,1);
+[R,L0]=sle2rlx(spin_system,sle.L,P,P);
+```
+
+- `L` is the generator in the `kron(lattice,spin)` order of `gridfree`;
+  `pi_vec` and `one_vec` are the lattice equilibrium distribution and the
+  lattice integration functional (unit vector of the rank-zero Wigner
+  function, which is lattice index 1, for `gridfree`; equilibrium populations
+  and a vector of ones for an explicitly built `kron(species,spin)` exchange
+  generator with the same spin space in every species). The direct sum of
+  substance blocks that `kinetics.m` builds for `inter.chem` is not of this
+  form and is not supported.
+- `R` comes back in the same frame as `L`: build the generator with
+  `'labframe'` assumptions when comparing with `relaxation.m`, and set
+  `inter.rlx_keep='labframe'` and `inter.rlx_dfs='keep'` on the Redfield
+  side for an element-by-element comparison.
+- Build the generator from a spin system without `inter.relaxation`: any
+  relaxation superoperator present in `L` is averaged into `L0`, not into
+  `R`.
+- The result is the Markov limit of the exact Nakajima-Zwanzig memory kernel
+  and is valid when the lattice relaxes faster than the spins (Redfield
+  condition); the function does not check this. Rank two is the minimum
+  lattice rank for rank-two interactions; even there the Q-to-Q blocks of
+  the anisotropic interaction are retained in `A`, so the result resums
+  higher-order anisotropy terms and reduces to Redfield theory only when
+  those blocks are negligible. Higher ranks add further coupling paths.
+- Example: `examples/relaxation_theory/sle2rlx_vs_redfield.m`; test:
+  `tests/kernel/test_sle2rlx.m`.
+
+
 ## Chemical kinetics
 
 Reaction records currently require `sphten-liouv`. Declare each species and
@@ -295,7 +351,7 @@ parameters such as `inter.tau_c` remain per substance.
 
 The example is at exchange equilibrium because forward and reverse event
 fluxes are equal. `state(spin_system,'Lz','1H')` applies initial concentrations
-without a chemistry qualifier; `coil_state(spin_system,'Lz','1H','exact')`
+without a chemistry qualifier; `coil_state(spin_system,'Lz','1H')`
 is unweighted detection. `equilibrate(K,c0)` may still calculate stationary
 concentrations of the separate classical network `dc/dt=K*c`; the classical
 matrix is not a chemistry input field. First-order reaction rates have units
@@ -317,7 +373,7 @@ frequency, distorted-state lifetime, and rotational correlation time
 separate when adapting this model; scaling both exchange rates preserves
 populations but is a different physical scan.
 
-Spin replacement between molecules uses matching rather than a flux matrix.
+Explicit spin-replacement reaction records use atom matching. The original point-to-point `flux_rate`/`flux_type` model remains supported separately through the relaxation generator in `sphten-liouv`; it is not interchangeable with every matching-based reaction.
 For a two-proton molecule exchanging its first proton with a one-proton pool:
 
 ```matlab
@@ -332,7 +388,7 @@ coincide. The additive arrival keeps each reactant's internal orders but not
 cross-reactant polarisation products: the retained molecular spin survives,
 while correlations involving the departing spin are lost. Intramolecular
 permutation records instead transport the mapped multi-spin orders. These are
-physical matching models, not an automatic translation of every retired flux
+physical matching models, not an automatic translation of every point-to-point flux
 matrix. `test_cwdm_flux` supplies an analytic replacement check. Freezing an
 additive generator is justified only when its concentrations and rates remain
 constant, not for general mass-action or product-closure networks.
@@ -419,3 +475,11 @@ Spinning contexts add a second convergence axis, `parameters.max_rank`,
 which must be converged independently of the grid. `gridfree` needs no grid
 at all, and takes its rotational correlation times in `parameters.tau_c`
 rather than `inter.tau_c`, the latter being read only by Redfield theory.
+
+### Imaging relaxation phantoms
+
+`imaging` assembles `R` only from the user-supplied `parameters.rlx_ph` and `parameters.rlx_op`. These relaxation superoperators must already contain all required contributions, including magnetisation flux; the context does not add a separate flux term.
+
+## Explicit point-to-point flux relaxation
+
+Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.

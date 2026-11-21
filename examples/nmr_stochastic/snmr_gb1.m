@@ -8,10 +8,13 @@
 function snmr_gb1()
 
 % Protein data import
+protein_dir=fullfile(fileparts(mfilename('fullpath')),...
+                     '..','standard_systems','proteins');
 options.pdb_mol=1;
 options.noshift='delete';
 options.select='all';
-[sys,inter]=protein('2N9K.pdb','2N9K.bmrb',options);
+[sys,inter]=protein(fullfile(protein_dir,'2n9k.pdb'),...
+                    fullfile(protein_dir,'2n9k.bmrb'),options);
 
 % Magnet field
 sys.magnet=18.79;
@@ -59,9 +62,9 @@ Nx=operator(spin_system,'Lx','15N');
 Ny=operator(spin_system,'Ly','15N');
 
 % Observables
-coils=[coil_state(spin_system,'Lx','1H','exact')  coil_state(spin_system,'Ly','1H','exact')  ...
-       coil_state(spin_system,'Lx','13C','exact') coil_state(spin_system,'Ly','13C','exact') ...
-       coil_state(spin_system,'Lx','15N','exact') coil_state(spin_system,'Ly','15N','exact')];
+coils=[coil_state(spin_system,'Lx','1H')  coil_state(spin_system,'Ly','1H')  ...
+       coil_state(spin_system,'Lx','13C') coil_state(spin_system,'Ly','13C') ...
+       coil_state(spin_system,'Lx','15N') coil_state(spin_system,'Ly','15N')];
 
 % Isotropic thermal equilibrium
 rho=equilibrium(spin_system);

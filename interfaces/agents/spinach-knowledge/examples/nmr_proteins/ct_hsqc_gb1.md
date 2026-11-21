@@ -23,3 +23,6 @@ The caller sets `J=90`, sweeps [3000, 3000] Hz, offsets [-7300, 5100] Hz, 128 x 
 - Builds the basis, simulates the two FID components, apodises and Fourier-transforms them, combines them, and plots `-real(spectrum)`.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

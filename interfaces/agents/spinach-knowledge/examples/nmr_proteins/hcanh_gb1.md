@@ -17,3 +17,6 @@ The example calls `liquid(spin_system,@hcanh,parameters,'nmr')` with spins `1H`,
 All four FIDs receive squared-cosine apodisation. The example Fourier-transforms F3 for each channel; for F2 it transforms the positive and negative channel pairs separately and combines them with complex conjugation as `f3f2_pos + conj(f3f2_neg)`; it then Fourier-transforms F1. The real part is displayed with `plot_3d`; no output data file is written.
 
 The sequence source cites the bidirectional-propagation method at http://dx.doi.org/10.1016/j.jmr.2014.04.002 and documents the H(CA)NH sequence as Figure 7.37 in *Protein NMR Spectroscopy*, 2nd edition. See also [experiments/nmr_protein/hcanh.m](https://github.com/IlyaKuprov/Spinach/blob/main/experiments/nmr_protein/hcanh.m).
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

@@ -19,6 +19,11 @@
 % the checks it had recorded before the error are recovered from
 % test_record and reported alongside the error message.
 %
+% Console chatter is captured per test and shown only on failure. Progress
+% and outcomes are always printed; verbose adds individual check messages.
+% Test-created figures are invisible and deleted even after a thrown error;
+% existing figures and root graphics defaults are retained.
+%
 % ilya.kuprov@weizmann.ac.il
 
 function results=run_tests(varargin)
@@ -57,38 +62,28 @@ end
 results=struct('id',{},'name',{},'purpose',{},'status',{},'elapsed',{},...
                'messages',{},'failures',{},'error',{});
 
+% Announce the selected workload
+fprintf('Spinach regression tests: %d selected.\n',numel(manifest));
+id_width=max([numel('Test') cellfun(@numel,{manifest.id})]);
+
 % Run the tests
 for n=1:numel(manifest)
 
-    % Reset the clock and the record accumulator
-    tic;
-    test_record(new_test_result(manifest(n).id,manifest(n).name,''));
+    % Show progress before entering a potentially lengthy calculation
+    fprintf('[%d/%d] %-*s  ',n,numel(manifest),id_width,manifest(n).id);
 
-    try
-        result=feval(manifest(n).function);
-        result.elapsed=toc;
-        result.error=strjoin(result.failures,'; ');
-        if isempty(result.failures)
-            result.status='PASS';
-        else
-            result.status='FAIL';
-        end
-    catch err
-        result=test_record([]);
-        result.status='FAIL';
-        result.elapsed=toc;
-        result.failures{end+1}=err.message;
-        result.error=strjoin(result.failures,'; ');
-    end
+    % Capture test chatter without discarding recorded or thrown failures
+    [result,transcript]=test_execute(manifest(n));
     results(end+1)=result; %#ok<AGROW>
+    fprintf('%s  %8.3f s\n',result.status,result.elapsed);
     if options.verbose
-        fprintf('%s\t%s\t%.3f s\n',result.status,result.id,result.elapsed);
         for k=1:numel(result.messages)
             fprintf('    %s\n',result.messages{k});
         end
-        if strcmp(result.status,'FAIL')
-            fprintf('    ERROR: %s\n',result.error);
-        end
+    end
+    if strcmp(result.status,'FAIL')&&~isempty(strtrim(transcript))
+        fprintf('    Captured output:\n    %s\n',...
+                strrep(strtrim(transcript),newline,[newline '    ']));
     end
     if options.stop_on_fail&&strcmp(result.status,'FAIL')
         break;

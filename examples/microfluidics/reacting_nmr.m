@@ -115,7 +115,7 @@ R=relaxation(spin_system);
 Hy=operator(spin_system,'Ly','1H');
 
 % Detect transverse magnetisation
-Hp=coil_state(spin_system,'L+','1H','exact');
+Hp=coil_state(spin_system,'L+','1H');
 
 % Preallocate FID array
 fids=cell(19,1);

@@ -1,5 +1,7 @@
 # examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m
 
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
 > This historical Spinach variant optimises a ten-level RF-power ensemble and uses L-BFGS; the paper’s first example is a single-system two-channel design. Its on-resonance 1H–13C state transfer and 1/J duration remain useful, but it does not reproduce the paper’s pulse.
 
 - Signature: `coherence_transfer()`
@@ -10,7 +12,7 @@ Design a finite-duration heteronuclear coherence-transfer pulse from proton tran
 
 ## Physical / mathematical content
 
-The model is a two-spin 1H-13C system at 14.1 T. Both isotropic chemical shifts are set to 0 ppm, and the scalar coupling is 140 Hz. The NMR drift Hamiltonian is built from this system. The initial density operator is Lx on spin 1 (1H), and the target is Lx on spin 2 (13C); each is normalised. The fixed transfer time is T = 1/J, where J is the specified coupling.
+The model is a two-spin 1H-13C system at 14.1 T. Both isotropic chemical shifts are set to 0 ppm, and the scalar coupling is 140 Hz. The NMR drift Hamiltonian is built from this system. The initial density operator is Lx on spin 1 (1H), and the target is Lx on spin 2 (13C); each is normalised. The fixed transfer time is `T=1/J`, where J is the specified coupling.
 
 ## Numerical / algorithmic content
 
@@ -18,7 +20,7 @@ The complete `sphten-liouv` basis is selected with approximation `none`. Four Ca
 
 ## Syntax
 
-Call `coherence_transfer()` with no arguments. Source: [examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m](https://github.com/IlyaKuprov/Spinach/blob/main/examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m).
+Call `coherence_transfer()` with no arguments. Source: `examples/optimal_control/case_studies/Tosner_JMR_2009/coherence_transfer.m` (source removed).
 
 ## Parameters / inputs
 

@@ -1,8 +1,10 @@
 # interfaces/jsonlab-1.5/loadjson.m
 
-- MATLAB source: [loadjson.m](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/loadjson.m)
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
+- MATLAB source: `interfaces/jsonlab-1.5/loadjson.m` (source removed)
 - Related documentation: [Spin Dynamics Wiki](https://spindynamics.org/wiki/index.php?title=Main_Page)
-- Signature: `data = loadjson(fname,varargin)`
+- Signature: `data=loadjson(fname,varargin)`
 
 ## Contract
 
@@ -28,4 +30,4 @@ It also shows loading `examples/example1.json`, optionally with `'SimplifyCell',
 
 ## Provenance
 
-This is the JSONLab utility by Qianqian Fang, with earlier contributions credited in its source to [Nedialko Krouchev](http://www.mathworks.com/matlabcentral/fileexchange/25713), [Francois Glineur](http://www.mathworks.com/matlabcentral/fileexchange/23393), and Joel Feenstra. The source identifies the JSONLab project at [iso2mesh / JSONLab](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab) and states a BSD license. No DOI is cited in the source.
+This is the JSONLab utility by Qianqian Fang, with earlier contributions credited in its source to [Nedialko Krouchev](http://www.mathworks.com/matlabcentral/fileexchange/25713), [Francois Glineur](http://www.mathworks.com/matlabcentral/fileexchange/23393), and Joel Feenstra. The source identifies the JSONLab project at [iso2mesh / JSONLab](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab) and states a BSD licence. No DOI is cited in the source.

@@ -53,7 +53,6 @@ inter.chem.reactions={...
 parameters.grid='leb_1ang_rank_63';
 parameters.spins={'E'};
 parameters.tol=1e-2;
-parameters.verbose=0;
 parameters.sum_up=0;
 
 % Optional GPU arithmetic

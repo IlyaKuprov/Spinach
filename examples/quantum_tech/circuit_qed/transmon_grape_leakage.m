@@ -64,8 +64,8 @@ common.max_iter=300;
 common.plotting={};
 
 % Trajectory cost term variants
-variants={'final fidelity','leakage penalty',...
-          'time-averaged fidelity','time-averaged fidelity, leakage penalty'};
+variants={'final fid.','leakage pen.','time-av. fid.',...
+          'time-av. fid., leakage pen.'};
 
 % Preallocate fidelity and leakage population trajectories
 fid_traj=zeros(4,24); leak_traj=zeros(4,24);
@@ -98,9 +98,9 @@ for v=1:4
 
     % Report the outcome
     disp([pad(variants{v},40) ' final fidelity ' num2str(fid_traj(v,end),'%.4f') ...
-          ', first node above 0.9 fidelity ' int2str(find(fid_traj(v,:)>0.9,1)) ...
-          ', mean leakage population ' num2str(mean(leak_traj(v,:)),'%.4f') ...
-          ', peak leakage population ' num2str(max(leak_traj(v,:)),'%.4f')]);
+                              ', first node above 0.9 fidelity ' int2str(find(fid_traj(v,:)>0.9,1)) ...
+                              ', mean leakage population ' num2str(mean(leak_traj(v,:)),'%.4f') ...
+                              ', peak leakage population ' num2str(max(leak_traj(v,:)),'%.4f')]);
 
 end
 
@@ -117,14 +117,17 @@ end
 
 % Plot the fidelity trajectories
 time_axis=1e9*cumsum(pulse_dt);
-kfigure(); subplot(1,2,1); plot(time_axis,fid_traj'); kgrid;
+kfigure(); scale_figure([1.75 0.75]);
+subplot(1,2,1); plot(time_axis,fid_traj'); 
 kxlabel('time, ns'); kylabel('transfer fidelity');
 klegend(variants,'Location','southeast');
+xlim tight; ylim padded; kgrid;
 
 % Plot the leakage population trajectories
 subplot(1,2,2); plot(time_axis,leak_traj'); kgrid;
 kxlabel('time, ns'); kylabel('leakage population');
-klegend(variants,'Location','northwest');
+klegend(variants,'Location','northeast');
+xlim tight; ylim padded; kgrid;
 
 end
 

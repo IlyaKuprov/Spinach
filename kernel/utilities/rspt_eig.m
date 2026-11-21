@@ -9,8 +9,9 @@
 %
 % Parameters:
 %
-%     Hz   -  laboratory frame Hamiltonian, containing only 
-%             Zeeman terms at 1 Tesla
+%     Hz   -  laboratory frame Hamiltonian, containing only
+%             Zeeman terms at spin_system.inter.magnet Tesla;
+%             this reference field must be non-zero
 %
 %     Hc   -  laboratory frame Hamiltonian, containing all 
 %             spin-spin couplings, but no Zeeman terms
@@ -37,8 +38,9 @@
 %
 % Outputs:
 %
-%     E    - a column vector of energies, sorted in ascen-
-%            ding order (rad/s)
+%     E    - a column vector of energies (rad/s), ascending
+%            within each symmetry block; blocks retain the
+%            order of the symmetry projectors
 %
 %     V    - a matrix with eigenvectors in columns, sorted 
 %            left to right in the same order as the energies
@@ -58,7 +60,7 @@
 function [E,V,dE,T,LP]=rspt_eig(spin_system,parameters,Hz,Hc,Hmw,B)
 
 % Check consistency
-grumble(parameters,Hz,Hc,Hmw,B);
+grumble(spin_system,parameters,Hz,Hc,Hmw,B);
 
 % Recursive call for symmetry
 if isfield(spin_system.bas,'sym_fact')
@@ -105,7 +107,7 @@ if isfield(spin_system.bas,'sym_fact')
 else
 
     % Hamiltonian
-    H=B*Hz+Hc; H=full((H+H')/2);
+    H=(B/spin_system.inter.magnet)*Hz+Hc; H=full((H+H')/2);
 
     % Decide the method
     switch parameters.rspt_order
@@ -132,11 +134,13 @@ else
 
 end
 
-% Sort the energies in ascending order
-[E,idx]=sort(E,'ascend'); V=V(:,idx);
+% Sort within each symmetry block, preserving its position in the direct sum
+if ~isfield(spin_system.bas,'sym_fact')
+    [E,idx]=sort(E,'ascend'); V=V(:,idx);
+end
 
 % Hellmann-Feynman dE/dB, if required
-if nargout>2, dE=real(diag(V'*Hz*V)); end
+if nargout>2, dE=real(diag(V'*Hz*V))/spin_system.inter.magnet; end
 
 % Transition moments, if required
 if nargout>3, T=abs(V'*Hmw*V).^2; end
@@ -165,7 +169,7 @@ if (nargout>4)&&isfield(parameters,'rho0')
 elseif nargout>4
 
     % Hamiltonian
-    H=B*Hz+Hc; H=(H+H')/2;
+    H=(B/spin_system.inter.magnet)*Hz+Hc; H=(H+H')/2;
 
     % Thermal equilibrium
     rho0=equilibrium(spin_system,H);
@@ -178,7 +182,13 @@ end
 end
 
 % Consistency enforcement
-function grumble(parameters,Hz,Hc,Hmw,B)
+function grumble(spin_system,parameters,Hz,Hc,Hmw,B)
+if (~isfield(spin_system,'inter'))||(~isfield(spin_system.inter,'magnet'))||...
+   (~isnumeric(spin_system.inter.magnet))||(~isreal(spin_system.inter.magnet))||...
+   (~isscalar(spin_system.inter.magnet))||(~isfinite(spin_system.inter.magnet))||...
+   (spin_system.inter.magnet==0)
+    error('spin_system.inter.magnet must be a finite non-zero real scalar.');
+end
 if ~isfield(parameters,'rspt_order')
     error('parameters.rspt_order subfield must be present.');
 end

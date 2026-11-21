@@ -30,7 +30,7 @@ spin_system=basis(spin_system,bas);
 
 % Pulse-acquire setup
 parameters.rate=1000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=17;
 parameters.grid='leb_2ang_rank_17';
 parameters.sweep=2e4;
@@ -38,8 +38,7 @@ parameters.npoints=512;
 parameters.zerofill=4096;
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=coil_state(spin_system,'L+','1H','exact');
-parameters.verbose=0;
+parameters.coil=coil_state(spin_system,'L+','1H');
 
 % Simulation
 fid=singlerot(spin_system,@acquire,parameters,'nmr');

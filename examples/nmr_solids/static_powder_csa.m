@@ -27,7 +27,7 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'1H'};
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=coil_state(spin_system,'L+','1H','exact');
+parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.decouple={};
 parameters.offset=0;
 parameters.grid='rep_2ang_6400pts_sph';
@@ -36,7 +36,6 @@ parameters.npoints=256;
 parameters.zerofill=512;
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
-parameters.verbose=0;
 
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'nmr');

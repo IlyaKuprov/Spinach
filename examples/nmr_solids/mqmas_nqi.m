@@ -24,7 +24,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment setup
 parameters.rate=62.5e3;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=7;
 parameters.grid='rep_2ang_1600pts_sph';
 parameters.npoints=[128 128];
@@ -36,7 +36,7 @@ parameters.rframes={{'87Rb',2}};
 parameters.mq_order=3;
 parameters.axis_units='ppm';
 parameters.rho0=state(spin_system,'Lz','87Rb');
-parameters.coil=coil_state(spin_system,'L+','87Rb','exact');
+parameters.coil=coil_state(spin_system,'L+','87Rb');
 parameters.pulse_amp=2*pi*[250e3 250e3];
 parameters.pulse_dur=[2e-6 1e-6];
 

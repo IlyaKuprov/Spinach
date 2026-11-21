@@ -31,6 +31,8 @@ The optional `bas.projections`, `bas.longitudinal`, and `bas.zero_quantum` setti
 
 For `sphten-liouv`, the routine prepares `spin_system.bas.lpst` and `spin_system.bas.rpst` cells indexed by spin multiplicity, loading or computing product tables through `ist_product_table` for each present multiplicity other than 1. It stores an MD5 hash of all descriptor blocks, `nstates`, and `chem.parts` in `spin_system.bas.basis_hash` for later cache use. This function does not itself describe persistent cache storage or cache invalidation.
 
+`bas.row_hash{n}` is a character array with one 32-character MD5 digest per local spherical-tensor descriptor row, computed as `md5_hash(full(bas.basis{n}(k,:)))`. It is distinct from the aggregate `basis_hash`. Hashes are compiled after basis filtering and ordering, and accompany temporary local descriptors used for symmetry. Compiled Zeeman bases have empty 0-by-32 row-hash arrays; `sim2liouv` changes their dimensions but not their empty descriptors. Rebuild with `basis` after changing basis settings; any explicit descriptor slicing must slice its row hashes identically. Hash matches do not perform collision detection.
+
 ## Parameters / output
 
 - `spin_system` - primary structure produced by [create.m](create.md), including component multiplicities, types, isotope identities, interactions, and chemical-substance mapping.
@@ -50,3 +52,5 @@ Before compilation, the union of `chem.parts` must equal every global spin index
 Wavefunction direct-sum storage uses the local Hilbert dimensions, including scalar spin-free blocks. Nonempty reaction records raise `Spinach:basis:wavefunctionChemistry`: chemical reactions are not supported in zeeman-wavef formalism.
 
 Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.
+
+Product records are sorted by operator index, then source and destination. `bas.lp_offsets{mult}` and `bas.rp_offsets{mult}` store cumulative row counts (starting at zero), locating each tensor slice. `bas.unit_norm{mult}` stores the `[n 1 n value]` coefficients for direct detection-state normalisation. Disk cache filenames and contents are unchanged.

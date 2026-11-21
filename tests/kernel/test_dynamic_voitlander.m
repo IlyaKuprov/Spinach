@@ -112,6 +112,31 @@ reference=prod_area*pd*line_shape;
 result=test_close(result,'voitlander vertex product amplitude',spec_corr,reference,1e-10,1e-12,...
                   'the Simpson-Richardson correction must average finite per-vertex products');
 
+% Unmatched identities must retain their vertex contribution
+tri_unmatched=triangle;
+for n=1:3
+    tri_unmatched(n).ti=[100+n 200+n 1];
+end
+spec_unmatched=voitlander(spin_system,parameters,tri_unmatched,Ic,Iz,Qc,Qz,Hmw);
+result=test_close(result,'voitlander unmatched vertex conservation',...
+                  spec_unmatched,spec,1e-10,1e-12,...
+                  'relabelled constant lines must retain the same total area');
+
+% A missing vertex carries zero intensity rather than erasing its neighbours
+tri_empty=triangle;
+fields={'tf','tm','tw','pd','tj','ti'};
+for n=1:numel(fields)
+    tri_empty(1).(fields{n})=tri_empty(1).(fields{n})([],:);
+end
+spec_empty=voitlander(spin_system,parameters,tri_empty,Ic,Iz,Qc,Qz,Hmw);
+empty_area=(4*((2/3)*area_a+area_b+area_c+area_d)-...
+            (2/3)*sphtarea(r1,r2,r3))/3;
+reference=empty_area*tm*tj*pd*(line_width/pi)./...
+          ((parameters.b_axis-tf).^2+line_width^2);
+result=test_close(result,'voitlander missing vertex conservation',...
+                  spec_empty,reference,1e-10,1e-12,...
+                  'a missing corner must suppress only its third of each triangle');
+
 % Check that singular field-sweep Jacobian vertices are rejected safely
 tri_sing=triangle;
 tri_sing(1).tj=Inf;

@@ -15,7 +15,7 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
   - Orders 1–4: the Hamiltonian is split into diagonal and off-diagonal parts, and `rspert` is called with the specified order.
   - `Inf`: full diagonalisation via `eig(H,'vector')`.
   - Any other value: an error `'unsupported perturbation theory order.'` is raised.
-- Energies are sorted in ascending order and eigenvectors reordered to match.
+- Energies are ascending within each symmetry block; the blocks retain projector order rather than being globally interleaved. Eigenvectors and derived quantities use this same ordering. Without a decomposition, energies remain globally ascending.
 - If more than two output arguments are requested, `dE` is computed via the Hellmann–Feynman theorem as `real(diag(V'*Hz*V))`.
 - If more than three output arguments are requested, transition moments are computed as `T = abs(V'*Hmw*V).^2`.
 - If more than four output arguments are requested, level populations `LP = real(diag(V'*rho0*V))` are computed from the thermal equilibrium state:
@@ -31,14 +31,14 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
 - `parameters` — Parameter struct:
   - `parameters.rspt_order` — perturbation theory order used to account for the off-diagonal part of the Hamiltonian; `Inf` for exact diagonalisation.
   - `parameters.rho0` — optional; a matrix specifying a user-defined thermal equilibrium state, or a function handle `f(B,alp,bet,gam)` returning the thermal equilibrium at each orientation and magnetic field; if absent, the thermal equilibrium is computed at the current temperature, orientation, and magnetic field.
-- `Hz` — laboratory frame Hamiltonian containing only Zeeman terms at 1 Tesla.
+- `Hz` — laboratory-frame Hamiltonian containing only Zeeman terms at the reference field `spin_system.inter.magnet` (Tesla).
 - `Hc` — laboratory frame Hamiltonian containing all spin-spin couplings but no Zeeman terms.
 - `Hmw` — observable operator without the amplitude prefactor (2-norm should be around 1).
 - `B` — magnetic field, Tesla.
 
 **Outputs:**
 
-- `E` — column vector of energies, sorted in ascending order (rad/s).
+- `E` — column vector of energies (rad/s), ascending within each symmetry block in projector order.
 - `V` — matrix with eigenvectors in columns, sorted left to right in the same order as the energies.
 - `dE` — column vector of dE/dB derivatives, sorted in the same order as the energies.
 - `T` — matrix of transition moments under `Hmw`.
@@ -48,3 +48,7 @@ Computes the eigensystem of sparse Hamiltonians to a user-specified order in Ray
 
 - Spinach Wiki: [rspt_eig.m](https://spindynamics.org/wiki/index.php?title=rspt_eig.m)
 - Source code: [https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspt_eig.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/rspt_eig.m)
+
+## Reference field
+
+`Hz` is the Zeeman Hamiltonian evaluated at the finite, non-zero reference field `spin_system.inter.magnet` (Tesla). At target field `B`, the Hamiltonian is `(B/spin_system.inter.magnet)*Hz+Hc`; energy derivatives and thermal populations use the same normalisation. A reference field of one Tesla retains the original behaviour. `eigenfields` accepts a per-Tesla Zeeman pencil and sets its local reference field to one Tesla; `fieldsweep` retains its existing one-Tesla input requirement.

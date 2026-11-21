@@ -44,7 +44,7 @@ subplot(1,2,1); spy(abs(H)>1e3);
 ktitle('Original Hamiltonian');
 subplot(1,2,2); spy(abs(S'*H*S)>1e3); 
 ktitle('Symmetrised Hamiltonian');
-xline(20); yline(20); xline(28); yline(28);
+xline(20.5); yline(20.5); xline(28.5); yline(28.5);
 
 end
 

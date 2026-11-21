@@ -214,7 +214,6 @@ if ~isempty(spin_system.sys.enable)
     if ismember('paranoia',spin_system.sys.enable),   report(spin_system,'         > paranoid numerical accuracy settings'); end
     if ismember('cowboy',spin_system.sys.enable),     report(spin_system,'         > loose numerical accuracy settings'); end
     if ismember('polyadic',spin_system.sys.enable),   report(spin_system,'         > polyadic arithmetic with spatial degrees of freedom'); end
-    if ismember('dafuq',spin_system.sys.enable),      report(spin_system,'         > detailed parallel profiling'); end
     if ismember('sodd',spin_system.sys.enable),       report(spin_system,'         > spin-orbit corrections to dipolar couplings'); end
 end
 
@@ -232,20 +231,6 @@ if ~isworkernode
     
     % Shuffle the random number generator
     rng('shuffle'); report(spin_system,'random number generator shuffled');
-    
-    % Detailed parallel profiling
-    if ismember('dafuq',spin_system.sys.enable)
-        
-        % Dump MDCS messages to console
-        setSchedulerMessageHandler(@disp);
-        
-        % Turn on MDCS debugging
-        setenv('MDCE_DEBUG','true');
-        
-        % Preserve job information
-        pctconfig('preservejobs',true);
-        
-    end
     
     % Set default parallel profile
     if ~isfield(sys,'parallel')
@@ -297,9 +282,11 @@ if ~isworkernode
         report(spin_system,'WARNING - this pool will be re-used');
         sys=rmfield(sys,'parallel'); sys=rmfield(sys,'parprops');
 
-        % Empty ValueStore of the current pool
-        store=current_pool.ValueStore; store.remove(store.keys);
-        report(spin_system,'parallel pool ValueStore cleared.');
+        % Clear ValueStore only when no ValueStore-backed cache is enabled
+        if ~any(ismember({'op_cache','ham_cache','prop_cache'},spin_system.sys.enable))
+            store=current_pool.ValueStore; store.remove(store.keys);
+            report(spin_system,'parallel pool ValueStore cleared.');
+        end
 
         % Disable pool timeout
         current_pool.IdleTimeout=Inf;
@@ -312,20 +299,6 @@ if ~isworkernode
         report(spin_system,'starting a parallel pool with the following parameters:')
         report(spin_system,['         > parallel profile:  ' spin_system.sys.parallel{1}]);
         report(spin_system,['         > workers requested: ' num2str(spin_system.sys.parallel{2})]);
-
-        % Default port range is insufficient
-        pool_port_range=[20001 44999];
-        port_rng_str=[num2str(pool_port_range(1)) ' ' ...
-                      num2str(pool_port_range(2))];
-        pctconfig('portrange',pool_port_range);
-
-        % Report the network port range override
-        report(spin_system,['         > worker port range: ' num2str(pool_port_range(1)) '-' ...
-                                                             num2str(pool_port_range(2))]);
-
-        % Pass worker-side port override into worker environment
-        setenv('PARALLEL_SERVER_OVERRIDE_PORT_RANGE',port_rng_str);
-        pool_env_vars={'PARALLEL_SERVER_OVERRIDE_PORT_RANGE'};
 
         % Get cluster object
         c=parcluster(spin_system.sys.parallel{1});
@@ -369,8 +342,7 @@ if ~isworkernode
         maxNumCompThreads(feature('numcores'));
         
         % Start the parallel pool
-        current_pool=parpool(c,spin_system.sys.parallel{2},...
-                             'EnvironmentVariables',pool_env_vars);
+        current_pool=parpool(c,spin_system.sys.parallel{2});
 
         % Disable pool timeout
         current_pool.IdleTimeout=Inf;
@@ -409,6 +381,17 @@ if (~isworkernode)&&ismember('gpu',spin_system.sys.enable)...
                   &&(~ismember('hygiene',spin_system.sys.disable))
     report(spin_system,'Clearing GPU(s)...'); pctRunOnAll('gpuDevice([]);');
     parallel.gpu.enableCUDAForwardCompatibility(true);
+end
+
+% Minimise GPU allocation caching on the client and every worker
+if ismember('gpu',spin_system.sys.enable)
+    if isworkernode
+        device=gpuDevice; device.CachePolicy='minimum';
+    else
+        pctRunOnAll(['spinach_gpu_device=gpuDevice; '...
+                     'spinach_gpu_device.CachePolicy=''minimum''; '...
+                     'clear spinach_gpu_device;']);
+    end
 end
 
 % Spin system banner
@@ -737,8 +720,8 @@ if isfield(inter,'suscept')
                                     pad(num2str(pms_tensor(3,2),'%+4.3e'),12) pad(num2str(pms_tensor(3,3),'%+4.3e'),12)]);
                 if n<spin_system.comp.nspins, report(spin_system,' '); end
                 
-                % Update the Zeeman tensor
-                spin_system.inter.zeeman.matrix{n}=spin_system.inter.zeeman.matrix{n}+pms_tensor;
+                % Update the Zeeman tensor (Spinach applies it as B*Z*S, hence the transpose)
+                spin_system.inter.zeeman.matrix{n}=spin_system.inter.zeeman.matrix{n}+pms_tensor.';
                 
             end
             
@@ -920,7 +903,7 @@ if isfield(inter,'chem')&&isfield(inter.chem,'reactions')
 end
 
 % Report back to the user
-summary_chemistry(spin_system);
+summary_kinetics(spin_system);
 
 % Order matrices
 if isfield(inter,'order_matrix')
@@ -1123,6 +1106,21 @@ else
     
 end
 
+% Absorb magnetisation flux rates
+if isfield(inter,'flux_rate')&&isfield(inter,'flux_type')
+
+    % Assign the data structure
+    spin_system.rlx.flux_rate=inter.flux_rate;
+    spin_system.rlx.flux_type=inter.flux_type;
+
+else
+
+    % No magnetisation fluxes
+    spin_system.rlx.flux_rate=[];
+    spin_system.rlx.flux_type='';
+
+end
+
 % Relaxation superoperator
 if isfield(inter,'relaxation')
     spin_system.rlx.theories=inter.relaxation;
@@ -1133,6 +1131,9 @@ else
     spin_system.rlx.theories={};
     report(spin_system,'WARNING - no relaxation theory specified');
 end
+
+% Report enabled magnetisation flux
+summary_rlx_flux(spin_system);
 
 % Rotational correlation times
 if isfield(inter,'tau_c')
@@ -1524,7 +1525,7 @@ if isfield(sys,'enable')
         error('sys.enable must be a cell array of strings.');
     end
     if any(~ismember(sys.enable,{'zte','gpu','op_cache','greedy','paranoia','sodd',...
-                                 'cowboy','polyadic','dafuq','prop_cache','ham_cache'}))
+                                 'cowboy','polyadic','prop_cache','ham_cache'}))
         error('unrecognised switch in sys.enable field.');
     end
 end
@@ -1991,7 +1992,7 @@ if isfield(inter,'relaxation')
     end
     
     % Check relaxation theories
-    if ~all(ismember(inter.relaxation,{'damp','t1_t2','redfield','lindblad',...
+    if ~all(ismember(inter.relaxation,{'damp','t1_t2','redfield','lindblad','flux',...
                                        'nottingham','weizmann','SRFK','SRSK',...
                                        'naka-zwan'}))
         error('unrecognised relaxation theory specification.');
@@ -2731,10 +2732,44 @@ if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')&&...
     error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
 end
 
+% Check magnetisation flux parameters
+if isfield(inter,'flux_rate')&&(~isfield(inter,'flux_type'))
+    error('flux type (inter.flux_type) must be provided.');
+elseif isfield(inter,'flux_type')&&(~isfield(inter,'flux_rate'))
+    error('flux rates (inter.flux_rate) must be provided.');
+end
+
+if isfield(inter,'flux_rate')
+    if (~isnumeric(inter.flux_rate))||(~isreal(inter.flux_rate))||...
+       (~ismatrix(inter.flux_rate))||...
+       (~all(isfinite(inter.flux_rate(:))))||...
+       (size(inter.flux_rate,1)~=size(inter.flux_rate,2))
+        error('inter.flux_rate must be a finite real square matrix.');
+    end
+    if any(size(inter.flux_rate)~=numel(sys.isotopes))
+        error('both dimensions of inter.flux_rate matrix must be equal to the number of spins.');
+    end
+end
+
+if isfield(inter,'flux_type')
+    if ~ischar(inter.flux_type)
+        error('inter.flux_type must be a character string.');
+    end
+    if ~ismember(inter.flux_type,{'intermolecular','intramolecular'})
+        error('incorrect flux type specification.');
+    end
+end
+
+% Require flux parameters when the theory is enabled
+if isfield(inter,'relaxation')&&ismember('flux',inter.relaxation)&&...
+   (~isfield(inter,'flux_rate')||~isfield(inter,'flux_type'))
+    error('flux relaxation requires inter.flux_rate and inter.flux_type.');
+end
+
 % Check chemical kinetics
 if isfield(inter,'chem')
-    
-    retired={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'};
+
+    retired={'rates','rp_theory','rp_rates','rp_electrons'};
     for n=1:numel(retired)
         if isfield(inter.chem,retired{n})
             error('Spinach:create:retiredChemistry',...
@@ -2744,7 +2779,7 @@ if isfield(inter,'chem')
     end
     if ~isempty(setdiff(fieldnames(inter.chem),{'parts','concs','reactions'}))
         error('Spinach:create:chemistryField',...
-              'inter.chem accepts only parts, concs, and reactions.');
+              'inter.chem accepts only parts, concs, and reactions; use inter.flux_rate and inter.flux_type for flux relaxation.');
     end
     if isfield(inter.chem,'reactions')&&~isfield(inter.chem,'parts')
         error('Spinach:create:reactionParts',...
@@ -3157,4 +3192,5 @@ end
 % the soil for those who did not.
 %
 % Benjamin Franklin
+
 

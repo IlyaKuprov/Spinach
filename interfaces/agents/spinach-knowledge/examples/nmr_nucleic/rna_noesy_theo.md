@@ -11,7 +11,7 @@ The source sets the field to 17.62 T. Relaxation is Redfield, with `rlx_keep='ki
 
 ## Sequence parameters and processing
 
-The mixing parameter is `tmix=0.200`; the wrapper does not annotate its unit. It sets offset 3473, sweeps `[7500 7500]`, acquired points `[512 1024]`, zero-fill sizes `[1024 4096]`, a 1H spin label, and ppm axis labels. As in the source, the offset and sweep values are given without explicit units. The initial density operator is built from proton `Lz` using the `cheap` state option.
+The mixing parameter is `tmix=0.200`; the wrapper does not annotate its unit. It sets offset 3473, sweeps `[7500 7500]`, acquired points `[512 1024]`, zero-fill sizes `[1024 4096]`, a 1H spin label, and ppm axis labels. As in the source, the offset and sweep values are given without explicit units. The initial density operator is built from proton `Lz` using the default exact state construction.
 
 The simulated signal is returned by `liquid(spin_system,@noesy,parameters,'nmr')`. The cosine and sine components are squared-cosine apodised, transformed along F2, combined as `f1_cos-1i*f1_sin` (the States signal in the source comment), then transformed along F1. The wrapper plots the negative real part of that spectrum.
 

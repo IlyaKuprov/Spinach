@@ -34,7 +34,7 @@ spin_system=basis(spin_system,bas);
 % Set the sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=coil_state(spin_system,'L+','E','exact');
+parameters.coil=coil_state(spin_system,'L+','E');
 parameters.offset=0;
 parameters.nsteps=[128 128];
 parameters.zerofill=[256 256];
@@ -42,7 +42,6 @@ parameters.sweep=20e6;
 parameters.tau=136e-9;
 parameters.grid='rep_2ang_800pts_sph';
 parameters.axis_units='MHz';
-parameters.verbose=0;
 
 % Simulation
 fid=powder(spin_system,@hyscore,parameters,'esr');

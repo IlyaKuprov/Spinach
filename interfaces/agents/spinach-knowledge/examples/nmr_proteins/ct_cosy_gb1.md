@@ -23,3 +23,6 @@ The caller sets offset 2400 Hz, sweeps [9000, 9000] Hz, 256 x 256 acquisition po
 - Builds the spin system and basis, simulates the COSY FID, apodises and Fourier-transforms it, then plots `abs(spectrum)`.
 
 Zero track elimination is explicitly enabled with `zte` in `sys.enable`.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

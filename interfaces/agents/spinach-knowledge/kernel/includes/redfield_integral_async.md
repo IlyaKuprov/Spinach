@@ -1,6 +1,6 @@
 # kernel/includes/redfield_integral_async.m
 
-- Signature: script include; its nested worker has signature `brw_compute_kernel(spin_system,w,job_id,upper_lim)`.
+- Signature: script include; its nested worker has signature `brw_compute_kernel(spin_system,weight,job_id,upper_limit)`.
 
 ## Purpose and scope
 

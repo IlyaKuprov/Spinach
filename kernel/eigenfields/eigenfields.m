@@ -65,6 +65,9 @@ function tran=eigenfields(spin_system,parameters,Hz,Hc,Hmw)
 % Check consistency
 grumble(spin_system,parameters,Hz,Hc);
 
+% The supplied Zeeman pencil is normalised to one Tesla
+spin_system.inter.magnet=1;
+
 % Get frequency gap tolerance in rad/s
 frq_gap_tol=abs(spin('E')*parameters.pp_tol);
 
@@ -127,14 +130,16 @@ switch spin_system.bas.formalism
                     % Field grid interval
                     dx=grid(n)-grid(n-1);
                     
-                    % Predict and sort midpoint energies
+                    % Predict midpoint energies in the eigensolver ordering
                     EmP1=herm_spline(E(:,n-1),dE(:,n-1)*dx,...
                                      E(:,n),  dE(:,n)*dx, ...
                                      (1/3)*ones(size(E,1),1));
                     EmP2=herm_spline(E(:,n-1),dE(:,n-1)*dx,...
                                      E(:,n),  dE(:,n)*dx, ...
                                      (2/3)*ones(size(E,1),1));
-                    EmP1=sort(EmP1); EmP2=sort(EmP2);
+                    if ~isfield(spin_system.bas,'sym_fact')
+                        EmP1=sort(EmP1); EmP2=sort(EmP2);
+                    end
                                     
                     % Get eigensystem information for the grid midpoints
                     midp1=grid(n-1)+(1/3)*dx; midp2=grid(n-1)+(2/3)*dx;

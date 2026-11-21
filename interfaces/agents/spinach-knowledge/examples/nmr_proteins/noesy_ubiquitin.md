@@ -13,3 +13,6 @@ The sequence uses liquid with noesy; the source sets tmix=0.065, matching its st
 ## Simulation and output
 
 The simulated cosine and sine FIDs are squared-cosine apodised and Fourier-transformed in F2. The States signal is formed as f1_cos-1i*f1_sin before the F1 transform, and the plot shows the negative real part of the 2D spectrum. The PDB/BMRB inputs define the simulated protein model; the example does not read an experimental spectrum or report measured coherence data. No DOI citation appears in the source.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

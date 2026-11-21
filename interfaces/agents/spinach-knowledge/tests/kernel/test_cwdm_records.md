@@ -5,3 +5,5 @@ Validates explicit reaction input, the additive default, retirement errors, matc
 An empty-chemistry merge regression checks that absent partitions and reaction records remain absent and that `create` supplies one default substance containing the merged spins.
 
 Column-oriented single-substance membership is preserved by create and printed on one line by the chemistry summary.
+
+Chemistry-field validation accepts only parts, concs, and reactions. Flux rate/type belong at top-level inter.flux_rate/inter.flux_type, not inter.chem; the rejection assertion expects the restricted chemistry-field message.

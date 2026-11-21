@@ -52,7 +52,7 @@ spin_system=basis(spin_system,bas);
 
 % Experiment setup
 parameters.rate=14000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=11;
 parameters.grid='leb_2ang_rank_11';
 parameters.sweep=1e5;
@@ -64,8 +64,7 @@ parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=coil_state(spin_system,'L+','13C','exact');
-parameters.verbose=1;
+parameters.coil=coil_state(spin_system,'L+','13C');
 
 % Simulation
 fid=floquet(spin_system,@acquire,parameters,'nmr');

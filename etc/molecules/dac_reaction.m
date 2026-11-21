@@ -167,6 +167,10 @@ bas.connectivity={'scalar_couplings','scalar_couplings',...
                   'scalar_couplings','scalar_couplings','scalar_couplings'};
 bas.prox_level={1,1,1,1,1};
 
+% Only solvent permutations preserve the full interaction tensors
+bas.sym_group={{},{},{},{},{'S3'}};
+bas.sym_spins={{},{},{},{},{[1 2 3]}};
+
 % Relaxation theory parameters
 inter.relaxation={'redfield','t1_t2'};
 inter.equilibrium='zero';

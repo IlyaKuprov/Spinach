@@ -45,13 +45,12 @@ inter.coupling.matrix{2,2}=remtrace(nqi);
 
 % Experiment setup
 parameters.rate=10000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=5;
 parameters.npoints=128;
 parameters.zerofill=1024;
 parameters.spins={'13C'};
 parameters.grid='rep_2ang_200pts_sph';
-parameters.verbose=0;
 
 % Numerical rotating frame transforms
 parameters.rframes={{'13C',1},{'14N',2}};
@@ -82,7 +81,7 @@ for m=1:numel(fields)
     parameters.sweep=200*sys.magnet;      % unchanged in ppm
     parameters.offset=43.6*sys.magnet*spin('13C')/(2*pi*1e6);
     parameters.rho0=state(spin_system,'L+','13C');
-    parameters.coil=coil_state(spin_system,'L+','13C','exact');
+    parameters.coil=coil_state(spin_system,'L+','13C');
         
     % Lab frame Hamiltonian, then numerical rotating frames
     fid=singlerot(spin_system,@acquire,parameters,'labframe');

@@ -16,38 +16,6 @@
 %
 %     spin_system  - updated Spinach data structure
 %
-% Note: this function freezes the optimisation problem. The ensemble
-%       case catalog is built here, its cases are assigned to the
-%       parallel pool workers in contiguous blocks recorded in
-%       spin_system.control.worker_cases, and the frozen problem is
-%       published to the workers exactly once: the common part as a
-%       parallel.pool.Constant in spin_system.control.invariants, the
-%       drift generators as a parallel.pool.Constant built from a per-
-%       worker Composite in spin_system.control.drift_slices, so that
-%       each worker receives the drifts of its own case block and no-
-%       thing else; the pool must therefore have SpmdEnabled set to
-%       true. Heavy invariants - the drift generators, the control
-%       operators, the offset operators, the control commutators,
-%       and the Bloch-Siegert response operators - are then removed
-%       from the returned structure, and their names are recorded
-%       in spin_system.control.frozen_fields. All other control
-%       fields stay live: ensemble() re-sends them to the workers
-%       at every evaluation, and they may be overwritten between
-%       optimisations. Among them are the Bloch-Siegert channel
-%       carrier frequencies, kept in spin_system.control.carrier_-
-%       frq, from which bloch_siegert() rebuilds the response ope-
-%       rators when a waveform is replayed on the client. Changes
-%       to the ensemble composition, the operators, the generators,
-%       the channel isotopes, or the carrier frequencies require a
-%       fresh optimcon() call: the frozen response operators are
-%       built from the carriers seen here, and editing them after-
-%       wards would replay physics that the optimiser never saw.
-%
-% Note: nonempty keyhole schedules with 'newton' or 'goodwin' are not
-%       implemented for 'sphten-liouv', 'zeeman-liouv', or 'zeeman-wavef'.
-%       First-order 'lbfgs' and 'rbfgs' keyhole methods, empty schedules,
-%       and existing Hilbert-space keyhole Hessians remain available.
-%
 % david.goodwin@inano.au.dk
 % u.rasulov@soton.ac.uk
 % ilya.kuprov@weizmann.ac.il

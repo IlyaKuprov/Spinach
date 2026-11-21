@@ -39,10 +39,9 @@ parameters.sweep=[-200e3 200e3];
 parameters.npoints=4096;
 parameters.zerofill=4096;
 parameters.rho0=state(spin_system,'Lz','10B');
-parameters.coil=coil_state(spin_system,'Lz','10B','exact');
+parameters.coil=coil_state(spin_system,'Lz','10B');
 parameters.spins={'10B'};
 parameters.axis_units='kHz';
-parameters.verbose=1;
 
 % Simulation
 spectrum=singlerot(spin_system,@overtone_a,parameters,'qnmr');

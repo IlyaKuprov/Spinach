@@ -2,7 +2,7 @@
 
 ## General Context
 
-*Spinach* is an open-source spin dynamics simulation library implemented in *MATLAB* (assume version R2026a or later) with small amounts of Java and C++/CUDA MEX. It spans many areas of physics and mathematics, including linear algebra, quantum mechanics, Lie algebras and Lie groups, as well as scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance, electron spin resonance, magnetic resonance imaging, quantum optimal control theory, and other spin dynamics related domains. This repository contains the *Spinach* codebase. All contributions or AI-generated code must adhere to the established conventions of this codebase. These conventions are summarised below.
+*Spinach* is an open-source spin dynamics simulation library implemented in *MATLAB* (assume version R2026b or later) with small amounts of C++/CUDA MEX. It spans many areas of physics and mathematics, including linear algebra, quantum mechanics, Lie algebras and Lie groups, as well as scientific computing and numerical methods. *Spinach* supports applications such as nuclear magnetic resonance, electron spin resonance, magnetic resonance imaging, quantum optimal control theory, and other spin dynamics related domains. This repository contains the *Spinach* codebase. All contributions or AI-generated code must adhere to the established conventions of this codebase. These conventions are summarised below.
 
 ## Task Execution Policies
 
@@ -13,6 +13,8 @@
 * **No Hallucinations, no Lies, no Errors:** You must not lie and must not fabricate information, code, or documentation. All content you generate must be accurate and supported by the *Spinach* codebase or user instructions. If you are unsure about something, refer to the existing code or ask the user for clarification. Above all, do not make mistakes.
 
 * **No uninformative output:** You must not produce usless or uninformative output. If you are unsure about something, you must read the existing *Spinach* code and find missing information to make sure that your output is useful and informative. Generic placeholder phrases must be removed from your output if they appear. Avoid cosmetic churn unless explicitly requested and clearly beneficial.
+
+* **Pull request merging requires permission:** When asked to submit a pull request, prepare it and address Codex bot review comments, but do not merge the pull request. Merging is something the user will do after reviewing the pull request.
 
 ### Preservation and Scientific Correctness
 
@@ -48,7 +50,17 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 ### File Layout, Naming, and Formatting
 
-* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with exactly two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits.
+* **Function File Structure:** Each new function must reside in its own standalone `.m` file. Use four spaces for indentation (no tabs). Each `.m` file must end with exactly two blank lines. Helper functions, if any, should be separated from the preceding text by only one blank line. If there is a quote in the comments at the end of the file, retain that quote in all edits. Every `end` keyword must be correctly indented. Continuation layout follows the alignment rule below. For non-grumbler code, maintain formatting symmetry between opening and closing keywords: when its opening statement is followed by a blank line, the closing `end` must be preceded by a blank line. Grumbler code needs no blank lines anywhere.
+
+* **Continuation Alignment (not block indentation):** Four-space indentation applies to control-flow blocks; it is not a blanket rule for lines continued with `...`. Align continued arguments with the corresponding arguments or opening-delimiter contents above, align continued expression terms structurally, and align numerical array columns by their decimal points. Preserve meaningful existing continuation columns when restyling; never flatten them to a uniform four-space indent or accept an automatic formatter's output without inspection. If an earlier edit changes the width of the text providing the alignment anchor, adjust the continuation columns accordingly. Review every affected multi-line statement in monospaced text: syntax checks, unchanged syntax trees, and generic style checks do not establish visual alignment. For example:
+
+  ```matlab
+  rho=step(spin_system,L,rho,...
+           time_step);
+
+  coords=[0.0 0.0  0.0;...
+          0.0 0.0 12.5];
+  ```
 
 * **Naming Conventions:** Use descriptive, concise, all-lowercase, underscore-separated variable and function names of at most 20 characters. Read the current function documentation and consider each variable’s context, content, and role before naming it; avoid ambiguous or vague names. Use standard, commonly understood or documented abbreviations, such as `prop_idx` for a property index. Follow nearby naming patterns when in doubt. Uppercase textbook operator names (`H`, `R`, `K`, `P`, `Q`) and matrix names matching their mathematical notation are permitted. Loop counters should be single lowercase letters, such as `n` and `k`; do not use `i` or `l` as variables, and use `1i` for the imaginary unit. Use British spelling in function names, variable names, and comments, preferring `s` to `z` where both are allowed, and use the Oxford comma. Preserve required API field names, literal option strings, and existing API spellings rather than renaming them to satisfy these conventions.
 
@@ -56,41 +68,51 @@ All code contributions must follow *Spinach*’s existing coding style and struc
 
 * **General Formatting:** When in doubt about formatting, mimic the existing code. Refer to functions in the `kernel` and `experiments` folders for the correct style and structure if unsure.
 
+* **Paragraph spacing:** Each logically distinct code stage must be preceded and followed by a blank line and must have a comment line as its first line. In <start> ... <end> type code structures, the starting statement must be followed by a blank line and the final `end` must be preceded by a blank line.
+
+* **Semicolon ends the line:** When writing new code, a new line after a semicolon is mandatory. An exception is data plotting blocks, where one-word commands like `kgrid` may be placed after a semicolon that terminates the preceding command to get more compact and visually elegant code. 
+
 ### Comments and Function Headers
 
 * **Code Comments:** Above every conceptually distinct operation, write exactly one line explaining its purpose, preceded by one blank line. Omit the final full stop for a one-sentence comment. Put extended explanations in the function header rather than long body comment blocks.
 
 * **Function Documentation Header:** Every function file must begin with a documentation comment block that describes the function’s purpose and, where applicable, its usage syntax, input parameters, and outputs. For non-example functions, format this documentation header exactly as seen in the `kernel` and `experiments` directories, and do not omit any expected sections. For examples, follow the Spinach example coding style below; no-argument, no-output demonstrations must not acquire empty library-style `Inputs`, `Outputs`, or `Syntax` sections. Helper functions should have a one-line comment above their signature with a description of what they do. Preserve existing author attribution.
 
+* **Function header compactness:** Do not turn function headers into modification logs and warning lists. Warnings belong in grumblers.
+
 ## Spinach Kernel Coding Elegance
 
-Keep the scientific model, algorithm, and numerical costs directly readable. Apply these rules alongside the programming style above; retain established API behaviour. Read this section before writing or refactoring a Spinach function, and apply the final review before delivery.
+Keep the scientific model, algorithm, and numerical costs directly readable. Apply these rules alongside the programming style above; retain established API behaviour. Read this section before writing or refactoring a Spinach function, and apply the final review before delivery. If the functionality being requested already exists in Spinach in some form, draw the user's attento to that before proceeding.
 
 ### Write the calculation, not a framework
 
-1. **Start from a nearby kernel analogue.** Read its scientific contract and implementation before designing the change; apply the existing-capability and minimalism rules above.
+- **Start from a nearby kernel analogue.** Read its scientific contract and implementation before designing the change; apply the existing-capability and minimalism rules above.
 
-2. **Keep the mathematics visible.** Use expressions that a domain scientist can match to the defining equation. Keep small fixed transforms explicit when that is clearer than a generic implementation. Introduce an intermediate when it names a physical quantity, exposes a numerical stage, or avoids meaningful repeated work—not merely to rename an expression.
+- **Keep the mathematics visible.** Use expressions that a domain scientist can match to the defining equation. Keep small fixed transforms explicit when that is clearer than a generic implementation. Introduce an intermediate when it names a physical quantity, exposes a numerical stage, or avoids meaningful repeated work—not merely to rename an expression.
 
-3. **Use direct data flow.** Arrange the body in dependency order, with one conceptually distinct operation per captioned block. Prefer ordinary matrices, arrays, cells, and existing Spinach structures. Do not introduce a class, dispatcher framework, configuration parser, or mutable cache for a routine calculation.
+- **Use direct data flow.** Arrange the body in dependency order, with one conceptually distinct operation per captioned block. Prefer ordinary matrices, arrays, cells, and existing Spinach structures. Do not introduce a class, dispatcher framework, configuration parser, or mutable cache for a routine calculation.
 
-4. **Abstract scientific reuse, not typing effort.** Apply the helper and reuse rules above. Do not force distinct physical cases through a more complicated universal mechanism merely to eliminate repeated lines.
+- **Abstract scientific reuse, not typing effort.** Apply the helper and reuse rules above. Do not force distinct physical cases through a more complicated universal mechanism merely to eliminate repeated lines.
+
+- **Do not make ugly penny-pinching edits.** It is acceptable to incur small additional computational costs if that produces more elegant and compact code.
+
+- **No pointless past behaviour preservation.** For code re-factors, good numerical agreement is sufficient, bit-wise identity is unnecessary: do not introduce ugly clauses to preserve exact previous behaviour. Do not maintain backwards compatibility of calls with previous versions of Spinach. Only the current head must be internally consistent.
 
 ### Make the numerical representation earn its cost
 
-5. **Compute only what the caller needs.** If an operator action suffices, do not materialise the full operator or exponential. Do not allocate a trajectory, Hessian, or accumulated propagator unless requested. Preserve sparse, factorised, or matrix-free structure until an operation genuinely requires expansion.
+- **Compute only what the caller needs.** If an operator action suffices, do not materialise the full operator or exponential. Do not allocate a trajectory, Hessian, or accumulated propagator unless requested. Preserve sparse, factorised, or matrix-free structure until an operation genuinely requires expansion.
 
-6. **Use MATLAB operations where they express the mathematics clearly.** Prefer direct array algebra and established sparse constructors to hand-built book-keeping. Keep loops when they naturally traverse spins, tensor ranks, pulse slices, or independent cases. Do not replace a readable loop with dense broadcasting, elaborate indexing, or a large temporary merely to call the result vectorised. Preallocate growing results and avoid repeating expensive conversions inside loops.
+- **Use MATLAB operations where they express the mathematics clearly.** Prefer direct array algebra and established sparse constructors to hand-built book-keeping. Keep loops when they naturally traverse spins, tensor ranks, pulse slices, or independent cases. Do not replace a readable loop with dense broadcasting, elaborate indexing, or a large temporary merely to call the result vectorised. Preallocate growing results and avoid repeating expensive conversions inside loops.
 
-7. **Give numerical decisions a reason.** Derive scales, convergence decisions, and bounds from the algorithm and data where possible; reuse the relevant Spinach tolerance policy. Distinguish exact mathematical constants from numerical tolerances and performance cutoffs. Do not introduce an unexplained epsilon, iteration cap, size threshold, or regulariser. Do not silently change established thresholds during restyling, and do not claim a performance improvement without measurement.
+- **Give numerical decisions a reason.** Derive scales, convergence decisions, and bounds from the algorithm and data where possible; reuse the relevant Spinach tolerance policy. Distinguish exact mathematical constants from numerical tolerances and performance cutoffs. Do not introduce an unexplained epsilon, iteration cap, size threshold, or regulariser. Do not silently change established thresholds during restyling, and do not claim a performance improvement without measurement.
 
-8. **Preserve the scientific contract.** Keep units, signs, normalisation, basis order, shapes, and operator conventions explicit. For propagation, retain the convention `exp(-1i*L*t)`. Do not silently symmetrise, renormalise, clip, transpose, or regularise an input to make the calculation work; such operations need a documented mathematical role and compatibility with the requested behaviour.
+- **Preserve the scientific contract.** Keep units, signs, normalisation, basis order, shapes, and operator conventions explicit. For propagation, retain the convention `exp(-1i*L*t)`. Do not silently symmetrise, renormalise, clip, transpose, or regularise an input to make the calculation work; such operations need a documented mathematical role and compatibility with the requested behaviour.
 
 ### Review before delivery
 
-9. **Review for subtraction before delivery.** Apply the minimalism rules above while keeping the scientific calculation locally understandable; compactness is not code golf. Compare against the original to preserve scientific content and established behaviour. For every changed MATLAB file, run the required house-style checker, MATLAB `checkcode`, and the validation required by the repository and change; style compliance does not prove numerical correctness.
+- **Review for subtraction before delivery.** Apply the minimalism rules above while keeping the scientific calculation locally understandable; compactness is not code golf. Compare against the original to preserve scientific content and established behaviour. For every changed MATLAB file, run the required house-style checker, MATLAB `checkcode`, and the validation required by the repository and change; style compliance does not prove numerical correctness.
 
-**Final review question:** Can a Spinach scientist see the model, the algorithm, and the numerical costs directly, without mentally dismantling software scaffolding? If not, simplify the design before polishing its formatting.
+- **Final review question:** Can a Spinach scientist see the model, the algorithm, and the numerical costs directly, without mentally dismantling software scaffolding? If not, simplify the design before polishing its formatting.
 
 ## Spinach example coding style
 
@@ -138,6 +160,8 @@ The common shape is **physical specification → basis and numerical options →
 
 - Use `%%` only when a long example genuinely has separate major demonstrations. Ordinary operation blocks use `%`, without banners or numbered workflow narration.
 
+- Use the appropriate number of decimal places for each physical parameter.
+
 #### 4. Use the familiar Spinach data flow
 
 - Keep the conventional structure names: `sys`, `inter`, `bas`, `spin_system`, `parameters`, and, for optimal control, `control`.
@@ -149,6 +173,8 @@ The common shape is **physical specification → basis and numerical options →
 - Normally keep `create()` followed by `basis()` together under `% Spinach housekeeping`. Where necessary, perform spin selection or other system changes between them, and caption those operations explicitly.
 
 - Construct states and operators after the required basis is available. Make assumptions explicit where the example constructs Hamiltonians directly.
+
+- Instead of Matlab plot decoration functions (xlabel, title, legend, etc.) use Spinach plot decoration commands from `kernel/plotting` directory.
 
 - For standard experiments, call the appropriate context with an existing sequence handle, such as `liquid(spin_system,@acquire,parameters,'nmr')`. Direct Hamiltonian construction and propagation are appropriate when those operations are themselves the demonstration.
 

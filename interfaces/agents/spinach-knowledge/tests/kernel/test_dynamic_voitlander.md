@@ -25,6 +25,9 @@ Source: https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynami
 - Builds a minimal two-level avoided-crossing system (`spin_system.sys.output='hush'`, `bas.basis=zeros(2,1)`, `comp.mults=2`, `Iz=diag([-1 1])`, `Ic=[0 0.1;0.1 0]`, `Hmw=[0 1;1 0]`, `rho0=diag([1 0])`, `mw_freq=1/(2*pi)`, `window=[-0.8 0.8]`, `fwhm=0.01`, `npoints=9`) with two resonance roots from `eigenfields`.
 - Compares integration of the high root (`high_root=2`) using stable branch labels `ti_ref=ti(high_root,:)` against locally renumbered labels `ti_local=[ti(high_root,1:2) 1]` at the other two vertices; the two spectra must agree within `1e-12`/`1e-12`, verifying that field-continuation matching ignores local branch ordinal changes at window edges.
 
+- **Unmatched-line conservation:** arbitrarily relabelling a constant transition at all three vertices must preserve its integrated spectrum.
+- **Missing-corner conservation:** an empty corner contributes zero, while the other corners retain their one-third-area vertex contributions through the Richardson subdivision.
+
 ## Inputs and outputs
 
 ```matlab

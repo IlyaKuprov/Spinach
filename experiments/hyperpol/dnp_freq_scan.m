@@ -137,9 +137,6 @@ switch parameters.method
             b=R*kron(ones(spc_dim,1),parameters.rho0);
         end
 
-        % MDCS diagnostics
-        parallel_profiler_start;
-
         % Loop in parallel over the frequencies
         parfor n=1:numel(parameters.mw_frq)
 
@@ -185,9 +182,6 @@ switch parameters.method
 
         end
 
-        % Get MDCS diagnostics
-        parallel_profiler_report;
-
     % Liouville space path
     case {'lvn-gmres','lvn-backs'}
 
@@ -200,9 +194,6 @@ switch parameters.method
 
         % Precompute the right hand side
         b=R*parameters.rho0;
-
-        % MDCS diagnostics
-        parallel_profiler_start;
 
         % Loop in parallel over the frequencies
         parfor n=1:numel(parameters.mw_frq)
@@ -234,9 +225,6 @@ switch parameters.method
             end
 
         end
-
-        % Get MDCS diagnostics
-        parallel_profiler_report;
 
     otherwise
 

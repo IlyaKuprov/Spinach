@@ -54,8 +54,8 @@ parameters.npoints=1024;
 parameters.zerofill=1024;
 parameters.spins={'14N'};
 parameters.rho0=state(spin_system,'Lz','14N');
-parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N','exact')+...
-                sin(theta)*coil_state(spin_system,'Lx','14N','exact');
+parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N')+...
+                sin(theta)*coil_state(spin_system,'Lx','14N');
 parameters.Lx=cos(theta)*operator(spin_system,'Lz','14N')+...
               sin(theta)*operator(spin_system,'Lx','14N');
 parameters.method='average';
@@ -63,7 +63,6 @@ parameters.rf_pwr=2*pi*3.0e6;
 parameters.rf_dur=1.0e-6;
 parameters.rf_frq=-10e3;
 parameters.axis_units='kHz';
-parameters.verbose=0;
 
 % Run the simulation
 spectrum=doublerot(spin_system,@overtone_pa,parameters,'qnmr');

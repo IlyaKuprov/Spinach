@@ -610,6 +610,11 @@ if ismember('ham_cache',spin_system.sys.enable)
                            spin_system.bas.basis_hash,spin_system.inter.giant});
     end
 
+    % Include rounding and storage policy in the cache identity
+    ham_hash=md5_hash({ham_hash,spin_system.tols.liouv_zero,...
+                      spin_system.tols.small_matrix,spin_system.tols.dense_matrix,...
+                      ismember('clean-up',spin_system.sys.disable)});
+
     % Get ValueStore, unless the client has no parallel pool
     if ~isworkernode
         pool=gcp('nocreate');
@@ -662,7 +667,7 @@ if ~isworkernode
     D=parallel.pool.DataQueue;
     afterEach(D,@(~)parfor_progr);
     terms_done=0; last_toc=0;
-    tic; ticBytes(gcp); do_diag=true;
+    tic; do_diag=true;
 else
     do_diag=false; D=[]; tic;
 end
@@ -695,13 +700,6 @@ parfor n=1:nterms
     % Report progress
     if do_diag, send(D,n); end
 
-end
-
-% Parfor communication stats
-if ~isworkernode
-    nbytes=mean(tocBytes(gcp),1)/2^20;
-    report(spin_system,['average worker process received ' num2str(nbytes(1)) ...
-                        ' MB and sent back ' num2str(nbytes(2)) ' MB']);
 end
 
 % Inform the user

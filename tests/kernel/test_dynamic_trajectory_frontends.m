@@ -22,9 +22,7 @@ result=new_test_result('kernel/dynamic_trajectory_frontends',...
                        'trajectory plotting and similarity helpers must expose deterministic branch outputs.');
 
 % Force invisible figures during plotting checks
-old_visibility=get(groot,'defaultFigureVisible');
-set(groot,'defaultFigureVisible','off');
-cleaner=onCleanup(@()local_cleanup(old_visibility));
+cleaner=test_graphics(); %#ok<NASGU>
 
 % Build the trajectory used by plotting and similarity checks
 [spin_system,traj]=local_test_trajectory();
@@ -136,15 +134,6 @@ rho_a=unit_state(spin_system)+...
       0.5*state(spin_system,'Ly','13C')+...
       0.25*state(spin_system,{'L+','L-'},{1,2});
 traj=[rho_a 2*rho_a 0.5*rho_a];
-
-end
-
-
-function local_cleanup(old_visibility)
-
-% Restore figure state after success or failure
-close all force;
-set(groot,'defaultFigureVisible',old_visibility);
 
 end
 

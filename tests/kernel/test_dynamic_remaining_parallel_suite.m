@@ -13,6 +13,9 @@
 
 function result=test_dynamic_remaining_parallel_suite()
 
+% Keep test graphics invisible and preserve the caller's figures
+cleaner=test_graphics(); %#ok<NASGU>
+
 % Announce the test target
 fprintf('TESTING: Remaining parallel and stochastic utilities\n');
 
@@ -51,7 +54,6 @@ figures_before=numel(findall(0,'Type','figure'));
 rho=ones(10,1);
 overwound(rho,[10 1 1],1);
 figures_after=numel(findall(0,'Type','figure'));
-close all;
 result=test_true(result,'overwound one-dimensional diagnostic',figures_after>=figures_before+1,...
                  'a resolved one-dimensional Fokker-Planck state should produce one diagnostic spectrum');
 
@@ -86,4 +88,5 @@ if isempty(current_pool)
 end
 
 end
+
 

@@ -30,7 +30,7 @@ result = test_dynamic_remaining_spectral_suite()
 
 - `result` — regression test result structure with explanatory messages, populated via `new_test_result`, `test_close`, and `test_true`.
 
-The function takes no inputs.
+The function takes no inputs. The eigensolver checks include overlapping symmetry-block energy ranges at two fields: energies, eigenvectors, and derivatives must remain ordered within each block rather than across the direct sum.
 
 ## References
 

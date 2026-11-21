@@ -19,3 +19,42 @@ run_tests('verbose',true);
 ```
 
 
+The runner prints one aligned progress/result line per selected test, then a
+pass/fail summary. `verbose=true` adds recorded check explanations. Spinach
+systems built by `test_spin_system` use `sys.output='hush'`; remaining console
+output is captured and printed only for failed tests, including text emitted
+before an exception. Recorded failures and thrown errors still fail the suite.
+Test-created figures are invisible and deleted on success or error. Existing
+figures, the current figure, and root graphics defaults are preserved; tests
+must not explicitly close caller-owned figures. MATLAB's capture does not
+intercept native process stderr, including JVM startup diagnostics on some
+MATLAB/Java installations; those messages are outside the test reporter.
+
+The CUDA sparse-product comparison is registered in the main manifest:
+
+```matlab
+run_test('kernel/cuda_product');
+```
+
+It compares the gateway directly with independent CPU products for random
+square and rectangular sparse matrices in all real/complex combinations.
+This gateway requires MATLAB R2026b or later; older releases skip its test.
+GPU checks report explicit `SKIP` messages when a usable GPU or the compiled
+gateway is unavailable, following the existing GPU coverage convention.
+With both prerequisites present, numerical and non-loader CUDA errors fail
+the test. Build the gateway with `compile_mex()` before running GPU coverage.
+
+GPU-dependent custom CUDA sparse-product regressions (not part of the CPU manifest):
+
+```matlab
+addpath('kernel/overloads','tests/kernel');
+test_alg3_fallback();
+test_cuda_sparse();
+```
+
+These require a supported GPU. The fallback test uses an isolated wrapper copy
+against missing and invalid binaries and mocked non-loader failures; shipped
+binaries are never modified. The product test requires the compiled gateway
+and checks independent CPU references, real/complex combinations, empty and
+rectangular inputs, cancellation, bounded-memory row splitting, input
+immutability, and ordinary MATLAB operations on the returned sparse gpuArray.

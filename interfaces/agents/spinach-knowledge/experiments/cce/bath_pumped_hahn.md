@@ -1,0 +1,21 @@
+# bath_pumped_hahn
+
+[MATLAB source](../../../../../experiments/cce/bath_pumped_hahn.m)
+
+Syntax: `[E,aux]=bath_pumped_hahn(spin_system,parameters,H,R,K)`
+
+Experiment owns validation, preparation, and detection through cce_observation. times gives total elapsed sequence duration in seconds. Normalised signal defaults to true and uses the actual detected preparation reference. Explicit rho0/coil or preparation descriptors override the transition preparation. Hahn refocusing plus an ideal bath x pi pulse at pump.fraction. pump requires center, halfwidth, units (Hz or rad/s), fraction, and allow_empty. Optional sites/species restrict the physical bath. Spectral boundaries are closed by default; set pump.boundary=open for a strict interval. With `parameters.cce.meanfield='none'`, selected exterior spins are omitted from each retained marginal bath state, including the empty cluster. With static conditioning, a selected exterior spin is rejected: bath_pumped_hahn does not update time-dependent exterior conditioning.
+
+Bath-pumped Hahn evaluation uses `clexpn(spin_system,@bath_pumped_hahn,parameters,assumptions)`. The five-argument experiment optionally returns `[E,aux]`; coherent projected propagation supplies spectral residuals, Hamiltonian round-off bounds, and signal error estimates to the native reducer. The pump selects canonical axial Zeeman frequencies, with explicit Hz or rad/s units, a nonnegative halfwidth and explicit open/closed interval convention, a fraction in [0,1], logical allow_empty, and optional distinct physical bath sites or isotope-label cells. No-field product-density ensembles allow selected spins outside a retained cluster; static exterior mean-field pumping remains explicitly unsupported by bath_pumped_hahn; the Cartesian exterior-rotation support belongs to hahn_echo refocusing and the internal segment service.
+
+Pump selection applies the single declared unit conversion and an explicit interval convention: boundary=open uses abs(frequency-center)<halfwidth, whereas boundary=closed (the native default) includes both endpoints. A zero-width open window selects nothing; a zero-width closed window can select an exact resonance. Empty selection requires allow_empty. aux.selected_sites records the complete physical selection before retained-cluster pruning, and aux.boundary_rule records strict_abs_less_than or abs_less_than_or_equal. The capability version also binds the retained generator evidence used by checkpoints.
+
+Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
+
+Detection uses the fixed physical receiver: after an odd observed-spin manifold interchange, the propagated bath-coherence block is adjointed, including its initial complex preparation coefficient. The receiver itself and the initial normalisation reference are not conjugated. Zero elapsed time applies no pulse. The bath pump does not interchange observed-spin manifolds; the observed midpoint inversion does.
+
+Bath-pulse matrices are constructed in Hilbert space in both supported propagation representations; Liouville states are reshaped only for the physical density/coherence rotation.
+
+The coherent projected branch explicitly composes the selected observed and bath rotations in time order in the experiment body. Numerical bounds and the complete pre-pruning selected-site metadata accompany its response.
+
+With an explicit preparation or receiver, the interval evaluator accumulates free-evolution and numerical pulse-action estimates. A projected observed inversion merely exchanges branches; the selected physical bath rotation multiplies the coherence and is included. Zero elapsed time has no propagation or pulse-action error. The public contract is closed-system only. For a direct retained call with a GKSL generator, later intervals can amplify Frobenius errors: the estimate uses trace-norm contractivity of the remaining channel and converts each local error by at most `sqrt(d)`, for a `d`-dimensional density or coherence block. Receiver Frobenius norms and the actual normalisation divisor put the result in signal units; preparation and readout rounding are outside this estimate.

@@ -58,7 +58,7 @@ L=rotframe(spin_system,C,L,'E',1);
 L=L+H_mw+1i*R;
 
 % Get the detection state
-coil=coil_state(spin_system,'L+','E','exact');
+coil=coil_state(spin_system,'L+','E');
 
 % Compute the waveform and the axis
 waveform=linspace(parameters.sweep(1),...

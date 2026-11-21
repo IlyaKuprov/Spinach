@@ -1,6 +1,8 @@
 # interfaces/jsonlab-1.5/jsonopt.m
 
-[Canonical source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/jsonlab-1.5/jsonopt.m) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
+This source is absent from the current distribution. The following historical description is retained for reference, not as an available runnable interface. No replacement is inferred from the old signature.
+
+`interfaces/jsonlab-1.5/jsonopt.m` (source removed) · [JSONLab project page](http://iso2mesh.sf.net/cgi-bin/index.cgi?jsonlab)
 
 **Call:** `val=jsonopt(key,default,varargin)`.
 

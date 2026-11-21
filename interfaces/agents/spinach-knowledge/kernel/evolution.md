@@ -27,6 +27,8 @@ The accepted `output` strings are `final`, `trajectory`, `total`, `refocus`, `ob
 
 The routine returns states or observable values, not a separate time vector; the caller's `timestep` supplies the spacing. The input contract checks that `L`, `coil`, `timestep`, and `nsteps` are numeric, that `rho` is numeric or a cell array, and that `output` is one of the listed strings.
 
+For explicit-propagator Liouville-space GPU `refocus`, the state stack is held in full GPU storage and propagated in batches. Column n still receives n-1 steps. Allow GPU memory for the dense stack and multiplication temporaries, rather than only one state vector.
+
 ## Parallel context
 
 The source reports Hilbert-space parallel tests through a 128-core configuration (16 nodes, 8 cores each) and notes trajectory parallelisation did not appear beneficial because of inter-thread communication ([10.1063/1.3679656](https://doi.org/10.1063/1.3679656)).

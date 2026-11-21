@@ -55,13 +55,8 @@ inter.chem.concs=[1 1];
 bas.formalism='sphten-liouv';
 bas.approximation={'none', 'none'};
 
-% Disable start-up checks
-sys.disable={'hygiene'};
-
-% Enable zero track elimination, with optional GPU arithmetic
+% Enable zero track elimination
 sys.enable={'zte'};
-
-% sys.enable={'zte','gpu'};
 
 % Exchange rate constant array
 exch_rates=[1e1 1e2 1e3 1e4 1e5 1e6]; % Hz
@@ -69,7 +64,7 @@ exch_rates=[1e1 1e2 1e3 1e4 1e5 1e6]; % Hz
 % Experiment setup
 parameters.spins={'1H','13C'};
 parameters.rate=10000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=7;
 parameters.grid='rep_2ang_800pts_sph';
 parameters.offset=[2e3 1e4];      % 5 ppm 1H, 100 ppm 13C
@@ -78,7 +73,6 @@ parameters.cp_pwr=[60e3 50e3];    % Hz
 parameters.nsteps=1000; 
 parameters.timestep=1e-5;         % sec
 parameters.needs={'iso_eq'};
-parameters.verbose=1;
 
 % Preallocate contact curve array
 contact_curves=zeros(numel(exch_rates),...
@@ -89,16 +83,18 @@ for n=1:numel(exch_rates)
 
     % Set the exchange rates
     inter.chem.reactions={struct('reactants',1,'products',2,...
-                                'matching',[1 4; 2 5; 3 6],'rate',exch_rates(n)),...
+                                 'matching',[1 4; 2 5; 3 6],...
+                                 'rate',exch_rates(n)),...
                           struct('reactants',2,'products',1,...
-                                'matching',[4 1; 5 2; 6 3],'rate',exch_rates(n))};
+                                 'matching',[4 1; 5 2; 6 3],...
+                                 'rate',exch_rates(n))};
 
     % Spinach housekeeping
     spin_system=create(sys,inter);
     spin_system=basis(spin_system,bas);
     
     % Detection state
-    parameters.coil=coil_state(spin_system,'L+','13C','exact');
+    parameters.coil=coil_state(spin_system,'L+','13C');
 
     % Simulation
     contact_curves(n,:)=singlerot(spin_system,@cp_contact_soft,parameters,'nmr');

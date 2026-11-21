@@ -16,7 +16,7 @@ Call the zero-input MATLAB function `expansions()` from a Spinach checkout with 
 
 ## Checks encoded in the source
 
-For every pair of IST basis indices, the left table is reconstructed from `ist_PTL` and the right table from `ist_PTR`; each table uses basis matrices divided by their Frobenius norms. The corresponding direct products are `T{n}*T{m}/norm(T{m},'fro')` and `T{m}*T{n}/norm(T{m},'fro')`. For each side, the Frobenius-norm difference is divided by `norm(T{m},'fro')` and must not exceed `sqrt(eps)`. The bosonic group performs the analogous comparisons using `bos_PTL`, `bos_PTR`, and `boson_ortho`'s matrices, with the same tolerance rule based on `norm(B{m},'fro')`.
+For every pair of IST basis indices, matching `[n m k value]` records in `ist_PTL` and `ist_PTR` reconstruct the left and right products; each term uses the indicated basis matrix divided by its Frobenius norm. Bosonic tables retain their dense three-index representation. The corresponding direct products are `T{n}*T{m}/norm(T{m},'fro')` and `T{m}*T{n}/norm(T{m},'fro')`. For each side, the Frobenius-norm difference is divided by `norm(T{m},'fro')` and must not exceed `sqrt(eps)`. The bosonic group performs the analogous comparisons using `bos_PTL`, `bos_PTR`, and `boson_ortho`'s matrices, with the same tolerance rule based on `norm(B{m},'fro')`.
 
 ## Assumptions and limits
 

@@ -40,7 +40,7 @@ result=test_true(result,'column membership summary',...
                  'reporting formats a row without changing the accepted column-oriented input');
 
 % Assert every retired input even when its value is empty
-for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
+for field={'rates','rp_theory','rp_rates','rp_electrons'}
     bad=inter; bad.chem.(field{1})=[]; rejected=false;
     try
         create(sys,bad);

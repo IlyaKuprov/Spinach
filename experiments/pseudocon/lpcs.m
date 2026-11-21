@@ -67,13 +67,13 @@ end
 % Build look-up tables
 A=zeros(max(ranks)+1,1);
 for n=0:max(ranks)
-    A(n+1)=cg_fast(n+2,0,n,0,2,0);
+    A(n+1)=clebsch_gordan(n+2,0,n,0,2,0);
 end
 B=zeros(max(ranks)+1,2*(max(ranks)+1)+1,5);
 for n=0:max(ranks)
     for p=-n:n
         for q=-2:2
-            B(n+1,p+n+1,q+3)=cg_fast(n+2,p+q,n,p,2,q);
+            B(n+1,p+n+1,q+3)=clebsch_gordan(n+2,p+q,n,p,2,q);
         end
     end
 end

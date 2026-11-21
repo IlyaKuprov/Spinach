@@ -34,7 +34,7 @@ for n=1:numel(formalisms)
     [DL_anl,DR_anl]=trapdiff(spin_system,Hd,Hc,dt,cL,cR);
 
     % Get numerical derivatives
-    dc=sqrt(eps('double'));
+    dc=eps('double')^(1/3);
     H_dir_L=(1/2)*Hc+1i*dt*(sqrt(3)/12)*(Hc*Hd{2}-Hd{2}*Hc);
     H_dir_R=(1/2)*Hc+1i*dt*(sqrt(3)/12)*(Hd{1}*Hc-Hc*Hd{1});
     H=(Hd{1}+Hd{2})/2+cL*H_dir_L+cR*H_dir_R;

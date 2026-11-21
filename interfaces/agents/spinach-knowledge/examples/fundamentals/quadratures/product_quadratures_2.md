@@ -23,3 +23,9 @@ For each grid and method the endpoint error is `norm(mu - mu_ref) / norm(mu_ref)
 The example produces a trajectory plot, a relative-error comparison, and fitted empirical slopes. No measured error values or slopes are asserted here. The reference is a numerical calculation with RKMK-DP8, which is also one of the benchmarked methods; it is not an independent analytic solution. The source cites the radiation-damping model but does not provide a separate quantitative validation criterion.
 
 [Source example](../../../../../../examples/fundamentals/quadratures/product_quadratures_2.m).
+
+For the analytic single-spin check, probe detuning, shared-coil isochromats,
+and coupled-spin comparisons, see the examples in
+`examples/nmr_liquids/radiation_damping/`, starting with
+[rd_closed_form](../../nmr_liquids/radiation_damping/rd_closed_form.md) and
+[rd_inhomogeneous](../../nmr_liquids/radiation_damping/rd_inhomogeneous.md).

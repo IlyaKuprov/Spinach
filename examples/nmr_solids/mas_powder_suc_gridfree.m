@@ -35,7 +35,7 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Experiment setup
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=23;
 parameters.rate=6000;
 parameters.sweep=5e4;
@@ -47,8 +47,7 @@ parameters.decouple={};
 parameters.axis_units='ppm';
 parameters.invert_axis=1;
 parameters.rho0=state(spin_system,'L+','13C');
-parameters.coil=coil_state(spin_system,'L+','13C','exact');
-parameters.verbose=1;
+parameters.coil=coil_state(spin_system,'L+','13C');
 
 % Run the simulation
 fid=gridfree(spin_system,@acquire,parameters,'nmr');

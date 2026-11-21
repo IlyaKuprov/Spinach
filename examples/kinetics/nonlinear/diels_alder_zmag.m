@@ -139,11 +139,11 @@ for n=1:nsteps
 end
 
 % Look at spins in reactants and product
-coil=coil_state(spin_system,{'Lz'},{1},'exact');
+coil=coil_state(spin_system,{'Lz'},{1});
 kfigure(); plot(time_axis,real(coil'*traj)); 
-coil=coil_state(spin_system,{'Lz'},{3},'exact');
+coil=coil_state(spin_system,{'Lz'},{3});
 hold on;  plot(time_axis,real(coil'*traj)); 
-coil=coil_state(spin_system,{'Lz'},{9},'exact');
+coil=coil_state(spin_system,{'Lz'},{9});
 hold on;  plot(time_axis,real(coil'*traj));
 xlim tight; kgrid; kxlabel('time, seconds'); 
 kylabel('conc.-weighted exp. value, 300K');

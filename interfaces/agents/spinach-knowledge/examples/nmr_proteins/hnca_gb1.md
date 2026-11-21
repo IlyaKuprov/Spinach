@@ -5,7 +5,7 @@
 
 ## Task and input
 
-A forward simulation of a three-dimensional HNCA spectrum for GB1. The source assumes only the backbone is `13C,15N`-labelled. It calls `protein('2N9K.pdb','2N9K.bmrb',options)` with `pdb_mol=1`, `noshift='delete'`, and `select='backbone-minimal'`. These inputs construct the protein spin system; the script does not load a measured spectrum or compare the simulated result with experimental data. No paramagnetic centre or electron-spin interaction is specified.
+A forward simulation of a three-dimensional HNCA spectrum for GB1. The source assumes only the backbone is `13C,15N`-labelled. It calls `protein` with `pdb_mol=1`, `noshift='delete'`, and `select='backbone-minimal'`. These inputs construct the protein spin system; the script does not load a measured spectrum or compare the simulated result with experimental data. No paramagnetic centre or electron-spin interaction is specified.
 
 ## Spin model and basis
 
@@ -20,3 +20,6 @@ The `liquid(spin_system,@hnca,parameters,'nmr')` call generates simulated FIDs. 
 ## Output and scope
 
 The plot is `-real(spectrum)`, using threshold `10`, bounds `[0.1 0.5 0.1 0.5]`, dimension `2`, and selection `'positive'`. The source says calculation takes minutes and is faster with a Tesla A100 GPU; it does not activate the commented `gpu` option. No spectrum-file export is coded.
+
+Protein structure, shift, and CSA inputs (where used) are loaded from
+`examples/standard_systems/proteins`, resolved relative to the example file.

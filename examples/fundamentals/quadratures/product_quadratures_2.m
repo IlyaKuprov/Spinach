@@ -102,30 +102,25 @@ for k=1:numel(np)
 end
 
 % Plotting
-kfigure(); scale_figure([1.8 1.0]);
+kfigure(); scale_figure([2.000 0.666]);
 time_axis=linspace(0,0.5,np_ref);
 subplot(1,2,1); plot(time_axis,mu_traj);
 kgrid; xlim tight; ylim padded;
 kxlabel('time, seconds');
 kylabel('magnetisation, a.u.');
 klegend({'x-magnetisation','y-magnetisation',...
-         'z-magnetisation'},'Location','Best');
+         'z-magnetisation'},'Location','SouthEast');
 subplot(1,2,2); plot(np',bench);
-kgrid; xlim tight; ylim([1e-7 1e0]);
+kgrid; xlim tight; ylim([1e-13 10]);
 set(gca,'YScale','log','XScale','log');
 kxlabel('number of points in the time grid');
 kylabel('$\|$difference$\|$/$\|$exact$\|$');
 klegend({'LP','LG-2','LG-4','LG-4A',...
          'RKMK4','RKMK-DP5','RKMK-DP8'},...
-        'Location','Best');
-set(gca,'YTick',10.^(-7:2:0));
-set(gca,'MinorGridLineStyle','-'); 
-set(gca,'MinorGridColor',0.9*[1 1 1]);
-set(gca,'GridColor',0.9*[1 1 1]);
+         'Location','SouthWest');
 
 % Compute empirical convergence orders
-idx=floor(2*numel(np)/3):numel(np);
-log_np=log(np(idx));
+idx=floor(2*numel(np)/3):numel(np); log_np=log(np(idx));
 method_names={'PWCL','LG2','LG4','LG4A','RKMK4','RKMK-DP5','RKMK-DP8'};
 
 % Print empirical convergence orders

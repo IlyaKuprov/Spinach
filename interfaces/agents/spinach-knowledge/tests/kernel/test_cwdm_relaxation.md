@@ -48,4 +48,4 @@ Steady-state comparisons and guesses carry the specified concentrations, includi
 
 A symmetric relaxation fixture with cross-substance active-state entries and exactly zero unit action must raise `Spinach:thermalize:crossSubstanceRelaxation` in IME. The corresponding supported block-diagonal operator must annihilate the supplied polarised unweighted target within `10*eps*norm(R_therm,'fro')*norm(rho_eq)` in the whole-vector two-norm.
 
-Pumping reference shapes use the explicit four-argument `coil_state` API.
+Pumping reference shapes use the three-argument `coil_state` API.

@@ -48,6 +48,9 @@
 %                 parameters.rlx_ph={Ph1,Ph2,...,PhN}
 %                 parameters.rlx_op={R1,R2,...,RN}
 %
+% Relaxation superoperators must include all required contributions,
+% including magnetisation flux, as supplied by the user.
+%
 % where PhN have the same dimension as the sample voxel grid and RN are re-
 % laxation superoperators. The initial condition phantom reflects the fact 
 % that different voxels might start off in a different spin state. It must
@@ -128,6 +131,7 @@ for n=1:numel(parameters.rlx_ph)
     polyadic_cores{n}{1}=spdiags(parameters.rlx_ph{n}(:),0,spc_dim,spc_dim);
     polyadic_cores{n}{2}=parameters.rlx_op{n};
 end
+
 R=polyadic(polyadic_cores);
 
 % Decide the initial state
@@ -292,4 +296,5 @@ end
 % asked me what they were discussing. I said, "religion".
 %
 % IK's email to Fred Mentink-Vigier, 2014
+
 

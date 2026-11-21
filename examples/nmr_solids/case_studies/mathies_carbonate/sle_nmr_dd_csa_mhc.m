@@ -50,9 +50,9 @@ spin_system=basis(spin_system,bas);
 
 % Experiment parameters
 parameters.rate=10000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.rho0=state(spin_system,'L+','1H');
-parameters.coil=coil_state(spin_system,'L+','1H','exact');
+parameters.coil=coil_state(spin_system,'L+','1H');
 parameters.spins={'1H'};
 parameters.decouple={};
 parameters.sweep=120000;

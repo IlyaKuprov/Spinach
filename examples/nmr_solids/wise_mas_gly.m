@@ -40,7 +40,7 @@ spin_system=basis(spin_system,bas);
 % Experiment setup
 parameters.spins={'1H','13C'};
 parameters.rate=5000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=9;
 parameters.grid='rep_2ang_200pts_sph';
 parameters.offset=[2e3 1e4];           % Hz
@@ -52,10 +52,9 @@ parameters.npoints=[128 512];          % [f1 f2]
 parameters.zerofill=[512 2048];        % [f1 f2]
 parameters.needs={'iso_eq'};
 parameters.invert_axis=1;
-parameters.verbose=0;
 
 % Detection state
-parameters.coil=coil_state(spin_system,'L+','13C','exact');
+parameters.coil=coil_state(spin_system,'L+','13C');
 
 % Simulation
 fid=singlerot(spin_system,@wise,parameters,'nmr');

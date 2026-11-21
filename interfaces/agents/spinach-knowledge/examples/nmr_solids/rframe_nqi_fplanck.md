@@ -9,7 +9,7 @@ Calculates a powder MAS spectrum with rotor-synchronised detection for a single 
 
 ## Spin system and rotor sampling
 
-The field parameter is 14.1. The quadrupolar interaction is `eeqq2nqi(3.06e6, 0.40, 1, [0 0 0])`; its arguments have no units stated in the source. The full spherical-tensor Liouville basis is used. `singlerot` propagates the acquisition callback in the lab frame, with rate 50000, rotor axis `[1,1,1]`, maximum rank 85, and the `rep_2ang_6400pts_sph` grid. The example disables trajectory-level propagation and Krylov methods, and selects rotating-frame order 2. No gradient is configured.
+The field parameter is 14.1. The quadrupolar interaction is `eeqq2nqi(3.06e6, 0.40, 1, [0 0 0])`; its arguments have no units stated in the source. The full spherical-tensor Liouville basis is used. `singlerot` propagates the acquisition callback in the lab frame, with rate 50000, rotor axis `[sqrt(2/3) 0 sqrt(1/3)]`, maximum rank 85, and the `rep_2ang_6400pts_sph` grid. The example disables trajectory-level propagation and Krylov methods, and selects rotating-frame order 2. No gradient is configured.
 
 ## Acquisition and processing
 

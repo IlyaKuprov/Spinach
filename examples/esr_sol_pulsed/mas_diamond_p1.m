@@ -49,13 +49,13 @@ spin_system=create(sys,inter);
 spin_system=basis(spin_system,bas);
 
 % Rotor parameters
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=2700;
 
 % Sequence parameters
 parameters.spins={'E'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=coil_state(spin_system,'L+','E','exact');
+parameters.coil=coil_state(spin_system,'L+','E');
 parameters.pulse_dur=400e-9;
 parameters.pulse_frq=416e3;
 parameters.tau=300e-9;
@@ -68,7 +68,6 @@ parameters.npoints=601;
 parameters.zerofill=601;
 parameters.grid='rep_2ang_400pts_sph';
 parameters.axis_units='GHz-labframe';
-parameters.verbose=0;
 
 % Spinning rates
 rates=[0 10e3 25e3 37e3];

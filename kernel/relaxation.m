@@ -33,6 +33,11 @@
 %       space formalisms; the euler_angles parameter refers to the
 %       spin subsystem only and has no effect on the mode terms.
 %
+% Point-to-point fluxes specified by inter.flux_rate and
+% inter.flux_type require 'flux' in inter.relaxation. They are added
+% after retention and thermalisation, preserving the specified transfer
+% and correlation loss.
+%
 % ilya.kuprov@weizmann.ac.il
 % ledwards@cbs.mpg.de
 % alexander.karabanov@nottingham.ac.uk
@@ -61,11 +66,16 @@ if boson_terms&&(~ismember(spin_system.bas.formalism,{'zeeman-liouv','sphten-lio
     boson_terms=false;
 end
 
-% Do nothing if none specified
-if isempty(spin_system.rlx.theories)&&(~boson_terms)
+% Flux bypasses ordinary relaxation retention and thermalisation
+if (~boson_terms)&&all(strcmp(spin_system.rlx.theories,'flux'),'all')
 
-    % Update the user
-    report(spin_system,'relaxation superoperator set to zero.');
+    % Return the selected flux contribution, including the no-theory zero
+    R=rlx_flux(spin_system);
+    if isempty(spin_system.rlx.theories)
+        report(spin_system,'relaxation superoperator set to zero.');
+    else
+        report(spin_system,'ordinary relaxation disabled; returning flux contribution.');
+    end
 
     % Exit the function
     return;
@@ -452,8 +462,8 @@ if ismember('SRSK',spin_system.rlx.theories)
     for k=spin_system.rlx.srsk_sources
 
         % Relaxation rates of the source spin
-        Lz_k=coil_state(spin_system,{'Lz'},{k},'exact'); Lz_k=Lz_k/norm(Lz_k,2);
-        Lp_k=coil_state(spin_system,{'L+'},{k},'exact'); Lp_k=Lp_k/norm(Lp_k,2);
+        Lz_k=coil_state(spin_system,{'Lz'},{k}); Lz_k=Lz_k/norm(Lz_k,2);
+        Lp_k=coil_state(spin_system,{'L+'},{k}); Lp_k=Lp_k/norm(Lp_k,2);
         T1k=-1/real(Lz_k'*R*Lz_k); T2k=-1/real(Lp_k'*R*Lp_k);
 
         % Source spin quantum number
@@ -808,6 +818,11 @@ end
 % Perform final clean-up and make array complex for later
 R=complex(clean_up(spin_system,R,spin_system.tols.rlx_zero));
 
+% Add magnetisation flux after retention, thermalisation, and relaxation clean-up
+if ismember('flux',spin_system.rlx.theories)
+    R=R+rlx_flux(spin_system);
+end
+
 % Print matrix diagnostics
 report(spin_system,['final relaxation superoperator density ' num2str(100*nnz(R)/numel(R))...
                     '%, nnz(R)=' num2str(nnz(R)) ', sparsity ' num2str(issparse(R))]);
@@ -848,7 +863,7 @@ end
 for n=1:numel(spin_system.rlx.theories)
     if ~ismember(spin_system.rlx.theories{n},{'none','damp','t1_t2','SRSK','SRFK'...
                                               'redfield','lindblad','nottingham',...
-                                              'weizmann','naka-zwan'})
+                                              'weizmann','naka-zwan','flux'})
         error('unrecognised relaxation theory specification.');
     end
 end
@@ -907,7 +922,10 @@ if ( ismember('SRSK',spin_system.rlx.theories))&&...
     error('SRSK relaxation theory is only available in Liouville space.');
 end
 if ( strcmp(spin_system.rlx.equilibrium,'IME'))&&...
-   (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))
+   (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))&&...
+   ~(ismember('flux',spin_system.rlx.theories)&&...
+     all(strcmp(spin_system.rlx.theories,'flux'),'all')&&...
+     nnz(spin_system.rlx.flux_rate)==0)
     error('IME thermalisation is only available in Liouville space.');
 end
 if (strcmp(spin_system.rlx.equilibrium,'dibari'))&&...
@@ -922,4 +940,5 @@ end
 % it at all.
 %
 % Friedrich Nietzsche
+
 

@@ -43,8 +43,8 @@ parameters.sweep=[0e3 15e3];
 parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=state(spin_system,'Lz','14N');
-parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N','exact')+...
-                sin(theta)*coil_state(spin_system,'Lx','14N','exact');
+parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N')+...
+                sin(theta)*coil_state(spin_system,'Lx','14N');
 parameters.Lx=cos(theta)*operator(spin_system,'Lz','14N')+...
               sin(theta)*operator(spin_system,'Lx','14N');
 parameters.spins={'14N'};
@@ -53,7 +53,6 @@ parameters.rf_pwr=2*pi*11.3e6/sin(theta);
 parameters.rf_dur=1e-6;
 parameters.rf_frq=10e3;
 parameters.method='average';
-parameters.verbose=0;
 
 % Simulation
 spectrum=powder(spin_system,@overtone_pa,parameters,'qnmr');

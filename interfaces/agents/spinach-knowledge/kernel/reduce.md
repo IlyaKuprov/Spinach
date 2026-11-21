@@ -34,3 +34,5 @@ Use each projector `P` as documented by the source: `L_reduced=P'*L*P` for matri
 - http://dx.doi.org/10.1063/1.3398146
 - http://dx.doi.org/10.1016/j.jmr.2011.03.010
 
+
+An unselected flux theory must not suppress symmetry reduction merely because flux-rate fields are present. Only enabled, nonzero flux relevant to the permutation can constrain reduction; rates alone do not activate flux relaxation.

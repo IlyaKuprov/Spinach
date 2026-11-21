@@ -53,8 +53,8 @@ parameters.npoints=256;
 parameters.zerofill=256;
 parameters.rho0=cos(theta)*state(spin_system,'Lz','1H')+...
                 sin(theta)*state(spin_system,'Lx','1H');
-parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N','exact')+...
-                sin(theta)*coil_state(spin_system,'Lx','14N','exact');
+parameters.coil=cos(theta)*coil_state(spin_system,'Lz','14N')+...
+                sin(theta)*coil_state(spin_system,'Lx','14N');
 parameters.Nx=cos(theta)*operator(spin_system,'Lz','14N')+...
               sin(theta)*operator(spin_system,'Lx','14N');
 parameters.Hx=cos(theta)*operator(spin_system,'Lz','1H')+...
@@ -64,7 +64,6 @@ parameters.method='average';
 parameters.axis_units='kHz';
 parameters.rf_pwr=2*pi*[55.0e3 35.1e3]/sin(theta);
 parameters.rf_frq=48e3;
-parameters.verbose=0;
 
 % Start a new figure
 kfigure(); scale_figure([2.5 1.0]);

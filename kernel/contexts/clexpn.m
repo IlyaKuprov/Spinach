@@ -86,8 +86,8 @@ if ~isfield(numerics,'rtol')
     policy.defaults{end+1}='parameters.cce.numerics.rtol';
 end
 if ~isfield(numerics,'max_memory_bytes')
-    operating_system=java.lang.management.ManagementFactory.getOperatingSystemMXBean();
-    numerics.max_memory_bytes=floor(double(operating_system.getFreeMemorySize())/2);
+    [~,host_memory]=memory();
+    numerics.max_memory_bytes=floor(host_memory.PhysicalMemory.Available/2);
     policy.defaults{end+1}='parameters.cce.numerics.max_memory_bytes';
 end
 parameters.cce.numerics=numerics;
@@ -122,10 +122,10 @@ end
 
 % Disjoint families retain single groups or all inter-group pairs
 if strcmp(parameters.cce.expansion,'disjoint')
-    parameters.cce.order=1;
+    parameters.cce.order=min(1,numel(parameters.cce.bath_spins));
 end
 if strcmp(parameters.cce.expansion,'disjoint_inter')
-    parameters.cce.order=2;
+    parameters.cce.order=min(2,numel(parameters.cce.bath_spins));
 end
 
 % Construct product-state assignments without changing the caller's random stream

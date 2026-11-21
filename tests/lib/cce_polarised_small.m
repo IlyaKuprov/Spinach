@@ -4,14 +4,14 @@
 % The exhaustive reference is evaluated in test_cce_examples.
 % Syntax:
 %
-%             [answer,diagnostics]=cce_polarized_bath()
+%             [answer,diagnostics]=cce_polarised_small()
 %
 % Returns the normalised complex signal column in answer and the calculation
 % diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_polarized_bath()
+function [answer,diagnostics]=cce_polarised_small()
 
 % Standard Spinach magnet, isotope list, and illustrative Hz tensors
 sys.magnet=0.01;
@@ -43,14 +43,6 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
 % Run the named experiment in the cluster-expansion context
 spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
-
-% Plot the physical observed-spin response
-kfigure();
-plot(1e6*parameters.times,real(answer),'b-');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('64 sampled states');
-kgrid();
 
 end
 

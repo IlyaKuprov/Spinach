@@ -6,14 +6,9 @@
 % unit time for each of the two jumps on each site. The blue markers are
 % digitised from the paper's full-bath calculation, not simulated here.
 %
-% Syntax: [coherence,times]=mecce_dissipative_bath()
-%
-% coherence is a 201-by-5 array of normalised coherence magnitudes, with
-% ME-CCE orders in columns. times is a row of 201 plotted time coordinates.
-%
 % ilya.kuprov@weizmann.ac.il
 
-function [coherence,times]=mecce_dissipative_bath()
+function mecce_dissipative_bath()
 
 % Central-spin and periodic nearest-neighbour bath couplings from Table S1
 probe_coupling=[1.023643 1.900927 0.288319 1.897299 0.623663 0.846653 ...
@@ -100,16 +95,15 @@ end
 exact=readmatrix(fullfile(fileparts(mfilename('fullpath')),...
                           'mecce_dissipative_bath_exact.csv'));
 kfigure();
-main_axes=gca();
 lines=plot(times,coherence);
 hold on;
 exact_markers=plot(exact(:,1),exact(:,2),'.','Color',[0 0.65 0.78]);
-xlabel('Time (published units)');
-ylabel('Coherence');
+kxlabel('Time ($2\pi/\langle a_j\rangle$)');
+kylabel('Coherence');
 xlim([0 20]);
 ylim([0 1.03]);
 klegend([lines;exact_markers],{'ME-CCE1','ME-CCE2','ME-CCE3',...
-                             'ME-CCE4','ME-CCE5','Exact (published)'},...
+                             'ME-CCE4','ME-CCE5','Exact (digitised)'},...
         'Location','southwest');
 kgrid();
 
@@ -118,9 +112,8 @@ kgrid();
 inset=axes('Position',[0.58 0.59 0.29 0.29]);
 plot(inset,exact(:,1),coherence(exact_idx,:)-exact(:,2));
 xlim(inset,[0 20]);
-ylim(inset,[-0.1 0.2]);
-ylabel(inset,'\Delta');
-axes(main_axes);
+ylim(inset,[-0.1 0.1]);
+kylabel(inset,'$\Delta$');
 
 end
 

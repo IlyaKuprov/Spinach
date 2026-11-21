@@ -3,14 +3,14 @@
 % The deliberately small model is not a published material reproduction.
 % Syntax:
 %
-%             [answer,diagnostics]=cce_deer_bandwidth()
+%             [answer,diagnostics]=cce_deer_small()
 %
 % Returns the normalised complex signal column in answer and the calculation
 % diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_deer_bandwidth()
+function [answer,diagnostics]=cce_deer_small()
 
 % Magnet and isotopes
 sys.magnet=0.01;
@@ -47,15 +47,6 @@ parameters.pump=struct('sites',2,'center',0,'halfwidth',1e5,...
 
 % Run the cluster expansion for the named bath-pumped Hahn experiment
 [answer,diagnostics]=clexpn(spin_system,@bath_pumped_hahn,parameters,'labframe');
-
-% Plot the projected complex signal
-kfigure();
-plot(1e6*parameters.times,real(answer),'b-',...
-     1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
-kgrid();
 
 end
 

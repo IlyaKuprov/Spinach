@@ -6,12 +6,6 @@
 
 function result=test_cce_erbium_s12()
 
-% Make the CCE examples available for the duration of this test
-saved_path=path;
-path_cleanup=onCleanup(@() path(saved_path));
-root=fileparts(fileparts(fileparts(mfilename('fullpath'))));
-addpath(fullfile(root,'examples','cce'));
-
 % Three tungsten sites in the region of resolvable flip-flop decay
 result=new_test_result('kernel/cce_erbium_s12','Er:CaWO4 secular pair reduction',...
                        'Compare the analytical pair product with explicit Hahn propagation.');
@@ -60,7 +54,7 @@ for j=1:size(xyz,1)-1
 end
 
 % Compare the analytical product to the explicit propagators
-answer=cce_erbium_cawo4_pairs(xyz,field_axis,hyperfine,dipolar,times,0);
+answer=cce_secular_pairs(xyz,field_axis,hyperfine,dipolar,times,0);
 result=test_true(result,'Resolved decay',min(real(reference))<0.999,...
                  'The finite bath must distinguish the echo from unity.');
 result=test_close(result,'Secular pair product',answer,reference,1e-8,1e-8,...
@@ -70,7 +64,7 @@ result=test_close(result,'Secular pair product',answer,reference,1e-8,1e-8,...
 for k=[1 size(xyz,1)]
 
     % Vanishing detuning exercises rows with no retained factors
-    answer=cce_erbium_cawo4_pairs(xyz(1:k,:),field_axis,0,dipolar,times,0);
+    answer=cce_secular_pairs(xyz(1:k,:),field_axis,0,dipolar,times,0);
     result=test_true(result,sprintf('Commuting case (%d spins)',k),all(answer==1),...
                      'Without hyperfine detuning the Hahn echo must equal unity.');
 

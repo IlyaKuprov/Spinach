@@ -3,30 +3,33 @@
 % coherent intramethyl exchange, not as stochastic jumps. The measured
 % echo is overlaid with the scale factor used by the authors.
 %
-% Syntax: [answer,diagnostics]=cce_methyl_molecular()
-%
-% answer is the 2048-by-1 normalised Hahn echo. diagnostics contains the
-% total echo times in seconds and the powder quadrature and node traces.
-%
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_methyl_molecular()
+function cce_methyl_molecular()
 
 % Finland trityl core inputs from doi:10.5281/zenodo.13850793
-data=load(fullfile(fileparts(mfilename('fullpath')),'trityl_finland.mat'));
+folder=fileparts(mfilename('fullpath'));
+protons=readmatrix(fullfile(folder,'trityl_finland_protons.csv'));
+measured=readmatrix(fullfile(folder,'trityl_finland_echo.csv'));
+coords=protons(:,1:3);
+hyperfine=reshape(protons(:,4:12).',3,3,[]);
+
+% Three protons per methyl group share a tunnel splitting (kHz)
+splittings=[54.5 4.8 4.8 54.5 54.5 4.8 54.5 4.8 4.8 54.5 54.5 4.8];
+tunnel=kron(diag(2*pi*1e3*splittings),ones(3)-eye(3));
 
 % Evaluate the pair expansion before averaging the powder
 times=linspace(0,40e-6,2048).';
-[answer,diagnostics]=trityl_appa(data.coords,data.hyperfine,data.tunnel,times);
+echo=trityl_appa(coords,hyperfine,tunnel,times);
 
 % Compare with the measured trace in deuterated o-terphenyl
 kfigure();
-plot(1e6*times,answer,'b-',data.exp_time,data.exp_echo,'k.');
-xlim([0 max(data.exp_time)]);
+plot(1e6*times,echo,'b-',measured(:,1),measured(:,2),'k.');
+xlim([0 max(measured(:,1))]);
 ylim([0 1]);
 kxlabel('Total echo time / $\mu$s');
 kylabel('Normalised Hahn echo');
-klegend('APPA (36 protons)','Experiment');
+klegend('APPA simulation (36 protons)','Archived experimental echo');
 kgrid();
 
 end

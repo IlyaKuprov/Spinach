@@ -4,17 +4,11 @@
 % antiparallel proton subspace the flip-flop matrix element is C and
 % the diagonal energy difference is D+E or D-E. Common Zeeman and
 % exchange energies do not enter this pair echo.
-% Syntax:
-%
-%               [loss,axes_hz]=gcce_two_centres()
-%
-% loss is 1-|L| at total echo time 40 us, with one row per flip-flop
-% coupling and one column per hyperfine detuning. The corresponding
-% signed axes in Hz are returned in axes_hz.flip and axes_hz.detuning.
+% The plotted loss is 1-|L| at a total echo time of 40 microseconds.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [loss,axes_hz]=gcce_two_centres()
+function gcce_two_centres()
 
 % Electron pair and antiparallel proton pair in the secular Hamiltonian
 sys.isotopes={'E','E','1H','1H'};
@@ -58,16 +52,26 @@ end
 % Reversing C rephases one proton state; reversing E interchanges the branches
 loss=[flipud(loss(2:end,:));loss];
 loss=[fliplr(loss(:,2:end)) loss];
-axes_hz.flip=[-flip(end:-1:2) flip];
-axes_hz.detuning=[-detuning(end:-1:2) detuning];
+flip=[-flip(end:-1:2) flip];
+detuning=[-detuning(end:-1:2) detuning];
 
 % Display the pair contribution to triplet decoherence
 kfigure();
-surf(axes_hz.detuning,axes_hz.flip,loss);
-kxlabel('hyperfine detuning, Hz');
-kylabel('flip-flop coupling, Hz');
-kzlabel('pair decoherence');
-kgrid();
+surf(detuning,flip,loss,'FaceColor',[1 0.65 0.15],'EdgeColor',[0.3 0.25 0.18]);
+xlim([-1e5 1e5]);
+ylim([-4000 4000]);
+zlim([0 1]);
+xticks(-1e5:5e4:1e5);
+yticks(-4000:2000:4000);
+zticks(0:0.5:1);
+pbaspect([1 1 0.5]);
+set(gca,'YDir','reverse','Projection','perspective');
+view(-21,35);
+kxlabel('$E_{-1,k}$ / Hz');
+kylabel('$C_{\alpha k}$ / Hz');
+kzlabel('$g_k$');
+box on;
+grid off;
 
 end
 

@@ -3,14 +3,14 @@
 % This small illustrative model is not a published material reproduction.
 % Syntax:
 %
-%             [answer,diagnostics]=gcce_finite_drive()
+%             [answer,diagnostics]=gcce_drive_small()
 %
 % Returns one row of column-vectorised observed density per time point
 % in answer, and the cluster-expansion diagnostics structure in diagnostics.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=gcce_finite_drive()
+function [answer,diagnostics]=gcce_drive_small()
 
 % Magnet and isotopes; zero electron g isolates the model energy scales
 sys.magnet=0;
@@ -46,14 +46,6 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
 
 % Run the named finite-drive experiment
 [answer,diagnostics]=clexpn(spin_system,@finite_drive,parameters,'labframe');
-
-% Plot observed-spin populations
-populations=real(answer(:,1:sqrt(size(answer,2))+1:end));
-kfigure();
-plot(1e6*parameters.times,populations);
-xlabel('time / microseconds');
-ylabel('observed populations');
-kgrid();
 
 end
 

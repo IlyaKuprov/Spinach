@@ -44,14 +44,6 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
 spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@free_evolution,parameters,'labframe');
 
-% Plot populations in the observed tensor-product order
-populations=real(answer(:,1:sqrt(size(answer,2))+1:end));
-kfigure();
-plot(1e6*parameters.times,populations);
-xlabel('time / microseconds');
-ylabel('observed populations');
-kgrid();
-
 end
 
 

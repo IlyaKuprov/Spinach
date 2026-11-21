@@ -4,14 +4,14 @@
 % reproduction of the bulk gCCE3 calculation.
 % Syntax:
 %
-%             [answer,diagnostics]=cce_hbn_quadrupoles()
+%             [answer,diagnostics]=cce_hbn_small()
 %
 % Returns the normalised complex signal column in answer and the calculation
 % diagnostics structure in diagnostics, with one entry per time point.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_hbn_quadrupoles()
+function [answer,diagnostics]=cce_hbn_small()
 
 % Magnet and isotopes
 sys.magnet=0.01;
@@ -55,15 +55,6 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
 % Execute the named Hahn echo through the cluster-expansion context
 spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
-
-% Plot the complex echo amplitude
-figure();
-plot(1e6*parameters.times,real(answer),'b-',...
-     1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
-kgrid();
 
 end
 

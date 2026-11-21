@@ -40,13 +40,6 @@ parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
 spin_system=create(sys,inter);
 [answer,diagnostics]=clexpn(spin_system,@free_evolution,parameters,'labframe');
 
-% Plot the physical observed-spin response
-kfigure();
-plot(1e6*parameters.times,real(answer(:,3)),'b-');
-xlabel('time / microseconds');
-ylabel('observed signal');
-kgrid();
-
 end
 
 

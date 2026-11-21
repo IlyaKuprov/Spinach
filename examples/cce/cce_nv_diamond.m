@@ -3,14 +3,12 @@
 % seed-5 realisation of the PyCCE diamond ensemble generator (40 Angstrom
 % bath, [111] field); interacting pairs are retained within 6 Angstrom.
 %
-%                  [answer,diagnostics]=cce_nv_diamond()
-%
-% answer contains the CCE2 echo at each total time. diagnostics contains
-% times (seconds), the CCE1 echo, and the exact isolated-nuclei product.
+% The markers are calculated CCE1 and CCE2 echoes; the line is the
+% analytic isolated-nuclei result from Eq. (29).
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_nv_diamond()
+function cce_nv_diamond()
 
 % Read the occupied carbon sites, in Angstrom, with the NV axis along z
 directory=fileparts(mfilename('fullpath'));
@@ -34,7 +32,10 @@ dipolar=1.05457172*gamma_c*gamma_e*1000./(2*pi*radius.^3);
 hyperfine=dipolar.*([0 0 1]-3*unit(:,3).*unit);
 inter.coupling.matrix=cell(count+1);
 for n=1:count
+
+    % Collect the projected hyperfine in the electron longitudinal column
     inter.coupling.matrix{1,n+1}=[zeros(3,2) hyperfine(n,:).'];
+
 end
 
 % The cluster graph contains precisely the retained carbon-carbon dipoles
@@ -73,7 +74,8 @@ parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...
                                'max_memory_bytes',2^31);
 spin_system=create(sys,inter);
-[answer,details]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+[cce2,details]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+cce1=details.reduction.by_order(:,:,2);
 
 % Evaluate the isolated-nuclei expression independently (Eq. 29)
 omega=-gamma_c*500*1000;
@@ -82,18 +84,17 @@ conditioned=sqrt((omega-2*pi*hyperfine(:,3)).^2+perp_sq);
 quarter=parameters.times/4;
 isolated=prod(1-2*(perp_sq./conditioned.^2).*sin(conditioned*quarter).^2.*...
                 sin(omega*quarter).^2,1).';
-diagnostics=struct('times',parameters.times(:),'isolated',isolated,...
-                   'bound',details.reduction.abs_error_bound,...
-                   'cce1',details.reduction.by_order(:,:,2));
 
 % Overlay the exact product with the alternating CCE1 and CCE2 markers
 kfigure();
-plot(1e3*diagnostics.times,isolated,'k-',...
-     1e3*diagnostics.times(2:2:end),real(diagnostics.cce1(2:2:end)),'b.',...
-     1e3*diagnostics.times(1:2:end),real(answer(1:2:end)),'r.');
-kxlabel('total echo time / ms');
+times_us=1e6*parameters.times;
+plot(times_us,isolated,'k-');
+hold on;
+plot(times_us(2:2:end),real(cce1(2:2:end)),'.','Color',[0 0.45 0.74]);
+plot(times_us(1:2:end),real(cce2(1:2:end)),'.','Color',[0.85 0.33 0.10]);
+kxlabel('total echo time / $\mu$s');
 kylabel('coherence');
-klegend({'isolated nuclei','CCE1','CCE2'});
+klegend({'Eq. (29), isolated nuclei','Spinach CCE1','Spinach CCE2'});
 
 end
 

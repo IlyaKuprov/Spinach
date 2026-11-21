@@ -475,29 +475,19 @@ With \lstinline|parameters.sum_up=false|, a grid calculation returns a column ce
 \end{description}
 
 \subsection{Which supplied example should I open?}
-The files below are in \lstinline|examples/cce/|. Call a file by its basename after adding the examples directory to the MATLAB path. Material examples identify their target figure in the header. Distinguish agreement with archived numerical data from reconstruction with a different isotope realisation. The single-nucleus, bandwidth, noise, and finite-drive examples are controls rather than material fits.
+Call these functions without arguments or outputs after adding \lstinline|examples/cce/| to the MATLAB path. Each produces the published panel or the calculated traces identified below. The model and its assumptions are specified in the example, rather than fitted to the plotted points.
 \begin{longtable}{@{}p{0.36\linewidth}p{0.58\linewidth}@{}}
-\toprule Example & What to inspect \\ \midrule\endfirsthead
-\toprule Example (continued) & What to inspect \\ \midrule\endhead
-\texttt{cce\_single\_nucleus} & Analytic one-nucleus modulation of a projected echo; a first check on times and couplings. \\
-\texttt{cce\_nv\_diamond} & Fixed-receiver NV echo on pinned inputs; inspect the imaginary as well as the real quadrature. \\
-\texttt{cce\_molecular\_powder} & OX063 powder echo from 48 protons, Jeschke Fig.~9. \\
-\texttt{cce\_deer\_bandwidth} & Selection of a pumped bath site by a finite spectral window. \\
-\texttt{cce\_noise\_spectrum} & Ordered time-domain correlation and the consequences of a finite observation window. \\
-\texttt{cce\_polarized\_bath} & Polarisation and sampling of a product-state nuclear bath. \\
-\texttt{cce\_hbn\_quadrupoles} & Explicit quadrupolar tensors in a planar high-spin bath. \\
-\texttt{cce\_methyl\_molecular} & Finland trityl powder echo from 36 protons, Jeschke Fig.~7. \\
-\texttt{cce\_p1\_electron\_bath} & An electron bath with a nitrogen hyperfine group. \\
-\texttt{cce\_erbium\_cawo4} & Anisotropic tungsten couplings around an effective central electron. \\
-\texttt{cce\_sic\_divacancy} & Different nuclear species in a divacancy-like environment. \\
-\texttt{cce\_sip\_donor} & Site-dependent contact terms and valley interference in a silicon donor model. \\
-\texttt{gcce\_finite\_drive} & A finite spin-lock drive propagated with the coupled drift. \\
-\texttt{gcce\_highspin\_siv} & Explicit spin-3/2 dynamics in a vacancy-like environment. \\
-\texttt{gcce\_sic\_clock} & A low-field transition where transverse zero-field splitting matters. \\
-\texttt{gcce\_two\_centres} & Proton-pair Hahn modulation for two triplet centres, Chen Fig.~3(b). \\
-\texttt{gcce\_votpp} & An electron and vanadium nucleus in the observed subsystem. \\
-\texttt{mecce\_dissipative\_bath} & Dissipative XXZ ring coherence through ME-CCE order five, Onizhuk Fig.~1(c). \\
-\texttt{pcce\_electron\_layer} & Five planar lattice partition curves; the normally averaged dimer curve differs from the published result. \\
+\toprule Example & Published calculation \\ \midrule\endfirsthead
+\toprule Example (continued) & Published calculation \\ \midrule\endhead
+\texttt{cce\_nv\_diamond} & Onizhuk and Galli, Fig.~3(a), inset: order-resolved NV Hahn echo. \\
+\texttt{gcce\_sic\_clock} & Onizhuk and Galli, Fig.~4(c): mixed-bath free induction at the SiC clock transition. \\
+\texttt{cce\_methyl\_molecular} & Jeschke, Fig.~7: Finland trityl powder echo. \\
+\texttt{cce\_molecular\_powder} & Jeschke, Fig.~9: OX063 powder echo. \\
+\texttt{cce\_p1\_electron\_bath} & Park et al., Fig.~5(a,c,d): P1 pair energy levels and flip-flop channels, not the ensemble decay. \\
+\texttt{cce\_erbium\_cawo4} & Le Dantec et al., Fig.~S12: lattice and amorphous tungsten-bath echoes. \\
+\texttt{gcce\_two\_centres} & Chen et al., Fig.~3(b): the proton-pair contribution to the two-triplet Hahn echo. \\
+\texttt{gcce\_votpp} & Ryan et al., Fig.~2 and Fig.~3 (middle): register energy levels and proton-limited echo. \\
+\texttt{mecce\_dissipative\_bath} & Onizhuk et al., Fig.~1(c): dissipative XXZ ring through ME-CCE order five; full-bath markers are digitised. \\
 \bottomrule\end{longtable}
 
 \section{Getting started: the echo of one nucleus}\label{sec:start}
@@ -585,7 +575,7 @@ klegend('Real','Imaginary');
 kgrid();
 \end{lstlisting}
 
-In a double-precision run the printed line was \code{Valid: 101/101; max |echo-reference|: 7.77e-16}. The blue real component starts at unity, reaches its lowest sampled value, $0.15980$, at $9.713~\mu\mathrm{s}$, and returns to unity at $37.356~\mu\mathrm{s}$. The red imaginary component stays within $1.2\times10^{-16}$ of zero. The largest reported numerical error bound was $4.74\times10^{-9}$, below the requested absolute tolerance. Round-off can change the last digits. A dip followed by recovery here is coherent nuclear modulation, not an irreversible $T_2$ decay. As a physical check, setting $A_\perp=0$ makes the conditional axes collinear and the formula predicts a flat echo. The shipped counterpart is \code{examples/cce/cce\_single\_nucleus.m}.
+In a double-precision run the printed line was \code{Valid: 101/101; max |echo-reference|: 7.77e-16}. The blue real component starts at unity, reaches its lowest sampled value, $0.15980$, at $9.713~\mu\mathrm{s}$, and returns to unity at $37.356~\mu\mathrm{s}$. The red imaginary component stays within $1.2\times10^{-16}$ of zero. The largest reported numerical error bound was $4.74\times10^{-9}$, below the requested absolute tolerance. Round-off can change the last digits. A dip followed by recovery here is coherent nuclear modulation, not an irreversible $T_2$ decay. As a physical check, setting $A_\perp=0$ makes the conditional axes collinear and the formula predicts a flat echo.
 
 \section{Advanced user manual}\label{sec:advanced}
 
@@ -632,9 +622,9 @@ pulse.drive=struct('spins',1,'axis','x','amplitude',2*pi*25e3,...
 rho=reshape(density(end,:),3,3);
 disp(real(diag(rho)).');
 \end{lstlisting}
-The four rows are observation times. Each row is the column-vectorised $3\times3$ observed density; its diagonal contains the three populations in descending $m_S$ order. At $8~\mu\mathrm{s}$ these were $0.82764$, $0.16422$, and $0.00815$. Drift remains active during the rectangular pulse; multiplying a separately computed free evolution by an ideal flip is not this calculation. Supply amplitude and detuning in rad~s$^{-1}$, duration in seconds. For successive slices supply equal-length row vectors of amplitudes and durations. Use \code{gcce\_finite\_drive.m} for the spin-half electron version.
+The four rows are observation times. Each row is the column-vectorised $3\times3$ observed density; its diagonal contains the three populations in descending $m_S$ order. At $8~\mu\mathrm{s}$ these were $0.82764$, $0.16422$, and $0.00815$. Drift remains active during the rectangular pulse; multiplying a separately computed free evolution by an ideal flip is not this calculation. Supply amplitude and detuning in rad~s$^{-1}$, duration in seconds. For successive slices supply equal-length row vectors of amplitudes and durations.
 
-For ideal pulses choose the sequence that expresses the experiment. \code{@cpmg\_echo} takes \code{parameters.nloops} (a positive pulse count); \code{@refocusing\_train} takes explicit ideal pulses or an XY8/UDD train in closed generalised Hilbert evolution. For a frequency-selective bath inversion, use \code{@bath\_pumped\_hahn}: \code{cce\_deer\_bandwidth.m} shows how to specify a pump centre, half-width, frequency units, and placement. A field called \code{parameters.sequence}, even an empty one, is not a substitute for these native declarations.
+For ideal pulses choose the sequence that expresses the experiment. \code{@cpmg\_echo} takes \code{parameters.nloops} (a positive pulse count); \code{@refocusing\_train} takes explicit ideal pulses or an XY8/UDD train in closed generalised Hilbert evolution. For a frequency-selective bath inversion, use \code{@bath\_pumped\_hahn} and specify the pump centre, half-width, frequency units, and placement. A field called \code{parameters.sequence}, even an empty one, is not a substitute for these native declarations.
 
 \subsection{Decide whether the next cluster order matters}
 Increasing the order for a single nucleus cannot reveal a missing pair. Add a second $^{13}$C with a weaker central coupling and an explicit mutual coupling to the first nucleus. Changes to \code{sys} or \code{inter} require a new \code{create} call; changes to the CCE order alone do not.
@@ -687,7 +677,7 @@ fprintf('Max |change of averaging order|: %.4g\n',max(abs(internal-external)));
 \end{lstlisting}
 With the same seed and 16 draws, the maximum absolute difference between the two calculations was $0.02659$. The default \code{'after\_expansion'} reduces each draw, then averages its completed echo. \code{'internal\_then\_expansion'} instead averages the cluster signals and observed-only references before reducing. Products and divisions generally do not commute with averaging. On an orientation grid the same distinction applies to quadrature nodes; the internal route requires identical physical cluster families. Changing the grid does not redraw the bath for each node.
 
-Inspect \code{state\_info.reduction.sampling\_standard\_error}: its maximum here was $0.06685$, not an order-truncation error and not evidence that 16 samples suffice. Repeat at increasing sample counts and with a different seed; a sample-count ladder in \code{cce\_converge} requires a held-out seed override. To prescribe a product density without Monte Carlo noise, use \code{'explicit\_product'} with \code{rho} cells in \code{bath\_spins} order. The shipped \code{cce\_polarized\_bath.m} illustrates sampled polarisation in a two-proton model.
+Inspect \code{state\_info.reduction.sampling\_standard\_error}: its maximum here was $0.06685$, not an order-truncation error and not evidence that 16 samples suffice. Repeat at increasing sample counts and with a different seed; a sample-count ladder in \code{cce\_converge} requires a held-out seed override. To prescribe a product density without Monte Carlo noise, use \code{'explicit\_product'} with \code{rho} cells in \code{bath\_spins} order.
 
 \subsection{Introduce a dissipative bath without fitting a decay constant}
 Compare two otherwise identical signals with and without a local raising jump on site 2. Use \code{'zeeman-liouv'} for the retained Liouville spaces and \code{'generalized'} to keep the observed density. Jump support is a \emph{physical} spin ID; the rate below is in s$^{-1}$, not Hz to be multiplied by $2\pi$.
@@ -730,7 +720,7 @@ noise.spectrum=struct('frequency_grid',linspace(-2*abs(omega),2*abs(omega),81),.
 [correlation,noise_info]=clexpn(spin_system,@noise_correlation,noise,'labframe');
 fprintf('Max correlation error: %.3g\n',max(abs(correlation-cos(omega*time)/4)));
 \end{lstlisting}
-The first return is the correlation versus lag, with $C(0)=0.25$; the largest deviation from the cosine was $2.78\times10^{-17}$. The spectrum is in \code{noise\_info.spectrum}, not the first return. Its peaks lie near $\pm|\omega|$; \code{omega} there is in rad~s$^{-1}$ and \code{frequency\_hz} is in Hz. The Hann window and finite acquisition determine the line shape; its width here is not a relaxation rate. Positive-time extension uses the declared stationarity and $C(-t)=C(t)^*$. Connected correlations subtract the \emph{ensemble} means; subtracting each sample's means before averaging gives a different quantity. See \code{cce\_noise\_spectrum.m} for the longer acquisition and plotting commands.
+The first return is the correlation versus lag, with $C(0)=0.25$; the largest deviation from the cosine was $2.78\times10^{-17}$. The spectrum is in \code{noise\_info.spectrum}, not the first return. Its peaks lie near $\pm|\omega|$; \code{omega} there is in rad~s$^{-1}$ and \code{frequency\_hz} is in Hz. The Hann window and finite acquisition determine the line shape; its width here is not a relaxation rate. Positive-time extension uses the declared stationarity and $C(-t)=C(t)^*$. Connected correlations subtract the \emph{ensemble} means; subtracting each sample's means before averaging gives a different quantity.
 
 \subsection{Choose a task axis and restart a calculation}
 Set \code{sys.parallel} \emph{before} \code{create} to size the pool; use \code{parameters.cce.parallel.mode} to choose serial, cluster, or bath-state scheduling. Do not start a separate pool. The following is a restart demonstration on one worker, not a speed comparison.
@@ -1029,7 +1019,7 @@ On a grid, \code{diagnostics.grid} holds retained angles and weights, and \code{
 The convergence driver returns its status in \code{convergence}: \code{converged}, \code{not\_converged}, or \code{limit\_reached}. Inspect \code{convergence\_report} for comparisons and work, and \code{input\_parameters} for the original request.
 
 \subsection{Utilities and specialised calls}
-Use \code{clexpn} and the registered handles for simulations. The following separate interfaces construct inputs, assess computed data, or move data between programs. An analysis or import specification is \emph{not} a field to pass through \code{clexpn}.
+Use \code{clexpn} and the registered handles for simulations. The following separate interfaces construct inputs or assess computed data. An analysis specification is \emph{not} a field to pass through \code{clexpn}.
 
 \begingroup\small
 \begin{longtable}{@{}>{\raggedright\arraybackslash}p{0.335\linewidth}@{\hspace{0.025\linewidth}}>{\raggedright\arraybackslash}p{0.64\linewidth}@{}}
@@ -1047,8 +1037,6 @@ Function & Arguments in call order; result\\
 \code{cce\_converge} & \code{(spin\_system,parameters,pulse\_sequence,assumptions)} returns baseline answer and finite-ladder diagnostics. Note the argument order differs from \code{clexpn}.\\
 \code{cce\_spectrum} & \code{(times,correlation,parameters)} transforms a finite $T$-row correlation on a strictly increasing time vector, using \code{parameters.spectrum} above. Returns a structure, not just transformed values.\\
 \code{cce\_analyse} & \code{(result,parameters)} requires \code{result.times}, \code{value}, and matching logical \code{valid}. Omit \code{analysis} for no fit. Otherwise \code{analysis.fit} is logical. For a fit, choose the observable column, \code{envelope} (\code{magnitude}/\code{real}), \code{model} (\code{exponential}/\code{stretched\_exponential}), \code{interval} in seconds, a positive \code{weights} vector on all times, \code{confidence} (\code{none}/\code{linearized}), and \code{confidence\_level} in $(0,1)$. Inspect returned status and warnings; an envelope fit does not establish a relaxation mechanism.\\
-\code{cce\_export} & \code{(filename,model,result)} writes scalar structures to MAT or JSON; CSV is a real/imaginary table with a JSON sidecar carrying the complete record. Keep the sidecar for reimport.\\
-\code{cce\_import} & \code{(filename,format,units)} reads \code{mat}, \code{json}, \code{csv}, \code{xyz}, \code{tensor}, or \code{cube}. For external geometry specify \code{length} (\code{angstrom}, \code{nm}, \code{m}, \code{bohr}) and \code{frame}; tensor units are \code{Hz}, \code{kHz}, \code{MHz}, \code{rad/s}, \code{T}, \code{mT}, or \code{G} (\code{gyro\_rad\_s\_T} for field units). Optional proper \code{rotation} maps input to lab axes. External spin/tensor data are canonicalised to \AA{} and Hz, not the rad/s of compiled tensors.\\
 \end{longtable}
 \endgroup
 

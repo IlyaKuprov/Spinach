@@ -46,15 +46,6 @@ parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...
 % Execute the named Hahn experiment through the cluster context
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
-% Plot the measured complex echo amplitude
-kfigure();
-plot(1e3*parameters.times,real(answer),'b-',...
-     1e3*parameters.times,imag(answer),'r--');
-xlabel('total echo time / ms');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
-kgrid();
-
 end
 
 

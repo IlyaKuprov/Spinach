@@ -1,6 +1,6 @@
 # cce_erbium_cawo4
 
-`[answer,diagnostics]=cce_erbium_cawo4()` recalculates the lattice- and amorphous-bath Hahn echo amplitudes in Fig. S12 of [Le Dantec et al.](https://doi.org/10.1126/sciadv.abj9786). The two columns of `answer` are ensemble means, with the lattice first. `diagnostics.times` contains total echo times in seconds; `diagnostics.realisations` is indexed by time, bath realisation, and bath type, and `diagnostics.counts` reports the number of spins per realisation and bath type.
+`cce_erbium_cawo4()` plots the ensemble mean Hahn echo amplitudes of the lattice and amorphous baths in Fig. S12 of [Le Dantec et al.](https://doi.org/10.1126/sciadv.abj9786).
 
 The model is a secular, mixed-state (^{183}\mathrm{W}) bath within 11 nm of an Er ion at a Ca site. The field lies at 46.5° in the crystal plane. Only its direction enters the echo: the identical nuclear Zeeman terms commute with the secular pair Hamiltonians and cancel under Hahn refocusing. With no transverse hyperfine terms, a single nucleus produces no echo modulation. Each two-nucleus cluster is evaluated analytically in its flip-flop subspace, so the material calculation does not need to instantiate millions of Spinach Hamiltonians. The absolute effect of pruning is bounded by the sum of the omitted pairs' maximum possible echo losses.
 

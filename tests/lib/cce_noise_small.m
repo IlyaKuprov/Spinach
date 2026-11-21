@@ -3,14 +3,14 @@
 % The regression test checks that identity, not a phenomenological T1 fit.
 % Syntax:
 %
-%             [answer,diagnostics]=cce_noise_spectrum()
+%             [answer,diagnostics]=cce_noise_small()
 %
 % Returns the correlation column in answer, in squared spin-operator units,
 % and the calculation diagnostics, including the spectrum, in diagnostics.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,diagnostics]=cce_noise_spectrum()
+function [answer,diagnostics]=cce_noise_small()
 
 % Magnet and isotopes
 sys.magnet=0.01;
@@ -50,22 +50,6 @@ parameters.spectrum=struct('frequency_grid',...
                            'time_domain','positive','weights','trapezoid',...
                            'stationary',true);
 [answer,diagnostics]=clexpn(spin_system,@noise_correlation,parameters,'labframe');
-
-% Plot the physical correlation and its finite-window transform
-kfigure();
-subplot(1,2,1);
-plot(1e6*parameters.times,real(answer));
-xlabel('lag / microseconds');
-ylabel('C(t)');
-kgrid();
-
-% Display the finite-window transform in kilohertz
-subplot(1,2,2);
-plot(diagnostics.spectrum.omega/(2*pi*1e3),...
-     real(diagnostics.spectrum.value));
-xlabel('frequency / kHz');
-ylabel('finite-window spectrum / s');
-kgrid();
 
 end
 

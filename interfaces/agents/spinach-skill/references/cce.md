@@ -81,7 +81,7 @@ A dissipative noise estimate includes source and trace arithmetic even at zero e
 
 Inspect numerical error, denominator conditioning, density validity, and sampling error separately. A converged cluster order does not prove bath-radius, graph-cutoff, partition or sample-count convergence. For controlled comparisons, hold the bath realisation, physical spin ordering, transition phase, pulse schedule, and normalisation fixed; compare complete-bath raw responses with an independently constructed small-system calculation.
 
-`cce_analyse` fits only an explicitly declared observable, envelope, model, interval and weighting. `cce_import` and `cce_export` are explicit interchange utilities. `cce_spectrum` may be called explicitly, or requested through `parameters.spectrum` for post-processing the completed context correlation; no per-cluster Fourier transform is performed. Call `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)` for independent native refinement ladders.
+`cce_analyse` fits only an explicitly declared observable, envelope, model, interval and weighting. `cce_spectrum` may be called explicitly, or requested through `parameters.spectrum` for post-processing the completed context correlation; no per-cluster Fourier transform is performed. Call `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)` for independent native refinement ladders.
 
 ## Orientation grids
 
@@ -164,11 +164,11 @@ The old observed_spins spelling is removed; use observed. Old top-level order, g
 
 Raw sequence/name/event-array forms are rejected at runtime, including empty arrays. Use the registered experiment and its drive, refocusing, train, nloops, or pump controls instead. All finite-drive physics checks use native descriptors: independent-axis overlapping drives, fractional starts, partial observations, coupled drift, and simultaneous GKSL relaxation. Internal events are compiled inside cce_acquire from validated native declarations; no raw parameter field or alternate context API remains.
 
-Use cce_analyse with an explicit record containing times, value, and valid and separate analysis options; that small data record is not a returned legacy simulation wrapper. Use cce_export(filename,model,payload) with an explicitly packed answer/diagnostics payload. Both utilities remain explicit post-processing choices.
+Use cce_analyse with an explicit record containing times, value, and valid and separate analysis options; that small data record is not a returned legacy simulation wrapper.
 
 finite_drive accepts a nonempty structure row of independent drives. Each has observed spins, axis, amplitude/duration rows, detuning, and optional absolute time; a single finite pulse may instead specify a start fraction in [0,1]. Durations remain seconds, and overlapping contributions add while the full drift and supported dissipation remain active.
 
-Optional transition-derived coils remain optional for refocusing_train and mixed ideal/finite controls. Convergence order ladders use the resolved baseline bath, so bath_spins may be omitted. spin_bath preserves existing electron magnet-frequency defaults when it introduces a Zeeman table, while respecting explicit zero or nonzero Zeeman inputs. JSON/CSV export of a complete answer/diagnostics payload preserves native registered experiment contracts, sparse arrays, character shapes, and missing strings; import rejects a changed capability version.
+Optional transition-derived coils remain optional for refocusing_train and mixed ideal/finite controls. Convergence order ladders use the resolved baseline bath, so bath_spins may be omitted. spin_bath preserves existing electron magnet-frequency defaults when it introduces a Zeeman table, while respecting explicit zero or nonzero Zeeman inputs.
 
 For native CCE orientation averaging, a checkpoint ledger is supported only for one positive-weight orientation; a larger grid is rejected before any checkpoint write. Repeated quadrature nodes do not create independent spin draws. Single sampled or truncated-interlaced draws retain `NaN` uncertainty, and internal-first complete-bath uncertainty is estimated after averaging each spin draw over orientations. Exact full-bath interlacing retains zero sampling error and shape-consistent per-order reasons. Diagnostic maxima preserve supplied unavailable residuals rather than hiding them.
 

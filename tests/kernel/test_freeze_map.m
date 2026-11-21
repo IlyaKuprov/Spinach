@@ -1,3 +1,4 @@
+% Test: optimcon/freeze_map | Frozen waveform-map derivatives
 % Tests frozen input derivatives through waveform maps. Syntax:
 %
 %                    result=test_freeze_map()

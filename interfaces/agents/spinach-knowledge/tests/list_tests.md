@@ -6,7 +6,7 @@ Lists the Spinach regression tests available in the `tests` directory ([source](
 
 ## Behaviour
 
-The function adds the test library (`lib` subdirectory of the folder containing `list_tests.m`) to the MATLAB path, parses the supplied options, and obtains the test manifest from `test_manifest()`. If a non-empty `pattern` option is given, the manifest is filtered to the entries whose `id` or `name` contains the pattern as a substring (case-sensitive `contains` check). The remaining entries are printed to the command window, one per line, as identifier, a tab, and the test name.
+The function adds the test library (`lib` subdirectory of the folder containing `list_tests.m`) to the MATLAB path, parses the supplied options, and obtains the test manifest from `discover_tests()`. If a non-empty `pattern` option is given, the manifest is filtered to the entries whose `id` or `name` contains the pattern as a substring (case-sensitive `contains` check). The remaining entries are printed to the command window, one per line, as identifier, a tab, and the test name.
 
 ## Inputs and outputs
 
@@ -22,7 +22,7 @@ manifest = list_tests(varargin)
 
 **Outputs**
 
-- `manifest` — structure array with test identifiers (`id`) and names (`name`), as returned by `test_manifest()` and optionally filtered by the pattern.
+- `manifest` — structure array with test identifiers (`id`) and names (`name`), as returned by `discover_tests()` and optionally filtered by the pattern.
 
 ## References
 

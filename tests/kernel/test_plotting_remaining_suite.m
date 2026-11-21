@@ -1,3 +1,4 @@
+% Test: kernel/plotting_remaining_suite | Remaining offscreen plotting helpers
 % Tests remaining Spinach plotting helper gaps under offscreen graphics. Syntax:
 %
 %                    result=test_plotting_remaining_suite()

@@ -1,5 +1,5 @@
 Install the repository-owned skill in interfaces/agents/spinach-skill and the source-matched Markdown knowledge base in interfaces/agents/spinach-knowledge in your AI assistant. Read this distribution's AGENTS.md before using or changing Spinach, and check documentation against the local source.
 
-For cluster correlation expansions, read the skill's references/cce.md: clexpn takes a spin system, a registered experiment handle, experiment parameters, and assumptions. Experiments live in experiments/cce. The former CCE driver and wrappers are removed; there is no compatibility translator. Read tests/lib/test_manifest.m for test registrations; do not generate a duplicate knowledge index.
+For cluster correlation expansions, read the skill's references/cce.md: clexpn takes a spin system, a registered experiment handle, experiment parameters, and assumptions. Experiments live in experiments/cce. The former CCE driver and wrappers are removed; there is no compatibility translator. Use list_tests() to discover tests; do not generate a duplicate knowledge index.
 
 The clexpn native boundary rejects parameters.sequence, including empty arrays. Use finite_drive, refocusing_train, or a named echo experiment with native physical descriptors; free_evolution is uncontrolled.

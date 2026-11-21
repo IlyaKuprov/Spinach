@@ -1,3 +1,4 @@
+% Test: kernel/mas_drift_frames | MAS drift frames
 % Tests numerical frame ordering and phase indexing of MAS drift stacks.
 % Syntax: result=test_mas_drift_frames()
 %

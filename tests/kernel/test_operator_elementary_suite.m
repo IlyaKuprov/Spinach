@@ -1,3 +1,4 @@
+% Test: kernel/operator_elementary_suite | Elementary operator generators
 % Tests elementary operator generators in kernel/operators. Syntax:
 %
 %                    result=test_operator_elementary_suite()

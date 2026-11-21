@@ -1,3 +1,4 @@
+% Test: kernel/cce_clusters | CCE graphs and subsets
 % Exhaustive small-graph CCE family and physical grouping tests. Syntax:
 %
 %                    result=test_cce_clusters()

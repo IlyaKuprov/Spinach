@@ -1,3 +1,4 @@
+% Test: optimcon/support_paths | Optimal-control support helper paths
 % Tests small optimal-control support paths. Syntax:
 %
 %                    result=test_optimcon_support_paths()

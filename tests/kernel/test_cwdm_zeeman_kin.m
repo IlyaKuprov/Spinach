@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_zeeman_kin | CWDM Zeeman chemistry T17-T18
 % Tests dense Zeeman chemistry and Hilbert matrix actions (T17 and T18).
 % Syntax:
 %

@@ -1,3 +1,4 @@
+% Test: runner/output_cleanup | Runner output and graphics cleanup
 % Tests regression-runner output capture and graphics isolation. Syntax:
 %
 %                         result=test_runner_output()

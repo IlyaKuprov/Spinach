@@ -1,3 +1,4 @@
+% Test: kernel/floquet_magnus | Harmonic Floquet-Magnus expansion
 % Tests finite-harmonic Floquet-Magnus averaging and periodic kicks. Syntax:
 %
 %                       result=test_floquet_magnus()

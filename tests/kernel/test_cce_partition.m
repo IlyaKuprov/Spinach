@@ -1,3 +1,4 @@
+% Test: kernel/cce_partition | CCE physical partitions
 % Physical partitions against an independent dense Kronecker/expm oracle. Syntax:
 %
 %                    result=test_cce_partition()

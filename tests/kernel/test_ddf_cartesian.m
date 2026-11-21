@@ -1,3 +1,4 @@
+% Test: kernel/ddf_cartesian | Cartesian dipolar fields
 % Cartesian dipolar field tests on anisotropic grids. Syntax:
 %
 %                     result=test_ddf_cartesian()

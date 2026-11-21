@@ -1,3 +1,4 @@
+% Test: kernel/relaxation_t2_rate | Phenomenological T2 decay rate
 % Tests phenomenological T2 relaxation rate. Syntax:
 %
 %                    result=test_relaxation_t2_rate()

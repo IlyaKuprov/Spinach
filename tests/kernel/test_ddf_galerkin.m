@@ -1,3 +1,4 @@
+% Test: kernel/ddf_galerkin | Bounded Galerkin comparisons
 % BlochDDFGalerkin midpoint-field and reflecting-sphere comparisons.
 % Reference: Bouchard, J. Chem. Phys. 164, 144121 (2026). Syntax:
 %

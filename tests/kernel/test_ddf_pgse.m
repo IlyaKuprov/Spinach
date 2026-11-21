@@ -1,3 +1,4 @@
+% Test: kernel/ddf_pgse | Finite gradient diffusion
 % Unrestricted diffusion control for finite rectangular gradient lobes.
 % The ratio to a separately simulated zero-gradient acquisition must
 % reproduce Stejskal and Tanner, https://doi.org/10.1063/1.1695690 .

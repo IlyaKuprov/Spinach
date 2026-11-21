@@ -1,3 +1,4 @@
+% Test: kernel/ddf_waveform | Finite DDF waveform
 % Independent nonlinear Bloch reference for overlapping controls. Syntax:
 %
 %                        result=test_ddf_waveform()

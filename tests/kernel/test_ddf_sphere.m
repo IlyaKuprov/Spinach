@@ -1,3 +1,4 @@
+% Test: kernel/ddf_sphere | Reflecting sphere
 % Reflecting sphere diffusion and spherical cavity field checks. Syntax:
 %
 %                     result=test_ddf_sphere()

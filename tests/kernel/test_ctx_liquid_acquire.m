@@ -1,3 +1,4 @@
+% Test: kernel/ctx_liquid_acquire | Liquid context acquire path
 % Tests the liquid context against the direct acquire path. Syntax:
 %
 %                    result=test_ctx_liquid_acquire()

@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_superop | Spherical-tensor superoperator construction
 % Tests superop() sparse-XYZ spherical-tensor product operators. Syntax:
 %
 %                    result=test_dynamic_superop()

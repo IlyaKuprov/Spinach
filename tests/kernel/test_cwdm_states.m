@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_states | CWDM weighted states
 % Tests concentration-weighted states and unweighted detection vectors (T6).
 % Syntax:
 %

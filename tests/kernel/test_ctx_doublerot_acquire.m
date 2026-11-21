@@ -1,3 +1,4 @@
+% Test: kernel/ctx_doublerot_acquire | Double-rotor acquire path
 % Tests the double-rotor context with acquire(). Syntax:
 %
 %                    result=test_ctx_doublerot_acquire()

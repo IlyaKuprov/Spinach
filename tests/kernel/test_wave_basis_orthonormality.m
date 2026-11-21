@@ -1,3 +1,4 @@
+% Test: kernel/wave_basis_orthonormality | Waveform basis orthonormality
 % Tests waveform basis orthonormality. Syntax:
 %
 %                    result=test_wave_basis_orthonormality()

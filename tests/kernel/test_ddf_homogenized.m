@@ -1,3 +1,4 @@
+% Test: kernel/ddf_homogenized | Solvent-referenced spectroscopy
 % Check the HOMOGENIZED spectrum against spin echoes integrated over a
 % real-space solvent kernel, and check the acquired line positions. Syntax:
 %

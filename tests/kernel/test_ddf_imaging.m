@@ -1,3 +1,4 @@
+% Test: kernel/ddf_imaging | Periodic distant dipolar fields
 % Periodic distant dipolar field, CRAZED, and diffusion tests. Syntax:
 %
 %                    result=test_ddf_imaging()

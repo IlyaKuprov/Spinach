@@ -1,3 +1,4 @@
+% Test: kernel/ddf_maxcrazed | Two-axis MAXCRAZED
 % Check the two-dimensional MAXCRAZED example against the qualitative
 % Fig. 1(c) / Table I discrimination. Syntax:
 %

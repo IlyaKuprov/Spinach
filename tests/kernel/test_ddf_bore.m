@@ -1,3 +1,4 @@
+% Test: kernel/ddf_bore | Bore phantom imaging
 % Compare the bore image to a rotated direct-space Bloch calculation.
 % Separately refine the spatial grid and the integration time steps.
 % The coarse oracle tests the discrete forward map, not the curved

@@ -1,3 +1,4 @@
+% Test: kernel/pauli_spin_one_algebra | Spin-one angular momentum algebra
 % Tests spin-one angular momentum matrices. Syntax:
 %
 %                    result=test_pauli_spin_one_algebra()

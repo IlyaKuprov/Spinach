@@ -1,3 +1,4 @@
+% Test: kernel/orientation_average_suite | Orientation and average helpers
 % Tests orientation() and average() on small exact cases. Syntax:
 %
 %                    result=test_orientation_average_suite()

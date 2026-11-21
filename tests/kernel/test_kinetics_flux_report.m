@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_flux_report | Point-to-point flux reporting
 % Regression for restored point-to-point flux diagnostics. Syntax:
 %
 %                result=test_kinetics_flux_report()

@@ -1,0 +1,168 @@
+[
+  {
+    "id": "control-setup",
+    "responsibility": "Compile an optimal-control problem from a spin system and a control structure. Context-generated drifts enter here; optimisation is a separate call.",
+    "entry_points": [
+      "kernel/optimcon/optimcon.m",
+      "kernel/optimcon/drifts.m",
+      "kernel/optimcon/mas_drifts.m"
+    ],
+    "contracts": [
+      "control.drifts is a cell array over ensemble members, each containing a cell array over time: one generator for static drift or one per waveform point for time-dependent drift. Members have the same number of drift matrices. control.operators contains the generators multiplied by the waveform rows.",
+      "control.pulse_dt gives positive interval durations in seconds. For N intervals a rectangle waveform has N columns and a trapezium waveform has N+1 endpoint columns. Source and target lists contain square density matrices in zeeman-hilb and column vectors in the Liouville and wavefunction formalisms.",
+      "drifts() asks a context for unsummed systems and combines Hamiltonian, relaxation, and kinetics as H+1i*R+1i*K, including a supplied hydrodynamic contribution. mas_drifts() instead generates rotor-phase-resolved Hamiltonian stacks; it requires a uniformly weighted grid because the control ensemble uses an arithmetic mean."
+    ],
+    "change_guidance": [
+      "Route new control fields through optimcon(): it consumes recognised fields and rejects leftovers. Decide whether a field is live per evaluation or frozen on workers. Re-run setup after changing generators, ensemble composition, or pool.",
+      "Preserve the distinction between general Liouville generators and paths that require Hermiticity: optimcon checks drift, control, and offset generators for Hilbert-space density matrices, wavefunctions, and the Goodwin method."
+    ],
+    "verification": [
+      "tests/kernel/test_optimcon_grape_one_spin.m",
+      "examples/optimal_control/static_powder_control.m",
+      "examples/optimal_control/case_studies/Smelko_ChemRxiv_2026/ct_selective.m"
+    ]
+  },
+  {
+    "id": "control-ensemble",
+    "responsibility": "Turn ensemble specifications into cases, evaluate each case on the worker holding its drift, and return mean fidelity and derivatives.",
+    "entry_points": [
+      "kernel/optimcon/ens_catalog.m",
+      "kernel/optimcon/ensemble.m",
+      "kernel/optimcon/ens_block.m"
+    ],
+    "contracts": [
+      "Catalog columns index state pair, drift, power, offset combination, phase-cycle row, and distortion row. Correlations restrict the Cartesian product; the budget selects a reproducible subset after correlation. Each selected case has equal weight.",
+      "optimcon() groups cases by drift index, stores common invariants and worker-specific drift slices in parallel.pool.Constant objects, and records the pool ID. ensemble() must use that pool context; a problem to be evaluated inside an external parfor is prepared there.",
+      "ens_block() rotates channel pairs and phases the states, adds offsets in Hz via 2*pi*offset*off_op, and scales the normalised waveform by the case power in rad/s before applying distortions. ensemble() reduces derivative sums and restores case order for individually returned trajectories."
+    ],
+    "change_guidance": [
+      "Keep catalog construction, worker ownership, and final reordering consistent; compare single-case and multi-case results with distinct drifts or power levels.",
+      "Differentiate back to input coordinates through every waveform map. Apply the input freeze mask after these transformations; freezing a nominal X sample need not freeze the physical X sample after phase mixing or a temporal filter."
+    ],
+    "verification": [
+      "tests/kernel/test_optimcon_parfor_worker.m",
+      "tests/kernel/test_freeze_map.m",
+      "examples/optimal_control/features_phase_cycle.m",
+      "examples/optimal_control/features_multitarget.m"
+    ]
+  },
+  {
+    "id": "control-grape",
+    "responsibility": "Compute a single case's transfer fidelity and derivatives from forward states and backward costates for a prescribed physical waveform.",
+    "entry_points": [
+      "kernel/optimcon/grape_liouv.m",
+      "kernel/optimcon/grape_hilb.m",
+      "kernel/optimcon/aux_mat.m",
+      "kernel/utilities/dirdiff.m"
+    ],
+    "contracts": [
+      "ens_block() selects grape_hilb for zeeman-hilb and grape_liouv for sphten-liouv, zeeman-liouv, and zeeman-wavef. The former evolves density matrices, the latter vectors. The target is on the conjugated side of the overlap; swapping it reverses the sign of the imaginary fidelity.",
+      "The gradient has the waveform shape; the Hessian indexes waveform(:) in MATLAB column order. 'real', 'imag', and 'square' take the real part, imaginary part, and squared modulus of an overlap. Average fidelity uses the post-interval nodes, not an integral weighted by interval length.",
+      "State-dependent trajectory penalties enter the physical fidelity and its backward costate here, not the waveform penalty list. Neither time-averaged fidelity nor trajectory penalties support Hessians. Rectangle and trapezium support first derivatives; ensemble Hessians require rectangle."
+    ],
+    "change_guidance": [
+      "For a trapezium derivative, an interior sample contributes through both adjacent intervals; an endpoint contributes through only one. Check noncommuting controls, a multi-interval pulse, and numerical differences of the composed objective rather than a single propagator alone.",
+      "Keep formalism-specific boundaries: Liouville/wavefunction keyholes support first derivatives but not Newton/Goodwin Hessians; Hilbert-space rectangle keyhole Hessians are a distinct supported case."
+    ],
+    "verification": [
+      "tests/kernel/test_optimcon_grape_one_spin.m",
+      "tests/kernel/test_keyhole_guard.m",
+      "examples/optimal_control/features_trapezium.m",
+      "examples/quantum_tech/circuit_qed/transmon_grape_leakage.m"
+    ]
+  },
+  {
+    "id": "control-waveform-objectives",
+    "responsibility": "Map optimiser coordinates to normalised Cartesian controls and expose separate physical and waveform-penalty channels to the optimiser.",
+    "entry_points": [
+      "kernel/optimcon/wrappers/grape_xy.m",
+      "kernel/optimcon/wrappers/grape_phase.m",
+      "kernel/optimcon/wrappers/grape_curv.m",
+      "kernel/optimcon/wrappers/grape_coop.m",
+      "kernel/optimcon/penalty.m"
+    ],
+    "contracts": [
+      "grape_xy() optionally expands coefficients using waveform*control.basis, obtains the ensemble fidelity, and appends the weighted waveform penalties. Penalties are evaluated on the expanded normalised waveform before case-specific power and distortion; each term has its own gradient/Hessian slice.",
+      "grape_phase() maps fixed amplitudes and variable phases into alternating X/Y rows, with one phase row per pair. grape_curv() accepts a per-point map and gradient pullback; grape_coop() accepts two stacked phase profiles for point-to-point transfer and penalises the squared norm of their combined off-target final states. These last two wrappers do not supply Hessians.",
+      "penalty() distinguishes norm (NS), derivative norm (DNS), componentwise spillout (SNS), and amplitude spillout (SNSA). SNSA tests the magnitude of each XY pair against scalar bounds; it is not equivalent to constraining the two components separately."
+    ],
+    "change_guidance": [
+      "Return derivatives in the coordinates supplied by the optimiser, for every objective channel. A nonlinear reparameterisation needs its own chain-rule curvature for a Hessian; a gradient pullback alone is insufficient.",
+      "Keep freeze masks in the wrapper's input coordinates. Cartesian time-point freezing cannot be combined with a waveform basis; a cooperative mask has separate row blocks for the two pulses."
+    ],
+    "verification": [
+      "tests/kernel/test_optimcon_support_paths.m",
+      "tests/kernel/test_coop_gradient.m",
+      "tests/kernel/test_freeze_map.m",
+      "examples/optimal_control/features_wave_basis.m",
+      "examples/optimal_control/features_curv.m"
+    ]
+  },
+  {
+    "id": "control-distortions",
+    "responsibility": "Model the transfer from the programmed Cartesian waveform to the waveform delivered by the instrument.",
+    "entry_points": [
+      "kernel/optimcon/ens_block.m",
+      "kernel/optimcon/distortions/no_dist.m",
+      "kernel/optimcon/distortions/firf.m",
+      "kernel/optimcon/distortions/spf.m",
+      "kernel/optimcon/distortions/amp_tanh.m",
+      "kernel/optimcon/distortions/kernelest.m"
+    ],
+    "contracts": [
+      "Each row of control.distortion is an ensemble alternative; its columns are sequential stages. On a value-only call each stage returns a waveform; on a gradient call it must also return the Jacobian of output(:) with respect to input(:).",
+      "ens_block() accumulates stage Jacobians in forward composition order and applies the transpose to the physical waveform gradient. Nonidentity distortion callbacks are excluded from ensemble Hessian evaluation; control.distplot is a separate plotting path."
+    ],
+    "change_guidance": [
+      "Use a filter or amplifier callback for a forward model; kernelest() estimates a convolution kernel from recorded input/output samples and is not itself a waveform callback. Check temporal cross-talk as well as simultaneous XY coupling with a directional finite difference."
+    ],
+    "verification": [
+      "tests/kernel/test_dynamic_optimcon_remaining.m",
+      "tests/kernel/test_freeze_map.m",
+      "examples/optimal_control/distortions/distortions_figure_3.m"
+    ]
+  },
+  {
+    "id": "control-optimiser",
+    "responsibility": "Maximise the assembled objective in the unfrozen coordinates, choose a search direction, and run the line search.",
+    "entry_points": [
+      "kernel/optimcon/fmaxnewton.m",
+      "kernel/optimcon/objeval.m",
+      "kernel/optimcon/lbfgs.m",
+      "kernel/optimcon/bfgs.m",
+      "kernel/optimcon/hessreg.m",
+      "kernel/optimcon/bracketing.m",
+      "kernel/optimcon/sectioning.m"
+    ],
+    "contracts": [
+      "fmaxnewton(spin_system,cost_function,guess) vectorises the guess internally and returns its original shape. objeval reshapes trial points for the callback and maximises fidelity(1)-sum(fidelity(2:end)), with the same subtraction for gradient and Hessian channels.",
+      "'lbfgs' and 'rbfgs' use gradient history; 'rbfgs' forms and regularises a BFGS curvature matrix. 'newton' and 'goodwin' request the objective Hessian and regularise its negative on the unfrozen subspace. A zero-iteration request evaluates the value without taking a step."
+    ],
+    "change_guidance": [
+      "Apply initial gradient and ascent-direction checks to the assembled, unfrozen objective, not to one physics or penalty term. Preserve that maximisation sign in bracketing, sectioning, and curvature updates; test a concave objective and opposing derivative contributions."
+    ],
+    "verification": [
+      "tests/kernel/test_optimcon_support_paths.m",
+      "tests/kernel/test_coop_gradient.m",
+      "examples/optimal_control/features_newton.m"
+    ]
+  },
+  {
+    "id": "control-duration-optimisation",
+    "responsibility": "Optimise slice durations at fixed field amplitudes, separately from the amplitude/phase ensemble wrappers.",
+    "entry_points": [
+      "kernel/optimcon/tgrape.m",
+      "examples/optimal_control/features_dt_opt.m"
+    ],
+    "contracts": [
+      "tgrape() takes one Liouville-space drift, a control-by-slice physical waveform in rad/s, and a column of duration variables. It propagates for dt_grid*time_unit seconds and returns the real final target overlap and its gradient with respect to dt_grid, including the time_unit factor."
+    ],
+    "change_guidance": [
+      "Put a total-duration constraint or lower bounds in the external optimiser, as in features_dt_opt; check derivatives by varying durations while holding amplitudes fixed, not by perturbing waveform samples."
+    ],
+    "verification": [
+      "tests/kernel/test_dynamic_optimcon_remaining.m",
+      "examples/optimal_control/features_dt_opt.m"
+    ]
+  }
+]

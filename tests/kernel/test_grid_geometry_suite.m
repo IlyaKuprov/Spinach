@@ -1,3 +1,4 @@
+% Test: kernel/grid_geometry_suite | Grid and spherical geometry helpers
 % Tests grid and spherical geometry helpers. Syntax:
 %
 %                    result=test_grid_geometry_suite()

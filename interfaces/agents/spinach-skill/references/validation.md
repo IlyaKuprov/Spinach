@@ -78,9 +78,7 @@ assert(strcmp(result.status,'PASS'));
 ```
 
 Read `tests/README.md` and `tests/run_test.m` in the checkout for the current
-interface. Select relevant registered tests using `list_tests` or inspect
-`tests/lib/test_manifest.m`; do not assume the registry has a knowledge-base
-entry. Broader selection uses `run_tests`, for example
+interface. Select relevant tests with `list_tests`. Broader selection uses `run_tests`, for example
 `run_tests('pattern','relaxation')`. The runner throws on failed tests and
 returns `PASS` statuses on success; retain the selected test IDs and results.
 The runner prints uniform per-test progress and a summary; `verbose=true`

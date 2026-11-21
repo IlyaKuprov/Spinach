@@ -1,3 +1,4 @@
+% Test: kernel/overload_arithmetic_suite | Cheap overload arithmetic
 % Tests cheap overload arithmetic for cell, struct, RCV, and polyadic classes. Syntax:
 %
 %                    result=test_overload_arithmetic_suite()

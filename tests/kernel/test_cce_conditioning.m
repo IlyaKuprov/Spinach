@@ -1,3 +1,4 @@
+% Test: kernel/cce_conditioning | CCE zero conditioning
 % Controlled CCE zeros, uncertainty, cancellation, and phase tests. Syntax:
 %
 %                    result=test_cce_conditioning()

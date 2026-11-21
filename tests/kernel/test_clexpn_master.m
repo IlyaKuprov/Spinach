@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_master | Native master equation CCE
 % Native master-equation, projected-block, and conditioning callback tests.
 % Syntax:
 %

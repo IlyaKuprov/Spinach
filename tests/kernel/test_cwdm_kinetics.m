@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_kinetics | CWDM mass action T8-T11
 % Direct-sum mass-action and spin-transport tests T8-T11. Syntax:
 %
 %                    result=test_cwdm_kinetics()

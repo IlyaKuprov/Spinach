@@ -1,3 +1,4 @@
+% Test: kernel/cce_analytic | CCE analytic limits
 % Analytic projected CCE limits, Hahn modulation, and complex FID. Syntax:
 %
 %                    result=test_cce_analytic()

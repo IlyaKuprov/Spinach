@@ -156,7 +156,8 @@ inter.coupling.matrix{1,2}=A;
 All three are `nspins x nspins` cell arrays. `eigs` and `euler` must have the
 same dimensions and identical non-empty patterns. Only one triangle needs
 filling for a given pair; the kernel handles the rest. Couplings whose norm is
-below `sys.tols.inter_cutoff` are dropped, as are all couplings involving ghost
+below `sys.tols.inter_cutoff` are dropped. Exactly zero assembled tensors are
+absent even at zero cutoff, as are all couplings involving ghost
 spins. Couplings between spins that belong to different chemical subsystems are
 a hard error.
 

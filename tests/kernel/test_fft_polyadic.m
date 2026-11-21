@@ -1,3 +1,4 @@
+% Test: kernel/fft_polyadic | Matrix-free Fourier core actions
 % Compare function handle polyadic cores with explicit matrices.
 % Syntax:
 %

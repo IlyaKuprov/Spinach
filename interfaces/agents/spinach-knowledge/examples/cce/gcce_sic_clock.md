@@ -1,15 +1,9 @@
 # examples/cce/gcce_sic_clock.m
 
-A zero-field, clock-like spin-one centre with transverse zero-field splitting and a carbon-13/silicon-29 nuclear bath undergoes free evolution at generalised CCE order two.
+`[answer,diagnostics]=gcce_sic_clock()` calculates the free-induction coherence of the basal kh divacancy in natural 4H–SiC at the zero-field clock transition. It reproduces the mixed-bath gCCE1 and gCCE2 traces of Fig. 4(c) in Onizhuk and Galli, [doi:10.1002/adts.202100254](https://doi.org/10.1002/adts.202100254), not the Monte Carlo–averaged trace in Fig. 4(a).
 
-## Interface
+The observed coherence is between the spin-one `mS=0` state and the even superposition of `mS=±1` selected by positive transverse zero-field splitting. The nuclear density is a maximally mixed product, with no exterior mean field. The 40 Å seed-1 configuration contains 161 carbon-13 and 593 silicon-29 nuclei, with 1,963 pairs inside 8 Å. The physical-only fixture stores the isotopes, positions in Å, hyperfine tensors (inner-shell GIPAW, outer-shell point dipoles), pair indices in full-system numbering, and nuclear dipolar tensors. All tensor entries are in Hz. No full-bath basis is formed.
 
-`[answer,diagnostics]=gcce_sic_clock()` returns numeric rows of column-major observed density matrices. `diagnostics.parameters.times` gives elapsed times; `diagnostics.reduction` contains order-resolved answers, validity masks, and numerical error bounds. No clipping or positivity repair is applied.
+`answer` is the column of normalised complex gCCE2 coherences. `diagnostics.parameters.times` gives the time axis in seconds; `diagnostics.reduction.by_order` stores the central-only, gCCE1, and gCCE2 coherences in order, with matching validity masks and absolute numerical error bounds. The plot displays the last two magnitudes, without clipping. This is one finite isotope configuration and does not establish a bath-averaged coherence time.
 
-The example uses standard sys/inter/bas/parameters blocks, a product-ms transition selector, and `clexpn(spin_system,@free_evolution,parameters,'labframe')`. The selected manifolds define the equal coherent preparation; no state or operator matrix is assembled in the example. The plot shows observed populations.
-
-The independent dense Hamiltonian, preparation, propagation, and reduced-density comparison live in `tests/kernel/test_cce_examples.m`.
-
-The example takes no inputs and uses times in seconds and coupling tensors in Hz. It creates the spin system without a full-bath basis and uses a local one-worker pool; do not put Spinach and EasySpin on the same MATLAB path. This deliberately small illustrative model is not a publication-scale material reproduction. Quantitative comparisons require material structures, tensor frames, defect provenance, and source licences; the finite bath does not establish a thermodynamic T2 or microscopic T1.
-
-[MATLAB source](../../../../../examples/cce/gcce_sic_clock.m) · [Independent reference tests](../../../../../tests/kernel/test_cce_examples.m)
+[MATLAB source](../../../../../examples/cce/gcce_sic_clock.m)

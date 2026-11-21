@@ -1,3 +1,4 @@
+% Test: kernel/cce_convergence | CCE convergence budgets
 % Explicit independent convergence ladder and cap acceptance test. Syntax:
 %
 %                    result=test_cce_convergence()

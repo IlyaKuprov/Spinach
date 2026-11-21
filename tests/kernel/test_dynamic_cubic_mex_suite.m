@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_cubic_mex_suite | Cubic polynomial root MEX helper
 % Tests the cubic-polynomial MEX helper used by eigenfields(). Syntax:
 %
 %                    result=test_dynamic_cubic_mex_suite()
@@ -101,3 +102,5 @@ result=test_true(result,'cubic_roots random cubic set',rand_ok&&(rand_err<1e-10)
 clear('rng_cleanup');
 
 end
+
+

@@ -35,6 +35,5 @@ result=test_cce_sampling()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_sampling.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 The registered test calls `clexpn(spin_system,@free_evolution,parameters,'labframe')` and receives numeric density arrays separately from diagnostics. It constructs native models with `cce_compile` and uses the ensemble supplied by context diagnostics; the two averaging orders, raw sample uncertainty, truncation/single-draw unavailable estimates, and static exterior-field assertions are unchanged.

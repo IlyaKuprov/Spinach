@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_retired | Retired consumer fields
 % Tests retired basis and chemistry fields at consumer boundaries. Syntax:
 %
 %                       result=test_cwdm_retired()

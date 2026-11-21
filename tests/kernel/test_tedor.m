@@ -1,3 +1,4 @@
+% Test: kernel/tedor | Finite-pulse TEDOR
 % Tests finite-pulse TEDOR with independent Hilbert matrix products.
 % Syntax:
 %

@@ -1,3 +1,4 @@
+% Test: kernel/cce_lunghi_fixtures | CCE Lunghi fixtures
 % Validate externally supplied reduced Lunghi two-proton fixtures. Syntax:
 %
 %                    result=test_cce_lunghi_fixtures()

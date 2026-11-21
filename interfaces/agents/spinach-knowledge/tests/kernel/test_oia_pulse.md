@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Regression test for `oia_pulse`, the offset-independent adiabaticity pulse generator (Tannus and Garwood, JMR A 120, 133 (1996)). Registered as `kernel/oia_pulse` in `tests/lib/test_manifest.m`.
+Regression test for `oia_pulse`, the offset-independent adiabaticity pulse generator (Tannus and Garwood, JMR A 120, 133 (1996)). Registered as `kernel/oia_pulse`.
 
 ## Checks
 

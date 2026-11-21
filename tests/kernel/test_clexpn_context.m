@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_context | Native cluster context
 % Validate native context dispatch, natural output, and capability rejection.
 % Syntax:
 %

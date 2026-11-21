@@ -1,3 +1,4 @@
+% Test: kernel/step_sparse_gpu | Small Hilbert sparse GPU propagation
 % Tests small-Hilbert sparse GPU propagation against spin rotation identities.
 % Syntax:
 %

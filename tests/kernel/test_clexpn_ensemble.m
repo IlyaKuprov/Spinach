@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_ensemble | Native ensemble reduction
 % Native ensemble ordering, elementwise density, and partitioned-cluster tests.
 % Syntax:
 %

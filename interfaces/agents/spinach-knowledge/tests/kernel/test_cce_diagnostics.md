@@ -39,7 +39,6 @@ result=test_cce_diagnostics()
 ## References
 
 - [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_diagnostics.m)
-- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
 
 ## Native contract
 

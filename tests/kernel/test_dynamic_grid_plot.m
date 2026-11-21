@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_grid_plot | Spherical grid plotting
 % Tests grid_plot() under offscreen graphics. Syntax:
 %
 %                    result=test_dynamic_grid_plot()

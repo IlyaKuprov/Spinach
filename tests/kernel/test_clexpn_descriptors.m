@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_descriptors | Native cluster descriptors
 % Tests canonical cluster spin operators and explicit density descriptors.
 % Syntax:
 %

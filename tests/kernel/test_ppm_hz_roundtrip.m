@@ -1,3 +1,4 @@
+% Test: kernel/ppm_hz_roundtrip | Chemical-shift frequency conversion
 % Tests chemical shift and frequency conversion. Syntax:
 %
 %                    result=test_ppm_hz_roundtrip()

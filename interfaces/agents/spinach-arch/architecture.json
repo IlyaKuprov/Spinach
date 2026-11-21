@@ -1,0 +1,32 @@
+{
+  "format_version": 1,
+  "scope": "Development map of subsystem boundaries and representative source paths, not an exhaustive call graph. Read AGENTS.md for repository policy and consult the implementation for a specific formalism or experiment.",
+  "paths": "Module filenames are relative to this document. Source, example and test paths inside modules and workflows are relative to the Spinach repository root.",
+  "modules": {
+    "core.json": "How physical inputs become a basis, states, operators and generators; how evolution, reduction and storage depend on that representation.",
+    "simulation.json": "Where the physical setting ends and the experiment begins: contexts, sequences, pulse operations and specialised simulations.",
+    "control.json": "How a control problem, waveform, ensemble and optimiser fit together; where objective values and derivatives originate.",
+    "boundaries.json": "Runtime setup, external model inputs, signal output, native acceleration and the regression harness."
+  },
+  "component_fields": {
+    "id": "Unique component key across modules.",
+    "responsibility": "What belongs here.",
+    "entry_points": "Files to read first; includes internal implementations, not just public APIs.",
+    "contracts": "Assumptions and data conventions at this boundary.",
+    "change_guidance": "Where a change belongs and what must remain consistent.",
+    "verification": "Relevant tests or worked examples to inspect; a reference is not a claim that a test has been run."
+  },
+  "workflows": [
+    {
+      "task": "Trace a liquid-state COSY spectrum from a structure calculation to its plotted axes.",
+      "example": "examples/nmr_liquids/cosy90_sucrose.m",
+      "stages": [
+        {"files": ["interfaces/gaussian/gparse.m", "interfaces/g2spinach.m"], "output": "Gaussian properties mapped to sys and inter; the example specifies the field, basis and acquisition parameters."},
+        {"files": ["kernel/create.m", "kernel/basis.m"], "output": "spin_system with the selected working basis."},
+        {"files": ["kernel/contexts/liquid.m", "experiments/nmr_liquids/cosy.m"], "output": "The context supplies H, R and K to the sequence handle. The sequence constructs states and pulses and returns the two-dimensional time-domain signal."},
+        {"files": ["kernel/step.m", "kernel/evolution.m"], "output": "Within the sequence, step applies the pulses; evolution propagates the indirect-dimension stack and detects the direct dimension."},
+        {"files": ["kernel/utilities/apodisation.m", "kernel/plotting/plot_2d.m"], "output": "The example windows the FID, applies fft2 and fftshift, then plots the real spectrum using the experiment parameters."}
+      ]
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+% Test: interfaces/pdb_residues | PDB residue numbers
 % Tests protein PDB import across the three- to four-digit residue boundary.
 % Syntax:
 %

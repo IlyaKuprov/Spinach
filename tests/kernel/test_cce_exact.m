@@ -1,3 +1,4 @@
+% Test: kernel/cce_exact | CCE exact spin-manifold validation
 % Independent full-density receiver reference for four-spin projected CCE.
 %
 % Syntax:

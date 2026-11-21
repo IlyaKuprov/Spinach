@@ -1,3 +1,4 @@
+% Test: kernel/state_constructor_suite | State-constructor functions
 % Tests state-constructor helper functions. Syntax:
 %
 %                    result=test_state_constructor_suite()

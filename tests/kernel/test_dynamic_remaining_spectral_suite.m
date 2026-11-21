@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_remaining_spectral_suite | Remaining spectral and spatial utilities
 % Tests remaining spectral, symmetry, and Fokker-Planck utilities. Syntax:
 %
 %                    result=test_dynamic_remaining_spectral_suite()

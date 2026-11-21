@@ -160,7 +160,7 @@ else
 end
 
 % Asynchronous BRW integral kernel, careful memory management
-function job_id=brw_compute_kernel(spin_system,w,job_id,upper_lim)
+function job_id=brw_compute_kernel(spin_system,weight,job_id,upper_limit)
 
 % Get data from pool ValueStore
 store=getCurrentValueStore();
@@ -169,13 +169,14 @@ store_keys={['brw_integrator_batch_' num2str(job_id) '_A'],...
             ['brw_integrator_batch_' num2str(job_id) '_C'],...
             ['brw_integrator_batch_' num2str(job_id) '_D']};
 ABCD=get(store,store_keys); remove(store,store_keys);
+[A,B,C,D]=deal(ABCD{:}); clear('ABCD');
 
 % Compute the integral and do an intermediate clean-up
-R=-w*ABCD{1}*expmint(spin_system,ABCD{2},ABCD{3},ABCD{4},upper_lim); 
-clear('ABCD'); R=clean_up(spin_system,R,1e-2*spin_system.tols.rlx_zero);
+R_int=-weight*A*expmint(spin_system,B,C,D,upper_limit); clear('A','B','C','D');
+R_int=clean_up(spin_system,R_int,1e-2*spin_system.tols.rlx_zero);
 
 % Convert CSR sparse format into XYZ format
-[row,col,val]=find(R); clear('spin_system','R');
+[row,col,val]=find(R_int); clear('spin_system','R_int');
 
 % Send to the pool ValueStore and delete local copy
 put(store,{['redfield_int_batch_' num2str(job_id)]},...

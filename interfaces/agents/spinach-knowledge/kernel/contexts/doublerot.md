@@ -29,3 +29,11 @@ With `sys.enable={'polyadic'}`, both phase derivatives are three-factor FFT poly
 ## State-dependent chemistry boundary
 
 This context rejects a function handle returned by `kinetics` with `Spinach:doublerot:stateDependentKinetics`. Multi-reactant or callback-rate reaction records require a custom pulse sequence using `step`/`iserstep`, rather than static context assembly; see `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m`. Constant matrix kinetics remain supported.
+
+## Explicit spherical grids
+
+`parameters.grid` also accepts a scalar structure containing `alphas`, `betas`, `gammas`, and `weights`. These must be non-empty, finite, real numeric vectors with equal element counts; angles are in radians. Row and column vectors are accepted. Weights are used exactly as supplied, without normalisation or a positivity restriction. This permits orientation selection and non-isotropic quadrature. The character-grid path retains its existing behaviour.
+
+The supplied grid is returned as `sph_grid`. For rotor contexts, the special rotor-localised initial state remains associated only with the character name `single_crystal`; an explicit grid retains the powder initial-state convention.
+
+`test_ctx_custom_grids_hilbert` compares a loaded 100-orientation three-angle grid with the explicit structure in both rotor contexts. It checks every 2-by-2 Hilbert Hamiltonian in the rotor stack, short transverse-density propagation, non-isotropic signed weights, and column-vector layouts.

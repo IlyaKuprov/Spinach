@@ -13,7 +13,7 @@ This routine simulates magic-angle-spinning DNP and returns a powder-orientation
 - `parameters.spins`: spin labels for microwave irradiation; the implementation uses the first label, `parameters.spins{1}`, for the microwave frequency and operator.
 - `parameters.rate`: MAS rate in Hz; `parameters.axis`: spinning-axis direction vector; `parameters.max_rank`: integer rotor-discretisation rank.
 - `parameters.mw_pwr`: microwave power in radians per second; `parameters.mw_frq`: microwave frequency in Hz; `parameters.mw_time`: irradiation/equilibration duration in seconds.
-- `parameters.grid`: name of a spherical averaging grid available in the Spinach grids folder; `parameters.coil`: detection state; `parameters.verbose`: diagnostic-output flag (0 or 1).
+- `parameters.grid`: name of a spherical averaging grid available in the Spinach grids folder; `parameters.coil`: detection state; `parameters.verbose`: optional diagnostic-output flag (0 or 1, default 0).
 - `spin_system` must use `sphten-liouv` or `zeeman-liouv` formalism. Call `masdnp` directly, not through a context wrapper.
 
 ## Calculation and output

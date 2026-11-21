@@ -1,30 +1,16 @@
-% Simulates an author-deposited robust universal 180 degree pulse
-% Syntax:
+% Simulates robust universal 180 degree pulse described in 
 %
-%    [profiles,fig]=ur180_profiles(offset_hz,rf_scales)
+%       https://doi.org/10.1016/j.jmr.2012.09.013
 %
-% Parameters:
+% Shape UR180_730u comes from
 %
-%    offset_hz - resonance offsets in Hz; 100 points over
-%                20 kHz reproduce the source grid
+%      https://www.ioc.kit.edu/luy/311.php
 %
-%    rf_scales - relative RF amplitudes; five evenly spaced
-%                values from 0.6 to 1.4 reproduce the source grid
+% archive UR180_BW20_0-40pmB1.zip, pm40B1/UR180_730u.
 %
-% Outputs:
-%
-%    profiles  - state mappings and propagator overlap scores
-%
-%    fig       - source waveform and robustness plots
-%
-% Source: Kobzar et al., J. Magn. Reson. 225, 142-160 (2012).
-% DOI: 10.1016/j.jmr.2012.09.013. Shape UR180_730u comes from
-% https://www.ioc.kit.edu/luy/311.php, archive
-% UR180_BW20_0-40pmB1.zip, pm40B1/UR180_730u.
-% Original numerical header states 730 us, 0.5 us slices,
-% 20 kHz bandwidth, five B1 scales, and 10 kHz maximum RF.
-%
-function [profiles,fig]=ur180_profiles(offset_hz,rf_scales)
+% ilya.kuprov@weizmann.ac.il
+
+function ur180_profiles()
 
 % Magnetic field and isotope
 sys.magnet=14.1;
@@ -70,6 +56,10 @@ assert(size(waveform,2)==3);
 pulse_dt=waveform(:,3).';
 xy_rad=2*pi*waveform(:,1:2).';
 
+% Match the source
+offset_hz=linspace(-10e3,10e3,100);
+rf_scales=linspace(0.6,1.4,50);
+
 % Preallocate the offset-by-RF response
 fidelity=zeros(numel(offset_hz),numel(rf_scales));
 
@@ -104,43 +94,36 @@ end
 % Convert the three-state SO(3) score to the source SU(2) overlap
 quality=sqrt(max(0,(1+3*fidelity)/4));
 
-% Package the grid and rotation scores
-profiles.offset_hz=offset_hz;
-profiles.rf_scales=rf_scales;
-profiles.fidelity=fidelity;
-profiles.quality=quality;
-
 % Start the waveform and response figure
-fig=kfigure();
-tiledlayout(2,2);
+kfigure(); scale_figure([1.5 1.5]); tiledlayout(2,2);
 
 % Plot the deposited Cartesian waveform
-time_us=1e6*cumsum(pulse_dt);
-nexttile;
+time_us=1e6*cumsum(pulse_dt); nexttile;
 plot(time_us,xy_rad(1,:)/(2*pi*1e3),...
      time_us,xy_rad(2,:)/(2*pi*1e3));
-kxlabel('time (microseconds)'); kylabel('RF quadratures (kHz)');
-ktitle('deposited UR180 pulse'); klegend({'x','y'}); kgrid;
+kxlabel('time (microseconds)'); 
+kylabel('RF quadratures (kHz)');
+ktitle('deposited UR180 pulse'); 
+klegend({'x','y'}); kgrid;
+xlim tight; ylim padded;
 
 % Plot the nominal RF amplitude
-nexttile;
-plot(time_us,hypot(xy_rad(1,:),xy_rad(2,:))/(2*pi*1e3));
+nexttile; plot(time_us,hypot(xy_rad(1,:),xy_rad(2,:))/(2*pi*1e3));
 kxlabel('time (microseconds)'); kylabel('RF amplitude (kHz)');
-ktitle('RF at nominal power'); kgrid;
+ktitle('RF at nominal power'); kgrid; xlim tight; ylim padded;
 
 % Plot the offset-by-RF robustness map
-nexttile;
-imagesc(offset_hz/1e3,rf_scales,quality.'); axis xy;
+nexttile; imagesc(offset_hz/1e3,rf_scales,quality.'); 
 kxlabel('offset (kHz)'); kylabel('relative $B_1$');
 ktitle('y-axis 180 degree overlap'); colorbar;
-clim([min(quality(:)) 1]);
+clim([min(quality(:)) 1]); axis xy;
 
 % Plot the RF-scale response profiles
 nexttile;
 plot(offset_hz/1e3,quality);
 kxlabel('offset (kHz)'); kylabel('propagator overlap');
 ktitle('profiles by RF scale'); kgrid;
+xlim tight; ylim padded;
 
 end
-
 

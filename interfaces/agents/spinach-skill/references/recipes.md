@@ -20,6 +20,7 @@
 - [Chemical kinetics and exchange](#chemical-kinetics-and-exchange)
 - [MRI, imaging, flow and diffusion](#mri-imaging-flow-and-diffusion)
 - [Optimal control](#optimal-control)
+- [Radiation damping and shared-coil feedback](#radiation-damping-and-shared-coil-feedback)
 - [Fitting to experimental data](#fitting-to-experimental-data)
 - [Singlet states](#singlet-states)
 - [Zero-field and low-field NMR](#zero-field-and-low-field-nmr)
@@ -166,7 +167,7 @@ a named grid.
 inter.zeeman.eigs={[<xx> <yy> <zz>]};    % ppm
 inter.zeeman.euler={[<a> <b> <g>]};      % radians
 sys.disable={'trajlevel'}; bas.projections={+1};
-parameters.grid='rep_2ang_6400pts_sph'; parameters.verbose=0;
+parameters.grid='rep_2ang_6400pts_sph';
 fid=powder(spin_system,@acquire,parameters,'nmr');
 ```
 
@@ -180,7 +181,7 @@ CSA, dipolar, quadrupolar, alanine, glycine, sucrose and tryptophan; compare
 `mas_powder_csa_fplanck.m` against `mas_powder_csa_gridfree.m` for two
 formalisms on identical physics. `singlerot` (Fokker-Planck) is the default and
 adds `parameters.rate` (Hz, sign sets the rotation sense),
-`parameters.axis=[1 1 1]` for the magic angle, `parameters.max_rank` and a
+`parameters.axis=[sqrt(2/3) 0 sqrt(1/3)]` for the magic angle, `parameters.max_rank` and a
 Lebedev grid; rank and grid are both convergence parameters and must be raised
 together. `gridfree` takes the same three but no grid, `doublerot` handles DOR.
 Cross polarisation is `cp_powder_static_nh.m` and
@@ -347,7 +348,8 @@ MAS-DNP has a dedicated non-context driver, `masdnp`, returning the
 steady-state enhancement directly (`dnp_mas/solid_effect_mas_powder.m`), with
 `*_enlev.m`, `*_dynam.m` and `*_steady.m` companions decomposing the same
 physics; these use `inter.equilibrium='dibari'`, the correct treatment for a
-strongly polarised electron. Liquid-phase Overhauser DNP is
+strongly polarised electron. MAS-DNP diagnostics are quiet by default;
+set `parameters.verbose=1` only when debugging. Liquid-phase Overhauser DNP is
 `dnp_liq/odnp_liquid_1.m`, running `liquid` with `@dnp_time_dep` and `'esr'`
 assumptions; transfer comes from Redfield dipolar cross-relaxation, so geometry
 and `inter.tau_c` are the physics, and detection is a row of `Lz` states so
@@ -399,8 +401,8 @@ To extract one rate by hand:
 
 ```matlab
 R=relaxation(spin_system);
-Lz=coil_state(spin_system,'Lz','<isotope>','exact');
-Lp=coil_state(spin_system,'L+','<isotope>','exact');
+Lz=coil_state(spin_system,'Lz','<isotope>');
+Lp=coil_state(spin_system,'L+','<isotope>');
 R1=-(Lz'*R*Lz)/(Lz'*Lz);  R2=-(Lp'*R*Lp)/(Lp'*Lp);
 ```
 
@@ -426,7 +428,7 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
 ```
 
 After `create` and `basis`, prepare with `state(spin_system,'L+','1H')` and
-detect with `coil_state(spin_system,'L+','1H','exact')`. All `state` methods
+detect with `coil_state(spin_system,'L+','1H')`. All `state` methods
 are concentration-weighted; no chemistry qualifier is needed. Varying the
 rates through coalescence tests an exchange model. `exchange_asymmetric.m`
 handles unequal populations, `glucose_exsy_a.m` demonstrates two-dimensional
@@ -441,6 +443,12 @@ departing-spin correlation loss, and invariant concentrations. Do not infer
 that a permutation record preserves the old phenomenological flux model's
 correlations. Nonlinear examples use `kinetics` and the state-dependent `step`
 route; `react_gen` returns product-row maps, not propagation matrices.
+
+Point-to-point magnetisation flux is instead selected with
+`inter.relaxation={'flux'}` (or alongside other relaxation theories), using
+`inter.flux_rate` and `inter.flux_type`. Supply the usual `inter.rlx_keep`
+and `inter.equilibrium` settings. These inputs do not create chemistry
+records, and they are inactive unless `'flux'` is selected.
 
 ## MRI, imaging, flow and diffusion
 
@@ -503,10 +511,11 @@ norm. `optimcon` distributes the drift generators over the workers of the pool
 that is open when it runs and records that pool's identity; each worker then
 evaluates its own block of ensemble cases in `ens_block`. The pool must have
 `SpmdEnabled` true (the default), and `ensemble` refuses any other pool, even
-one with the same number of workers, and refuses a call from inside a worker:
-keep the same pool object from `optimcon` through `fmaxnewton` and any later
-`ensemble` evaluation, and re-run `optimcon` after deleting or restarting the
-pool. `control.freeze` masks input-waveform coordinates after the full distortion,
+one with the same number of workers: keep the same pool object from `optimcon`
+through `fmaxnewton` and any later `ensemble` evaluation, and re-run `optimcon`
+after deleting or restarting the pool. Inside a `parfor` body on a process-pool
+worker there is no pool; call `optimcon` in the loop body, and the ensemble is
+then evaluated serially on that worker. `control.freeze` masks input-waveform coordinates after the full distortion,
 phase, and power derivative pullback; frozen fidelity-gradient entries and
 supported Hessian rows and columns are zero (distortion Hessians remain
 unavailable). For `grape_curv`, the mask has exactly the shape of the input
@@ -729,6 +738,42 @@ files for basis-truncation behaviour. `extremes/high_symmetry_1.m` needs tens
 of cores and over a hundred gigabytes; `nmr_stochastic/snmr_strychnine.m`
 requires a GPU.
 
+## Periodic high-frequency effective generators
+
+For a finite Fourier series `H(t)=sum H_n*exp(1i*n*omega*t)`, use
+`[F,K]=floquet_magnus(H,omega,order,t0,theory)`. Supply an odd-length
+row cell array ordered from negative to positive harmonic, angular frequency
+in rad/s, effective inverse-frequency power zero to three, an initial time
+in seconds, and either `'van_vleck'` or `'aht'`. The former fixes a zero-mean
+kick; the latter fixes a kick that vanishes at the specified initial time.
+The order number counts inverse-frequency powers: the paper's fourth-order
+effective Hamiltonian is `order=3` here.
+
+The mathematical factorisation is
+$U(t,t_0)=e^{-iK(t)}e^{-iF(t-t_0)}e^{iK(t_0)}$, but examples should delegate
+its execution to Spinach: prepare states with `state`, detectors with
+`coil_state`, apply dimensionless kicks with `step`, propagate the effective
+generator with `evolution`, and read observables with `hdot` or native
+observable evolution. Use `operator` or `pauli` rather than literal spin
+matrices. A time-dependent reference can use the existing three-point
+`step` quadrature; check its time-grid refinement rather than writing a
+separate Schrodinger ODE or matrix-exponential density propagation. The
+returned kick includes one extra inverse-frequency power for intra-cycle sampling.
+Do not judge accuracy from quasienergies alone: omitted kicks can preserve
+eigenvalues while corrupting complex signals. Check direct time propagation,
+Fourier resolution, expansion order, and the intended observation interval.
+
+Keep native `floquet` and `singlerot` contexts for full-space MAS dynamics.
+`drifts(spin_system,@singlerot,parameters,assumptions)` extracts their
+Fokker-Planck generators for reference propagation, but those generators
+include the spatial derivative and are not the temporal Fourier input to
+`floquet_magnus`. Obtain physical phase Hamiltonians using `rotor_stack`
+and Fourier transform that stack instead. The integration test
+`test_fme_context` checks this input against native FP phase blocks and
+propagation; its signed phase convention uses
+`omega=-2*pi*parameters.rate`. This is not a harmonic extractor for
+nonuniform grids, diffusion, or arbitrary flow.
+
 ## Exporting NMR and EPR data
 
 For native Spinach outputs, prefer `jcamp_nmr(spin_system,parameters,signal,domains,info)`
@@ -765,3 +810,105 @@ text (row strings or cell vectors of lines), not numeric arrays.
 Complex NMR quadratures use `ARBITRARY UNITS`; magnitude/power data must
 be real and already transformed. NMR assignments may omit heights and method
 comments; widths require a method description.
+
+## Snapshot POD for repeated parameter families
+
+For an explicitly covered system and parameter family, train with `pod_basis`,
+project fixed affine terms and state/detection columns using `pod_project`, then
+supply coefficients and a uniform grid to `pod_evolve`. Keep Euclidean ordering
+and Liouvillian convention L=H+1i*R+1i*K, rad/s; time is seconds. Integer inputs
+and counts are double. No metric, processing, reference subtraction, stability
+repair or positivity constraint is inferred.
+
+Weighted snapshot matrices or covariance-equivalent factors are normalised in
+one binary frame before SVD, QR, rank decisions and residual measurement.
+Exact SVD is the full-data reference. Randomised SVD applies weighted blocks in
+bounded slices, reorthogonalises after every data/adjoint pass and factors only
+compressed snapshots, following Halko et al., DOI:10.1137/090771806. Preserve
+caller RNG; exclude validated zero-weight blocks from workspace but retain
+original-dimension rank thresholds and diagnostic padding. Form retained modes
+only and release Gaussian coefficients before compressed data.
+
+Physical diagnostic energy may round to zero or infinity. Use relative residuals
+and the returned scaled diagnostics, not squared energy, for numerical decisions.
+Normalisation that loses nonzero components is unsupported. Factor truncation
+qualifies reconstruction of supplied factors, not omitted original trajectories.
+POD snapshot optimality is not a reduced-output error guarantee; see Benner et al.,
+DOI:10.1137/130932715. Validate held-out complex FIDs and identically processed
+spectra against full Spinach; report offline costs separately from repeated queries.
+
+Projection normalises data before matrix products and restores physical units.
+Evaluation assembles the time-scaled affine sum in one binary-exponent frame,
+then restores only the summed generator. Normalised propagation carries real
+scalar growth and state amplitude separately, restoring only the Hermitian
+observable. Use MATLAB's maintained reduced exponential; do not introduce a
+heuristic size dispatcher. Unsupported component ranges, unrepresentable
+projected coordinates/generators and nonfinite final signals remain explicit errors.
+
+Initial-only and exact constant signals avoid an unnecessary exponential after
+validation. Common structural stationarity must use the same side across every
+active term; mixed state/detector sides do not establish stationarity. Computed
+zero actions can underflow and are not certificates. Sparse storage is preserved
+through native exponential actions. Blocks are bounded by reduced rank and a
+Hermitian-part growth estimate; exactly diagonal models use componentwise exponentials. The
+forward/adjoint choice preserves the Hermitian signal and native norm estimates
+preserve caller RNG. No componentwise
+accuracy or arbitrary-precision guarantee is implied for ill-conditioned models.
+
+The observable is accumulated with component exponents, and propagation removes coordinates outside structural state-to-detector paths. Implicit term-support traversal avoids constructing dense support graphs. Per-term assembly workspaces are released before physical rescaling. The diagonal is separated once; scalar shifts are applied in the callback without a second dense generator. Hermitian radii and forward/adjoint norms use sparse reductions or bounded dense column/row scans. Real states/actions retain real storage. Fixed off-diagonal bounds are measured once; shifted diagonal bounds are cached per block. Dense range scans use bounded columns. Fixed basis adjoints and component ranges are prepared once outside projection slices. All-real projection data retain real working slices and prepared coordinates. Extreme normalised operand ranges are explicit errors, not silent product underflow.
+
+Repeat directed reachability on the assembled affine sum before restoring
+physical units, because affine cancellation can disconnect previously linked modes.
+Sparse POD action bounds use absolute row/column sums, with their half-sum
+bounding Hermitian radii without constructing a Hermitian part. Rayleigh
+estimates stream normalised columns and sparse scalar overlaps. Binary
+scaling checks stored component counts, avoiding implicit-zero masks.
+
+Accumulate affine entries with TwoSum-based compensated additions
+(Ogita et al., DOI:10.1137/030601818, Algorithms3.1/4.1). Compensation
+workspace is column-sized. Dense outputs are preallocated; sparse output
+columns are staged and concatenated once to avoid quadratic sparse-pointer
+insertion. Reject a final zero whose correction accumulation lost information
+before using it as structural evidence. These transforms apply to computed
+scaled terms, not exact coefficient products or arbitrary-precision sums.
+
+Physical projection restoration must retain every nonzero working component.
+Reject real or imaginary components rounded to zero before storing terms or
+states; representable subnormal coordinates remain supported.
+
+POD evaluation recognises an exactly diagonal assembled generator and applies its componentwise closed-form exponential one state column at a time. This avoids retaining a dense zero off-diagonal matrix and bypasses the generic non-diagonal action-norm restriction; existing numeric range and finite-observable contracts still apply.
+
+Exactly diagonal POD modes carry individual binary state amplitudes. Evaluation forms bounded exponential residuals and phases rather than a potentially overflowing/underflowing standalone exponential; observable accumulation combines each coordinate exponent with its Hermitian detector product. Exact-integer exponent limits and finite-output requirements remain explicit.
+
+POD observable accumulation accepts discarded working products only if an absolute power-of-two bound on their complete computed physical tail lies below half the smallest subnormal. This supports fully damped modes alongside surviving signals without discarding a potentially representable collective tail.
+
+Diagonal POD updates require the cached factor and changing state component bounds to give a normal nonzero double product. Subnormal working products are rejected explicitly before phase loss or quantisation; the conservative restriction can reject a finite physical observable, while the normal-product boundary remains supported.
+
+POD observable exponent alignment checks exact binary scale restoration, including nonzero subnormal quantisation. Inexact aligned groups require the existing complete physical-tail bound before they may be discarded; representable tails are explicit errors. Exactly aligned subnormal groups remain supported through cancellation. Regression controls use independently known residuals with real/imaginary signs, exchanged state/detector roles and dense/sparse terms.
+
+Observable group addition reuses the TwoSum transform and cascaded correction to retain aligned cancellation residuals; a computed zero with lost correction information is rejected. This is compensation for computed products, not arbitrary-precision or exact-product summation.
+
+Computed component products sharing an exponent are accumulated with TwoSum and cascaded correction before zero groups are filtered. A zero group with lost correction information is rejected. The aligned-group stage retains its own compensation; neither stage certifies exact real-number products. Signed real/imaginary, exchanged state/detector, reordered and dense/sparse controls retain a dyadic residual of one.
+
+Normalised Galerkin column-slice sums retain TwoSum/cascaded corrections in projected-output-shaped workspace before physical restoration. A zero coordinate with lost correction information is rejected, rather than certifying a stationary generator. Compensation applies to computed slice products, not exact matrix multiplication. Independent dense/sparse and real/imaginary dyadic controls retain a projected 2^-56 term and its finite long-time phase.
+
+## Radiation damping and shared-coil feedback
+
+Use `examples/nmr_liquids/radiation_damping/` for nonlinear probe feedback:
+
+- `rd_closed_form` checks single-spin recovery against the tanh/sech solution.
+- `rd_detuned_probe` demonstrates probe-phase-dependent damping and pulling.
+- `rd_inhomogeneous` treats a Gaussian isochromat ensemble in one shared coil.
+- `rd_coupled_pair` compares quantum AX/AB dynamics with spectral-line models.
+- `rd_coupled_spectrum` compares coupled-proton spectra with and without feedback.
+
+The examples use a state-dependent generator with `iserstep` and `LG4`.
+For isochromats, sum the weighted transverse magnetisation before constructing
+the feedback field, then apply that same field to every isochromat. Do not
+propagate separate feedback fields and average the results. Choose the grid
+range from the line-shape tails and its spacing from the acquisition duration:
+the recurrence time is the inverse spacing in Hz and must lie well beyond the
+acquisition. Check convergence under refinement, not just agreement with a port
+using the same grid. For integrator comparisons, retain
+`examples/fundamentals/quadratures/product_quadratures_2.m` as the companion
+example; it compares numerical methods rather than providing an analytic truth.

@@ -83,6 +83,10 @@ interface. Select relevant registered tests using `list_tests` or inspect
 entry. Broader selection uses `run_tests`, for example
 `run_tests('pattern','relaxation')`. The runner throws on failed tests and
 returns `PASS` statuses on success; retain the selected test IDs and results.
+The runner prints uniform per-test progress and a summary; `verbose=true`
+adds recorded check explanations. Stray console output is captured and shown
+on failure, including output before exceptions. Test figures are invisible
+and cleaned up without closing existing figures or changing root defaults.
 
 Examples demonstrate intended usage and may be expensive or produce only
 figures. Tests provide explicit assertions but do not necessarily cover the
@@ -104,3 +108,11 @@ comparison isolates the unit-column source difference algebraically; an actual
 old-kernel comparison additionally requires a separately captured stock result
 and an explicit descriptor embedding. Do not treat the algebraic test as a
 stock execution.
+
+## Angular-momentum coefficients
+
+Use `clebsch_gordan(L,M,L1,M1,L2,M2)` for all CG calculations, including
+low ranks. The coupled state comes first; the two uncoupled states follow
+in their physical order. The former `cg_fast` function and rank-two SLE
+formula bypass have been removed. SLE product operators use the acting
+rank before the source rank and retain separate left and right projections.

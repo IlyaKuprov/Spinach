@@ -54,7 +54,7 @@ Legal `sys.disable` entries, anything else being an error: `'pt'` (non-interacti
 `sys.enable` entries: `'zte'` (zero track elimination, off by default), `'gpu'`, `'op_cache'`, `'ham_cache'`, `'prop_cache'`,
 `'greedy'`, `'paranoia'` (tight tolerances), `'cowboy'` (loose
 tolerances), `'polyadic'`, `'sodd'` (spin-orbit corrections to dipolar
-couplings), `'dafuq'`. With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
+couplings). With `'polyadic'` enabled, `v2fplanck` supports scalar and voxel-wise velocities; spin-space Kronecker extension preserves prefactors by nesting affixed polyadics.
 
 `sim2liouv` refreshes existing basis cache identities after Hilbert-to-Liouville
 conversion; cached operators and Hamiltonians remain representation-specific.
@@ -71,14 +71,14 @@ ratio in rad/(s·tesla) and the multiplicity.
 
 | Specification | Particle |
 |---|---|
-| `'1H'`, `'13C'`, `'15N'`, `'195Pt'`, ... | Nucleus: mass number followed by element symbol. |
+| `'1H'`, `'13C'`, `'15N'`, `'195Pt'`,... | Nucleus: mass number followed by element symbol. |
 | `'E'`, `'E+'` | Electron and positron, multiplicity 2. |
 | `'E4'`, `'E16'` | High-spin electron; the integer is the **multiplicity**, so `'E4'` is S=3/2 and `'E16'` is S=15/2. |
 | `'G'` | Ghost spin, gamma=0 and multiplicity 1; a placeholder that carries coordinates but no magnetism. |
 | `'N'`, `'antiN'`, `'M'`, `'M+'` | Neutron, antineutron, negative and positive muons. |
 | `'anti1H'` | Antiproton; `'1H'` remains the proton row. |
 | `'Lambda'`, `'Sigma+'`, `'Sigma-'`, `'Xi0'`, `'Xi-'`, `'Omega-'` | Static-moment hyperons; `anti`-prefixed keys name their CPT-qualified counterparts. |
-| `'99Tc_m'`, `'180Ta_m'`, ... | Distinct evaluated nuclear states, not unqualified ground-state aliases. |
+| `'99Tc_m'`, `'180Ta_m'`,... | Distinct evaluated nuclear states, not unqualified ground-state aliases. |
 | `'C#'`, `'V#'`, `'T#'` | Cavity mode, phonon mode, transmon; the integer is the number of levels, and gamma is zero for all three. |
 
 The fixed signature is `[gamma,multiplicity,data]=spin(name)`. Existing one-/two-output
@@ -102,6 +102,10 @@ are retained. Alternative environmental lifetimes do not override this cutoff.
 `iselectron` and `isnucleus` test a specification string. `isoswap(sys,inter,
 spins,new_iso)` performs isotope replacement and rescales all interactions
 accordingly, wiping quadratic and higher-order couplings with a warning.
+
+`isot2elem({'1H','13C','35Cl'})` returns `{'H','C','Cl'}`, retaining the input
+cell-array shape and order. It strips digits only, without an isotope lookup;
+isomer suffixes and other non-digit characters are not removed.
 
 ## Zeeman interactions
 
@@ -248,7 +252,7 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
 - `concs` — non-negative initial concentrations, one per subsystem; required
   for multiple substances. Propagated unit coordinates carry subsequent
   concentrations. `state` weights each block by its initial concentration;
-  `coil_state(...,'exact')` constructs unweighted detection vectors.
+  `coil_state(...)` constructs unweighted detection vectors.
 - `reactions` — cell array of scalar records with row-vector `reactants` and
   `products`, two-column global-spin `matching`, and non-negative scalar or
   time-dependent `rate`. First-order rates are in inverse seconds; order-m rates
@@ -263,11 +267,12 @@ inter.chem.reactions={struct('reactants',1,'products',2,...
   left/right projector matrices. See the selective-loss recipe in relaxation.md.
 
 Spin replacement uses explicit matching records, not a flux matrix.
-Legacy rates, flux, and radical-pair fields are rejected. Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
+Legacy rate-matrix and radical-pair fields are rejected. The original point-to-point `flux_rate`/`flux_type` inputs remain supported separately through relaxation in `sphten-liouv`. Reaction records are supported in both Liouville formalisms. `zeeman-hilb` supports first-order matrix actions; `zeeman-wavef` is storage-only.
 `merge_inp(sys_parts,inter_parts)` combines `sys`/`inter` structures from
 separate DFT calculations into one input set, offsetting spin and subsystem
 indices; non-extensive fields such as `magnet` and `temperature` must agree
-across parts.
+across parts. Bosonic mode inputs are merged as well, and inputs that
+cannot be merged unambiguously raise an informative error.
 
 ## Partial ordering, temperature and relaxation inputs
 
@@ -453,6 +458,9 @@ Karplus curve to a Gaussian dihedral scan.
 `[sys,inter,aux]=protein(pdb_file,bmrb_file,options)` builds a protein spin
 system from PDB coordinates and BMRB chemical shifts, guessing J-couplings from
 Karplus curves and literature values and CSAs from local geometry.
+Shipped protein PDB, BMRB, and CSA inputs reside in
+`examples/standard_systems/proteins`; examples resolve that directory relative
+to their own file location.
 `options.select` is `'backbone'`, `'backbone-minimal'`, `'backbone-hsqc'`,
 `'all'`, or a list of PDB atom numbers; `options.pdb_mol` selects a molecule
 from a multi-molecule PDB; `options.noshift` is `'keep'` (unassigned atoms
@@ -570,7 +578,7 @@ Cross-substance pair couplings raise `Spinach:create:crossSubstanceCoupling`;
 product operators and states raise `Spinach:which_subst:crossSubstance`.
 
 Chemistry uses explicit `chem.reactions` records through `kinetics` and
-`react_gen`; retired rates, flux, and radical-pair fields are rejected.
+`react_gen`; retired rate-matrix and radical-pair fields are rejected. Point-to-point flux inputs remain supported through relaxation.
 
 Hilbert `evolution` reads the per-substance approximation cell; every Hilbert
 block must use `none`, as enforced by `basis`.
@@ -628,7 +636,7 @@ these experiments retain their supported single-substance algorithms.
 
 ### Explicit chemistry records
 
-Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rates/flux/radical-pair input fields are retired. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices; entirely empty chemistry groups retain the default single-substance contract.
+Use `inter.chem.reactions`, a cell array of records containing `reactants`, `products`, `matching`, and `rate`. Substance indices are row vectors (repeats carry stoichiometry); matching is a two-column global spin map, and `zeros(0,2)` is an empty map. Empty products denote untracked loss. Rates may be non-negative scalars or time handles. `closure` defaults to `additive`; select `product` explicitly to retain cross-reactant polarisation products. Legacy rate-matrix and radical-pair input fields are retired. The original paired `inter.flux_rate`/`flux_type` inputs remain supported independently of reaction records: matrix entry `(from,to)` is a directed spin flux in Hz, with `intramolecular` correlation transfer or `intermolecular` correlation damping. They contribute through relaxation in `sphten-liouv`. `create` reports their nonzero rates and type through `summary_rlx_flux`. `kinetics(spin_system)` has one argument and does not print summaries. Named selectors carry two electron indices on a single reactant; user selector matrices are substance-local. `merge_inp` shifts record substance and spin indices, not local selector matrices; entirely empty chemistry groups retain the default single-substance contract.
 
 `unit_state`, `state`, and `equilibrium` return concentration-weighted density
 matrices and Liouville states; storage-only wavefunctions remain unweighted.
@@ -668,7 +676,7 @@ Reaction-bearing systems bypass spin-only symmetry factorisation in `reduce`: ch
 
 ### Spatial two-stage chemistry
 
-`reacting_flow_nmr` traces all spins with `kill_spin` for its concentration-only stage: the resulting five unit blocks include the traced solvent, and the same reaction records generate both concentration and spin transport. Its frozen-rate stepping workflow and `makima` history are retained, but equal sharing of product unit arrival changes finite frozen concentration steps relative to the old asymmetric generator. Equal sharing is the specified additive closure, not a claim of improved frozen-step accuracy: both allocations converge to the same mass-action ODE. Do not claim numerical history equivalence from the equal instantaneous derivative. In the NMR stage, history values are placed into voxel unit coordinates before evaluating `K(t,eta)`; additive closure then depends only on those coordinates, not the spin orders. The actual propagated state includes unit populations, while detection and reference longitudinal vectors use `coil_state`. The shared `dac_reaction` definition retains all three acetonitrile protons and their T1/T2 relaxation. The flow example prepares only the four reacting species; solvent remains unexcited and contributes no signal.
+`reacting_flow_nmr` traces all spins with `kill_spin` for its concentration-only stage: the resulting five unit blocks include the traced solvent, and the same reaction records generate both concentration and spin transport. Its frozen-rate stepping workflow and `makima` history are retained, but equal sharing of product unit arrival changes finite frozen concentration steps relative to the old asymmetric generator. Equal sharing is the specified additive closure, not a claim of improved frozen-step accuracy: both allocations converge to the same mass-action ODE. Do not claim numerical history equivalence from the equal instantaneous derivative. In the NMR stage, history values are placed into voxel unit coordinates before evaluating `K(t,eta)`; additive closure then depends only on those coordinates, not the spin orders. The actual propagated state includes unit populations, while detection and reference longitudinal vectors use `coil_state`. The shared `dac_reaction` definition retains all three acetonitrile protons and their T1/T2 relaxation. Its solvent S3 declaration uses local indices `[1 2 3]` in the fifth substance. Do not declare S2 for global DAC pairs `[5 6]` or `[25 26]`: their full DFT Zeeman tensors are unequal, and the production symmetry guard rejects them. The flow example prepares only the four reacting species; solvent remains unexcited and contributes no signal.
 
 `create(sys)` without interaction input remains supported; it uses an empty
 interaction structure and the ordinary one-substance/unit-concentration defaults.
@@ -677,9 +685,8 @@ In chemistry-free systems, `reduce` rejects cross-substance entries in caller-su
 compiled spin dimension before building substance-local projectors. This
 boundary also covers the adjoint generator passed by destination screening.
 
-The unweighted primitive requires `coil_state(spin_system,states,spins,method)`
-with all four arguments; use `exact` or `cheap`, and pass `[]` for wavefunction
-spin lists. Only the legacy `state` wrapper retains optional arguments.
+The unweighted primitive requires `coil_state(spin_system,states,spins)`
+with all three arguments; pass `[]` for wavefunction spin lists. Only the legacy `state` wrapper retains optional arguments.
 
 Zeeman-wavefunction direct sums provide storage only. Nonempty reaction records
 are rejected by `basis` and `kinetics`; `equilibrium`, `unit_state`, and
@@ -713,3 +720,37 @@ after `create`; use `chem.reactions`. These are consumer checks, not custom
 dot-read interception: the compiled objects remain ordinary MATLAB structs.
 
 Linear contexts (`liquid`, `imaging`, `crystal`, `powder`, `device`, `floquet`, `singlerot`, `doublerot`, and `gridfree`) reject state-dependent kinetics handles. Use a custom pulse sequence with `step`/`iserstep` for multi-reactant or callback-rate records; `examples/kinetics/nonlinear/bimolecular_closures.m` and `examples/microfluidics/reacting_flow_nmr.m` demonstrate that route.
+
+## Explicit point-to-point flux relaxation
+
+Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
+
+## Native finite baths and observed transitions
+
+spin_bath(sys,inter,specification) appends to authoritative native inputs. Supply sys.magnet in tesla and coordinate rows/cell vectors in Angstrom; specification.magnetic is rejected. Pair tensors remain in Hz until create; total local tensors_Hz are converted to native shielding/g units so create supplies rad/s exactly once. Existing native entries must not be overwritten. Retained candidate labels and augmented physical spin IDs are separate metadata. Isotope tables are explicit cell rows. For a giant-spin centre, supply the paired `inter.giant.coeff` and `inter.giant.euler` tables before appending: existing terms are preserved, and added sites receive no giant-spin terms.
+
+For clexpn inputs use parameters.observed for physical IDs and parameters.spins for isotope channel names. transition.spins repeats the ordered observed IDs and selects ms, levels or explicit orthonormal alpha/beta states. times is a strictly increasing nonnegative seconds row; orientation is a radian Euler-angle row. Put approximation/ensemble/reducer options under parameters.cce, and explicit physical bath jumps under parameters.bath_jumps with inverse-second rates. cce_options records defaults and unresolved convergence/resource choices; it does not infer polarisation, optical populations, quadrupoles or jump rates.
+
+Native cluster compilation consumes parameters.observed and parameters.cce.bath_spins, with assumptions as a separate argument. Keep canonical tensors in rad/s and coordinates in Angstrom; retain spin_bath occupancy-selected isotope IDs and cce.groups without resampling. Compilation requires resolved cce.numerics.atol, rtol and max_memory_bytes. Explicit bath configurations supply bath_ids/bath_rho together for the selected bath; explicit cce_state populations supply all retained physical IDs once. A missing physical population is an error, not an invitation to normalise or fill it.
+
+## Native retained generators, evolution and observation
+
+Use cce_generators(cluster_system,parameters,cache), cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output), and cce_observation(cluster_system,parameters). Conventional L=H+1i*R+1i*K propagates with exp(-1i*L*t); conventional dissipation requires zeeman-liouv. Projected generators are explicitly tagged left/right branch structures and must never be passed to arbitrary stock sequences. See the corresponding kernel/cce knowledge entries for output orientation, branch swaps, and supported pairs.
+
+Observation owns preparation/detection descriptors, physical-ID ordering, receiver phase, and the actual complex initial reference. The returned state/detector are not pre-normalised: experiments divide once by meta.normalization_divisor. The service defaults normalized=false; experiment-specific defaults are not guessed here. The raising jump L+ pumps towards the upper magnetic sublevel. Native registered coverage: kernel/clexpn_generators and kernel/clexpn_observation. The former public driver and wrappers are removed; no translator or compatibility adapter is provided.
+
+## Native context and closed-system experiments
+
+Native closed-system experiments own times, transition, rho0/coil, preparation, `normalized`, nloops, and pump selectors. Context-owned approximation, graph, order, bath state and numerical controls remain under parameters.cce. Signal normalisation is experiment-owned, not a resolver default.
+
+## Native dissipative, noise and ensemble contracts
+
+Use `clexpn` with `@free_evolution` or `@hahn_echo` and explicit `bath_jumps` for GKSL evolution. Free evolution supports generalised elementwise density output; projected states are coherence blocks. `@noise_correlation` requires explicit ordering, connected flag and manifold; never average conditional covariances without retaining and averaging first moments. `parameters.cce.bath_state` owns mixed, explicit, sampled or interlaced product states; interlacing also requires an enumeration budget. `parameters.cce.averaging` chooses after-expansion or internal-first reduction. Partition policies use `cce.expansion='partition'` and physical `groups` or `partition`; order counts groups. Native scheduling supports serial/parallel batches and exact checkpoint resume; masks and error bounds are never discarded.
+
+Native `bath_jumps` retains the complete physical GKSL support contract: selected observed spins as well as selected bath spins are allowed. Generalised dynamics may transfer observed populations; projected dynamics still rejects jumps that mix the declared manifolds. IDs outside the selected observed-plus-bath set are rejected.
+
+For a pinned NV numerical dataset, cce_fixture('nv_four_c13','6f7282b6') returns sys/inter physical data and source metadata with the original grid. Its full hyperfine tensors are not automatically projected; no transition, bath state, cluster order, or resource policy is selected. Coordinates remain metadata because all dipoles are explicit. See the CCE recipe for the fixture and native orientation-grid contract.
+
+Public clexpn preparation uses transition, preparation or rho0, and detection uses the selected transition or coil. The direct cce_observation service also accepts detection and receiver_phase; do not pass those service-only fields to clexpn. Put a public receiver phase in the complex coil. Pulse descriptors belong to hahn_echo, finite_drive, or refocusing_train; old sequence/name/event-array input is removed from the supported public interface. Spectrum options may request post-processing after the completed correlation; analysis options belong only to cce_analyse.
+
+The clexpn native boundary rejects parameters.sequence, including empty arrays. Use finite_drive, refocusing_train, or a named echo experiment with native physical descriptors; free_evolution is uncontrolled.

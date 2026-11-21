@@ -33,21 +33,21 @@ couplings, g-tensors, and correlation times come from the literature, from
 experiment, or from a quantum chemistry calculation - never from plausibility.
 If a parameter is unavailable, say so instead of inventing a number.
 
-**2. Start from the nearest example.** The `examples/` tree holds over 700
-working simulations across 37 problem areas, and almost every request resembles
-one of them. Locating the closest example and adapting it is faster and far more
-reliable than writing from scratch, because the example already encodes the
+**2. Start from the nearest example.** The `examples/` tree covers many
+application areas, and almost every request resembles a shipped simulation.
+Locating the closest example and adapting it is faster and far more reliable
+than writing from scratch, because the example already encodes the
 correct basis, context, assumptions, and processing chain for that physics.
 
 ```bash
-ls examples/                                  # 37 problem areas
+ls examples/                               # browse application areas
 grep -rl "hsqc" examples/ | head              # find by experiment
 grep -rl "sys.isotopes={'E'" examples/ | head # find by system type
 ```
 
 ## The canonical simulation
 
-Every Spinach simulation has the same seven-part shape. This is a real, working
+Most conventional Spinach simulations follow the seven-part shape below. This is a real, working
 liquid-state NMR simulation; the section comments are the house convention and
 should be kept.
 
@@ -241,3 +241,7 @@ result, check what physics says it must satisfy.
 
 Run MATLAB non-interactively for unattended work, and require a unique success
 marker at the end of the script rather than trusting exit status alone.
+
+## Cluster expansion without a full-bath basis
+
+For a finite spin bath, use `create` without a full-bath basis and call `[answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)`. Set `parameters.orientation` for one Euler triple in radians or `parameters.grid` for a native orientation quadrature.

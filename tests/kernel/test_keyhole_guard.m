@@ -148,7 +148,7 @@ for form_idx=1:numel(formalisms)
         gradient=gradient(:,:,1);
 
         % Independently differentiate the composed physical objective
-        step_size=1e-4; grad_ref=zeros(size(waveform));
+        step_size=eps('double')^(1/3); grad_ref=zeros(size(waveform));
         hess_ref=zeros(numel(waveform),numel(waveform));
         for n=1:numel(waveform)
             plus=waveform; minus=waveform;

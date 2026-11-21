@@ -44,11 +44,7 @@
 %
 %                   psi=state(spin_system,[-1/2 1/2 0])
 %
-% Method argument has the following effect in sphten-liouv formalism:
-%
-%    'cheap'  - the state vector is generated without
-%               normalisation. For very large spin sys-
-%               tems this is much faster
+% The method argument accepts:
 %
 %    'exact'  - exact state vector with correct normalisation,
 %               this is the default when the last argument is
@@ -86,11 +82,10 @@ grumble(spin_system,states,spins,method);
 if strcmp(method,'chem')
     warning('Spinach:state:deprecatedChem',...
             '''chem'' is deprecated: use state for weighted states and coil_state for unweighted coils.');
-    method='exact';
 end
 
 % Construct the unweighted operator representation
-rho=coil_state(spin_system,states,spins,method);
+rho=coil_state(spin_system,states,spins);
 
 % Keep storage-only wavefunctions normalised independently of concentration
 if strcmp(spin_system.bas.formalism,'zeeman-wavef'), return; end
@@ -124,7 +119,7 @@ end
 
 if ~ischar(method)
     error('method must be a character string.')
-elseif ~ismember(method, {'cheap', 'exact', 'chem'})
+elseif ~ismember(method, {'exact', 'chem'})
     error('unknown method specification.');
 end
 

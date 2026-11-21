@@ -25,8 +25,10 @@
 %       usually required - please use the (much friendlier) operator()
 %       function.
 %
-% Note: the superoperator is returned in XYZ sparse format, which is 
-%       different from Matlab's CSC format.
+% Note: the superoperator is returned in XYZ sparse format, which is
+%       different from Matlab's CSC format. Commutators retain odd total
+%       operator/source/destination rank parity; anticommutators retain
+%       even parity. Cancellation precedes many-spin basis matching.
 %
 % ilya.kuprov@weizmann.ac.il
 % hannah.hogben@chem.ox.ac.uk
@@ -34,16 +36,6 @@
 % <https://spindynamics.org/wiki/index.php?title=superop.m>
 
 function A=superop(spin_system,opspec,side)
-
-% Issue a recursive call if appropriate
-if strcmp(side,'comm')
-    A=superop(spin_system,opspec,'leftofcomm');
-    B=superop(spin_system,opspec,'rightofcomm');
-    B(:,3)=-B(:,3); A=[A; B]; return;
-elseif strcmp(side,'acomm')
-    A=[superop(spin_system,opspec,'left');
-       superop(spin_system,opspec,'right')]; return;
-end
 
 % Validate the input
 grumble(spin_system,opspec);
@@ -56,6 +48,8 @@ if isempty(active_spins)
     A=unit_oper(spin_system); 
     [rows,cols,vals]=find(A);
     A=[rows cols vals];
+    if strcmp(side,'comm'), A=[1 1 0]; end
+    if strcmp(side,'acomm'), A(:,3)=2*A(:,3); end
     return;
 end
 
@@ -79,18 +73,20 @@ for n=1:length(active_spins)
     mult=spin_system.comp.mults(active_spins(n));
     table_idx=opspec(active_spins(n))+1;
 
-    % Extract pages corresponding to the current state
+    % Select the sided product table
     switch side
 
-        case {'left','leftofcomm'}
+        case {'left','leftofcomm','comm','acomm'}
 
-            % Extract left product pages from Lie structure tables
-            pt=squeeze(spin_system.bas.lpst{mult}(table_idx,:,:));
+            % Read left product coordinate records
+            pt=spin_system.bas.lpst{mult};
+            offsets=spin_system.bas.lp_offsets{mult};
 
         case {'right','rightofcomm'}
 
-            % Extract right product pages from Lie structure tables
-            pt=squeeze(spin_system.bas.rpst{mult}(table_idx,:,:));
+            % Read right product coordinate records
+            pt=spin_system.bas.rpst{mult};
+            offsets=spin_system.bas.rp_offsets{mult};
 
         otherwise
 
@@ -99,8 +95,9 @@ for n=1:length(active_spins)
 
     end
 
-    % Convert product action table to indices
-    [destin{n},source{n},struct{n}]=find(pt);
+    % Select the current tensor and read its coordinate records
+    pt=pt((offsets(table_idx)+1):offsets(table_idx+1),:);
+    destin{n}=pt(:,2); source{n}=pt(:,3); struct{n}=pt(:,4);
 
     % Spinach uses 0 index for the unit matrix
     source{n}=source{n}-1; destin{n}=destin{n}-1;
@@ -115,6 +112,15 @@ for n=2:numel(active_spins)
     to=[kron(to,ones(size(destin{n},1),1)) ...
         kron(ones(size(to,1),1),destin{n})];
     coeff=kron(coeff,struct{n});
+end
+
+% Remove cancelling product paths before matching the many-spin basis
+if ismember(side,{'comm','acomm'})
+    ranks_from=floor(sqrt(from)); ranks_to=floor(sqrt(to));
+    rank_oper=sum(floor(sqrt(opspec(active_spins))));
+    odd_paths=mod(rank_oper+sum(ranks_from,2)+sum(ranks_to,2),2)==1;
+    if strcmp(side,'comm'), keep=odd_paths; else, keep=~odd_paths; end
+    from=from(keep,:); to=to(keep,:); coeff=2*coeff(keep);
 end
 
 % Lift the basis columns corresponding to the relevant spins
@@ -139,7 +145,7 @@ for n=1:size(from,1)
     end
     source_subsp=spin_system.bas.basis{subst}(source_subsp_idx,:);
     source_subsp_idx=find(source_subsp_idx);
-    source_subsp(:,local_spins)=[];
+    source_subsp(:,local_spins)=repmat(to(n,:),size(source_subsp,1),1);
     
     % Get source subspace dimension
     subsp_dim=size(source_subsp,1);
@@ -154,7 +160,6 @@ for n=1:size(from,1)
         end
         destin_subsp=spin_system.bas.basis{subst}(destin_subsp_idx,:);
         destin_subsp_idx=find(destin_subsp_idx);
-        destin_subsp(:,local_spins)=[];
         
         % Fill the operator
         if isequal(source_subsp,destin_subsp)
@@ -164,8 +169,9 @@ for n=1:size(from,1)
             
         else
         
-            % Otherwise, use brute-force state-by-state matching
-            [does_it_go_anywhere,where_it_goes_if_it_does]=ismember(source_subsp,destin_subsp,'rows');
+            % Match full transition targets against cached destination row hashes
+            [does_it_go_anywhere,where_it_goes_if_it_does]=hash_ismember(source_subsp,...
+                spin_system.bas.row_hash{subst}(destin_subsp_idx,:));
             A{n}=[source_subsp_idx(does_it_go_anywhere)                           ...
                   destin_subsp_idx(where_it_goes_if_it_does(does_it_go_anywhere)) ...
                   coeff(n)*ones(nnz(does_it_go_anywhere),1)];
@@ -203,7 +209,7 @@ end
 if numel(opspec)~=spin_system.comp.nspins
     error('the number of elements in the opspec array must be equal to the number of spins.');
 end
-if any((opspec+1)>spin_system.comp.mults.^2)
+if any(opspec<0)||any((opspec+1)>spin_system.comp.mults.^2)
     error('physically impossible state requested in opspec.');
 end
 end
@@ -214,4 +220,5 @@ end
 % absolute.
 %
 % Ayn Rand
+
 

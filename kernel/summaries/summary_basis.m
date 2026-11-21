@@ -34,17 +34,32 @@ for s=1:spin_system.bas.nsubst
                             ' states in the basis - printing suppressed.']);
     elseif strcmp(spin_system.bas.formalism,'sphten-liouv')
         report(spin_system,'final basis set summary (L,M quantum numbers in irreducible spherical tensor products).');
-        report(spin_system,['N       ' num2str(spins,'%d       ')]);
+
+        % Size columns from local ranks, signed projections, and global indices
+        [ranks,projs]=lin2lm(spin_system.bas.basis{s});
+        rank_width=numel(num2str(max(ranks,[],'all')));
+        proj_width=max(numel(num2str(min(projs,[],'all'))),...
+                       numel(num2str(max(projs,[],'all'))));
+        col_width=max([8 rank_width+proj_width+5 ...
+                       numel(num2str(max(spins)))+2]);
+        index_width=max(7,numel(num2str(spin_system.bas.offsets(s)+nstates))+1);
+
+        % Retain the header inset used by the ordinary eight-character columns
+        header_line=blanks(index_width+col_width*nspins); header_line(1)='N';
+        for k=1:nspins
+            spin_number=num2str(spins(k));
+            header_line(index_width+1+col_width*(k-1)+(1:length(spin_number)))=spin_number;
+        end
+        report(spin_system,deblank(header_line));
         for n=1:nstates
 
             % Format the global state index and local tensor labels
-            current_line=blanks(7+8*nspins);
+            current_line=blanks(index_width+col_width*nspins);
             state_number=num2str(spin_system.bas.offsets(s)+n);
             current_line(1:length(state_number))=state_number;
             for k=1:nspins
-                [L,M]=lin2lm(spin_system.bas.basis{s}(n,k));
-                state_token=['(' num2str(L) ',' num2str(M) ')'];
-                current_line(7+8*(k-1)+(1:length(state_token)))=state_token;
+                state_token=['(' num2str(ranks(n,k)) ',' num2str(projs(n,k)) ')'];
+                current_line(index_width+col_width*(k-1)+(1:length(state_token)))=state_token;
             end
             report(spin_system,current_line);
         end

@@ -43,8 +43,8 @@ result=test_true(result,'md5_hash storage sensitivity',~strcmp(md5_hash(eye(2)),
 
 % Check stable duplicate-row removal through hash-table identity
 A=sparse([1 0 2;1 0 2;0 3 0;1 0 2;4 0 0]);
-result=test_close(result,'unihash stable rows',unihash(A),sparse([1 0 2;0 3 0;4 0 0]),1e-15,1e-15,...
-                  'unihash must keep the first occurrence of each unique sparse row in stable order');
+result=test_close(result,'hash_unique stable rows',hash_unique(A),sparse([1 0 2;0 3 0;4 0 0]),1e-15,1e-15,...
+                  'hash_unique must keep the first occurrence of each unique sparse row in stable order');
 
 % Check least-squares transfer matrix recovery from overdetermined samples
 T_ref=[2 1;0 -1];

@@ -8,7 +8,7 @@ This is the source's Figure 9 water-exchange spin-lock pump example, attributed 
 
 ## Spin and exchange model
 
-The model has four peptide spins in the order H, N, C-alpha, and carbonyl C, plus 100 water protons. It sets `sys.magnet=11.7` (the source gives no unit beside this field parameter), all water-proton shifts to zero, and the listed H-N and N-carbonyl-C scalar couplings to -45 and 8. The source does not annotate units for these coupling entries. It assigns both T1 and T2 values in seconds: H 0.2722, N 0.8, C-alpha 2, carbonyl C 2, and water 0.2994. Relaxation is `t1_t2`, diagonal terms are retained, equilibrium is `IME`, and temperature is 298.
+The model has four peptide spins in the order H, N, C-alpha, and carbonyl C, plus 100 water protons. It sets `sys.magnet=11.7` (the source gives no unit beside this field parameter), all water-proton shifts to zero, and the listed H-N and N-carbonyl-C scalar couplings to -45 and 8. The source does not annotate units for these coupling entries. It assigns both T1 and T2 values in seconds: H 0.2722, N 0.8, C-alpha 2, carbonyl C 2, and water 0.2994. Relaxation is selected as `inter.relaxation={'t1_t2','flux'}`. Diagonal retention and `IME` equilibrium apply to the T1/T2 contribution, while flux is added separately; temperature is 298.
 
 The amide proton (spin 1) and first water proton (spin 5) exchange at 1000 in each direction; each distinct water pair exchanges at 1e4. These are source-assigned rates, not measured values.
 
@@ -27,3 +27,5 @@ This is a forward sequence simulation with source-specified relaxation and excha
 ## Reaction-record representation
 
 The peptide is one substance and every water proton has its own unit-concentration substance. An additive replacement swaps the amide proton with the nearest water proton while retaining the other peptide spins; each distinct water pair has one symmetric replacement record. Internal peptide correlations involving the departing proton decay, while no cross-molecular correlations are stored. Concentrations are invariant, permitting the sequence to freeze the additive generator once at `unit_state`. Observable vectors use unweighted `coil_state`; thermal equilibrium and IME remain concentration-aware.
+
+Current executable example selects 'flux' explicitly in inter.relaxation and supplies top-level inter.flux_rate and inter.flux_type. Flux is appended through relaxation once; rates alone would not enable it. Preserve the example's ordinary inter.rlx_keep and inter.equilibrium configuration.

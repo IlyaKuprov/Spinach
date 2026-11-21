@@ -1,6 +1,6 @@
 # kernel/utilities/kill_spin.m
 
-`spin_system=kill_spin(spin_system,hit_list)` removes spins or bosonic modes from the unified particle list. `hit_list` is a vector of valid positive particle indices or a logical mask with one element per particle. The returned system retains the surviving physical model, reindexes particle-dependent interactions and relaxation data, and rebuilds an existing basis rather than attempting to patch compiled descriptors.
+`spin_system=kill_spin(spin_system,hit_list)` removes spins or bosonic modes from the unified particle list. `hit_list` is a vector of distinct valid positive particle indices (repeated indices are rejected) or a logical mask with one element per particle. The returned system retains the surviving physical model, reindexes particle-dependent interactions and relaxation data, and rebuilds an existing basis rather than attempting to patch compiled descriptors.
 
 ## Physical model and chemistry
 
@@ -17,3 +17,5 @@ Correlation depths are capped by the remaining local population without increasi
 Connectivity, permutation-symmetry settings, and Hamiltonian assumptions are discarded because they describe the old particle set. Zeeman, coupling, giant-spin, and mode strengths derived from those assumptions are likewise invalidated. Reapply `assume` before constructing a new Hamiltonian; warnings identify cleared assumption information.
 
 Source: [kernel/utilities/kill_spin.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kill_spin.m). [Wiki](https://spindynamics.org/wiki/index.php?title=kill_spin.m).
+
+Removing spins deletes their corresponding rows and columns from spin_system.rlx.flux_rate. Flux type remains spin_system.rlx.flux_type. This is relaxation storage, not spin_system.chem storage; the selected theory still controls whether relaxation uses the reduced flux matrix.

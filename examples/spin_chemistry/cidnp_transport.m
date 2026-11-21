@@ -28,11 +28,11 @@ H=2*operator(spin_system,'Lz',1)+1.7*operator(spin_system,'Lz',2)...
   +1.2*operator(spin_system,{'Lz','Lz'},{1,3})...
   +0.6*operator(spin_system,{'L+','L-'},{1,3})...
   +0.6*operator(spin_system,{'L-','L+'},{1,3});
-K=kinetics(spin_system,'report');
+K=kinetics(spin_system);
 
 % Unit-concentration electron singlet with an unpolarised nucleus
 rho=4*singlet(spin_system,1,2);
-coil=coil_state(spin_system,'Lz',4,'exact');
+coil=coil_state(spin_system,'Lz',4);
 time_grid=linspace(0,3,301); dt=time_grid(2)-time_grid(1);
 traj=evolution(spin_system,H+1i*K,[],rho,dt,numel(time_grid)-1,'trajectory');
 

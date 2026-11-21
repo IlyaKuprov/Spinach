@@ -35,8 +35,8 @@ result=test_close(result,'adelim induced relaxation',R_extra,R_ref,1e-14,1e-14,.
                   'the eliminated fast block contributes i*L01*(L11\\L10)');
 
 % Check a textbook Clebsch-Gordan coefficient
-cg_triplet=cg_fast(1,0,1/2,1/2,1/2,-1/2);
-result=test_close(result,'cg_fast triplet coefficient',cg_triplet,1/sqrt(2),...
+cg_triplet=clebsch_gordan(1,0,1/2,1/2,1/2,-1/2);
+result=test_close(result,'clebsch_gordan triplet coefficient',cg_triplet,1/sqrt(2),...
                   1e-12,1e-12,...
                   'two spin-half states couple to the triplet M=0 state with coefficient 1/sqrt(2)');
 

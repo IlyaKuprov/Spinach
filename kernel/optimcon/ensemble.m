@@ -30,18 +30,6 @@
 %                  ent is returned as an array separating penalty Hes-
 %                  sians from the fidelity Hessian.
 %
-% Note: the ensemble cases enumerated in spin_system.control.catalog
-%       are processed in the contiguous per-worker blocks assigned by
-%       optimcon.m in spin_system.control.worker_cases. Each worker
-%       holds the common frozen problem and the drift generators of its
-%       own block, published by optimcon.m as pool constants; the per-
-%       case physics runs in ens_block.m on each worker, so only the
-%       waveform and the live control fields travel at each objective
-%       evaluation, and the gradient, the Hessian, and averaged trajec-
-%       tories are summed on the workers. This function must be called
-%       from the client, on the pool that was open when optimcon.m ran:
-%       a worker holds only its own block.
-%
 % david.goodwin@inano.au.dk
 % ilya.kuprov@weizmann.ac.il
 % m.keitel@soton.ac.uk
@@ -142,8 +130,8 @@ if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','drift_s
 end
 current_pool=gcp('nocreate'); pool_id=0;
 if ~isempty(current_pool), pool_id=current_pool.ID; end
-if (~isempty(getCurrentWorker()))||(pool_id~=spin_system.control.pool_id)
-    error('ensemble() must run on the client, on the pool that was open when optimcon() ran; re-run optimcon() after changing the pool.');
+if pool_id~=spin_system.control.pool_id
+    error('ensemble() must run with the parallel pool that was open when optimcon() ran; re-run optimcon() after changing the pool, and inside the parfor body when running on a worker.');
 end
 if any(isfield(spin_system.control,spin_system.control.frozen_fields))
     error('generators and operators are frozen after optimcon(), re-run optimcon() to change them.');

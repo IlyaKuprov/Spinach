@@ -33,14 +33,14 @@ if ~isfield(sys,'parallel')
 
             end
 
-        case 'TALOS' % 56 Intel cores, 1 TB of RAM, 3 A800 GPUs
+        case 'TALOS' % 56 Intel cores, 1 TB of RAM, 2 A800 GPUs
 
             % Be careful with GPUs
             if isfield(sys,'enable')&&...
                ismember('gpu',sys.enable)
 
                 % 4 workers per GPU are safe
-                sys.parallel={'processes',12};
+                sys.parallel={'processes',8};
 
             end
 

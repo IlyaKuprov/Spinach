@@ -40,7 +40,7 @@ K=kinetics(spin_system);
 units=spin_system.bas.offsets(1:end-1)+1;
 result=test_close(result,'concentration conservation',sum(K(units,:),1),...
                   zeros(1,size(K,2)),1e-14,1e-14,'total molecular population is conserved');
-coil=coil_state(spin_system,'Lz','1H','exact');
+coil=coil_state(spin_system,'Lz','1H');
 result=test_close(result,'longitudinal conservation',coil'*K,...
                   zeros(1,size(K,2)),1e-14,1e-14,'matched longitudinal spin order is conserved');
 

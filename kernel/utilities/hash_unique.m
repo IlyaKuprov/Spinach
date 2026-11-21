@@ -1,0 +1,55 @@
+% Hash table based stable duplicate row eliminator,
+% for use with large sparse matrices where Matlab's
+% unique(...,'rows') is too slow. Syntax:
+%
+%                   A=hash_unique(A)
+%
+% Parameters:
+%
+%      A - a large and sparse matrix
+%
+% Outputs:
+%
+%      A - same matrix with duplicate 
+%          rows deleted, keeping the
+%          first occurrence of each
+%
+% ilya.kuprov@weizmann.ac.il
+% 
+% <https://spindynamics.org/wiki/index.php?title=hash_unique.m>
+
+function A=hash_unique(A)
+
+% Check consistency
+grumble(A);
+
+% Build an MD5 hash table
+hash_table=repmat(' ',[size(A,1) 32]);
+parfor k=1:size(A,1)
+    hash_table(k,:)=md5_hash(full(A(k,:)));
+end
+
+% Redundant row index using a hash table
+[~,idx]=unique(hash_table,'rows','stable');
+
+% Elimination
+A=A(idx,:);
+
+end
+
+% Consistency enforcement
+function grumble(A)
+if (~isnumeric(A))||(~ismatrix(A))
+    error('A must be a numeric matrix.');
+end
+end
+
+% Вот полно статей: норм введение, норм постановка задачи. А потом 
+% начинается ХУЙНЯ. Лютая, бестолковая, бесполезная ХУЙНЯ. И такие
+% мол вот: мы тут внесли, расширили, исследовали. Солнышки -- нет!
+% Вы ХУЙНЮ нагородили по данному вопросу. Лютую, бестолковую, бес-
+% полезную ХУЙНЮ. Теоретики особенно этим отличаются.
+%
+% Anonymous post in
+% an academic forum
+

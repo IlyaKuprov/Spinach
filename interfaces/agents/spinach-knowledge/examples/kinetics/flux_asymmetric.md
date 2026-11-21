@@ -15,3 +15,5 @@ The calculation uses the full `sphten-liouv` basis (`bas.approximation=none`). `
 ## Scope
 
 The source header estimates a calculation time of seconds, not an independently measured runtime. No simulated spectral values or fit result are included in the source; no specific line shape, peak intensity, or fitted flux is claimed.
+
+Current executable example selects 'flux' explicitly in inter.relaxation and supplies top-level inter.flux_rate and inter.flux_type. Flux is appended through relaxation once; rates alone would not enable it. Preserve the example's ordinary inter.rlx_keep and inter.equilibrium configuration.

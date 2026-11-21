@@ -1,6 +1,12 @@
-% MEX compilation utility. Rebuilds all C++ MEX binaries of
+% MEX compilation utility. Rebuilds all C++ and CUDA MEX binaries of
 % the Spinach installation that contains this file, placing
-% each binary next to its source. Syntax:
+% each binary next to its source. CUDA compilation requires
+% MATLAB R2026b or later, mexcuda, a supported host C++ compiler,
+% and the CUDA driver library. Windows uses CUDA_PATH/lib/x64 when
+% CUDA_PATH is set; otherwise mexcuda's library search is used.
+% macOS CUDA-unavailable errors are reported after the C++ builds;
+% all other compilation errors propagate.
+% Syntax:
 %
 %                       compile_mex()
 %
@@ -33,6 +39,34 @@ mex('-R2018a','-O','-DNDEBUG',...
 mex('-R2018a','-O','-DNDEBUG',...
     [P '/kernel/indexing/spunicols.cpp'],'-outdir',[P '/kernel/indexing']);
 
+% Enforce the CUDA sparse-storage release contract
+if isMATLABReleaseOlderThan('R2026b')
+    disp('CUDA sparse-product MEX compilation skipped: requires R2026b or later.');
+    return;
+end
+
+% CUDA driver library search on Windows; non-executable stack on
+% Linux, where glibc 2.41+ refuses to load executable-stack MEX
+link_args={};
+if ispc&&~isempty(getenv('CUDA_PATH'))
+    link_args={['-L' fullfile(getenv('CUDA_PATH'),'lib','x64')]};
+elseif isunix&&~ismac
+    link_args={'LDFLAGS=$LDFLAGS -Wl,-z,noexecstack'};
+end
+
+% CUDA sparse matrix product
+try
+    mexcuda('-R2018a','-O',link_args{:},'-lcuda',...
+            [P '/kernel/overloads/cuda_sparse_by_sparse_mex.cu'],...
+            '-outdir',[P '/kernel/overloads']);
+catch exception
+    if ismac&&strcmp(exception.identifier,'parallel:gpu:device:MacOSGPUNotSupported')
+        disp(['CUDA sparse-product MEX unavailable: ' exception.message]);
+    else
+        rethrow(exception);
+    end
+end
+
 end
 
 % Audiophiles don't use their equip-
@@ -41,4 +75,5 @@ end
 % their equipment.
 %
 % Alan Parsons
+
 

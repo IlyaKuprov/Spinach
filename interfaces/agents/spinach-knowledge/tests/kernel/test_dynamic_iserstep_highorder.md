@@ -23,6 +23,28 @@ Regression test for the nonlinear high-order `iserstep` branches. It checks zero
 - For each method, checks density-matrix invariants preserved by unitary propagation: trace preservation (`trace(rho_obs)` vs `trace(rho)`) and Hermiticity (`rho_obs` vs `rho_obs'`), both with tolerances `1e-12`.
 - All comparisons are accumulated into the test result via `test_close` with explanatory messages.
 
+## LG4A structure and convergence coverage
+
+The constant-generator limit is checked against exact two-sided density
+conjugation. The commuting quadratic field `L(t)=(1+t^2)*Sz` is integrated
+over one second with eight steps and compared with its exact Simpson phase;
+the absolute and relative tolerances are `1e-12`. This detects artificial
+damping from a final expression that is not a complete commutator.
+
+A rotating field uses ordinary Pauli matrices and
+`L(t)=0.8*(cos(2.3*t)*X+sin(2.3*t)*Y)+0.4*Z`. Its rotating-frame solution
+is exact. Density-matrix errors over two seconds are refined on 16, 32, and
+64 steps; the observed global orders must be within `0.05` of four.
+
+The additional nonlinear field is
+`L(t,rho)=0.7*X+0.2*cos(0.9*t)*Y+(0.3+0.6*real(trace(Z*rho)))*Z`.
+Its reference integrates the density commutator directly with tolerance-
+refined `ode113` and independent `ode89`. The ODE references must agree
+within `2e-12`; the LG4A density errors over 1.5 seconds on the same three
+grids must have orders within `0.08` of four. Trace and eigenvalues are
+checked at `1e-12` absolute and relative tolerances. No density projection
+or renormalisation is used.
+
 ## Inputs and outputs
 
 ```matlab

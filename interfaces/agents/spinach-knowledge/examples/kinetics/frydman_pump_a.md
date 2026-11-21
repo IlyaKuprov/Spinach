@@ -8,7 +8,7 @@
 
 The source identifies this as Lucio Frydman's water-exchange spin-lock pump, Figure 2, and cites https://doi.org/10.1016/j.jmr.2021.107083. The model has a `1H`, `15N`, `13C`, `13C` peptide core plus 20 added `1H` water spins (24 spins total). `sys.magnet` is set to 11.7; the source labels this a magnet field but gives no unit. All listed chemical shifts are zero. The explicitly assigned H-N scalar coupling is -45 Hz.
 
-The `t1_t2` relaxation model uses diagonal retention. Source-estimated T1 and T2 values are given in seconds: H 0.2722, N 0.8, C-alpha 2, carbonyl C 2, and water 0.2994. The source sets `inter.temperature=298` without stating a unit and uses an isotropic equilibrium model (`IME`). The basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, `inter_level=4`, and `prox_level=1`. Intermolecular exchange entries are source-labelled in Hz: 10 between the amide H and the first water proton, and 1e4 in the water-proton block.
+The example selects `inter.relaxation={'t1_t2','flux'}`. The T1/T2 contribution uses diagonal retention; flux is added separately without that projection. Source-estimated T1 and T2 values are given in seconds: H 0.2722, N 0.8, C-alpha 2, carbonyl C 2, and water 0.2994. The source sets `inter.temperature=298` without stating a unit and uses an isotropic equilibrium model (`IME`). The basis uses `sphten-liouv`, `IK-1`, scalar-coupling connectivity, `inter_level=4`, and `prox_level=1`. Intermolecular exchange entries are source-labelled in Hz: 10 between the amide H and the first water proton, and 1e4 in the water-proton block.
 
 ## Sequence and observables
 
@@ -26,3 +26,5 @@ The peptide is one substance and every water proton has its own unit-concentrati
 ## Thermal preparation and numerical comparison
 
 The represented non-unit Hamiltonian, dissipative relaxation, reaction generator, and pulse operators are identical to the former flux model. The full mapped trajectory differs by `1.0592e-8` relative. Replacing only the initial molecular thermal state by the former mapped initial state, retaining every new concentration-source column, reduces the dense-exponential trajectory discrepancy to `8.3e-12`. A complete molecular-basis dense-exponential thermal reference gives initial-state errors of `1.0804e-8` for the former preparation and `4.6898e-11` for the molecular preparation. The migration therefore improves the thermal preparation rather than changing the measured exchange generator. This measured preparation difference is documented; it is not a claim of literal `1e-10` stock-trajectory parity.
+
+Current executable example selects 'flux' explicitly in inter.relaxation and supplies top-level inter.flux_rate and inter.flux_type. Flux is appended through relaxation once; rates alone would not enable it. Preserve the example's ordinary inter.rlx_keep and inter.equilibrium configuration.

@@ -8,7 +8,7 @@
 %     result - exact state-weighting and thermal-equilibrium checks
 %
 % Independent single-substance constructions supply the reference shapes.
-% Exact and cheap states, identities, level projectors, zero populations,
+% Exact states, identities, level projectors, zero populations,
 % and spin-free substances are covered. Thermal vectors use a 1e-12 bound.
 %
 % ilya.kuprov@weizmann.ac.il
@@ -55,11 +55,11 @@ for n=1:2
     local_bas=bas; local_bas.approximation={'none'};
     local=test_spin_system(local_sys,local_inter,local_bas);
     reference{n}=s.chem.concs(n)*equilibrium(local);
-    for method={'exact','cheap'}
+    for method={'exact'}
         for label={'Lz','L+','E','ZL1'}
             expected=zeros(s.bas.offsets(end),1);
-            expected(rows)=coil_state(local,label{1},1,method{1});
-            actual=coil_state(s,label{1},spins(1),method{1});
+            expected(rows)=coil_state(local,label{1},1);
+            actual=coil_state(s,label{1},spins(1));
             name=sprintf('%s %s block %d',method{1},label{1},n);
             result=test_true(result,['coil ' name],isequal(actual,expected),...
                              'an independent molecule supplies the same unweighted shape');
@@ -77,7 +77,7 @@ result=test_true(result,'unit coordinates',...
                  'the identity contains exactly one concentration per substance');
 
 % Check an all-spin sum is weighted separately in each hosting block
-coil=coil_state(s,'Lz','all','exact'); expected=full(coil);
+coil=coil_state(s,'Lz','all'); expected=full(coil);
 for n=1:s.bas.nsubst
     rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
     expected(rows)=s.chem.concs(n)*expected(rows);
@@ -89,7 +89,7 @@ result=test_true(result,'all-spin weighting',isequal(state(s,'Lz','all'),expecte
 empty=s; empty.chem.concs=[0 0 1];
 result=test_true(result,'zero-population state',nnz(state(empty,'Lz','all'))==0,...
                  'absent substances carry no spin order');
-result=test_true(result,'zero-population coil',isequal(coil_state(empty,'Lz','all','exact'),coil),...
+result=test_true(result,'zero-population coil',isequal(coil_state(empty,'Lz','all'),coil),...
                  'detection is independent of concentration');
 result=test_true(result,'spin-free equilibrium',isequal(equilibrium(empty),unit_state(empty)),...
                  'the populated spin-free substance carries only its unit coordinate');
@@ -108,18 +108,62 @@ for concentration=[0 0.3 2]
 end
 fprintf('CWDM_WAVEFUNCTION norm_squared=%.16g\n',norm(psi)^2);
 
-% Require all four arguments on the new unweighted primitive
+% Reject retired constructor arguments in every supported formalism
+for formalism={'sphten-liouv','zeeman-liouv','zeeman-hilb','zeeman-wavef'}
+    bas.formalism=formalism{1};
+    s=test_spin_system(sys,inter,bas);
+    if strcmp(formalism{1},'zeeman-wavef')
+        description=0.5; spins=[];
+    else
+        description='Lz'; spins=1;
+    end
+    rejected=false;
+    try
+        state(s,description,spins,'cheap');
+    catch err
+        rejected=strcmp(err.message,'unknown method specification.');
+    end
+    result=test_true(result,'removed state method',rejected,...
+                     'state rejects the removed shortcut in every formalism');
+    rejected=false;
+    try
+        coil_state(s,description,spins,'exact');
+    catch err
+        rejected=strcmp(err.identifier,'MATLAB:TooManyInputs');
+    end
+    result=test_true(result,'removed coil method',rejected,...
+                     'coil_state rejects a fourth argument in every formalism');
+end
+
+% Require all three arguments on the unweighted primitive
 rejected=false;
 try
-    coil_state(s,0.5,[]);
+    coil_state(s,0.5);
 catch err
     rejected=strcmp(err.identifier,'MATLAB:minrhs');
 end
 result=test_true(result,'fixed coil signature',rejected,...
-                 'coil_state has no implicit method or spin-list defaults');
+                 'coil_state has no implicit spin-list default');
 result=test_true(result,'explicit wavefunction coil',...
-                 isequal(coil_state(s,0.5,[],'exact'),[1;0]),...
-                 'the explicit four-argument wavefunction API remains supported');
+                 isequal(coil_state(s,0.5,[]),[1;0]),...
+                 'the explicit three-argument wavefunction API returns the unit ket');
+
+% Compare direct tensor construction with full operator action for mixed spins
+sys=struct('magnet',0,'isotopes',{{'1H','2H','23Na'}}); inter=struct();
+cases={{'Lz','all'},{'L+','all'},{'Ly',[1 3]},...
+       {{'Lx','Ly'},{1,2}},{{'T2,-1','T3,2'},{2,3}},...
+       {{'ZL1','ZL3'},{1,3}},{'CTy',3},{'E','all'}};
+for approximation={'none','IK-0'}
+    bas=struct('formalism','sphten-liouv','approximation',{approximation});
+    if strcmp(approximation{1},'IK-0'), bas.inter_level={1}; end
+    s=test_spin_system(sys,inter,bas); unit=sparse(1,1,1,s.bas.offsets(end),1);
+    for args=cases
+        expected=operator(s,args{1}{:},'left')*unit;
+        actual=coil_state(s,args{1}{:});
+        result=test_close(result,'direct exact state',actual,expected,1e-13,1e-13,...
+                          'direct coefficients match operator action for mixed spins and truncated bases');
+    end
+end
 
 end
 

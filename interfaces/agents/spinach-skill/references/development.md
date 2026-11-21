@@ -6,7 +6,9 @@ Read and follow the distribution-root `AGENTS.md` as mandatory instructions
 for every task, as required by [the skill entrypoint](../SKILL.md#mandatory-repository-instructions).
 Consult that file directly for repository policy; this reference does not
 maintain an independent version of its instructions. Preserve unrelated
-changes and compiled MEX files.
+changes and compiled MEX files. For source-style auditing, `exorcise('offline')`
+skips network checks; `exorcise('online')` also checks documentation URLs
+through native MATLAB HTTP requests.
 Use a separate branch/worktree when the current checkout belongs to another
 task. Do not submit scientific or personal data that were not authorised for
 publication.
@@ -29,6 +31,16 @@ the derivation. Without that evidence, report a question, not a defect.
 
 ## Tests, examples, and documentation
 
+For GPU `propagator` work, two-sparse-operand Taylor and squaring products
+use custom low-level CUDA CSR arithmetic when `cuda_sparse_by_sparse_mex`
+is available. Missing or unloadable platform binaries retain native GPU
+multiplication; storage-layout, computation, and validation failures propagate.
+Exercise both stages and `clean_up` on real and complex GPU arrays, preserving
+its round-to-grid, density, and disable policies. Gateways rebuilt from the current source and the updated Linux binary use
+scalar placeholder expansion for nonempty output construction; the shipped
+Windows binary requires rebuilding to obtain this optimisation. Memory tests
+must include constructor temporaries, not just numerical-kernel workspace.
+
 Select tests from `tests/README.md` and `tests/lib/test_manifest.m`; add a
 focused regression when behaviour changes. Run affected examples when they
 exercise a different regime from the unit tests. Capture assertions and
@@ -44,6 +56,14 @@ examples, and claims against the current source. Do not claim numerical
 coverage for unchanged algorithms merely because the documentation checker
 passes. Use [skill evaluation](skill-evaluation.md) for skill changes.
 
+For `clebsch_gordan`, preserve the preliminary zero filters and the input ceiling.
+Its compensated magnetic recurrence uses native doubles only. Run both unchanged
+`examples/fundamentals/clebsch_gordan/cg_test_*` examples
+at their shipped strict absolute tolerance; also check nonzero tails relatively
+against independent high-precision references, since absolute tolerance alone
+can accept a vanished tiny coefficient. The angular-momentum regression suite
+contains representative reference, tail, exact-zero, and ceiling cases.
+
 ## Review and delivery
 
 Before committing, re-read the checkout `AGENTS.md`, inspect the full diff,
@@ -53,3 +73,7 @@ Address reviewer findings on the actual current head and revalidate affected
 behaviour; a review of an earlier commit is not a review of later changes.
 Follow the repository and user review/merge policy; opening a PR does not
 authorise merging it.
+
+## Cluster-expansion contract checks
+
+Read `cce_capabilities` for supported experiment handles and representations, `cce_options` for public field ownership, and `tests/lib/test_manifest.m` for registered test IDs. Retained internal engine records are not alternative public parameter forms. Preserve physical IDs, complex receiver convention, total elapsed time, both ensemble/reduction orders, and numerical validity/error channels when changing this boundary. Test a new public-field rejection at `clexpn`, not only at a low-level service. Use the existing source-matched regression notes rather than creating a knowledge copy of the test registry.

@@ -1,7 +1,7 @@
 % Generates Hilbert space density matrices and Liouville space state 
 % vectors from their human-readable descriptions. Syntax:
 %
-%              rho=coil_state(spin_system,states,spins,method)
+%              rho=coil_state(spin_system,states,spins)
 %
 % Parameters:
 %
@@ -42,17 +42,10 @@
 %    of projection quantum numbers on all spins; pass an empty spin list,
 %    for example, in a {'1H','1H','14N'} system:
 %
-%                   psi=coil_state(spin_system,[-1/2 1/2 0],[],'exact')
+%                   psi=coil_state(spin_system,[-1/2 1/2 0],[])
 %
-% Method argument has the following effect in sphten-liouv formalism:
-%
-%    'cheap'  - the state vector is generated without
-%               normalisation. For very large spin sys-
-%               tems this is much faster
-%
-%    'exact'  - exact state vector with correct normalisation
-%
-% All four arguments are required; method is ignored in Zeeman formalisms.
+% All three arguments are required. State vectors have correct
+% normalisation in every Liouville-space formalism.
 %
 % The result is unweighted in every formalism. Use state for initial
 % populations weighted by substance concentrations. Wavefunction output is
@@ -70,10 +63,10 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=coil_state.m>
 
-function rho=coil_state(spin_system,states,spins,method)
+function rho=coil_state(spin_system,states,spins)
 
 % Check consistency
-grumble(spin_system,states,spins,method);
+grumble(spin_system,states,spins);
 
 % Reject product states spanning substances
 if iscell(spins), which_subst(spin_system,cell2mat(spins)); end
@@ -96,90 +89,58 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')&&spin_system.bas.nsubst>1
     if isnumeric(spins)
         rho=sparse(spin_system.bas.offsets(end),1);
         for n=1:numel(spins)
-            rho=rho+coil_state(spin_system,{states},{spins(n)},method);
+            rho=rho+coil_state(spin_system,{states},{spins(n)});
         end
         return;
     end
     subst=which_subst(spin_system,cell2mat(spins));
 end
 
-% Get the unit state
-switch spin_system.bas.formalism
+% Get the unit state in Zeeman Liouville space
+if strcmp(spin_system.bas.formalism,'zeeman-liouv')
 
-    case 'sphten-liouv'
-
-        % Build unweighted substance unit coordinates
-        unit=sparse(spin_system.bas.offsets(1:end-1)+1,1,1,...
-                    spin_system.bas.offsets(end),1);
-        if spin_system.bas.nsubst>1
-            unit=sparse(spin_system.bas.offsets(subst)+1,1,1,...
-                        spin_system.bas.offsets(end),1);
-        end
-        
-    case 'zeeman-liouv'
-
-        % Vectorise the unweighted Hilbert identity
-        blocks=cell(spin_system.bas.nsubst,1);
-        for n=1:spin_system.bas.nsubst
-            block=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
-            blocks{n}=block(:);
-        end
-        unit=vertcat(blocks{:});
+    % Vectorise the unweighted Hilbert identity
+    blocks=cell(spin_system.bas.nsubst,1);
+    for n=1:spin_system.bas.nsubst
+        block=speye(prod(spin_system.comp.mults(spin_system.chem.parts{n})));
+        blocks{n}=block(:);
+    end
+    unit=vertcat(blocks{:});
 
 end
 
 % Decide how to proceed
 switch spin_system.bas.formalism
-    
+
     case 'sphten-liouv'
-        
-        % Choose the state vector generation method
-        switch method
-            
-            % Careless normalisation
-            case 'cheap'
-                
-                % Parse the specification
-                [opspecs,coeffs]=human2opspec(spin_system,states,spins);
-                
-                % Allocate the unweighted direct-sum state
-                rho=sparse(spin_system.bas.offsets(end),1);
 
-                % Locate each operator in its hosting descriptor
-                for n=1:numel(opspecs)
-                    active_spins=find(opspecs{n});
-                    if isempty(active_spins)
-                        rho=rho+coeffs(n)*unit;
-                        continue;
-                    end
-                    subst=which_subst(spin_system,active_spins);
-                    descriptor=opspecs{n}(spin_system.chem.parts{subst});
-                    [present,index]=ismember(descriptor,spin_system.bas.basis{subst},'rows');
-                    if ~present
-                        error('the requested state is not present in the basis.');
-                    end
-                    index=index+spin_system.bas.offsets(subst);
-                    rho(index)=rho(index)+coeffs(n);
-                end
-
-            % Careful normalisation
-            case 'exact'
-                
-                % Apply a left side product superoperator to the unit state
-                rho=operator(spin_system,states,spins,'left')*unit;
-            
-            otherwise
-                
-                % Complain and bomb out
-                error('unknown state generation method.');
-                
+        % Parse local tensor descriptors and their operator coefficients
+        [opspecs,coeffs]=human2opspec(spin_system,states,spins);
+        descriptors=vertcat(opspecs{:});
+        if spin_system.bas.nsubst==1, subst=1; end
+        if any(descriptors>=spin_system.comp.mults.^2,'all')
+            error('physically impossible state requested in opspec.');
         end
-        
+
+        % Apply each single-spin left-product table only to its unit coordinate
+        for n=1:size(descriptors,1)
+            for k=find(descriptors(n,:))
+                mult=spin_system.comp.mults(k); index=descriptors(n,k)+1;
+                coeffs(n)=coeffs(n)*spin_system.bas.unit_norm{mult}(index);
+            end
+        end
+
+        % Project directly into the hosting basis without building superoperators
+        parts=spin_system.chem.parts{subst};
+        [present,indices]=hash_ismember(descriptors(:,parts),spin_system.bas.row_hash{subst});
+        rho=sparse(indices(present)+spin_system.bas.offsets(subst),...
+                   ones(nnz(present),1),coeffs(present),spin_system.bas.offsets(end),1);
+
     case 'zeeman-liouv'
 
         % Apply a left side product superoperator to the unit state
-        rho=operator(spin_system,states,spins,'left')*unit; 
-                
+        rho=operator(spin_system,states,spins,'left')*unit;
+
     case 'zeeman-hilb'
         
         % Generate a Hilbert space operator
@@ -215,7 +176,7 @@ end
 end
 
 % Input validation function
-function grumble(spin_system,states,spins,method)
+function grumble(spin_system,states,spins)
 
 if (~isfield(spin_system,'bas'))||(~isfield(spin_system.bas,'formalism'))
     error('basis set information is missing, run basis() before calling this function.');
@@ -226,12 +187,6 @@ end
 if ~ismember(spin_system.bas.formalism,{'zeeman-hilb', 'zeeman-liouv',...
                                         'sphten-liouv','zeeman-wavef'})
     error('unknown formalism specification.');
-end
-
-if ~ischar(method)
-    error('method must be a character string.')
-elseif ~ismember(method, {'cheap', 'exact'})
-    error('unknown method specification.');
 end
 
 if (~(ischar(states)&&ischar(spins)))&&...

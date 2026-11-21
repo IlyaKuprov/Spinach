@@ -25,12 +25,18 @@ inter.chem.parts={1,2,3:4,[]}; inter.chem.concs=[0.7 0.3 0 0];
 reaction=struct('reactants',[1 2],'products',3,'matching',[1 3;2 4],'rate',50);
 inter.chem.reactions={reaction};
 bas.formalism='sphten-liouv'; bas.approximation={'none','none','none','none'};
-s=basis(create(sys,inter),bas); K=kinetics(s,'report');
+sys.output='console'; text=evalc('s=create(sys,inter);'); s.sys.output='hush';
+result=test_true(result,'creation reports reaction transport',...
+                 contains(text,'reaction 1: matched spins')&&contains(text,'closure additive'),...
+                 'create reports reaction maps before basis construction');
+result=test_true(result,'single-argument kinetics',nargin('kinetics')==1,...
+                 'kinetics has no reporting mode argument');
+s=basis(s,bas); K=kinetics(s);
 eta=unit_state(s)+0.1*state(s,'Lz',1)+0.2*state(s,'Lz',2);
-product=coil_state(s,'Lz',3,'exact')+2*coil_state(s,'Lz',4,'exact');
-reference=-50*0.3*(0.7*coil_state(s,'E',1,'exact')+0.1*state(s,'Lz',1))...
-          -50*0.7*(0.3*coil_state(s,'E',2,'exact')+0.2*state(s,'Lz',2))...
-          +10.5*(coil_state(s,'E',3,'exact')+0.1*product);
+product=coil_state(s,'Lz',3)+2*coil_state(s,'Lz',4);
+reference=-50*0.3*(0.7*coil_state(s,'E',1)+0.1*state(s,'Lz',1))...
+          -50*0.7*(0.3*coil_state(s,'E',2)+0.2*state(s,'Lz',2))...
+          +10.5*(coil_state(s,'E',3)+0.1*product);
 result=test_close(result,'T8 additive full source',K(0,eta)*eta,reference,1e-12,0,...
                   'loss follows the reactant spin state; unit arrival is counted once');
 result=test_close(result,'T8 units',chem_concs(s,K(0,eta)*eta),[-10.5 -10.5 10.5 0],1e-12,0,...
@@ -55,7 +61,7 @@ mixed=s; mixed.chem.parts={1,2,[3;4],[]};
 mixed.chem.reactions={struct('reactants',[3 1],'products',[],...
                             'matching',zeros(0,2),'rate',2,'closure','additive')};
 ordinary=kinetics(mixed); mixed.sys.output=1;
-[text,reported]=evalc('kinetics(mixed,''report'');');
+text=evalc('summary_kinetics(mixed);'); reported=kinetics(mixed);
 result=test_true(result,'mixed membership reporting',contains(text,'traced spins [1 3 4]'),...
                  'reporting accepts row and column spin memberships in the same reaction');
 result=test_close(result,'report generator invariance',reported(0,eta),ordinary(0,eta),0,0,...
@@ -97,7 +103,7 @@ result=test_true(result,'T9 sparse first order',issparse(K),'constant first orde
 result=test_close(result,'T9 exchange expm',chem_concs(s,expm(full(K)*0.73)*eta),...
                   [expected' 0 0],1e-11,0,'unit coordinates follow the two-state chemical rate matrix');
 result=test_close(result,'T9 polarisation map',K*state(s,'Lz',1),...
-                  -2*state(s,'Lz',1)+1.4*coil_state(s,'Lz',2,'exact'),1e-12,0,...
+                  -2*state(s,'Lz',1)+1.4*coil_state(s,'Lz',2),1e-12,0,...
                   'matched polarisation moves with its source concentration');
 
 % Time-dependent rates are evaluated at the requested stage time
@@ -139,7 +145,7 @@ result=test_true(result,'zero higher-order matrix',issparse(zero_gen)&&nnz(zero_
 parameters.spins={'1H'}; parameters.offset=0;
 parameters.sweep=100; parameters.npoints=4; parameters.decouple={};
 parameters.rho0=state(inactive,'L+','1H');
-parameters.coil=coil_state(inactive,'L+','1H','exact');
+parameters.coil=coil_state(inactive,'L+','1H');
 zero_fid=liquid(inactive,@acquire,parameters,'nmr');
 inactive.chem.reactions={};
 empty_fid=liquid(inactive,@acquire,parameters,'nmr');
@@ -154,7 +160,7 @@ result=test_true(result,'zero callback stays dynamic',isa(kinetics(inactive),'fu
 inter.chem.reactions={reaction}; inter.chem.reactions{1}.closure='product';
 s=basis(create(sys,inter),bas); K=kinetics(s);
 eta=unit_state(s)+0.1*state(s,'Lz',1)+0.2*state(s,'Lz',2);
-coil=coil_state(s,{'Lz','Lz'},{3,4},'exact');
+coil=coil_state(s,{'Lz','Lz'},{3,4});
 expected=50*0.7*0.3*0.1*0.2;
 result=test_close(result,'T11 product order',(coil'*(K(0,eta)*eta))/(coil'*coil),...
                   expected,1e-10,0,'the matched order receives k*cA*cB*pA*pB');
@@ -165,7 +171,7 @@ result=test_close(result,'T11 additive order',coil'*(K(0,eta)*eta),0,1e-10,0,...
 % Partial tracing destroys unmatched source orders and creates only identity
 traced=struct('reactants',3,'products',1,'matching',[3 1],'rate',2);
 partial=s; partial.chem.reactions={traced}; partial.chem.reactions{1}.closure='additive';
-trace_gen=kinetics(partial); source=coil_state(s,{'Lz','Lz'},{3,4},'exact');
+trace_gen=kinetics(partial); source=coil_state(s,{'Lz','Lz'},{3,4});
 result=test_close(result,'unmatched source trace',trace_gen*source,-2*source,1e-12,0,...
                   'an order involving a traced spin has no product arrival');
 

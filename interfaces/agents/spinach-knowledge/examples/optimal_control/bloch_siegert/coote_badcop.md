@@ -18,4 +18,4 @@ Only BADCOP2 and BADCOP3 add C-beta preservation targets. Their additional 80-po
 
 ## Evaluation observable
 
-The code also optimises a BSS-disabled waveform for each variant. It evaluates both waveforms with BSS physics present over 251 points from 0 to 200 ppm, propagates with `shaped_pulse_xy` and `expv-pwc`, and records final longitudinal magnetisation as `real(Iz' * rho)`. The plotted profiles mark the specified C-beta inversion-band edges.
+The code also optimises a BSS-disabled waveform for each variant. It evaluates both waveforms with BSS physics present over 251 points from 0 to 200 ppm, propagates with `shaped_pulse_xy` and `expv-pwc`, and records final longitudinal magnetisation as `real(Iz' * rho)`. Grey bands in the plotted profiles shade the chemical shifts that have no destination state in the optimisation: 0-5, 37-40, 72-165, and 185-200 ppm for BADCOP1, and 0-5, 80-165, and 185-200 ppm for BADCOP2 and BADCOP3, whose C-beta preservation targets cover 5-80 ppm.

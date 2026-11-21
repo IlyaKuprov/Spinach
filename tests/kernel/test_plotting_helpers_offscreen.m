@@ -23,9 +23,7 @@ result=new_test_result('kernel/plotting_helpers_offscreen',...
                        'plotting helpers must create deterministic graphics objects under invisible offscreen figures.');
 
 % Force invisible figures during the test
-old_visibility=get(groot,'defaultFigureVisible');
-set(groot,'defaultFigureVisible','off');
-cleaner=onCleanup(@()local_cleanup(old_visibility));
+cleaner=test_graphics(); %#ok<NASGU>
 
 % Build a minimal spin-system structure used only by plotting routines
 spin_system=local_plot_system();
@@ -395,15 +393,6 @@ function spectrum=local_spectrum_2d(nrows,ncols)
 pos_peak=exp(-8*((row_grid-0.30).^2+(col_grid+0.20).^2));
 neg_peak=0.75*exp(-10*((row_grid+0.25).^2+(col_grid-0.35).^2));
 spectrum=pos_peak-neg_peak;
-
-end
-
-
-function local_cleanup(old_visibility)
-
-% Restore figure state after success or failure
-close all force;
-set(groot,'defaultFigureVisible',old_visibility);
 
 end
 

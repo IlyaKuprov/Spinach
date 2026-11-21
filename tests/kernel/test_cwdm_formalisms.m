@@ -50,7 +50,7 @@ for formalism={'zeeman-liouv','zeeman-hilb','zeeman-wavef'}
 end
 
 % Store local pure kets without assigning concentrations to their amplitudes
-ket=coil_state(s,[0.5 0.5 0.5],[],'exact');
+ket=coil_state(s,[0.5 0.5 0.5],[]);
 result=test_close(result,'unweighted wavefunction storage',ket,[1;0;1;0;0;0;1],0,0,...
                   'each substance stores its own product ket, including the scalar empty block');
 rejected=false;

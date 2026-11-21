@@ -9,7 +9,7 @@ Simulates a DANTE MAS spectrum of one quadrupolar 14N nucleus using a one-dimens
 
 ## Spin system and rotor sampling
 
-The field parameter is 18.8 and the quadrupolar interaction is constructed as `eeqq2nqi(1.18e6, 0.50, 1, [0 0 0])`; the source does not state units for these interaction arguments. The simulation uses the full spherical-tensor Liouville basis, `singlerot` with the DANTE callback in the lab frame, rate 62.5e3, rotor axis `[1,1,1]`, maximum rank 35, and grid `rep_2ang_200pts_sph`. The selected rotating-frame order is 2. No gradient is configured.
+The field parameter is 18.8 and the quadrupolar interaction is constructed as `eeqq2nqi(1.18e6, 0.50, 1, [0 0 0])`; the source does not state units for these interaction arguments. The simulation uses the full spherical-tensor Liouville basis, `singlerot` with the DANTE callback in the lab frame, rate 62.5e3, rotor axis `[sqrt(2/3) 0 sqrt(1/3)]`, maximum rank 35, and grid `rep_2ang_200pts_sph`. The selected rotating-frame order is 2. No gradient is configured.
 
 ## DANTE acquisition and processing
 

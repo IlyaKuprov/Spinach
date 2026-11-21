@@ -20,14 +20,14 @@ if isworkernode, return; end
 % Inform the user
 disp('Running startup checks...');
 
-%##########################################
-% NO, IT WILL NOT MAGICALLY START WORKING %
-%     IF YOU COMMENT ANY OF THIS OUT      %
-%##########################################
+%##########################################%
+% THINGS WILL BREAK IN TERRIBLE, INSIDIOUS %
+%  WAYS IF YOU COMMENT OUT ANYTHING BELOW  %
+%##########################################%
 
 % Global Matlab release
-if isMATLABReleaseOlderThan('R2026a')
-    error('Spinach requires Matlab R2026a or later.');
+if isMATLABReleaseOlderThan('R2026b')
+    error('Spinach requires Matlab R2026b or later.');
 end
 
 % Existential toolboxes

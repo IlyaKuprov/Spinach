@@ -18,7 +18,7 @@ The kernel entry point constructs the `spin_system` object used by the rest of S
 1. Startup checks and configuration establish output and scratch destinations, run the available validation hooks, configure tolerances and enabled features, and prepare parallel/cache/GPU-related settings when requested.
 2. Particle metadata is absorbed: isotope labels and particle count, spin versus bosonic-mode classification, multiplicities, gyromagnetic ratios, magnet field, and base frequencies `-gamma*magnet`.
 3. Optional bosonic-mode specifications populate per-mode frequency, carrier, anharmonicity, damping, thermal occupation, and dephasing data, then pair-coupling and modulation data. If modes are present without mode interaction data, the source reports that zero couplings are assumed.
-4. One-particle magnetic terms are assembled from susceptibility contributions and the supplied Zeeman eigenvalue/Euler-angle, matrix, or scalar forms; electron g-tensors and nuclear ppm shifts are converted using the base frequencies. Giant-spin coefficients are absorbed where present.
+4. One-particle magnetic terms are assembled from susceptibility contributions (each point-dipole paramagnetic shift tensor `D*chi` from `xyz2pms` is added transposed, because Spinach applies Zeeman tensors as `B*Z*S`) and the supplied Zeeman eigenvalue/Euler-angle, matrix, or scalar forms; electron g-tensors and nuclear ppm shifts are converted using the base frequencies. Giant-spin coefficients are absorbed where present.
 5. Chemistry, concentrations, exchange/flux settings, and order matrices are absorbed, with defaults where the source specifies them.
 6. Coordinates and optional periodic-boundary vectors are absorbed and passed to `dipolar` for dipolar couplings. If coordinates are absent, the source assumes zero point-dipolar interactions and initialises an identity proximity matrix. User-specified pair couplings are then added.
 7. Relaxation and radical-pair recombination specifications are absorbed and reported.
@@ -50,10 +50,26 @@ Absent `inter.chem.parts` defaults to a single block containing all spins. A sin
 
 `inter.chem` accepts `parts`, `concs`, and `reactions`. Each reaction is a scalar structure with row-vector `reactants` and `products`, a two-column global-spin `matching` table, and a finite non-negative scalar `rate` or time function handle. Repeated substance indices encode stoichiometry; empty products encode untracked loss. Matched spins must belong to the declared sides, have identical isotopes, and appear at most once per matching column. Unmatched source spins are traced out and unmatched product spins arrive unpolarised when the generator is compiled.
 
-`closure` is `additive` by default or `product`. Optional selectors apply to a single first-order reactant: a named singlet/triplet (including Jones–Hore channel variants) with two distinct electron indices, or a pair of finite square product superoperators of equal size. Their basis dimensions are resolved by generator compilation, not by create. Legacy `rates`, `flux_rate`, `flux_type`, `rp_theory`, `rp_rates`, and `rp_electrons` inputs raise `Spinach:create:retiredChemistry` naming the replacement record format.
+`closure` is `additive` by default or `product`. Optional selectors apply to a single first-order reactant: a named singlet/triplet (including Jones–Hore channel variants) with two distinct electron indices, or a pair of finite square product superoperators of equal size. Their basis dimensions are resolved by generator compilation, not by create. Legacy `rates`, `rp_theory`, `rp_rates`, and `rp_electrons` inputs raise `Spinach:create:retiredChemistry` naming the replacement record format.
+
+The original paired `inter.flux_rate`/`flux_type` inputs remain supported. Matrix entry `(from,to)` gives a directed spin flux in Hz and must be a finite real two-dimensional square matrix; type is `intramolecular` or `intermolecular`. These inputs contribute through relaxation in `sphten-liouv`, independently of reaction records. Creation reports their nonzero rates and type only when `'flux'` is explicitly selected in `inter.relaxation`; inactive inputs produce no flux summary.
 
 Concentrations must be a finite, real, non-negative vector with one entry per substance, including spin-free substances. Zero concentrations are valid.
 
 ## Explicit NZ evaluation point
 
 `inter.nz_shift` must be an explicit finite scalar with non-negative real part. The former `'chem'` request is rejected by `create`: a general reaction network does not specify a unique scalar lifetime. For a legacy exponential radical-pair model use the summed channel rates; for the legacy Haberkorn/Jones–Hore scalar approximation use half their sum, stating that approximation explicitly in the example. `relaxation` uses the supplied scalar without reading retired radical-pair fields.
+
+## GPU allocation caching
+
+With GPU arithmetic enabled, `create` sets the selected GPU's `CachePolicy` to `minimum` on the client and every pool worker. This applies even when `hygiene` is disabled and limits retained allocation-cache blocks across experiments and powder orientations. The cache-policy assignment does not reset live GPU arrays; the existing optional hygiene reset remains separate. Selecting or resetting a device afterwards restores MATLAB's default policy, so call `create` again to reapply it.
+
+## ValueStore cache preservation
+
+When reusing a parallel pool, `create` clears its ValueStore only if none of `op_cache`, `ham_cache`, or `prop_cache` is enabled in `sys.enable`. Enabling any of these options preserves the entire existing store across spin-system construction.
+
+## MATLAB release maintenance
+
+Use current patched R2026b or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.
+
+Point-to-point flux inputs are inter.flux_rate and inter.flux_type, stored under spin_system.rlx. Their presence does not automatically select flux relaxation: include 'flux' in inter.relaxation to activate the contribution.

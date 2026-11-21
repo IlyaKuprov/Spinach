@@ -16,6 +16,9 @@ The spin-system and Hamiltonian inputs supply the eigensystem calculation at new
 
 For each matched transition, the triangle integrator takes the arithmetic mean of the three vertex linewidths `tw`. It forms the three vertex intensity products `tm * tj * pd`, discards non-finite products, and averages the remaining values for the transition amplitude. It then evaluates the Lorentzian-convolved triangle contribution on `b_axis` and multiplies it by the spherical triangle area from `sphtarea`. Thus the vertex factors are averaged over the corners and the triangle's spherical area supplies its integration weight; this routine does not divide by a grid-weight sum or by the full-sphere area. `tm`, `tj`, and `pd` are source-provided factors, not a grid generated here.
 
+A transition without partners at all three corners is retained as a vertex Lorentzian with its own width and finite `tm*tj*pd`, weighted by one third of the triangle area. An empty corner therefore removes only that corner's contribution, not the complete triangle. This conservative fallback becomes ordinary vertex quadrature when all identities are unmatched; fully matched triangles retain their existing interpolation.
+
+
 ## Adaptive spherical subdivision
 
 The code bisects the three spherical edges, evaluates the three midpoint eigensets, and forms four child triangles. Let `spec_dir` be the direct triangle estimate and `spec_sub` the sum over those four child estimates. The corrected estimate is `(4*spec_sub-spec_dir)/3`. If `norm(spec_dir-spec_sub,2)` exceeds the absolute tolerance `parameters.int_tol`, the routine recursively integrates the four children and sums their results; otherwise it returns the corrected estimate. The recursion therefore adapts the supplied triangle, rather than sampling a new orientation grid. The four recursive branches may be dispatched asynchronously by MATLAB parallel futures.

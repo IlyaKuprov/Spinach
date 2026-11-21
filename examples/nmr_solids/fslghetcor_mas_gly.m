@@ -42,12 +42,12 @@ spin_system=basis(spin_system,bas);
 
 % Start with Lz of 1H, detect in quadrature on 13C
 parameters.rho0=state(spin_system,'Lz','1H');
-parameters.coil=coil_state(spin_system,'L+','13C','exact');
+parameters.coil=coil_state(spin_system,'L+','13C');
 
 % Experiment setup
 parameters.spins={'1H','13C'};
 parameters.rate=10000;
-parameters.axis=[1 1 1];
+parameters.axis=[sqrt(2/3) 0 sqrt(1/3)];
 parameters.max_rank=7;
 parameters.grid='rep_2ang_100pts_sph';
 parameters.offset=[2e3 1e4];      % Hz
@@ -58,7 +58,6 @@ parameters.sweep=[NaN 1/(33e-6)]; % f1 f2
 parameters.npoints=[128 512];     % f1 f2
 parameters.zerofill=[512 2048];   % f1 f2
 parameters.nblocks=4;             % Number of FSLG blocks
-parameters.verbose=1;
 parameters.invert_axis=1;
 
 % Simulation

@@ -15,7 +15,8 @@
 %
 %     spin_system   - primary Spinach data structure, updated with
 %                     local basis{n}, nstates, N+1 zero-based offsets,
-%                     tot_proj{n}, tot_cord{n}, sym_fact(n), and basis_hash
+%                     tot_proj{n}, tot_cord{n}, sym_fact(n), basis_hash, and
+%                     row_hash{n} (one 32-character MD5 per full basis row)
 %
 % Note: it is important to understand the factors that influence basis set
 %       selection in spin dynamics simulations - see our paper
@@ -41,6 +42,7 @@ spin_system.bas=bas;
 nsubst=numel(spin_system.chem.parts);
 spin_system.bas.nsubst=nsubst;
 spin_system.bas.basis=cell(nsubst,1);
+spin_system.bas.row_hash=repmat({repmat(' ',0,32)},nsubst,1);
 spin_system.bas.nstates=zeros(nsubst,1);
 spin_system.bas.tot_proj=cell(nsubst,1);
 spin_system.bas.tot_cord=cell(nsubst,1);
@@ -134,6 +136,15 @@ for s=1:nsubst
             descriptor=substance_basis(local_system,local_bas);
         end
         spin_system.bas.basis{s}=descriptor;
+
+        % Cache full descriptor row hashes in the same substance-local order
+        row_hash=repmat(' ',size(descriptor,1),32);
+        parfor k=1:size(descriptor,1)
+            row_hash(k,:)=md5_hash(full(descriptor(k,:)));
+        end
+        spin_system.bas.row_hash{s}=row_hash;
+
+        % Record state counts and quantum-number totals
         spin_system.bas.nstates(s)=size(descriptor,1);
         [L,M]=lin2lm(descriptor);
         spin_system.bas.tot_proj{s}=full(sum(M,2));
@@ -153,6 +164,7 @@ for s=1:nsubst
                   'segmented Zeeman symmetry is not implemented.');
         end
         local_system.bas.basis=spin_system.bas.basis(s);
+        local_system.bas.row_hash=spin_system.bas.row_hash(s);
 
         % Build the stock Zeeman labels only for the local SALC calculation
         if ~strcmp(bas.formalism,'sphten-liouv')&&...
@@ -167,6 +179,13 @@ for s=1:nsubst
                 descriptor=[repmat(descriptor,[dim 1]) kron(descriptor,ones(dim,1))];
             end
             local_system.bas.basis={descriptor};
+
+            % Keep temporary Zeeman symmetry descriptors paired with their hashes
+            row_hash=repmat(' ',size(descriptor,1),32);
+            parfor k=1:size(descriptor,1)
+                row_hash(k,:)=md5_hash(full(descriptor(k,:)));
+            end
+            local_system.bas.row_hash={row_hash};
         end
 
         % Store the local irreducible projectors without retaining Zeeman labels
@@ -196,6 +215,9 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     % Preallocate the structure table arrays
     spin_system.bas.lpst=cell(max(unique_mults),1);
     spin_system.bas.rpst=cell(max(unique_mults),1);
+    spin_system.bas.lp_offsets=cell(max(unique_mults),1);
+    spin_system.bas.rp_offsets=cell(max(unique_mults),1);
+    spin_system.bas.unit_norm=cell(max(unique_mults),1);
 
     % Fill the arrays
     for n=setdiff(unique_mults,1)
@@ -203,11 +225,18 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         % Load from disk or compute
         [lpst,rpst]=ist_product_table(n);
 
-        % Left product structure table
+        % Group product records by operator descriptor
+        lpst=sortrows(lpst,[1 3 2]); rpst=sortrows(rpst,[1 3 2]);
         spin_system.bas.lpst{n}=lpst;
-
-        % Right product structure table
         spin_system.bas.rpst{n}=rpst;
+
+        % Index contiguous descriptor slices without scanning product tables
+        spin_system.bas.lp_offsets{n}=[0;cumsum(accumarray(lpst(:,1),1,[n^2 1]))];
+        spin_system.bas.rp_offsets{n}=[0;cumsum(accumarray(rpst(:,1),1,[n^2 1]))];
+
+        % Extract the detection-state normalisation once per multiplicity
+        unit_rows=lpst(:,2)==1&lpst(:,1)==lpst(:,3);
+        spin_system.bas.unit_norm{n}=accumarray(lpst(unit_rows,1),lpst(unit_rows,4),[n^2 1]);
 
     end
 
@@ -824,7 +853,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
 
     % Eliminate redundant states using a hash table
     report(spin_system,'eliminating redundant states...');
-    basis_spec=unihash(basis_spec);
+    basis_spec=hash_unique(basis_spec);
 
     % Sort the basis explicitly
     report(spin_system,'sorting the basis...');
@@ -1089,4 +1118,5 @@ end
 % make it worth defending".
 %
 % http://www.theregister.co.uk/2009/02/09/woudhuysen_energise_1/
+
 

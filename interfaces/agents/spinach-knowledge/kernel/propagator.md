@@ -10,7 +10,7 @@ Returns `P=exp(-1i*L*timestep)`. `L` is a numeric square Hamiltonian or Liouvill
 
 ## Numerical path
 
-For matrices with dimension below `spin_system.tols.small_matrix`, it calls MATLAB `expm`. Otherwise it evaluates a scaled Taylor series, cleans intermediate terms using `spin_system.tols.prop_chop`, and squares the result to undo scaling. The exact scaling is selected from the computed matrix norm. The source also contains a GPU branch when the `gpu` option is enabled and the dimension exceeds 500; this describes code routing, not a hardware-validation result.
+For matrices with dimension below `spin_system.tols.small_matrix`, it calls MATLAB `expm`. Otherwise it evaluates a scaled Taylor series, cleans intermediate terms using `spin_system.tols.prop_chop`, and squares the result to undo scaling. The exact scaling is selected from the computed matrix norm. GPU Taylor evaluation is selected when the `gpu` option is enabled and the dimension exceeds 500; GPU squaring is selected whenever that option is enabled and squarings are required. In both stages, products of two sparse GPU matrices explicitly call `cuda_sparse_by_sparse` using custom low-level CUDA CSR arithmetic and bounded shared-memory accumulators. The helper falls back to native GPU multiplication if its platform MEX is missing or MATLAB cannot load it; internal-layout, computation, and validation errors propagate. Dense and mixed sparse/dense products retain ordinary MATLAB multiplication. Terms are cleaned on the GPU by the same `clean_up` rounding and density policy as on the CPU; Taylor accumulation and the returned propagator remain on the CPU. These statements describe routing, not a hardware-validation result.
 
 ## Caching and side effects
 

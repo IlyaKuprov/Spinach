@@ -46,13 +46,13 @@ for n=1:numel(operators)
                      'every stored nonzero lies within one offsets block');
 end
 
-% Check both exact and cheap coil constructors on every individual spin
-for method={'exact','cheap'}
+% Check exact coil construction on every individual spin
+for method={'exact'}
     for n=1:2
         rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
         outside=setdiff(1:s.bas.offsets(end),rows);
         for k=s.chem.parts{n}
-            coil=coil_state(s,'L+',k,method{1});
+            coil=coil_state(s,'L+',k);
             result=test_true(result,['coil ' method{1} ' ' int2str(k)],...
                              nnz(coil(outside))==0&&nnz(coil(rows))>0,...
                              'a detection state occupies only its hosting substance');
@@ -101,7 +101,7 @@ for side={'left','right','acomm','comm'}
 end
 
 % Identity factors retain their selected block and per-spin multiplicity
-for method={'cheap','exact','chem'}
+for method={'exact','chem'}
     weights=s.chem.concs;
     for n=1:2
         expected=sparse(s.bas.offsets(n)+1,1,weights(n),s.bas.offsets(end),1);
@@ -128,7 +128,7 @@ for method={'cheap','exact','chem'}
 end
 
 % Level projectors retain the hosting block throughout their tensor expansion
-for method={'cheap','exact','chem'}
+for method={'exact','chem'}
     for n=1:2
         spins=s.chem.parts{n}; rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
         local_sys=sys; local_sys.isotopes=sys.isotopes(spins);

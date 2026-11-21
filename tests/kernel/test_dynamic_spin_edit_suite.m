@@ -327,6 +327,8 @@ spin_system.rlx.srfk_mdepth=[];
 spin_system.rlx.weiz_r1d=[];
 spin_system.rlx.weiz_r2d=[];
 spin_system.rlx.srsk_sources=[1 3];
+spin_system.rlx.flux_rate=[];
+spin_system.rlx.flux_type='';
 
 % Define chemistry arrays affected by spin removal
 spin_system.chem.parts={[1 2 3]};

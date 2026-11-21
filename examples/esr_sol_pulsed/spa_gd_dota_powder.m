@@ -44,7 +44,7 @@ for n=1:numel(W)
     % Sequence parameters
     parameters.spins={'E8'};
     parameters.rho0=state(spin_system,'Lz','E8');
-    parameters.coil=coil_state(spin_system,'L+','E8','exact');
+    parameters.coil=coil_state(spin_system,'L+','E8');
     parameters.decouple={};
     parameters.offset=0;
     parameters.sweep=0.8e10;
@@ -55,7 +55,6 @@ for n=1:numel(W)
     parameters.derivative=0;
     parameters.invert_axis=0;
     parameters.rframes={{'E8',3}};
-    parameters.verbose=0;
     
     % Soft pulse parameters
     parameters.pulse_rnk=2;

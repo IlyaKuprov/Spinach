@@ -12,6 +12,6 @@ This example computes a powder MAS spectrum for one quadrupolar `2H` nucleus. Th
 
 The source header identifies Fokker–Planck theory and says perturbative corrections to the rotating-frame transformation are not applied. The code's actual simulation call is `singlerot(spin_system,@acquire,parameters,'nmr')`, not `floquet` or `gridfree`; the page therefore distinguishes the stated formalism from the invoked routine. The source estimates seconds for calculation time, not a measured runtime.
 
-The rotor axis is `[1 1 1]` and rate `1000 Hz`; powder settings are `leb_2ang_rank_17` and `max_rank=17`. Acquisition uses a `2e4 Hz` sweep, 512 points, zero-fill 4096, offset 0, and ppm axis units; it selects `2H`, leaves `decouple={}`, and sets `invert_axis=1`. Both initial state and receiver are `L+` on `2H`.
+The rotor axis is `[sqrt(2/3) 0 sqrt(1/3)]` and rate `1000 Hz`; powder settings are `leb_2ang_rank_17` and `max_rank=17`. Acquisition uses a `2e4 Hz` sweep, 512 points, zero-fill 4096, offset 0, and ppm axis units; it selects `2H`, leaves `decouple={}`, and sets `invert_axis=1`. Both initial state and receiver are `L+` on `2H`.
 
 The returned FID is exponentially apodised with parameter `6`, Fourier transformed with `fftshift(fft(fid,parameters.zerofill))`, and the real spectrum is plotted using `plot_1d`. This is a computed spectrum; the source does not provide experimental measured output or a numerical comparison.

@@ -4,4 +4,4 @@ A small radical-pair model with two electrons and a nucleus demonstrates transpo
 
 The initial electron singlet is scaled to unit concentration. Constant-generator evolution returns species populations and an unweighted nuclear-product signal. The example reports concentration balance and the final product polarisation and plots both population and polarisation trajectories.
 
-Detection and reference operator vectors explicitly use the `exact` method of the four-argument `coil_state` primitive.
+Detection and reference operator vectors use the three-argument unweighted `coil_state` primitive.

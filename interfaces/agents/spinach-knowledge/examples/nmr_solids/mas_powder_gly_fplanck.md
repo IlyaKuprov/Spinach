@@ -12,7 +12,7 @@ This example constructs a computed 13C MAS spectrum for glycine powder. Its head
 
 ## MAS acquisition and spectrum
 
-The source sets the rotor axis to `[1 1 1]`, MAS rate to `2000 Hz` (2 kHz), powder grid `leb_2ang_rank_23`, and `max_rank=23`. Acquisition uses a `5e4 Hz` sweep and 256 points, zero-fills to 1024, and sets `offset=17000`; the script does not assign `axis_units`. Both initial state and receiver are `L+` on `13C`, and the selected observed spin is `13C`.
+The source sets the rotor axis to `[sqrt(2/3) 0 sqrt(1/3)]`, MAS rate to `2000 Hz` (2 kHz), powder grid `leb_2ang_rank_23`, and `max_rank=23`. Acquisition uses a `5e4 Hz` sweep and 256 points, zero-fills to 1024, and sets `offset=17000`; the script does not assign `axis_units`. Both initial state and receiver are `L+` on `13C`, and the selected observed spin is `13C`.
 
 The code calls `singlerot`, applies exponential apodisation with parameter `6`, computes `fftshift(fft(fid,parameters.zerofill))`, and plots `real(spectrum)` with `plot_1d`. The output is a simulation spectrum; this source does not supply experimentally measured output or report a numerical comparison.
 

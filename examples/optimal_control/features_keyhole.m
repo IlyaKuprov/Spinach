@@ -64,15 +64,15 @@ control.operators={LxH,LyH,LxC,LyC,LxF,LyF};      % Control operators
 control.rho_init={rho_init};                      % Starting state
 control.rho_targ={rho_targ};                      % Destination state
 control.pwr_levels=2*pi*linspace(0.8e3,1.2e3,5);  % Pulse powers, rad/s
-control.pulse_dt=2e-4*ones(1,50);                 % Interval durations
-control.penalties={'SNS'};                        % Penalty
-control.p_weights=100;                            % Penalty weight
+control.pulse_dt=1e-4*ones(1,100);                % Interval durations
+control.penalties={'NS','SNS'};                   % Penalty
+control.p_weights=[0.1 100];                      % Penalty weight
 control.method='lbfgs';                           % Optimisation method
 control.max_iter=200;                             % Termination condition
 
 % Set the keyhole
-control.keyholes=cell(1,50);
-control.keyholes{20}=@(rho)correlation(spin_system,rho,2,'all');
+control.keyholes=cell(1,100);
+control.keyholes{40}=@(rho)correlation(spin_system,rho,2,'all');
 
 % Plots during optimisation
 control.plotting={'correlation_order','local_each_spin',...
@@ -82,7 +82,7 @@ control.plotting={'correlation_order','local_each_spin',...
 spin_system=optimcon(spin_system,control);
 
 % Initial guess
-guess=randn(6,50)/3;
+guess=randn(6,100)/3;
 
 % Run the optimal control procedure
 pulse=fmaxnewton(spin_system,@grape_xy,guess);

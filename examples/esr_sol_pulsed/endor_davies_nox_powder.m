@@ -47,11 +47,10 @@ spin_system=basis(spin_system,bas);
 % Sequence parameters
 parameters.spins={'E','14N'};
 parameters.rho0=state(spin_system,'Lz','E');
-parameters.coil=coil_state(spin_system,'L+','E','exact');
+parameters.coil=coil_state(spin_system,'L+','E');
 parameters.grid='rep_2ang_12800pts_sph';
 parameters.offset=[-2e8 0];
 parameters.method='expm';
-parameters.verbose=0;
 
 % Electron pulse parameters
 parameters.e_rnk=2;

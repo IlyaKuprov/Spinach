@@ -54,7 +54,7 @@ for n=1:2
 end
 
 % Reject chemistry fields inserted after create even when empty
-for field={'rates','flux_rate','flux_type','rp_theory','rp_rates','rp_electrons'}
+for field={'rates','rp_theory','rp_rates','rp_electrons'}
     bad=s; bad.chem.(field{1})=[]; rejected=false;
     try
         kinetics(bad);

@@ -461,28 +461,17 @@ switch spin_system.bas.formalism
                             % Inform the user
                             report(spin_system,'propagating the system on GPU...');
                             
-                            % Move propagator to GPU
-                            P=gpuArray(P);
-                            
-                            % Loop over stack elements
-                            for n=2:size(rho_loc,2)               % done this way because sparse gpuArrays
-                                                                  % cannot be indexed into in R2017b - IK
-                                % Get the current state vector
-                                rho_cur=rho_loc(:,n);
-                                
-                                % Move it to GPU
-                                rho_cur=gpuArray(rho_cur);
-                                
-                                % Propagate it
-                                for k=2:n
-                                    rho_cur=P*rho_cur;
-                                end
-                                
-                                % Gather and reassign
-                                rho_loc(:,n)=gather(rho_cur);
-                                
+                            % Move the propagator and full state stack to GPU
+                            P=gpuArray(P); rho_loc=gpuArray(full(rho_loc));
+
+                            % Propagate each remaining column by one step
+                            for n=2:size(rho_loc,2)
+                                rho_loc(:,n:end)=P*rho_loc(:,n:end);
                             end
-                            
+
+                            % Retrieve the propagated state stack
+                            rho_loc=gather(rho_loc);
+
                         else
                             
                             % Inform the user
@@ -1010,4 +999,5 @@ end
 % independence.
 %
 % Ayn Rand, "The Fountainhead"
+
 

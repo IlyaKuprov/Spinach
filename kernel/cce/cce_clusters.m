@@ -1,4 +1,4 @@
-% Compile a downward-closed family of physical bath groups. Syntax:
+% Compile cluster families of physical bath groups. Syntax:
 %
 %             clusters=cce_clusters(model,graph,parameters)
 %
@@ -13,7 +13,8 @@
 % Output is sorted by (order,group IDs); proper_subsets are array indices,
 % mobius_power is signed int64, dimension includes the observed-spin system,
 % and bath_dimension excludes it. Empty-cluster raw data are separate.
-% All nonempty subsets are retained, including disconnected subsets.
+% All nonempty subsets are retained, including disconnected subsets, except
+% periodic_segments, which keeps only connected segments of one cycle.
 % selected_counts, actual_counts, and cap_overrun report closure costs;
 % family_id is the exact canonical family string, not a collision-prone
 % numeric hash. config_id=0 denotes the shared unconditioned spin_config.
@@ -68,19 +69,25 @@ family_bytes=metadata.bytes/numel(prototype)+8*(max_order+1);
 check_storage(ng);
 
 % Collapse physical graph edges and scores onto group vertices
-adjacency=false(ng);
-scores=zeros(ng);
-for a=1:ng
-    for b=a+1:ng
+if all(cellfun(@isscalar,groups))
+    [~,positions]=ismember([groups{:}],graph.bath_ids);
+    adjacency=graph.adjacency(positions,positions);
+    scores=graph.scores(positions,positions);
+else
+    [~,positions]=ismember([groups{:}],graph.bath_ids);
+    positions=mat2cell(positions,1,cellfun(@numel,groups));
+    adjacency=false(ng);
+    scores=zeros(ng);
+    for a=1:ng
+        for b=a+1:ng
 
-        % Preserve any physical connection between the composite groups
-        [~,ia]=ismember(groups{a},graph.bath_ids);
-        [~,ib]=ismember(groups{b},graph.bath_ids);
-        adjacency(a,b)=any(graph.adjacency(ia,ib),'all');
-        adjacency(b,a)=adjacency(a,b);
-        scores(a,b)=sum(graph.scores(ia,ib),'all');
-        scores(b,a)=scores(a,b);
+            % Preserve physical connections and sum scores between composite groups
+            adjacency(a,b)=any(graph.adjacency(positions{a},positions{b}),'all');
+            adjacency(b,a)=adjacency(a,b);
+            scores(a,b)=sum(graph.scores(positions{a},positions{b}),'all');
+            scores(b,a)=scores(a,b);
 
+        end
     end
 end
 
@@ -150,9 +157,13 @@ for order=1:max_order
 
 end
 
-% Close the selected family by successive immediate-subset deletion
+% Close the selected family unless the model uses only periodic segments
 family=selected;
-for order=max_order:-1:2
+closure_order=max_order;
+if strcmp(parameters.expansion,'periodic_segments')
+    closure_order=1;
+end
+for order=closure_order:-1:2
 
     % Add immediate subsets and remove duplicate group combinations
     rows=family(cellfun(@numel,family)==order);
@@ -180,6 +191,12 @@ for k=1:numel(family)
 end
 [~,permutation]=sortrows(padded);
 family=family(permutation);
+
+% Index each sorted group list once for subsequent subset and selection lookups
+keys=cellfun(@(ids)string(sprintf('%u,',ids)),family);
+selected_keys=cellfun(@(ids)string(sprintf('%u,',ids)),selected);
+selected_mask=ismember(keys,selected_keys);
+index=dictionary(keys,(1:numel(family)).');
 
 % Bound decimal family signatures, including old/new concatenation copies
 physical_digits=1;
@@ -224,15 +241,17 @@ entry=struct('id',uint64(0),'groups',[],'sites',[],'order',0,'dimension',1,...
              'bath_dimension',1,'proper_subsets',[],'direct_children',[],...
              'mobius_power',int64(0),'connected_components',{{}},...
              'config_id',uint64(0),'inclusion_reason','','weight',0,...
-             'family_id',family_id,'selected_counts',selected_counts,...
+             'family_id','','selected_counts',selected_counts,...
              'actual_counts',actual_counts,'cap_overrun',cap_overrun);
 metadata=whos('entry');
-bytes=3*numel(family)*(metadata.bytes+16*numel(family)+...
-      8*(4*max_order+3*numel(model.bath_ids)));
+subset_limit=min(numel(family),2^max_order-1);
+bytes=6*characters+3*numel(family)*(metadata.bytes+16*subset_limit+...
+                                  8*(4*max_order+3*numel(model.bath_ids)));
 if ~isfinite(bytes)||bytes>budget
     error('cce_clusters:memory',...
           'Cluster records and subset maps exceed numerics.max_memory_bytes.');
 end
+entry.family_id=family_id;
 clusters=repmat(entry,numel(family),1);
 
 % Build canonical physical cluster metadata and subset index maps
@@ -253,15 +272,26 @@ for k=1:numel(family)
         error('cce_clusters:dimension','Hilbert dimension exceeds exact double integer range.');
     end
 
-    % Store every proper nonempty subset, not only immediate children
-    subset=false(1,k-1);
-    for j=1:k-1
-        subset(j)=all(ismember(family{j},family{k}));
+    % Find each proper subset in the closed family without scanning other clusters
+    subsets=[];
+    for order=1:clusters(k).order-1
+        rows=nchoosek(family{k},order);
+        subkeys=strings(size(rows,1),1);
+        for n=1:size(rows,1)
+            subkeys(n)=string(sprintf('%u,',rows(n,:)));
+        end
+        if strcmp(parameters.expansion,'periodic_segments')
+            subkeys=subkeys(isKey(index,subkeys));
+        end
+        children=sort(index(subkeys)).';
+        subsets=[subsets children]; %#ok<AGROW>
     end
-    clusters(k).proper_subsets=find(subset);
-    clusters(k).direct_children=find(subset&[clusters(1:k-1).order]==clusters(k).order-1);
+    clusters(k).proper_subsets=subsets;
+    if clusters(k).order>1
+        clusters(k).direct_children=children;
+    end
     clusters(k).inclusion_reason='closure';
-    if any(cellfun(@(x)isequal(x,family{k}),selected))
+    if selected_mask(k)
         clusters(k).inclusion_reason='selected';
     end
     clusters(k).weight=sum(scores(family{k},family{k}),'all')/2;
@@ -285,21 +315,18 @@ for k=1:numel(family)
 end
 
 % Compute signed inclusion-exclusion powers with checked int64 arithmetic
+powers=ones(1,numel(clusters),'int64');
 for k=numel(clusters):-1:1
 
-    % Subtract contributions from all already processed superclusters
-    power=int64(1);
-    for j=k+1:numel(clusters)
-        if ismember(k,clusters(j).proper_subsets)
-            term=clusters(j).mobius_power;
-            if (term>0&&power<intmin('int64')+term)||...
-               (term<0&&power>intmax('int64')+term)
-                error('cce_clusters:overflow','Mobius coefficient exceeds signed int64 range.');
-            end
-            power=power-term;
-        end
+    % Propagate each supercluster contribution only to its actual subsets
+    term=powers(k);
+    subsets=clusters(k).proper_subsets;
+    if (term>0&&any(powers(subsets)<intmin('int64')+term))||...
+       (term<0&&any(powers(subsets)>intmax('int64')+term))
+        error('cce_clusters:overflow','Mobius coefficient exceeds signed int64 range.');
     end
-    clusters(k).mobius_power=power;
+    powers(subsets)=powers(subsets)-term;
+    clusters(k).mobius_power=term;
 
 end
 
@@ -346,7 +373,7 @@ if ~isstruct(parameters)||~isscalar(parameters)||...
    ~isnumeric(parameters.order)||~isreal(parameters.order)||...
    ~isscalar(parameters.order)||~isfinite(parameters.order)||...
    parameters.order<0||parameters.order~=fix(parameters.order)||...
-   ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter'})
+   ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter','periodic_segments'})
     error('cce_clusters:parameters','nonnegative order and explicit expansion are required.');
 end
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
@@ -367,6 +394,14 @@ if isfield(parameters,'groups')&&~isempty(parameters.groups)
     ng=numel(parameters.groups);
 else
     ng=n;
+end
+if strcmp(parameters.expansion,'periodic_segments')
+    [~,~,components,~]=dmperm(speye(n)+graph.adjacency);
+    if n<3||any(sum(graph.adjacency,2)~=2)||numel(components)~=2||...
+       parameters.order<1||parameters.order>=n||...
+       any(isfield(parameters,{'groups','clusters','cluster_cap'}))
+        error('cce_clusters:periodicSegments','Periodic segments require all contiguous subsets of one cycle up to a truncated order.');
+    end
 end
 limit=parameters.order;
 if strcmp(parameters.expansion,'disjoint')

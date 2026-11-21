@@ -73,3 +73,5 @@ When reusing a parallel pool, `create` clears its ValueStore only if none of `op
 Use current patched R2026b or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.
 
 Point-to-point flux inputs are inter.flux_rate and inter.flux_type, stored under spin_system.rlx. Their presence does not automatically select flux relaxation: include 'flux' in inter.relaxation to activate the contribution.
+
+Compact analytical Hahn systems use `inter.coordinates` and `inter.dipolar_geometry`: the site coordinates are in Angstrom, the bath dipolar prefactor is in Hz Å³, and the electron hyperfine input is a point-dipole prefactor in Hz Å³ or a Cartesian tensor per bath spin in Hz. An optional sparse symmetric `inter.tunnel_splittings` matrix supplies bath-pair splittings in Hz. The electron is physical site 1; the remaining sites are identical spin-½ nuclei. Creation converts the frequency inputs to angular units without materialising a coupling or proximity matrix. The compact representation is for the restricted analytical `clexpn(@hahn_echo)` path, not a general retained Hamiltonian input.

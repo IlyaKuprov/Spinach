@@ -20,6 +20,14 @@
 %  spin_system   - the primary object used by Spinach
 %                  to store simulation information
 %
+% For compact point-dipole baths, inter.coordinates supplies every site in
+% Angstrom, with the effective electron first. inter.dipolar_geometry has
+% nuclear (Hz Angstrom^3) and hyperfine (Hz Angstrom^3 for a point dipole,
+% or 3-by-3-by-N tensors in Hz for N nuclei). inter.tunnel_splittings, if
+% present, is a sparse symmetric N-by-N matrix in Hz, with zero diagonal.
+% This representation is for the projected analytical clexpn Hahn path;
+% no dense interaction matrix or geometry-based pair cutoff is created.
+%
 % Note: inter.modes.carriers declares, for each bosonic mode, the labo-
 %       ratory frequency of the rotating frame in which inter.modes.frqs
 %       is specified; declared frequencies are then detunings and may be
@@ -927,166 +935,188 @@ else
     
 end
     
-% Preallocate coupling tensor array
-report(spin_system,'initializing interaction arrays...');
-spin_system.inter.coupling.matrix=mat2cell(zeros(3*spin_system.comp.nspins),3*ones(spin_system.comp.nspins,1),...
-                                                                            3*ones(spin_system.comp.nspins,1));
-% Process coordinates
-if isfield(inter,'coordinates')
+% Store either compact point-dipole geometry or the ordinary interaction tables
+if isfield(inter,'dipolar_geometry')
 
-    % Absorb coordinates into data structure
+    % Canonicalise positions and angular-frequency inputs without enumerating pairs
+    model=inter.dipolar_geometry;
     spin_system.inter.coordinates=inter.coordinates;
-    
-    % Report back to the user
-    summary_coordinates(spin_system,'atomic coordinates (Angstrom)');
-    
-    % Process periodic boundary conditions
-    if isfield(inter,'pbc')
-        
-        % Absorb translation vectors into the data structure
-        spin_system.inter.pbc=inter.pbc;
-        
-        % Report back to the user
-        summary_pbc(spin_system,'PBC translation vectors (Angstrom)');
-        
+    spin_system.inter.dipolar_geometry=struct('xyz',vertcat(inter.coordinates{:}),...
+                                              'nuclear',2*pi*double(model.nuclear),...
+                                              'hyperfine',2*pi*double(model.hyperfine));
+    n_bath=spin_system.comp.nspins-1;
+    if isfield(inter,'tunnel_splittings')
+        spin_system.inter.tunnel_splittings=2*pi*double(inter.tunnel_splittings);
     else
-        
-        % Write an empty array
-        spin_system.inter.pbc={};
-        
+        spin_system.inter.tunnel_splittings=sparse(n_bath,n_bath);
+    end
+    report(spin_system,'stored compact point-dipole geometry for the analytical Hahn expansion.');
+
+else
+
+    % Preallocate coupling tensor array
+    report(spin_system,'initializing interaction arrays...');
+    spin_system.inter.coupling.matrix=mat2cell(zeros(3*spin_system.comp.nspins),3*ones(spin_system.comp.nspins,1),...
+                                                                                3*ones(spin_system.comp.nspins,1));
+
+    % Process coordinates
+    if isfield(inter,'coordinates')
+
+        % Absorb coordinates into data structure
+        spin_system.inter.coordinates=inter.coordinates;
+
         % Report back to the user
-        report(spin_system,'periodic boundary conditions not specified, assuming a standalone spin system.');
-        
-    end
-    
-    % Call dipolar coupling module
-    spin_system=dipolar(spin_system);
-    
-else
-    
-    % Warn the user that coordinates have not been found
-    report(spin_system,'WARNING - no coordinates given, point dipolar interactions assumed to be zero.');
-    
-    % Set an empty coordinate array
-    spin_system.inter.coordinates=cell(spin_system.comp.nspins,1);
-    
-    % Set proximity matrix to isolated spins
-    spin_system.inter.proxmatrix=speye(spin_system.comp.nspins,spin_system.comp.nspins);
-    
-end
+        summary_coordinates(spin_system,'atomic coordinates (Angstrom)');
 
-% Absorb user-specified couplings
-if isfield(inter,'coupling')
-    
-    % Inform the user
-    report(spin_system,'processing coupling data...');
-    
-    % Absorb eigenvalues and Euler angles
-    if isfield(inter.coupling,'eigs')
-        
-        % Get coupling norms
-        norms=cellfun(@(x)norm(diag(x),2),inter.coupling.eigs);
-        
-        % Find significant couplings (Hz at this point)
-        [rows,cols,~]=find(norms>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert Euler angles into DCM
-            if isempty(inter.coupling.euler{rows(n),cols(n)})
-                S=eye(3,3);
-            else
-                S=euler2dcm(inter.coupling.euler{rows(n),cols(n)});
+        % Process periodic boundary conditions
+        if isfield(inter,'pbc')
+
+            % Absorb translation vectors into the data structure
+            spin_system.inter.pbc=inter.pbc;
+
+            % Report back to the user
+            summary_pbc(spin_system,'PBC translation vectors (Angstrom)');
+
+        else
+
+            % Write an empty array
+            spin_system.inter.pbc={};
+
+            % Report back to the user
+            report(spin_system,'periodic boundary conditions not specified, assuming a standalone spin system.');
+
+        end
+
+        % Call dipolar coupling module
+        spin_system=dipolar(spin_system);
+
+    else
+
+        % Warn the user that coordinates have not been found
+        report(spin_system,'WARNING - no coordinates given, point dipolar interactions assumed to be zero.');
+
+        % Set an empty coordinate array
+        spin_system.inter.coordinates=cell(spin_system.comp.nspins,1);
+
+        % Set proximity matrix to isolated spins
+        spin_system.inter.proxmatrix=speye(spin_system.comp.nspins,spin_system.comp.nspins);
+
+    end
+
+    % Absorb user-specified couplings
+    if isfield(inter,'coupling')
+
+        % Inform the user
+        report(spin_system,'processing coupling data...');
+
+        % Absorb eigenvalues and Euler angles
+        if isfield(inter.coupling,'eigs')
+
+            % Get coupling norms
+            norms=cellfun(@(x)norm(diag(x),2),inter.coupling.eigs);
+
+            % Find significant couplings (Hz at this point)
+            [rows,cols,~]=find(norms>spin_system.tols.inter_cutoff);
+
+            % Loop over significant couplings
+            for n=1:numel(rows)
+
+                % Convert Euler angles into DCM
+                if isempty(inter.coupling.euler{rows(n),cols(n)})
+                    S=eye(3,3);
+                else
+                    S=euler2dcm(inter.coupling.euler{rows(n),cols(n)});
+                end
+
+                % Rotate and convert to rad/s
+                component=2*pi*S*diag(inter.coupling.eigs{rows(n),cols(n)})*S';
+
+                % Tidy up the numerics
+                component=(component+component')/2;
+
+                % Add to the total
+                spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
+                spin_system.inter.coupling.matrix{rows(n),cols(n)}+component;
+
             end
-            
-            % Rotate and convert to rad/s
-            component=2*pi*S*diag(inter.coupling.eigs{rows(n),cols(n)})*S';
-            
-            % Tidy up the numerics
-            component=(component+component')/2;
-            
-            % Add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+component;
-        
-        end
-        
-    end
- 
-    % Absorb coupling tensors
-    if isfield(inter.coupling,'matrix')
-        
-        % Find significant couplings using 2-norm criterion (Hz at this point)
-        [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.matrix)>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert to rad/s and add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*inter.coupling.matrix{rows(n),cols(n)};
-        
-        end
-        
-    end
-        
-    % Absorb scalar couplings
-    if isfield(inter.coupling,'scalar')
-        
-        % Find significant couplings using 2-norm criterion (Hz at this point)
-        [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.scalar)>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert to rad/s and add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*eye(3)*inter.coupling.scalar{rows(n),cols(n)};
-        
-        end
-        
-    end
-    
-else
-    
-    % Warn the user that couplings have not been found
-    report(spin_system,'WARNING - no couplings given, zeros assumed.');
 
-end
-
-% Clean up the result
-for n=1:spin_system.comp.nspins
-    for k=1:spin_system.comp.nspins
-
-        % Re-check all coupling tensors for significance in 2-norm and relevance
-        coupling_norm=norm(spin_system.inter.coupling.matrix{n,k},2);
-        if (coupling_norm==0)||(coupling_norm<2*pi*spin_system.tols.inter_cutoff)||...
-           (spin_system.comp.mults(n)==1)||((spin_system.comp.mults(k)==1)) % Ignore ghost spins
-       
-            % Set irrelevant tensors to empty
-            spin_system.inter.coupling.matrix{n,k}=[];
-            
         end
-        
-    end
-end
 
-% Check for inter-subsystem couplings
-for n=1:numel(spin_system.chem.parts)
-    for k=1:numel(spin_system.chem.parts)
-        if (n~=k)
-            coupling_block=spin_system.inter.coupling.matrix(spin_system.chem.parts{n},spin_system.chem.parts{k});
-            if ~all(cellfun(@isempty,coupling_block(:)))
-                error('Spinach:create:crossSubstanceCoupling',...
-                      'couplings detected between spins in different chemical species.');
+        % Absorb coupling tensors
+        if isfield(inter.coupling,'matrix')
+
+            % Find significant couplings using 2-norm criterion (Hz at this point)
+            [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.matrix)>spin_system.tols.inter_cutoff);
+
+            % Loop over significant couplings
+            for n=1:numel(rows)
+
+                % Convert to rad/s and add to the total
+                spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
+                spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*inter.coupling.matrix{rows(n),cols(n)};
+
+            end
+
+        end
+
+        % Absorb scalar couplings
+        if isfield(inter.coupling,'scalar')
+
+            % Find significant couplings using 2-norm criterion (Hz at this point)
+            [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.scalar)>spin_system.tols.inter_cutoff);
+
+            % Loop over significant couplings
+            for n=1:numel(rows)
+
+                % Convert to rad/s and add to the total
+                spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
+                spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*eye(3)*inter.coupling.scalar{rows(n),cols(n)};
+
+            end
+
+        end
+
+    else
+
+        % Warn the user that couplings have not been found
+        report(spin_system,'WARNING - no couplings given, zeros assumed.');
+
+    end
+
+    % Clean up the result
+    for n=1:spin_system.comp.nspins
+        for k=1:spin_system.comp.nspins
+
+            % Re-check all coupling tensors for significance in 2-norm and relevance
+            coupling_norm=norm(spin_system.inter.coupling.matrix{n,k},2);
+            if (coupling_norm==0)||(coupling_norm<2*pi*spin_system.tols.inter_cutoff)||...
+               (spin_system.comp.mults(n)==1)||((spin_system.comp.mults(k)==1)) % Ignore ghost spins
+
+                % Set irrelevant tensors to empty
+                spin_system.inter.coupling.matrix{n,k}=[];
+
+            end
+
+        end
+    end
+
+    % Check for inter-subsystem couplings
+    for n=1:numel(spin_system.chem.parts)
+        for k=1:numel(spin_system.chem.parts)
+            if (n~=k)
+                coupling_block=spin_system.inter.coupling.matrix(spin_system.chem.parts{n},spin_system.chem.parts{k});
+                if ~all(cellfun(@isempty,coupling_block(:)))
+                    error('Spinach:create:crossSubstanceCoupling',...
+                          'couplings detected between spins in different chemical species.');
+                end
             end
         end
     end
-end
 
-% Report back to the user
-summary_couplings(spin_system,'summary of coupling tensors and their anisotropies (Hz)');
+    % Report back to the user
+    summary_couplings(spin_system,'summary of coupling tensors and their anisotropies (Hz)');
+
+end
 
 % Temperature
 if ~isfield(inter,'temperature')
@@ -1491,8 +1521,6 @@ end
 
 % Input validation function
 function grumble(sys,inter)
-
-% Check the output switch
 if isfield(sys,'output')
     if ~ischar(sys.output)
         error('sys.output must be a character string.');
@@ -1801,6 +1829,57 @@ if isfield(inter,'coordinates')
         
     end
     
+end
+
+% Check the compact point-dipole declaration
+if isfield(inter,'dipolar_geometry')
+    model=inter.dipolar_geometry;
+    n_bath=numel(sys.isotopes)-1;
+    if any(~ismember(fieldnames(inter),{'coordinates','dipolar_geometry',...
+                                        'tunnel_splittings','chem','temperature'}))||...
+       ~isfield(inter.chem,'parts')||~isequal(inter.chem.parts,{1:(n_bath+1)})||...
+       isfield(inter.chem,'reactions')
+        error('Compact dipolar geometry cannot be combined with other interactions or chemical subsystems.');
+    end
+    if ~isfield(inter,'coordinates')||any(cellfun(@isempty,inter.coordinates))
+        error('Compact dipolar geometry requires all site coordinates.');
+    end
+    xyz=vertcat(inter.coordinates{:});
+    if any(~isfinite(xyz),'all')||size(unique(xyz,'rows'),1)~=n_bath+1
+        error('Compact dipolar coordinates must be finite and distinct.');
+    end
+    if n_bath<1||~strcmp(sys.isotopes{1},'E')||...
+       ~all(strcmp(sys.isotopes(2:end),sys.isotopes{2}))||...
+       ~isfinite(sys.magnet)||sys.magnet<=0
+        error('Compact dipolar geometry requires an effective electron, identical bath spins, and positive field.');
+    end
+    [gamma,mult]=spin(sys.isotopes{2});
+    if mult~=2||gamma==0||startsWith(sys.isotopes{2},'E')
+        error('Compact dipolar baths require magnetic spin-1/2 nuclei.');
+    end
+    if ~isstruct(model)||~isscalar(model)||...
+       ~all(isfield(model,{'nuclear','hyperfine'}))||numel(fieldnames(model))~=2
+        error('inter.dipolar_geometry must contain nuclear and hyperfine.');
+    end
+    if ~isnumeric(model.nuclear)||~isreal(model.nuclear)||...
+       ~isscalar(model.nuclear)||~isfinite(2*pi*double(model.nuclear))
+        error('Compact nuclear dipolar prefactor must be a finite real scalar in Hz Angstrom^3.');
+    end
+    hf=model.hyperfine;
+    if ~isnumeric(hf)||~isreal(hf)||any(~isfinite(2*pi*double(hf)),'all')||...
+       ~(isscalar(hf)||(size(hf,1)==3&&size(hf,2)==3&&numel(hf)==9*n_bath&&ndims(hf)<=3))
+        error('Compact hyperfine data must be a finite real prefactor or a 3-by-3-by-N tensor array.');
+    end
+    if isfield(inter,'tunnel_splittings')
+        tunnel=inter.tunnel_splittings;
+        if ~issparse(tunnel)||~isnumeric(tunnel)||~isreal(tunnel)||...
+           ~isequal(size(tunnel),[n_bath n_bath])||any(diag(tunnel))||...
+           ~issymmetric(tunnel)||any(~isfinite((8*pi/3)*nonzeros(tunnel)))
+            error('Tunnel splittings must be a finite real symmetric sparse bath matrix with zero diagonal.');
+        end
+    end
+elseif isfield(inter,'tunnel_splittings')
+    error('Tunnel splittings require compact dipolar geometry.');
 end
 
 % Check periodic boundary conditions
@@ -2304,8 +2383,7 @@ if isfield(inter,'r1_rates')
         % Check scalar relaxation rates
         if isnumeric(inter.r1_rates{n})&&isscalar(inter.r1_rates{n})
 
-            % Must be real numbers, negative values allowed
-            % because rate subtraction scenarios can exist
+            % Rate subtraction may give negative real scalars
             if ~isreal(inter.r1_rates{n})
                 error('scalars in inter.r1_rates must be real.');
             end
@@ -2313,8 +2391,7 @@ if isfield(inter,'r1_rates')
         % Check 3x3 relaxation rate tensors
         elseif isnumeric(inter.r1_rates{n})&&all(size(inter.r1_rates{n})==[3 3])
 
-            % Must be real symmetric, negative definite allowed
-            % because rate subtraction scenarios can exist
+            % Rate subtraction may give negative-definite real symmetric tensors
             if ~isreal(inter.r1_rates{n})
                 error('3x3 matrices in inter.r1_rates must be real.');
             end
@@ -2370,8 +2447,7 @@ if isfield(inter,'r2_rates')
         % Check scalar relaxation rates
         if isnumeric(inter.r2_rates{n})&&isscalar(inter.r2_rates{n})
 
-            % Must be real numbers, negative values allowed
-            % because rate subtraction scenarios can exist
+            % Rate subtraction may give negative real scalars
             if ~isreal(inter.r2_rates{n})
                 error('scalars in inter.r2_rates must be real.');
             end
@@ -2379,8 +2455,7 @@ if isfield(inter,'r2_rates')
         % Check 3x3 relaxation rate tensors
         elseif isnumeric(inter.r2_rates{n})&&all(size(inter.r2_rates{n})==[3 3])
 
-            % Must be real symmetric, negative definite allowed
-            % because rate subtraction scenarios can exist
+            % Rate subtraction may give negative-definite real symmetric tensors
             if ~isreal(inter.r2_rates{n})
                 error('3x3 matrices in inter.r2_rates must be real.');
             end

@@ -38,6 +38,10 @@
 %   reduced - values, validity/error/reason arrays, by-order results,
 %   cluster/cumulant and conditioning diagnostics.
 %
+% Periodic segments use unnormalised raw segment responses: at order n the
+% surviving powers are +1 for length n and -1 for length n-1 (n>1).
+% Order zero reports the observed-only record, but does not enter the ratio.
+%
 % Multiplicative convention: F(empty)=1; F(C)=E(C)/E(empty),
 % K(C)=F(C)/product(K(S), nonempty proper S subset C), and
 % E_approx=E(empty)*product(K(C), retained nonempty C).
@@ -52,7 +56,7 @@
 
 function reduced=cce_reduce(raw,clusters,parameters)
 
-% Validate indexed raw records and the closed cluster family
+% Validate indexed raw records and their cluster family
 grumble(raw,clusters,parameters);
 
 % Native ensemble reduction retains experiment-owned output axes
@@ -245,25 +249,27 @@ if isfield(parameters,'reducer')
     reducer=parameters.reducer;
 end
 
+% The periodic-segment prescription does not normalise by the empty cluster
+periodic=isfield(parameters,'expansion')&&strcmp(parameters.expansion,'periodic_segments');
+
 % Reduce each prefix independently; powers change with the included family
 for o=0:max_order
 
-    % Compile exact signed powers of this order's downward-closed family
+    % Compile exact signed powers on the subset or segment family
     active=find([clusters.order]<=o);
     powers=zeros(1,nc,'int64');
+    powers(active)=1;
     for k=fliplr(active)
-        power=int64(1);
-        for j=active(active>k)
-            if ismember(k,clusters(j).proper_subsets)
-                term=powers(j);
-                if (term>0&&power<intmin('int64')+term)||...
-                   (term<0&&power>intmax('int64')+term)
-                    error('cce_reduce:overflow','signed power overflow.');
-                end
-                power=power-term;
-            end
+
+        % Subtract each supercluster contribution from its actual subsets
+        term=powers(k);
+        subsets=clusters(k).proper_subsets;
+        if (term>0&&any(powers(subsets)<intmin('int64')+term))||...
+           (term<0&&any(powers(subsets)>intmax('int64')+term))
+            error('cce_reduce:overflow','signed power overflow.');
         end
-        powers(k)=power;
+        powers(subsets)=powers(subsets)-term;
+
     end
 
     % Evaluate independent times and observable elements in canonical order
@@ -335,6 +341,17 @@ for o=0:max_order
                 continue
             end
             masks(q)=true;
+        elseif periodic
+
+            % Apply signed powers to the unnormalised segment traces
+            needed=find(powers~=0)+1;
+            if any(~usable(needed))
+                why{q}='raw_invalid';
+                continue
+            end
+            [values(q),bounds(q),why{q}]=power_product(1,0,z(2:end),eta(2:end),powers);
+            masks(q)=strcmp(why{q},'ok');
+
         else
 
             % Normalisation always requires a resolved nonzero baseline

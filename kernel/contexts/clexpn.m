@@ -29,6 +29,10 @@
 % gammas, and weights vectors. Positive weights are normalised; zero-weight
 % nodes are omitted in both output modes. Each node has its own physical
 % model and cluster generators; the receiver and spin-state draws stay fixed.
+% A system created with compact dipolar geometry uses the analytical
+% ideal-pulse, projected Hahn CCE-2 limit. Its complete pair family is
+% implicit, so raw clusters, checkpoints, and nonstandard graph policies
+% are unavailable. In this path cce.numerics.atol budgets screening loss.
 % A checkpoint requires exactly one retained node. Grid nodes run serially;
 % cluster/state parallelism stays with the scheduler, or with an outer worker.
 %
@@ -109,7 +113,7 @@ if isfield(parameters,'grid')
         grid.(field{1})=double(data(indices));
     end
     grid.weights=grid.weights/sum(grid.weights);
-    if ~isempty(getCurrentTask())
+    if ~isempty(getCurrentTask())&&~isfield(spin_system.inter,'dipolar_geometry')
         parameters.cce.parallel.mode='serial';
     end
 end
@@ -296,6 +300,19 @@ function diagnostics=crystallite(spin_system,schedule,parameters,assumptions,pol
 started=tic;
 pulse_sequence=schedule.pulse_sequence;
 contract=schedule.contract;
+
+% Reduce an implicit complete family under the analytical Hahn assumptions
+if isfield(spin_system.inter,'dipolar_geometry')
+    diagnostics.reduction=cce_analytical_hahn(spin_system,parameters,pulse_sequence,assumptions);
+    diagnostics.policy=policy;
+    diagnostics.policy.backend='analytical_hahn';
+    diagnostics.parameters=parameters;
+    diagnostics.physical_ids=1:spin_system.comp.nspins;
+    diagnostics.observed_ids=parameters.observed;
+    diagnostics.bath_ids=parameters.cce.bath_spins;
+    diagnostics.elapsed_seconds=toc(started);
+    return;
+end
 
 % Compile immutable physical data, not a full-bath basis
 model=cce_compile(spin_system,parameters,assumptions);

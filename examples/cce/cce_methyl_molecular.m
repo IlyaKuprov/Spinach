@@ -11,20 +11,34 @@ function cce_methyl_molecular()
 folder=fileparts(mfilename('fullpath'));
 protons=readmatrix(fullfile(folder,'trityl_finland_protons.csv'));
 measured=readmatrix(fullfile(folder,'trityl_finland_echo.csv'));
-coords=protons(:,1:3);
-hyperfine=reshape(protons(:,4:12).',3,3,[]);
+
+% High-field dipolar geometry and electron-proton tensors in Spinach input units
+sys.magnet=1.2414;
+sys.isotopes=[{'E'} repmat({'1H'},1,size(protons,1))];
+sys.parallel={'processes',1};
+sys.output='hush';
+inter.coordinates=num2cell([zeros(1,3); protons(:,1:3)],2);
+inter.dipolar_geometry.hyperfine=reshape(protons(:,4:12).',3,3,[])/(2*pi);
+inter.dipolar_geometry.nuclear=xyz2dd([0 0 0],[1 0 0],'1H','1H')/(2*pi);
 
 % Three protons per methyl group share a tunnel splitting (kHz)
 splittings=[54.5 4.8 4.8 54.5 54.5 4.8 54.5 4.8 4.8 54.5 54.5 4.8];
-tunnel=kron(diag(2*pi*1e3*splittings),ones(3)-eye(3));
+inter.tunnel_splittings=kron(spdiags(1e3*splittings.',0,12,12),ones(3)-eye(3));
 
-% Evaluate the pair expansion before averaging the powder
-times=linspace(0,40e-6,2048).';
-echo=trityl_appa(coords,hyperfine,tunnel,times);
+% Evaluate the complete secular pair expansion at every powder node before averaging
+parameters.observed=1;
+parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
+parameters.times=linspace(0,40e-6,2048);
+parameters.grid=trityl_grid();
+parameters.cce.order=2;
+parameters.cce.approximation='projected';
+parameters.cce.numerics=struct('atol',0,'max_memory_bytes',2^27);
+spin_system=create(sys,inter);
+echo=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Compare with the measured trace in deuterated o-terphenyl
 kfigure();
-plot(1e6*times,echo,'b-',measured(:,1),measured(:,2),'k.');
+plot(1e6*parameters.times,echo,'b-',measured(:,1),measured(:,2),'k.');
 xlim([0 max(measured(:,1))]);
 ylim([0 1]);
 kxlabel('Total echo time / $\mu$s');

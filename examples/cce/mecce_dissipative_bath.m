@@ -95,7 +95,6 @@ end
 exact=readmatrix(fullfile(fileparts(mfilename('fullpath')),...
                           'mecce_dissipative_bath_exact.csv'));
 kfigure();
-main_axes=gca();
 lines=plot(times,coherence);
 hold on;
 exact_markers=plot(exact(:,1),exact(:,2),'.','Color',[0 0.65 0.78]);
@@ -115,7 +114,6 @@ plot(inset,exact(:,1),coherence(exact_idx,:)-exact(:,2));
 xlim(inset,[0 20]);
 ylim(inset,[-0.1 0.1]);
 kylabel(inset,'$\Delta$');
-axes(main_axes);
 
 end
 

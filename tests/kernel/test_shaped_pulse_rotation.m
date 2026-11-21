@@ -1,3 +1,4 @@
+% Test: kernel/shaped_pulse_rotation | Piecewise Cartesian pulse rotation
 % Tests a one-slice Cartesian shaped pulse. Syntax:
 %
 %                    result=test_shaped_pulse_rotation()

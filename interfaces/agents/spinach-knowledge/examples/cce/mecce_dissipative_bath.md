@@ -1,9 +1,11 @@
 # examples/cce/mecce_dissipative_bath.m
 
-Signature: `[answer,diagnostics]=mecce_dissipative_bath()`
+Signature: `[coherence,times]=mecce_dissipative_bath()`
 
-An observed electron and one bath carbon-13 nucleus evolve under the illustrative hyperfine tensor diag([1100 900 2200]) Hz and a nuclear raising-jump dissipator with rate 3000 per second. Standard sys/inter/bas/parameters blocks select a zeeman-liouv retained basis, generalised CCE order 1, transition preparation, density output, and bath_jumps with the physical descriptor 'L+'. clexpn calls free_evolution; the example constructs no state, detector, or jump matrix.
+Reproduces the five ME-CCE curves in Fig. 1(c) of [Onizhuk et al., Phys. Rev. Lett. 132, 250401 (2024)](https://doi.org/10.1103/PhysRevLett.132.250401). Table S1 in the [APS supplement](https://journals.aps.org/prl/supplemental/10.1103/PhysRevLett.132.250401/supplement.pdf) fixes the probe couplings and the twelve periodic nearest-neighbour XXZ bonds. The bath starts in a Néel state. Equal raising and lowering rates apply to each site: this phenomenological high-temperature relaxation does not derive a microscopic T1. The probe coupling is longitudinal, so Spinach can evolve a projected coherence block rather than the entire probe density. Connected ring clusters retain static fields from the exterior Néel spins.
 
-answer is 31-by-4: column-vectorised observed 2-by-2 density matrices, one row per time on 0 to 200 microseconds. The plotted signal is real(answer(:,3)). Uncontrolled generalised Liouville density propagation uses the stock exponential-action step with entry chopping disabled and transports its floating-point estimate. Independent dense Liouvillian/expm propagation and the comparison curve are retained in test_cce_examples. The supplied jump rate is phenomenological, not a microscopically derived T1.
+The returned 201-by-5 array contains normalised coherence magnitudes, with expansion order in columns. The 201-element time row is in the published panel's plotted coordinates: comparing to the published curves fixes the time mapping to the tabulated frequencies used directly, with rate 0.01 for each jump and no division by the realised sample-mean probe coupling. The 101 blue markers are digitised from the published exact calculation and are not a native full-bath simulation; the inset subtracts these samples from each corresponding ME-CCE curve.
 
-[MATLAB source](../../../../../examples/cce/mecce_dissipative_bath.m) · [Independent reference tests](../../../../../tests/kernel/test_cce_examples.m)
+The original two-spin, single-raising-jump example setup remains as a test fixture for the dense Liouvillian comparison in `test_cce_examples`.
+
+[MATLAB source](../../../../../examples/cce/mecce_dissipative_bath.m) · [Exact marker fixture](../../../../../examples/cce/mecce_dissipative_bath_exact.csv) · [Independent density regression](../../../../../tests/kernel/test_cce_examples.m)

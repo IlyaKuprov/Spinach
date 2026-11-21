@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_records | CWDM reaction record inputs
 % Tests the explicit chemical reaction input contract. Syntax:
 %
 %                       result=test_cwdm_records()

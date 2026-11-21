@@ -1,3 +1,4 @@
+% Test: kernel/apodisation_exp_window | Exponential FID apodisation
 % Tests exponential FID apodisation. Syntax:
 %
 %                    result=test_apodisation_exp_window()

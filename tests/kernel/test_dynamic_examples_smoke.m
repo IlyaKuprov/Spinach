@@ -1,3 +1,4 @@
+% Test: examples/dynamic_examples_smoke | Dynamic plotting example smoke paths
 % Tests compact dynamic example-stage execution with plotting. Syntax:
 %
 %                    result=test_dynamic_examples_smoke()

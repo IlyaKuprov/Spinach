@@ -1,3 +1,4 @@
+% Test: kernel/mecce_exact | ME exact dynamics
 % ME-CCE and ME-gCCE against closed and independent dense Liouville limits.
 % The six-electron tutorial is reconstructed from PyCCE
 % d74d3cb683bf3caa07231654314e554f440833b4: seed 2, six electrons,

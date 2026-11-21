@@ -1,3 +1,4 @@
+% Test: kernel/nmr_liquids_alignment_suite | NMR liquids literature-alignment probes
 % Tests compact literature-alignment probes for liquid-state NMR
 % pulse sequences. Syntax:
 %
@@ -191,3 +192,5 @@ result=test_close(result,'TOCSY spin-lock relaxation attenuation',...
                   'TOCSY mixing must include relaxation during the spin-lock interval');
 
 end
+
+

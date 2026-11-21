@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_sequences | CWDM sequence probes
 % Tests unweighted sequence probes and weighted PRESS preparation. Syntax:
 %
 %                      result=test_cwdm_sequences()

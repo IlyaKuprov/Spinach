@@ -1,3 +1,4 @@
+% Test: kernel/indexing_inverse_suite | Indexing inverse helpers
 % Tests indexing helper inverses. Syntax:
 %
 %                    result=test_indexing_inverse_suite()

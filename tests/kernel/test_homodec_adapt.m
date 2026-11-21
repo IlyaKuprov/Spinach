@@ -1,3 +1,4 @@
+% Test: kernel/homodec_adapt | Acquisition irradiation admission
 % Tests acquisition irradiation through Hilbert admission. Syntax:
 %
 %                   result=test_homodec_adapt()

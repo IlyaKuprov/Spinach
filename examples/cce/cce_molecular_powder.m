@@ -1,71 +1,33 @@
-% Orientation-averaged molecular Hahn echo with explicit quadrature weights.
-% Two deuterons illustrate tensor rotation; three axes are not converged powder.
-% The deliberately small model is not a published material reproduction.
-% Syntax:
+% Recomputes the OX063 methylene-proton APPA curve in Fig. 9 of Jeschke
+% et al., doi:10.5194/mr-6-15-2025. The complete two-proton expansion
+% is evaluated for each orientation before powder averaging. No solvent
+% spins are included in the simulation.
 %
-%             [answer,diagnostics]=cce_molecular_powder()
+% Syntax: [answer,diagnostics]=cce_molecular_powder()
 %
-% Returns the normalised complex signal column in answer and the calculation
-% diagnostics structure in diagnostics, with one entry per time point.
+% answer is the 2048-by-1 normalised Hahn echo. diagnostics contains the
+% total echo times in seconds and the powder quadrature and node traces.
 %
 % ilya.kuprov@weizmann.ac.il
 
 function [answer,diagnostics]=cce_molecular_powder()
 
-% Magnet and isotopes
-sys.magnet=0.01;
-sys.isotopes={'E','2H','2H'};
-sys.output='hush';
-sys.parallel={'local',1};
+% OX063 methylene-proton inputs from doi:10.5281/zenodo.13850793
+data=load(fullfile(fileparts(mfilename('fullpath')),'trityl_ox063.mat'));
 
-% Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
-inter.coordinates={[0 0 0];[1.45 0 0];[-0.725 1.2557 0]};
-inter.zeeman.matrix=repmat({zeros(3)},1,3);
-inter.coupling.matrix=cell(3);
+% Evaluate the pair expansion before averaging the powder
+times=linspace(0,40e-6,2048).';
+tunnel=zeros(size(data.coords,1));
+[answer,diagnostics]=trityl_appa(data.coords,data.hyperfine,tunnel,times);
 
-% Explicit illustrative hyperfine and bath coupling tensors in Hz
-inter.coupling.matrix{1,2}=[0 0 0;0 0 0;40000 0 20000];
-inter.coupling.matrix{1,3}=[0 0 0;0 0 0;20000 0 -10000];
-inter.coupling.matrix{2,3}=diag([500 500 -1000]);
-inter.coupling.matrix{2,2}=diag([-1 -1 2])*2e5;
-inter.coupling.matrix{3,3}=diag([-1 -1 2])*5e4;
-
-% Coordinates define the toy geometry; all couplings above are explicit
-inter=rmfield(inter,'coordinates');
-
-% Compile physical metadata without a full-bath basis
-spin_system=create(sys,inter);
-
-% Basis formalism for retained clusters
-bas.formalism='zeeman-hilb';
-
-% Experiment parameters
-parameters.observed=1;
-parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
-parameters.preparation='transverse';
-parameters.times=linspace(0,200e-6,41);
-
-% Cluster expansion controls
-parameters.cce.bath_spins=2:3;
-parameters.cce.order=2;
-parameters.cce.approximation='generalized';
-parameters.cce.basis=bas;
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
-
-% Average complete Hahn echo expansions over the quadrature
-parameters.grid=struct('alphas',[0 0 pi/2],'betas',[0 pi/2 pi/2],...
-                       'gammas',[0 0 0],'weights',ones(3,1)/3);
-[answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
-
-% Plot the projected complex signal
+% Compare with the measured trace in deuterated water/glycerol
 kfigure();
-plot(1e6*parameters.times,real(answer),'b-',...
-     1e6*parameters.times,imag(answer),'r--');
-xlabel('total echo time / microseconds');
-ylabel('normalised echo amplitude E(2τ)');
-legend('real','imaginary');
+plot(1e6*times,answer,'b-',data.exp_time,data.exp_echo,'k.');
+xlim([0 min(40,max(data.exp_time))]);
+ylim([0 1]);
+kxlabel('Total echo time / $\mu$s');
+kylabel('Normalised Hahn echo');
+klegend('APPA','Experiment');
 kgrid();
 
 end

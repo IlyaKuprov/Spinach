@@ -1,3 +1,4 @@
+% Test: kernel/liouville_commutator | Liouville commutation superoperator
 % Tests Liouville-space commutation superoperators. Syntax:
 %
 %                    result=test_liouville_commutator()

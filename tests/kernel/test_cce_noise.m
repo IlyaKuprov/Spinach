@@ -1,3 +1,4 @@
+% Test: kernel/cce_noise | Additive bath noise
 % Additive noise expansion against dense quantum and classical references. Syntax:
 %
 %                    result=test_cce_noise()

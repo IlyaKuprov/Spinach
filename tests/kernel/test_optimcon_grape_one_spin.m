@@ -1,3 +1,4 @@
+% Test: optimcon/grape_one_spin | One-spin optimal-control setup and GRAPE gradient
 % Tests one-spin optimal-control setup and Hilbert-space GRAPE. Syntax:
 %
 %                    result=test_optimcon_grape_one_spin()

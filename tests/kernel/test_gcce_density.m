@@ -1,3 +1,4 @@
+% Test: kernel/gcce_density | gCCE density diagnostics
 % Density physicality and singular-baseline exact bypass tests. Syntax:
 %
 %                         result=test_gcce_density()

@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_formalisms | CWDM formalism capabilities
 % Tests direct-sum Zeeman dimensions and storage-only wavefunction limits.
 % Syntax:
 %

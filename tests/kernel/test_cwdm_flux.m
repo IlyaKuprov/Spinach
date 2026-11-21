@@ -1,3 +1,4 @@
+% Test: kernel/cwdm_flux | CWDM intermolecular exchange expansion
 % Intermolecular exchange as an explicit reaction-record expansion. Syntax:
 %
 %                      result=test_cwdm_flux()

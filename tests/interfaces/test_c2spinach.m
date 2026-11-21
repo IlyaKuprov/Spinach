@@ -1,3 +1,4 @@
+% Test: interfaces/c2spinach | magres file parser
 % Tests the magres file parser on the CASTEP files bundled with the
 % examples and on small synthetic files. Syntax:
 %

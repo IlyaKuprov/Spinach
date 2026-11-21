@@ -1,3 +1,4 @@
+% Test: kernel/merge_inp | Input merging
 % Tests input merging against independently specified systems. Syntax:
 %
 %                         result=test_merge_inp()
@@ -32,6 +33,7 @@ bas.formalism='sphten-liouv';
 for n=1:7
     switch n
         case 1
+
             % D1: a mode subsystem and a spin-only subsystem
             left=sys; left.magnet=0; left.isotopes={'1H','C3'};
             right=sys; right.magnet=0;
@@ -53,6 +55,7 @@ for n=1:7
             expected.chem.parts={1:2,3}; expected.chem.concs=[1 1];
             bas.formalism='zeeman-liouv'; bas.approximation={'none','none'};
         case 2
+
             % D2: create() defaults each single-substance concentration to one
             left=sys; right=sys;
             inter.chem.parts={1}; other.chem.parts={1};
@@ -60,6 +63,7 @@ for n=1:7
             expected.chem.parts={1,2}; expected.chem.concs=[1 1];
             bas.formalism='sphten-liouv'; bas.approximation={'none','none'};
         case {3,4}
+
             % D3/D4: two substances followed by one substance
             left=sys; left.isotopes={'1H','13C'}; right=sys;
             inter.chem.parts={1;2}; inter.chem.concs=[2;3]; other=a;
@@ -76,12 +80,14 @@ for n=1:7
                 expected.rlx_keep='diagonal';
             end
         case 5
+
             % A single mode input must also be an identity merge
             left=sys; left.magnet=0; left.isotopes={'1H','C3'};
             inter.modes.frqs={[],1000}; inter.modes.anharms={[],5};
             expected_sys=left; expected=inter;
             bas.formalism='zeeman-liouv'; bas.approximation={'none'};
         case 6
+
             % Independent mode networks with spin-indexed tensor derivatives
             left=sys; left.magnet=0; left.isotopes={'1H','C3','C3'};
             right=sys; right.magnet=0; right.isotopes={'13C','C3'};
@@ -128,6 +134,7 @@ for n=1:7
             expected.chem.parts={1:3,4:5}; expected.chem.concs=[1 1];
             bas.formalism='zeeman-liouv'; bas.approximation={'none','none'};
         case 7
+
             % Explicit concentrations imply the local default partitions
             left=sys; right=sys;
             inter.chem.concs=2; other.chem.concs=3;

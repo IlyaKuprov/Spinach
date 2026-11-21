@@ -1,3 +1,4 @@
+% Test: kernel/slowpass_sat | Saturated CW steady states
 % Tests saturated CW detection against Bloch equations and a native
 % propagator steady state, including concentrations, spatial embedding,
 % the iterative branch, and rejected inputs. Syntax:

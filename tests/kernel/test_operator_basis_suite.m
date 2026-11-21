@@ -1,3 +1,4 @@
+% Test: kernel/operator_basis_suite | Operator-basis construction functions
 % Tests operator-basis construction and expansion helpers. Syntax:
 %
 %                    result=test_operator_basis_suite()
@@ -8,7 +9,7 @@
 %
 % The test checks single-spin tensor bases, bosonic bases, central
 % transitions, Stevens operators, single-transition matrices, expansion
-% helpers, and sparse preallocation dimensions.
+% helpers, and sparse preallocation dimensions
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -122,7 +123,7 @@ result=test_close(result,'mprealloc zeeman-liouv size',size(Apre),[16 16],0,0,..
 
 end
 
-% Reconstruct a matrix from IST coefficients.
+% Reconstruct a matrix from IST coefficients
 function A=ist_reconstruct(mult,states,coeffs)
 T=irr_sph_ten(mult);
 A=zeros(mult);
@@ -131,7 +132,7 @@ for n=1:numel(states)
 end
 end
 
-% Reconstruct a matrix from bosonic monomial coefficients.
+% Reconstruct a matrix from bosonic monomial coefficients
 function A=bm_reconstruct(nlevels,states,coeffs)
 B=boson_mono(nlevels);
 A=zeros(nlevels);
@@ -139,3 +140,5 @@ for n=1:numel(states)
     A=A+coeffs(n)*B{states(n)+1};
 end
 end
+
+

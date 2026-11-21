@@ -24,7 +24,7 @@ root_dir=fileparts(mfilename('fullpath'));
 addpath(fullfile(root_dir,'lib'));
 
 % Require a unique manifest match before running anything
-manifest=test_manifest();
+manifest=discover_tests();
 matched=contains({manifest.id},test_id)|...
         contains({manifest.name},test_id);
 if nnz(matched)~=1

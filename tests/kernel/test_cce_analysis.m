@@ -1,3 +1,4 @@
+% Test: kernel/cce_analysis | CCE decay diagnostics
 % Declared-window envelope fitting and invalid-data diagnostics. Syntax:
 %
 %                    result=test_cce_analysis()

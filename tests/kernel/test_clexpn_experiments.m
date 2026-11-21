@@ -1,3 +1,4 @@
+% Test: kernel/clexpn_experiments | Native cluster experiments
 % Validate closed-system experiments against independent matrix propagation.
 %
 % Syntax:

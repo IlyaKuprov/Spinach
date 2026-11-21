@@ -1,3 +1,4 @@
+% Test: kernel/lowlevel_utilities_suite | Low-level utility functions
 % Tests cheap deterministic low-level utility functions. Syntax:
 %
 %                    result=test_lowlevel_utilities_suite()

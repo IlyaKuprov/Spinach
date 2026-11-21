@@ -10,7 +10,7 @@ Runs the Spinach regression test suite ([source](https://github.com/IlyaKuprov/S
 - Enforces that options are supplied as name-value pairs; option names must be non-empty character row strings, otherwise an error is raised.
 - Adds the test library to the path: the directory of the file itself, its `lib` subdirectory, and recursively `kernel` and `interfaces` subdirectories.
 - Adds the Spinach production directories to the path: recursively `etc`, `experiments`, `interfaces`, and `kernel` under the Spinach root (the parent of the test directory).
-- Parses options via `test_options`, obtains the test manifest via `test_manifest`.
+- Parses options via `test_options`, obtains the test manifest via `discover_tests`.
 - If a `pattern` option is non-empty, filters the manifest to tests whose `id` or `name` contains the pattern as a substring.
 - Preallocates an empty result structure array with fields `id`, `name`, `purpose`, `status`, `elapsed`, `messages`, `failures`, `error`.
 - Each test runs through `test_execute`, which captures console output while preserving recorded failures, partial check messages, and thrown-error text. Elapsed time uses a dedicated timer so a test's own `tic` calls cannot reset it.

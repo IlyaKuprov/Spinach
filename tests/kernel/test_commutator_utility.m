@@ -1,3 +1,4 @@
+% Test: kernel/commutator_utility | Matrix commutator utility
 % Tests the commutator utility. Syntax:
 %
 %                    result=test_commutator_utility()

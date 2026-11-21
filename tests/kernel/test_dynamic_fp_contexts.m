@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_fp_contexts | Fokker-Planck imaging and meshflow contexts
 % Tests compact imaging() and meshflow() context hand-off paths. Syntax:
 %
 %                    result=test_dynamic_fp_contexts()

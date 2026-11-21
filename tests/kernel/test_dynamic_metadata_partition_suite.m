@@ -1,3 +1,4 @@
+% Test: kernel/dynamic_metadata_partition_suite | Metadata and partition utilities
 % Tests deterministic metadata, hashing, and partition helpers. Syntax:
 %
 %                    result=test_dynamic_metadata_partition_suite()

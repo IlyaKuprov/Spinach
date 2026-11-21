@@ -208,9 +208,10 @@ for k=1:nblocks
                 action=A;
             end
             [rho,flag]=gmres(action,rho0_subs,10,1e-6,numel(rho0_subs),M1,M2);
+            flags(n)=flag;
             if saturated
                 rho=Q\(P\rho);
-                flags(n)=flag; residuals(n)=norm(A*rho-rho0_subs);
+                residuals(n)=norm(A*rho-rho0_subs);
             end
         else
             rho=A\rho0_subs;
@@ -219,13 +220,12 @@ for k=1:nblocks
         if use_gpu, response=gather(response); end
         spectrum(n)=spectrum(n)+response;
     end
+    grumble('solution');
 
 end
 
 % Only the linear resolvent uses the unnormalised FFT convention
-if saturated
-    grumble('solution');
-else
+if ~saturated
     spectrum=spectrum*(abs(parameters.sweep(2)-parameters.sweep(1))*...
                        parameters.npoints/(parameters.npoints-1));
 end
@@ -233,6 +233,13 @@ end
 % Consistency enforcement
     function grumble(stage)
         if strcmp(stage,'solution')
+            if ~saturated
+                failed=find(flags~=0,1);
+                if ~isempty(failed)
+                    warning('linear GMRES returned flag %d at offset %g Hz.',flags(failed),freq_grid(failed)/(2*pi));
+                end
+                return;
+            end
             failed=find((flags~=0)|(residuals>1e-6*norm(rho0_subs)),1);
             if ~isempty(failed)
                 error('steady-state GMRES did not converge at offset %g Hz.',freq_grid(failed)/(2*pi));

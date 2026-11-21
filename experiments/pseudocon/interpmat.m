@@ -83,8 +83,8 @@ parfor n=1:size(xyz,1) %#ok<*PFBNS>
     z_intvec=spalloc(1,cube_dims(3),4); z_intvec(z_stencil)=fdweights(xyz(n,3),z_subgrid,0); %#ok<SPRIX>
    
     % Store non-zeroes
-    [~,cols{n},vals{n}]=find(kron(z_intvec,...
-                             kron(y_intvec,x_intvec)));
+    [cols{n},~,vals{n}]=find(kron(z_intvec,...
+                             kron(y_intvec,x_intvec)).');
     rows{n}=n*ones(size(cols{n}));
    
 end

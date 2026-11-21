@@ -15,7 +15,7 @@ The cases are defined by the catalog built in `optimcon.m`: state-target pairs, 
 - `waveform`: real numeric control coefficients in rad/s, with `ncontrols` rows. It has `pulse_nsteps` columns for the rectangle integrator and `pulse_nsteps + 1` for the trapezium integrator. The wrapper checks type and shape but does not explicitly test sample finiteness.
 - `spin_system`: spin system whose ensemble problem has been prepared by `optimcon.m`. If `control.return_traj` is absent, the wrapper sets it to `false`.
 
-Call from the client on the same parallel pool that was open when `optimcon.m` ran. The function rejects calls from a worker or a changed pool, modified frozen generators/operators, or a changed ensemble composition. A Hessian request requires the rectangle integrator and no waveform distortions.
+Call on the same parallel pool that was open when `optimcon.m` ran. Inside a `parfor` body on a worker, where no pool is visible, `optimcon.m` must run in the same loop body; the ensemble cases are then evaluated serially on that worker. The function rejects a changed pool, modified frozen generators/operators, or a changed ensemble composition. A Hessian request requires the rectangle integrator and no waveform distortions.
 
 ## Outputs
 

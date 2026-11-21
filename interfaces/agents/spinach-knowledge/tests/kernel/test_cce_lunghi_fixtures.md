@@ -1,0 +1,44 @@
+# tests/kernel/test_cce_lunghi_fixtures.m
+
+[MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_lunghi_fixtures.m)
+
+## Purpose
+
+Reduced VOTPP and Cu(mnt)2 source-input gCCE reconstruction.
+
+## Behaviour
+
+Requires `SPINACH_CCE_LUNGHI_FIXTURES` (external inputs/CSVs) and
+`SPINACH_CCE_LUNGHI_STATES` (phase-preserving states JSON and diagnostic MAT
+files). Without both, the test returns with an explanatory message and does
+not run the external comparison. These unlicensed source structures are not
+redistributed; reduced source-input validation is not published-figure validation.
+
+Runs the assertions and tolerance checks declared in the source.
+
+The test uses `new_test_result`, `test_true` and/or `test_close`; numerical tolerances and independent reference calculations are defined in the linked source.
+
+## Inputs and outputs
+
+```matlab
+result=test_cce_lunghi_fixtures()
+```
+
+**Inputs**
+
+- None; run with Spinach and its test libraries on the MATLAB path.
+
+**Outputs**
+
+- `result` — standard test-harness result with checks, pass/fail status, and diagnostics. Printed numerical metrics are not additional result fields.
+
+## References
+
+- [Source file on GitHub](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_cce_lunghi_fixtures.m)
+- [Test manifest](https://github.com/IlyaKuprov/Spinach/blob/main/tests/lib/test_manifest.m)
+
+Public optional-field contracts are explicit in reused fixtures: irrelevant method, event, geometry, and legacy numerical options are removed rather than passed silently.
+
+## Native interface
+
+The source-matrix reference is compiled with cce_compile and the selective transition is propagated through clexpn with hahn_echo. Each independent fixture starts with a fresh native parameter structure; its source eigenstates, dense reference propagators, and declared normalised detected amplitude are unchanged. Physical transition support is explicit in transition.spins.

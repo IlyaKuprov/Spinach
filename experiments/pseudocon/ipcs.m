@@ -251,8 +251,12 @@ if (parameters.sharpen>0)&&(~any(guess))
     error('the initial density is identically zero, the contrast functional is undefined there.');
 end
 
-% Generate Fourier derivative multipliers
-[X,Y,Z]=ndgrid(fftdiff(1,npoints,1),fftdiff(1,npoints,1),fftdiff(1,npoints,1));
+% Generate Fourier derivative multipliers in units of the X grid step
+steps=(ranges([2 4 6])-ranges([1 3 5]))/(npoints-1); 
+steps=steps/steps(1);
+[X,Y,Z]=ndgrid(fftdiff(1,npoints,steps(1)),...
+               fftdiff(1,npoints,steps(2)),...
+               fftdiff(1,npoints,steps(3)));
 
 % Get Laplace operator in Fourier space
 L=X.^2+Y.^2+Z.^2; 
@@ -349,21 +353,15 @@ end
             % Get the error gradient
             grad_err=2*1e6*reshape(real(ifftn(S.*fftn_dx)),[npoints^3 1])/probdens_scaling;
             
-            % Add contrast gradient (ugly interpolation over the singularity)
+            % Add contrast gradient, including the pivot dependence on the density (shared by tied maxima)
             if parameters.sharpen>0
                 if ~any(den)
                     error('density is identically zero, the contrast functional is undefined.');
                 end
-                [pivot,where]=max(abs(den)); pivot=pivot/2; pden=den/pivot;
+                pivot=max(abs(den))/2; pden=den/pivot; tied=find(abs(den)==2*pivot);
                 grad_cont=2*contrast_scaling*parameters.sharpen*...
                             exp(-pden.^2).*pden.*(1-pden.^2)/pivot;
-                if where==1
-                    grad_cont(where)=grad_cont(where+1);
-                elseif where==numel(grad_cont)
-                    grad_cont(where)=grad_cont(where-1);
-                else
-                    grad_cont(where)=(grad_cont(where+1)+grad_cont(where-1))/2;
-                end
+                grad_cont(tied)=grad_cont(tied)-sign(den(tied))*(pden.'*grad_cont)/(2*numel(tied));
                 grad_err=grad_err+grad_cont; clear('grad_cont','pden');
             end
             
@@ -462,21 +460,19 @@ end
             % Run the second FFT
             y(:,n)=2*1e6*reshape(real(ifftn(S.*fftn(probden))),[npoints^3 1])/probdens_scaling;
             
-            % Add contrast Hessian (ugly interpolation over the singularity)
+            % Add contrast Hessian, including the pivot dependence on the density (shared by tied maxima)
             if parameters.sharpen>0
                 if ~any(den_x)
                     error('density is identically zero, the contrast functional is undefined.');
                 end
-                [pivot,where]=max(abs(den_x)); pivot=pivot/2; pden_x=den_x/pivot;
+                pivot=max(abs(den_x))/2; pden_x=den_x/pivot; tied=find(abs(den_x)==2*pivot); m=numel(tied);
                 hess_cont=2*contrast_scaling*parameters.sharpen*(1/pivot^2)*...
                             exp(-pden_x.^2).*(1-5*pden_x.^2+2*pden_x.^4).*den_v;
-                if where==1
-                    hess_cont(where)=hess_cont(where+1);
-                elseif where==numel(hess_cont)
-                    hess_cont(where)=hess_cont(where-1);
-                else
-                    hess_cont(where)=(hess_cont(where+1)+hess_cont(where-1))/2;
-                end
+                C=contrast_scaling*parameters.sharpen; s=sign(den_x(tied)); a=(s.'*den_v(tied))/(2*m);
+                fp=2*exp(-pden_x.^2).*pden_x.*(1-pden_x.^2); fpp=2*exp(-pden_x.^2).*(1-5*pden_x.^2+2*pden_x.^4);
+                grad_x=C*fp/pivot; grad_x(tied)=grad_x(tied)-s*(pden_x.'*grad_x)/(2*m);
+                hess_cont=hess_cont-(a/pivot)*(C*fpp.*pden_x/pivot+grad_x);
+                hess_cont(tied)=hess_cont(tied)-s*C*sum((fpp.*pden_x+fp).*(den_v-pden_x*a))/(2*m*pivot^2);
                 y(:,n)=y(:,n)+hess_cont;
             end
             

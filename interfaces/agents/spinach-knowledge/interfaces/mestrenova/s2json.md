@@ -1,4 +1,6 @@
-# interfaces/mestrenova/s2json.m
+# Removed MestreNova s2json interface
+
+The source file interfaces/mestrenova/s2json.m is not present in this distribution. The following record describes the removed interface, not an available function; do not call it or infer a replacement from its old signature.
 
 - Signature: `s2json(file_name,sys,inter,parameters,fid)` (all five inputs are required; the function defines no defaults).
 
@@ -14,5 +16,4 @@ The serialised content retains the supplied parameter and signal representation;
 
 ## References
 
-- [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/interfaces/mestrenova/s2json.m)
 - [Spin Dynamics Wiki: s2json.m](https://spindynamics.org/wiki/index.php?title=s2json.m)

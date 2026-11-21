@@ -720,8 +720,8 @@ if isfield(inter,'suscept')
                                     pad(num2str(pms_tensor(3,2),'%+4.3e'),12) pad(num2str(pms_tensor(3,3),'%+4.3e'),12)]);
                 if n<spin_system.comp.nspins, report(spin_system,' '); end
                 
-                % Update the Zeeman tensor
-                spin_system.inter.zeeman.matrix{n}=spin_system.inter.zeeman.matrix{n}+pms_tensor;
+                % Update the Zeeman tensor (Spinach applies it as B*Z*S, hence the transpose)
+                spin_system.inter.zeeman.matrix{n}=spin_system.inter.zeeman.matrix{n}+pms_tensor.';
                 
             end
             

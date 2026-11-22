@@ -20,7 +20,6 @@ sys.magnet=0;
 sys.isotopes={'E3'};
 sys.isotopes(sites.spin)=cellstr(sites.isotope);
 sys.output='hush';
-sys.parallel={'processes',1};
 inter.coupling.matrix=cell(nsites);
 inter.zeeman.matrix=cell(1,nsites);
 

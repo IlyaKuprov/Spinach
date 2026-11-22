@@ -12,7 +12,6 @@ function p1_pair_levels()
 % NV frame and the aligned and tilted Jahn-Teller axes
 sys.magnet=0.05;
 sys.isotopes={'E','E','14N','14N'};
-sys.parallel={'processes',1};
 bas.formalism='zeeman-hilb';
 bas.approximation={'none'};
 z_axis=[1 1 1]/sqrt(3);

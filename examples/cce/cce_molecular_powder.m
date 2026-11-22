@@ -15,7 +15,6 @@ measured=readmatrix(fullfile(folder,'trityl_ox063_echo.csv'));
 % High-field dipolar geometry and electron-proton tensors in Spinach input units
 sys.magnet=1.2414;
 sys.isotopes=[{'E'} repmat({'1H'},1,size(protons,1))];
-sys.parallel={'processes',1};
 sys.output='hush';
 sys.tols.prox_cutoff=0;
 inter.coordinates=[{[]}; num2cell(protons(:,1:3),2)];
@@ -28,7 +27,7 @@ end
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
 parameters.times=linspace(0,40e-6,2048);
-parameters.grid=trityl_grid();
+parameters.grid='icos_2ang_642pts';
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
 parameters.cce.backend='analytical_hahn';

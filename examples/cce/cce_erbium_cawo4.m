@@ -44,7 +44,6 @@ n_amorphous=10346;
 % Effective electron g factor is specified for each physical bath below
 sys.tols.prox_cutoff=0;
 sys.magnet=0.067;
-sys.parallel={'processes',8};
 sys.output='hush';
 
 % Prepare independent isotope occupancies and continuum configurations
@@ -76,26 +75,27 @@ for n=1:n_configs
 
 end
 
-% Set up the first physical bath on the head node so create configures the pool
-first_bath=bath_system(sys,occupied{1});
+% Run every bath realisation through the Hahn echo
+baths=[occupied; amorphous];
+echoes=zeros(numel(parameters.times),numel(baths));
+parfor n=1:numel(baths)
 
-% Evaluate each independently created bath on a worker
-realisations=zeros(numel(parameters.times),n_configs,2);
-parfor n=1:n_configs
+    % Central electron first, then the tungsten bath in Angstrom
+    localsys=sys;
+    localsys.isotopes=[{'E'} repmat({'183W'},1,size(baths{n},1))];
+    inter=struct();
+    inter.zeeman.scalar=cell(size(localsys.isotopes));
+    inter.zeeman.scalar{1}=8.38;
+    inter.coordinates=num2cell([zeros(1,3); 1e10*baths{n}],2);
 
-    % Reuse the first created system instead of creating it again
-    if n==1
-        lattice_bath=first_bath;
-    else
-        lattice_bath=bath_system(sys,occupied{n});
-    end
-    continuum_bath=bath_system(sys,amorphous{n});
-    lattice_echo=clexpn(lattice_bath,@hahn_echo,parameters,'labframe');
-    random_echo=clexpn(continuum_bath,@hahn_echo,parameters,'labframe');
-    realisations(:,n,:)=reshape([lattice_echo random_echo],numel(parameters.times),1,2);
+    % Spinach housekeeping and the echo
+    spin_system=create(localsys,inter);
+    echoes(:,n)=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 end
-echo=reshape(mean(realisations,2),numel(parameters.times),2);
+
+% Average the lattice and the amorphous ensembles
+echo=[mean(echoes(:,1:n_configs),2) mean(echoes(:,(n_configs+1):end),2)];
 
 % Plot the normalised amplitude, not its square
 kfigure();
@@ -104,18 +104,6 @@ kxlabel('total echo time, $2\tau$ / ms');
 kylabel('normalised Hahn echo amplitude');
 klegend({'lattice bath','amorphous bath'},'Location','northeast');
 kgrid();
-
-end
-
-% Create one physical bath with the central electron first
-function spin_system=bath_system(sys,coords)
-
-% Assign physical IDs with the central electron first
-sys.isotopes=[{'E'} repmat({'183W'},1,size(coords,1))];
-inter.zeeman.scalar=cell(size(sys.isotopes));
-inter.zeeman.scalar{1}=8.38;
-inter.coordinates=num2cell([zeros(1,3); 1e10*coords],2);
-spin_system=create(sys,inter);
 
 end
 

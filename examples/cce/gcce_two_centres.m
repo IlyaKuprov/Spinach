@@ -13,7 +13,6 @@ function gcce_two_centres()
 % Electron pair and antiparallel proton pair in the secular Hamiltonian
 sys.isotopes={'E','E','1H','1H'};
 sys.magnet=0.01;
-sys.parallel={'processes',1};
 sys.output='hush';
 inter.zeeman.scalar={0,0,hz2ppm(5000,sys.magnet,'1H'),0};
 inter.coupling.matrix=cell(4);

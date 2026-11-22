@@ -17,7 +17,6 @@ function gcce_votpp()
 % The unique axis is x in the crystal frame; the applied field is along z
 sys.isotopes={'E','51V'};
 sys.output='hush';
-sys.parallel={'processes',64};
 inter.zeeman.matrix={diag([1.968 1.984 1.984]),zeros(3)};
 inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=diag([-473 -166 -166])*1e6;
@@ -59,7 +58,7 @@ kylabel('energy / GHz');
 kgrid();
 
 % Translate the crystal sites and retain the 20 Å proton bath
-sites=readmatrix(fullfile(fileparts(mfilename('fullpath')),'private','votpp_proton_sites.csv'));
+sites=readmatrix(fullfile(fileparts(mfilename('fullpath')),'votpp_proton_sites.csv'));
 cell_vec=[9.67194       0.0          0.0;...
           0.000288633  13.2521       0.0;...
           0.00231045   -0.0000010487 13.2521];

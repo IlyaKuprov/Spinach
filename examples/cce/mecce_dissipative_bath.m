@@ -23,7 +23,6 @@ neighbours=[sites(2:end) sites(1)];
 sys.magnet=0;
 sys.isotopes=[{'E'} repmat({'13C'},1,nbath)];
 sys.output='hush';
-sys.parallel={'processes',1};
 inter.zeeman.matrix=repmat({zeros(3)},1,nbath+1);
 inter.coupling.matrix=cell(nbath+1);
 for n=1:nbath

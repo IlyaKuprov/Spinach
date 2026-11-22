@@ -188,6 +188,9 @@ Cross polarisation is `cp_powder_static_nh.m` and
 `cp_contact_mas_nh_fplanck.m`; recoupling is `redor_curve.m` and
 `pdsd_simple.m`.
 
+For a sequential lab-frame rotor-axis jump, use `das_two_angle.m`.
+It keeps each crystallite and rotor phase continuous across the jump.
+
 For a direct single-crystal MAS route check, run
 `examples/fundamentals/mas_fplanck_slices.m`. It compares midpoint-sliced
 `rotor_stack` evolution against `singlerot` in Fokker–Planck Liouville

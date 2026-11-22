@@ -70,7 +70,11 @@ check_storage(ng);
 
 % Map bath positions to group vertices and sum inter-group scores
 [~,sites]=ismember([groups{:}],graph.bath_ids);
-group=sparse(sites,repelem(1:ng,cellfun(@numel,groups)),1,numel(sites),ng);
+vertices=cell(size(groups));
+for k=1:ng
+    vertices{k}=repmat(k,size(groups{k}));
+end
+group=sparse(sites,[vertices{:}],1,numel(sites),ng);
 adjacency=logical(group.'*sparse(graph.adjacency)*group);
 scores=group.'*sparse(graph.scores)*group;
 adjacency(1:ng+1:end)=false;

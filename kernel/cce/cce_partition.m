@@ -77,7 +77,11 @@ if strcmp(p.mode,'coupling')
         edges=zeros(0,4);
         [~,sites]=ismember([groups{:}],ids);
         ng=numel(groups);
-        group=sparse(sites,repelem(1:ng,cellfun(@numel,groups)),1,numel(ids),ng);
+        vertices=cell(size(groups));
+        for k=1:ng
+            vertices{k}=repmat(k,size(groups{k}));
+        end
+        group=sparse(sites,[vertices{:}],1,numel(ids),ng);
         [left,right]=find(triu(group.'*spones(graph.pair_norm)*group,1));
         for k=1:numel(left)
             a=left(k);

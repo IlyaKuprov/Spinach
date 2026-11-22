@@ -85,7 +85,7 @@ if isfield(inter.chem,'parts')&&isscalar(inter.chem.parts)&&~isfield(inter.chem,
 end
 
 % Validate input
-grumble(sys,inter);
+srfk_mdepth=grumble(sys,inter);
 
 % Run existential checks
 if (~isfield(sys,'disable'))||...
@@ -1077,14 +1077,15 @@ end
 % Absorb magnetisation flux rates
 if isfield(inter,'flux_rate')&&isfield(inter,'flux_type')
 
-    % Assign the data structure
-    spin_system.rlx.flux_rate=inter.flux_rate;
+    % Compile nonzero rates in column-major order
+    [rows,cols,vals]=find(inter.flux_rate);
+    spin_system.rlx.flux_rate=[num2cell(rows(:)) num2cell(cols(:)) num2cell(vals(:))];
     spin_system.rlx.flux_type=inter.flux_type;
 
 else
 
     % No magnetisation fluxes
-    spin_system.rlx.flux_rate=[];
+    spin_system.rlx.flux_rate=cell(0,3);
     spin_system.rlx.flux_type='';
 
 end
@@ -1165,20 +1166,12 @@ if ismember('SRFK',spin_system.rlx.theories)
 end
 
 % SRFK modulation depths
-if isfield(inter,'srfk_mdepth')
-    spin_system.rlx.srfk_mdepth=inter.srfk_mdepth;
-else
-    spin_system.rlx.srfk_mdepth=[];
-end
-if ismember('SRFK',spin_system.rlx.theories)&&(~isempty(spin_system.rlx.srfk_mdepth))
-    for n=1:spin_system.comp.nspins
-        for k=1:spin_system.comp.nspins
-            if ~isempty(spin_system.rlx.srfk_mdepth{n,k})
-                report(spin_system,['SRFK modulation depth for spins ' ...
-                                    num2str(n) ',' num2str(k) ': ' ...
-                                    num2str(spin_system.rlx.srfk_mdepth{n,k}) ' Hz']);
-            end
-        end
+spin_system.rlx.srfk_mdepth=srfk_mdepth;
+if ismember('SRFK',spin_system.rlx.theories)
+    for n=1:size(srfk_mdepth,1)
+        report(spin_system,['SRFK modulation depth for spins ' ...
+                            num2str(srfk_mdepth{n,1}) ',' num2str(srfk_mdepth{n,2}) ': ' ...
+                            num2str(srfk_mdepth{n,3}) ' Hz']);
     end
 end
 
@@ -1378,9 +1371,10 @@ end
 
 % User-supplied Weizmann R1d relaxation rates
 if isfield(inter,'weiz_r1d')
-    spin_system.rlx.weiz_r1d=inter.weiz_r1d;
+    [rows,cols,vals]=find(inter.weiz_r1d);
+    spin_system.rlx.weiz_r1d=[num2cell(rows(:)) num2cell(cols(:)) num2cell(vals(:))];
 else
-    spin_system.rlx.weiz_r1d=[];
+    spin_system.rlx.weiz_r1d=cell(0,3);
 end
 
 % User-supplied Weizmann R2e relaxation rates
@@ -1413,9 +1407,10 @@ end
 
 % User-supplied Weizmann R2d relaxation rates
 if isfield(inter,'weiz_r2d')
-    spin_system.rlx.weiz_r2d=inter.weiz_r2d;
+    [rows,cols,vals]=find(inter.weiz_r2d);
+    spin_system.rlx.weiz_r2d=[num2cell(rows(:)) num2cell(cols(:)) num2cell(vals(:))];
 else
-    spin_system.rlx.weiz_r2d=[];
+    spin_system.rlx.weiz_r2d=cell(0,3);
 end
 
 % Report relaxation rates back to the user
@@ -1459,7 +1454,7 @@ end
 end
 
 % Input validation function
-function grumble(sys,inter)
+function srfk_mdepth=grumble(sys,inter)
 
 % Check the output switch
 if isfield(sys,'output')
@@ -2104,39 +2099,45 @@ if isfield(inter,'rlx_dfs')
     
 end
     
-% Check SRFK modulation depths
+% Validate and compile SRFK depths one input column at a time
+srfk_mdepth=cell(0,3);
 if isfield(inter,'srfk_mdepth')
 
     % Check type
-    if (~iscell(inter.srfk_mdepth))||(~all(cellfun(@isnumeric,inter.srfk_mdepth(:))))
+    if ~iscell(inter.srfk_mdepth)
         error('inter.srfk_mdepth must be a cell array of empty matrices or scalars.');
     end
-    
+
     % Check dimensions
-    if ~all(size(inter.srfk_mdepth)==[numel(sys.isotopes) numel(sys.isotopes)])
+    if ~isequal(size(inter.srfk_mdepth),[numel(sys.isotopes) numel(sys.isotopes)])
         error('both dimensions of inter.srfk_mdepth array should match the number of spins.');
     end
-    
-    % Make sure all non-empty elements are non-negative real numbers
-    [rows,cols]=find(~cellfun(@isempty,inter.srfk_mdepth));
-    for n=1:numel(rows)
-        if (~isreal(inter.srfk_mdepth{rows(n),cols(n)}))||(inter.srfk_mdepth{rows(n),cols(n)}<0)
-            error('non-empty elements of inter.srfk_mdepth must be non-negative real numbers.');
+
+    % Check the user input without constructing a square mask
+    depths=cell(numel(sys.isotopes),1);
+    for k=1:numel(sys.isotopes)
+        column=inter.srfk_mdepth(:,k);
+        if ~all(cellfun(@isnumeric,column))
+            error('inter.srfk_mdepth must be a cell array of empty matrices or scalars.');
         end
-    end
-    
-    % Disallow quadratic scalar couplings
-    for n=1:numel(sys.isotopes)
-        if norm(inter.srfk_mdepth{n,n},1)~=0
+        rows=find(~cellfun(@isempty,column));
+        for n=1:numel(rows)
+            if (~isreal(column{rows(n)}))||(column{rows(n)}<0)
+                error('non-empty elements of inter.srfk_mdepth must be non-negative real numbers.');
+            end
+        end
+        if norm(column{k},1)~=0
             error('scalar couplings cannot be quadratic.');
         end
+        depths{k}=[num2cell(rows(:)) num2cell(repmat(k,numel(rows),1)) column(rows(:))];
     end
-    
+    srfk_mdepth=vertcat(depths{:});
+
     % Enforce SRFK if SRFK modulation depths are specified
     if (~isfield(inter,'relaxation'))||(~ismember('SRFK',inter.relaxation))
         error('inter.srfk_mdepth requires SRFK relaxation theory.');
     end
-    
+
 end
 
 % Check equilibrium switch
@@ -2585,7 +2586,7 @@ end
 if isfield(inter,'weiz_r1d')
     
     % Check type and values
-    if (~isnumeric(inter.weiz_r1d))||any(inter.weiz_r1d(:)<0)||(~isreal(inter.weiz_r1d))
+    if (~isnumeric(inter.weiz_r1d))||any(nonzeros(inter.weiz_r1d)<0)||(~isreal(inter.weiz_r1d))
         error('inter.weiz_r1d must be a matrix of non-negative real numbers.');
     end
     
@@ -2605,7 +2606,7 @@ end
 if isfield(inter,'weiz_r2d')
     
     % Check type and values
-    if (~isnumeric(inter.weiz_r2d))||any(inter.weiz_r2d(:)<0)||(~isreal(inter.weiz_r2d))
+    if (~isnumeric(inter.weiz_r2d))||any(nonzeros(inter.weiz_r2d)<0)||(~isreal(inter.weiz_r2d))
         error('inter.weiz_r2d must be a matrix of non-negative real numbers.');
     end
     
@@ -2622,9 +2623,11 @@ if isfield(inter,'weiz_r2d')
 end
 
 % Check Weizmann relaxation rate sanity
-if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')&&...
-   any(inter.weiz_r2d(:)<inter.weiz_r1d(:)/2)
-    error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
+if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')
+    idx=find(inter.weiz_r1d);
+    if any(inter.weiz_r2d(idx)<inter.weiz_r1d(idx)/2)
+        error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
+    end
 end
 
 % Check magnetisation flux parameters
@@ -2637,7 +2640,7 @@ end
 if isfield(inter,'flux_rate')
     if (~isnumeric(inter.flux_rate))||(~isreal(inter.flux_rate))||...
        (~ismatrix(inter.flux_rate))||...
-       (~all(isfinite(inter.flux_rate(:))))||...
+       (~all(isfinite(nonzeros(inter.flux_rate))))||...
        (size(inter.flux_rate,1)~=size(inter.flux_rate,2))
         error('inter.flux_rate must be a finite real square matrix.');
     end

@@ -170,7 +170,7 @@ dissipator is completely positive by construction. `R2>=R1/2` is enforced on
 thermodynamic grounds here and on every Weizmann and Nottingham rate pair.
 The Weizmann matrices `inter.weiz_r1d` and `inter.weiz_r2d` are
 nspins-by-nspins and non-negative, carrying longitudinal flip-flop and
-transverse ZZ cross-relaxation respectively.
+transverse ZZ cross-relaxation respectively. The compiled tables contain nonzero `{from,to,rate}` records; R2d does not require an R1d record for the same pair, and neither table contributes diagonal rates to the cross-relaxation operator.
 
 `inter.damp_rate` is a real scalar or a 3x3 matrix with non-negative
 eigenvalues, in hertz. Given Euler angles it is projected onto the
@@ -199,7 +199,7 @@ inter.srfk_mdepth{1,4}=20;    % RMS modulation depth, Hz
 giving the exponential components of the correlation function.
 `inter.srfk_mdepth` is an nspins-by-nspins cell array of empty matrices or
 non-negative scalars in hertz, the root mean square modulation depth of the
-corresponding coupling, with zero diagonal. The coupling Hamiltonian is
+corresponding coupling, with zero diagonal. The compiled table stores nonempty depths (including explicit zeros) as `{from,to,depth}` records. The coupling Hamiltonian is
 rebuilt with the couplings replaced by their modulation depths and
 integrated against the background Hamiltonian; the Redfield validity
 condition is retested against each `srfk_tau_c{n}(2)`.
@@ -482,4 +482,4 @@ rather than `inter.tau_c`, the latter being read only by Redfield theory.
 
 ## Explicit point-to-point flux relaxation
 
-Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
+Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. The nonzero entries of the input matrix become `{source,destination,rate}` rows in spin_system.rlx.flux_rate, including diagonal bath rates, and the selector is stored in spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.

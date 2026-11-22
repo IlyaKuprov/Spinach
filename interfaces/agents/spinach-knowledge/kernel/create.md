@@ -75,3 +75,5 @@ Use current patched R2026b or later. Pool startup uses MATLAB’s default port s
 Point-to-point flux inputs are inter.flux_rate and inter.flux_type, stored under spin_system.rlx. Their presence does not automatically select flux relaxation: include 'flux' in inter.relaxation to activate the contribution.
 
 Compiles dipolar, eigenvalue/Euler, Cartesian, and scalar contributions in that order into one tensor per ordered pair. A diagonal key is a quadratic coupling; opposite keys remain distinct. User-supplied square cell arrays are consumed a column at a time.
+
+The square flux and Weizmann dipolar-rate inputs compile to nonzero `{from,to,value}` rows in `spin_system.rlx`, sorted by destination then source. The SRFK input cell array compiles to the same layout, retaining every nonempty depth (including an explicitly specified zero). An absent or empty compiled table is `cell(0,3)`. Flux rates do not automatically select flux relaxation: include `'flux'` in `inter.relaxation` to activate the contribution.

@@ -21,3 +21,5 @@ compiled fixtures use per-substance descriptors and offsets.
 
 The source test retains the exact fixtures and tolerances; this entry records
 the guarantees rather than duplicating that executable specification.
+
+The point-dipole fixture checks both directed proximity keys and one half-weight tensor.

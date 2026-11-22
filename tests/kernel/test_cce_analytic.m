@@ -31,8 +31,12 @@ transverse=430;
 phase=230;
 spin_system.inter.zeeman.matrix{1}(3,3)=phase;
 spin_system.inter.zeeman.matrix{2}(3,3)=omega;
-spin_system.inter.coupling.matrix{1,2}(1,3)=transverse;
-spin_system.inter.coupling.matrix{1,2}(3,3)=longitudinal;
+tensor_value=cce_test_read(spin_system,[1 2]);
+tensor_value(1,3)=transverse;
+spin_system=cce_test_write(spin_system,[1 2],tensor_value);
+tensor_value=cce_test_read(spin_system,[1 2]);
+tensor_value(3,3)=longitudinal;
+spin_system=cce_test_write(spin_system,[1 2],tensor_value);
 
 % Declare the observed transition and bath policy
 p.observed=1;
@@ -140,7 +144,7 @@ result=test_close(result,'empty bath phase',empty,exp(-1i*phase*p.times(:)),1e-1
 % Verify a disconnected unpolarised bath changes no observed dynamics
 p.cce.bath_spins=2;
 p.cce.order=1;
-spin_system.inter.coupling.matrix{1,2}=zeros(3);
+spin_system=cce_test_write(spin_system,[1 2],zeros(3));
 uncoupled=clexpn(spin_system,@free_evolution,p,'labframe');
 result=test_close(result,'uncoupled bath',uncoupled,empty,1e-11,1e-11,'Independent analytic or dense reference.');
 
@@ -155,9 +159,13 @@ metrics.hahn_error=max(abs(echo-reference));
 % Check the same absolute boundary in both generalised propagation paths
 probe_system=spin_system;
 probe_system.inter.zeeman.matrix{1}(3,3)=phase;
-probe_system.inter.coupling.matrix{1,2}=zeros(3);
-probe_system.inter.coupling.matrix{1,2}(1,3)=transverse;
-probe_system.inter.coupling.matrix{1,2}(3,3)=longitudinal;
+probe_system=cce_test_write(probe_system,[1 2],zeros(3));
+tensor_value=cce_test_read(probe_system,[1 2]);
+tensor_value(1,3)=transverse;
+probe_system=cce_test_write(probe_system,[1 2],tensor_value);
+tensor_value=cce_test_read(probe_system,[1 2]);
+tensor_value(3,3)=longitudinal;
+probe_system=cce_test_write(probe_system,[1 2],tensor_value);
 probe=q;
 probe.output='density';
 probe.rho0=ones(2)/2;

@@ -126,6 +126,10 @@ if projected
         ops=cell(1,3*numel(observed));
         fields=cell(size(ops));
         axes={'x','y','z'};
+
+        % Resolve both directions of each retained pair
+        [pair_index,tensors]=cce_pair_index(model);
+
         for c=1:numel(observed)
             for a=1:3
                 slot=3*(c-1)+a;
@@ -133,7 +137,7 @@ if projected
                                c,model.multiplicities(observed));
                 field=zeros(cluster_system.bath_dimension);
                 for b=1:numel(cluster_system.sites)
-                    tensor=model.retained{observed(c),cluster_system.sites(b)};
+                    tensor=tensors{1+pair_index(observed(c),cluster_system.sites(b))};
                     for axis=1:3
                         field=field+tensor(a,axis)*embed(...
                             pauli_axis(cluster_system.multiplicities(numel(observed)+b),axes{axis}),...
@@ -142,7 +146,7 @@ if projected
                 end
                 for b=1:numel(cluster_system.configuration.exterior_ids)
                     field=field+eye(cluster_system.bath_dimension)*(...
-                        model.retained{observed(c),cluster_system.configuration.exterior_ids(b)}(a,:)*...
+                        tensors{1+pair_index(observed(c),cluster_system.configuration.exterior_ids(b))}(a,:)*...
                         cluster_system.configuration.exterior_expectations(b,:).');
                 end
                 fields{slot}=field;
@@ -261,6 +265,9 @@ dims=system.multiplicities;
 dimension=system.dimension;
 memory_guard(parameters,16*dimension^2*(12+3*numel(ids)));
 
+% Resolve both directions of each retained pair
+[pair_index,tensors]=cce_pair_index(model);
+
 % Construct angular momentum operators in canonical product ordering
 ops=cell(numel(ids),3);
 for n=1:numel(ids)
@@ -327,7 +334,7 @@ if strcmp(backend,'direct')
 
         % Apply the stock on-site quadratic retention convention
         tensor=model.quadratic{id};
-        strength=model.spin_system.inter.coupling.strength{id,id};
+        strength=model.quadratic_strength{id};
         switch strength
             case 'strong'
 
@@ -355,7 +362,7 @@ if strcmp(backend,'direct')
 
         % Sum each physical pair once, using combined ordered-cell tensors
         for k=n+1:numel(ids)
-            tensor=model.retained{id,ids(k)};
+            tensor=tensors{1+pair_index(id,ids(k))};
             for axis=1:3
                 for other=1:3
                     term=tensor(axis,other)*(ops{n,axis}*ops{k,other});
@@ -404,7 +411,7 @@ if isfield(spin_config,'exterior_ids')
     end
     for n=1:numel(ids)
         for k=1:numel(spin_config.exterior_ids)
-            field=model.retained{ids(n),spin_config.exterior_ids(k)}*...
+            field=tensors{1+pair_index(ids(n),spin_config.exterior_ids(k))}*...
                   spin_config.exterior_expectations(k,:).';
             for axis=1:3
                 term=field(axis)*ops{n,axis};

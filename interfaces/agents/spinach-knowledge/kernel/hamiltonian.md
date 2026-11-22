@@ -42,3 +42,6 @@ When `ham_cache` is enabled, the cache key includes the descriptor, `operator_ty
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/hamiltonian.m)
 - [Spinach Wiki: hamiltonian.m](https://spindynamics.org/wiki/index.php?title=hamiltonian.m)
+
+Self records supply the quadratic terms; off-diagonal records carry their aligned strength labels into the bilinear terms.
+Mode terms traverse ordered pair records. The offset-frame connectivity graph uses their endpoints; the radiation-pressure channel keeps the declared order of its two mode indices.

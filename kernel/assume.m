@@ -81,7 +81,7 @@ spin_system.inter.assumptions=assumptions;
 % Preallocate the arrays
 spin_system.inter.zeeman.strength=cell(spin_system.comp.nspins,1);
 spin_system.inter.giant.strength=cell(spin_system.comp.nspins,1);
-spin_system.inter.coupling.strength=cell(spin_system.comp.nspins);
+spin_system.inter.coupling.strength=spin_system.inter.coupling.matrix;
 
 % Set the approximations
 switch assumptions
@@ -118,21 +118,24 @@ switch assumptions
             % Giant spin terms should be secular
             spin_system.inter.giant.strength{n}='secular';
             
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                if strcmp(spin_system.comp.isotopes{n},spin_system.comp.isotopes{k})
-                    
-                    % Couplings between spins of the same type should be secular
-                    spin_system.inter.coupling.strength{n,k}='secular';
-                    
-                else
-                    
-                    % Couplings between spins of different types should be weak
-                    spin_system.inter.coupling.strength{n,k}='zz';
-                    
-                end
+        end
+
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+            if strcmp(spin_system.comp.isotopes{n},spin_system.comp.isotopes{k})
+
+                % Couplings between spins of the same type should be secular
+                spin_system.inter.coupling.strength{q,3}='secular';
+
+            else
+
+                % Couplings between spins of different types should be weak
+                spin_system.inter.coupling.strength{q,3}='zz';
+
             end
-            
+
         end
         
     case {'esr','deer'}
@@ -176,30 +179,34 @@ switch assumptions
             % Giant spin terms should be secular
             spin_system.inter.giant.strength{n}='secular';
             
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                if strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Couplings from electrons to nuclei should be left-secular
-                    spin_system.inter.coupling.strength{n,k}='z*';
-                    
-                elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Couplings from nuclei to electrons should be right-secular
-                    spin_system.inter.coupling.strength{n,k}='*z';
-                    
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Couplings between electrons should be secular
-                    spin_system.inter.coupling.strength{n,k}='secular';
-                    
-                else
-                    
-                    % Couplings between nuclei should be strong
-                    spin_system.inter.coupling.strength{n,k}='strong';
-                    
-                end
+        end
+
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+            if strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Couplings from electrons to nuclei should be left-secular
+                spin_system.inter.coupling.strength{q,3}='z*';
+
+            elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Couplings from nuclei to electrons should be right-secular
+                spin_system.inter.coupling.strength{q,3}='*z';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Couplings between electrons should be secular
+                spin_system.inter.coupling.strength{q,3}='secular';
+
+            else
+
+                % Couplings between nuclei should be strong
+                spin_system.inter.coupling.strength{q,3}='strong';
+
             end
+
         end
         
     case {'deer-zz'}
@@ -243,36 +250,39 @@ switch assumptions
             % Giant spin terms should be secular
             spin_system.inter.giant.strength{n}='secular';
             
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                if strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Couplings from electron to nucleus should be left-secular
-                    spin_system.inter.coupling.strength{n,k}='z*';
-                    
-                elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Couplings from nucleus to electron should be right-secular
-                    spin_system.inter.coupling.strength{n,k}='*z';
-                    
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(n~=k)
-                    
-                    % Couplings between different electrons should be weak
-                    spin_system.inter.coupling.strength{n,k}='zz';
-                    
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(n==k)
-                    
-                    % Quadratic couplings on each electron should be secular
-                    spin_system.inter.coupling.strength{n,k}='secular';
-                    
-                else
-                    
-                    % Couplings between nuclei should be strong
-                    spin_system.inter.coupling.strength{n,k}='strong';
-                    
-                end
+        end
+
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+            if strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Couplings from electron to nucleus should be left-secular
+                spin_system.inter.coupling.strength{q,3}='z*';
+
+            elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Couplings from nucleus to electron should be right-secular
+                spin_system.inter.coupling.strength{q,3}='*z';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(n~=k)
+
+                % Couplings between different electrons should be weak
+                spin_system.inter.coupling.strength{q,3}='zz';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(n==k)
+
+                % Quadratic couplings on each electron should be secular
+                spin_system.inter.coupling.strength{q,3}='secular';
+
+            else
+
+                % Couplings between nuclei should be strong
+                spin_system.inter.coupling.strength{q,3}='strong';
+
             end
-            
+
         end
         
     case {'labframe'}
@@ -308,15 +318,10 @@ switch assumptions
             % Giant spin terms should be full
             spin_system.inter.giant.strength{n}='strong';
 
-            % The same applies to all couplings
-            for k=1:spin_system.comp.nspins
-
-                % Full coupling tensors should be used for all spins
-                spin_system.inter.coupling.strength{n,k}='strong';
-
-            end
-
         end
+
+        % The same applies to all couplings
+        spin_system.inter.coupling.strength(:,3)={'strong'};
 
         % Process bosonic mode terms
         if isfield(spin_system.inter,'modes')
@@ -357,36 +362,39 @@ switch assumptions
             % Ignore all giant spin model terms
             spin_system.inter.giant.strength{n}='ignore';
             
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                if n==k
-                    
-                    % Ignore quadratic couplings
-                    spin_system.inter.coupling.strength{n,k}='ignore';
+        end
 
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Keep EzN+ for electron-nuclear couplings
-                    spin_system.inter.coupling.strength{n,k}='z+';
-                    
-                elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Keep N+Ez for nuclear-electron couplings
-                    spin_system.inter.coupling.strength{n,k}='+z';
-                    
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Ignore couplings between electrons
-                    spin_system.inter.coupling.strength{n,k}='ignore';
-                    
-                elseif (~strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Keep the T(L,+1) component of inter-nuclear couplings
-                    spin_system.inter.coupling.strength{n,k}='T(L,+1)';
-                    
-                end
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+            if n==k
+
+                % Ignore quadratic couplings
+                spin_system.inter.coupling.strength{q,3}='ignore';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Keep EzN+ for electron-nuclear couplings
+                spin_system.inter.coupling.strength{q,3}='z+';
+
+            elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Keep N+Ez for nuclear-electron couplings
+                spin_system.inter.coupling.strength{q,3}='+z';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Ignore couplings between electrons
+                spin_system.inter.coupling.strength{q,3}='ignore';
+
+            elseif (~strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Keep the T(L,+1) component of inter-nuclear couplings
+                spin_system.inter.coupling.strength{q,3}='T(L,+1)';
+
             end
-            
+
         end
         
     case {'se_dnp_h-'}
@@ -416,36 +424,39 @@ switch assumptions
             % Ignore all giant spin model terms
             spin_system.inter.giant.strength{n}='ignore';
             
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                if n==k
-                    
-                    % Ignore quadratic couplings
-                    spin_system.inter.coupling.strength{n,k}='ignore';
+        end
 
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Keep EzN- for electron-nuclear couplings
-                    spin_system.inter.coupling.strength{n,k}='z-';
-                    
-                elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Keep N-Ez for nuclear-electron couplings
-                    spin_system.inter.coupling.strength{n,k}='-z';
-                    
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Ignore couplings between electrons
-                    spin_system.inter.coupling.strength{n,k}='ignore';
-                    
-                elseif (~strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Keep the T(L,-1) component of inter-nuclear couplings
-                    spin_system.inter.coupling.strength{n,k}='T(L,-1)';
-                    
-                end
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+            if n==k
+
+                % Ignore quadratic couplings
+                spin_system.inter.coupling.strength{q,3}='ignore';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Keep EzN- for electron-nuclear couplings
+                spin_system.inter.coupling.strength{q,3}='z-';
+
+            elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Keep N-Ez for nuclear-electron couplings
+                spin_system.inter.coupling.strength{q,3}='-z';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Ignore couplings between electrons
+                spin_system.inter.coupling.strength{q,3}='ignore';
+
+            elseif (~strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Keep the T(L,-1) component of inter-nuclear couplings
+                spin_system.inter.coupling.strength{q,3}='T(L,-1)';
+
             end
-            
+
         end
         
     case {'se_dnp_h0'}
@@ -475,36 +486,39 @@ switch assumptions
             % Ignore all giant spin model terms
             spin_system.inter.giant.strength{n}='ignore';
             
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                if n==k
-                    
-                    % Ignore quadratic couplings
-                    spin_system.inter.coupling.strength{n,k}='ignore';
+        end
 
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Keep EzNz for electron-nuclear couplings
-                    spin_system.inter.coupling.strength{n,k}='zz';
-                    
-                elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Keep NzEz for nuclear-electron couplings
-                    spin_system.inter.coupling.strength{n,k}='zz';
-                    
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
-                    
-                    % Ignore couplings between electrons
-                    spin_system.inter.coupling.strength{n,k}='ignore';
-                    
-                elseif (~strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
-                    
-                    % Keep the secular component of inter-nuclear couplings
-                    spin_system.inter.coupling.strength{n,k}='secular';
-                    
-                end
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+            if n==k
+
+                % Ignore quadratic couplings
+                spin_system.inter.coupling.strength{q,3}='ignore';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Keep EzNz for electron-nuclear couplings
+                spin_system.inter.coupling.strength{q,3}='zz';
+
+            elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Keep NzEz for nuclear-electron couplings
+                spin_system.inter.coupling.strength{q,3}='zz';
+
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
+
+                % Ignore couplings between electrons
+                spin_system.inter.coupling.strength{q,3}='ignore';
+
+            elseif (~strcmp(spin_system.comp.isotopes{k}(1),'E'))&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+
+                % Keep the secular component of inter-nuclear couplings
+                spin_system.inter.coupling.strength{q,3}='secular';
+
             end
-            
+
         end
         
     case 'qnmr'
@@ -555,34 +569,36 @@ switch assumptions
             % Ignore all giant spin model terms
             spin_system.inter.giant.strength{n}='ignore';
             
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                
-                % Assign strength parameters
-                if (spin_system.comp.mults(n)==2)&&(spin_system.comp.mults(k)>2)
-                    
-                    % Couplings from S=1/2 to S>1/2 nuclei should be left-secular
-                    spin_system.inter.coupling.strength{n,k}='z*';
-                    
-                elseif (spin_system.comp.mults(n)>2)&&(spin_system.comp.mults(k)==2)
-                    
-                    % Couplings from S>1/2 to S=1/2 nuclei should be right-secular
-                    spin_system.inter.coupling.strength{n,k}='*z';
-                    
-                elseif (spin_system.comp.mults(n)==2)&&(spin_system.comp.mults(k)==2)
-                    
-                    % Couplings between S=1/2 nuclei should be secular
-                    spin_system.inter.coupling.strength{n,k}='secular';
-                    
-                else
-                    
-                    % Couplings between S>1/2 nuclei should be strong
-                    spin_system.inter.coupling.strength{n,k}='strong';
-                    
-                end
+        end
+
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+
+            % Assign strength parameters
+            if (spin_system.comp.mults(n)==2)&&(spin_system.comp.mults(k)>2)
+
+                % Couplings from S=1/2 to S>1/2 nuclei should be left-secular
+                spin_system.inter.coupling.strength{q,3}='z*';
+
+            elseif (spin_system.comp.mults(n)>2)&&(spin_system.comp.mults(k)==2)
+
+                % Couplings from S>1/2 to S=1/2 nuclei should be right-secular
+                spin_system.inter.coupling.strength{q,3}='*z';
+
+            elseif (spin_system.comp.mults(n)==2)&&(spin_system.comp.mults(k)==2)
+
+                % Couplings between S=1/2 nuclei should be secular
+                spin_system.inter.coupling.strength{q,3}='secular';
+
+            else
+
+                % Couplings between S>1/2 nuclei should be strong
+                spin_system.inter.coupling.strength{q,3}='strong';
                 
             end
-            
+
         end
 
     case {'cavity'}
@@ -611,24 +627,22 @@ switch assumptions
             % Giant spin terms should be secular
             spin_system.inter.giant.strength{n}='secular';
 
-            % All spin-spin couplings should be secular
-            for k=1:spin_system.comp.nspins
-                spin_system.inter.coupling.strength{n,k}='secular';
-            end
-
         end
+
+        % All spin-spin couplings should be secular
+        spin_system.inter.coupling.strength(:,3)={'secular'};
 
         % Process bosonic mode terms
         if isfield(spin_system.inter,'modes')
 
             % Disallow longitudinal terms that average out under the RWA
-            if ~all(cellfun(@isempty,spin_system.inter.modes.longitudinal(:)))
+            if ~isempty(spin_system.inter.modes.longitudinal)
                 error('longitudinal couplings average to zero in this frame, use spin-phonon or labframe.');
             end
 
             % Disallow modulation terms that average out under the RWA
-            if (~all(cellfun(@isempty,spin_system.inter.modes.coupling_mod(:))))||...
-               (~all(cellfun(@isempty,spin_system.inter.modes.zeeman_mod(:))))
+            if (~isempty(spin_system.inter.modes.coupling_mod))||...
+               (~isempty(spin_system.inter.modes.zeeman_mod))
                 error('Hamiltonian modulation terms average to zero in this frame, use spin-phonon or labframe.');
             end
 
@@ -682,30 +696,34 @@ switch assumptions
             % Giant spin terms should be secular
             spin_system.inter.giant.strength{n}='secular';
 
-            % For spin-spin couplings, it depends
-            for k=1:spin_system.comp.nspins
-                if strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
+        end
 
-                    % Couplings from electrons to nuclei should be left-secular
-                    spin_system.inter.coupling.strength{n,k}='z*';
+        % For spin-spin couplings, it depends
+        for q=1:size(spin_system.inter.coupling.strength,1)
+            n=spin_system.inter.coupling.strength{q,1};
+            k=spin_system.inter.coupling.strength{q,2};
+            if strcmp(spin_system.comp.isotopes{n}(1),'E')&&(~strcmp(spin_system.comp.isotopes{k}(1),'E'))
 
-                elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
+                % Couplings from electrons to nuclei should be left-secular
+                spin_system.inter.coupling.strength{q,3}='z*';
 
-                    % Couplings from nuclei to electrons should be right-secular
-                    spin_system.inter.coupling.strength{n,k}='*z';
+            elseif strcmp(spin_system.comp.isotopes{k}(1),'E')&&(~strcmp(spin_system.comp.isotopes{n}(1),'E'))
 
-                elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
+                % Couplings from nuclei to electrons should be right-secular
+                spin_system.inter.coupling.strength{q,3}='*z';
 
-                    % Couplings between electrons should be secular
-                    spin_system.inter.coupling.strength{n,k}='secular';
+            elseif strcmp(spin_system.comp.isotopes{n}(1),'E')&&(strcmp(spin_system.comp.isotopes{k}(1),'E'))
 
-                else
+                % Couplings between electrons should be secular
+                spin_system.inter.coupling.strength{q,3}='secular';
 
-                    % Couplings between nuclei should be strong
-                    spin_system.inter.coupling.strength{n,k}='strong';
+            else
 
-                end
+                % Couplings between nuclei should be strong
+                spin_system.inter.coupling.strength{q,3}='strong';
+
             end
+
         end
 
         % Process bosonic mode terms
@@ -742,10 +760,8 @@ if exist('retention','var')&&strcmp(retention,'couplings')
 elseif exist('retention','var')&&strcmp(retention,'zeeman')
     for n=1:spin_system.comp.nspins
         spin_system.inter.giant.strength{n}='ignore';
-        for k=1:spin_system.comp.nspins
-            spin_system.inter.coupling.strength{n,k}='ignore';
-        end
     end
+    spin_system.inter.coupling.strength(:,3)={'ignore'};
     report(spin_system,'WARNING - only Zeeman interactions will be included.');
 end
 
@@ -766,4 +782,5 @@ end
 % playful, rebellious, and immature.
 %
 % Tom Robbins
+
 

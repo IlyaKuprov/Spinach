@@ -42,6 +42,13 @@ grumble(spin_system,hit_list)
 % Catch logical indexing
 if islogical(hit_list), hit_list=find(hit_list); end
 
+% Map retained particle indices in their original order
+retained=true(spin_system.comp.nspins,1);
+retained(hit_list)=false;
+keep=reshape(find(retained),1,[]);
+spin_map=zeros(spin_system.comp.nspins,1);
+spin_map(keep)=1:numel(keep);
+
 % Retain input settings rather than patching compiled basis data
 if isfield(spin_system,'bas')
     fields={'formalism','approximation','inter_level','prox_level',...
@@ -53,9 +60,8 @@ if isfield(spin_system,'bas')
     end
 
     % Reindex retained filter labels and remove empty isotope selections
-    keep=setdiff(1:spin_system.comp.nspins,hit_list);
     for n=1:numel(spin_system.chem.parts)
-        local_keep=~ismember(spin_system.chem.parts{n},hit_list);
+        local_keep=retained(spin_system.chem.parts{n});
         if isfield(bas,'manual')
             bas.manual{n}=bas.manual{n}(:,local_keep);
         end
@@ -150,16 +156,14 @@ spin_system.inter.zeeman.ddscal(hit_list)=[];
 % Update giant spin Hamiltonian terms
 spin_system.inter.giant.coeff(hit_list)=[];
 
-% Update coupling tensor array
-spin_system.inter.coupling.matrix(hit_list,:)=[];
-spin_system.inter.coupling.matrix(:,hit_list)=[];
+% Restrict the tensor records to the retained keys
+spin_system.inter.coupling.matrix=pair_subset(spin_system.inter.coupling.matrix,spin_map);
 
 % Update coordinates
 spin_system.inter.coordinates(hit_list)=[];
 
-% Update proximity matrix
-spin_system.inter.proxmatrix(hit_list,:)=[];
-spin_system.inter.proxmatrix(:,hit_list)=[];
+% Restrict the proximity records to the retained particles
+spin_system.inter.proximity=pair_subset(spin_system.inter.proximity,spin_map);
 
 % Update particle-indexed bosonic mode data
 if isfield(spin_system.inter,'modes')
@@ -174,21 +178,19 @@ if isfield(spin_system.inter,'modes')
     fields={'exchange','kerr','longitudinal','dispersive',...
             'coupling_mod','zeeman_mod'};
     for n=1:numel(fields)
-        pairs=spin_system.inter.modes.(fields{n});
-        pairs(hit_list,:)=[]; pairs(:,hit_list)=[];
+        pairs=pair_subset(spin_system.inter.modes.(fields{n}),spin_map);
 
         % Reindex spin leaves inside retained modulation derivative orders
         if ismember(fields{n},{'coupling_mod','zeeman_mod'})
-            for k=find(~cellfun(@isempty,pairs(:)))'
-                orders=pairs{k};
-                for p=1:numel(orders)
-                    if isempty(orders{p}), continue; end
-                    orders{p}(:,hit_list)=[];
+            for k=1:size(pairs,1)
+                for p=1:numel(pairs{k,3})
+                    if isempty(pairs{k,3}{p}), continue; end
                     if strcmp(fields{n},'coupling_mod')
-                        orders{p}(hit_list,:)=[];
+                        pairs{k,3}{p}=pair_subset(pairs{k,3}{p},spin_map);
+                    else
+                        pairs{k,3}{p}=pairs{k,3}{p}(keep);
                     end
                 end
-                pairs{k}=orders;
             end
         end
         spin_system.inter.modes.(fields{n})=pairs;
@@ -215,49 +217,32 @@ end
 if ~isempty(spin_system.rlx.lind_r2_rates)
     spin_system.rlx.lind_r2_rates(hit_list)=[];
 end
-if ~isempty(spin_system.rlx.srfk_mdepth)
-    spin_system.rlx.srfk_mdepth(hit_list,:)=[];
-    spin_system.rlx.srfk_mdepth(:,hit_list)=[];
-end
-if ~isempty(spin_system.rlx.weiz_r1d)
-    spin_system.rlx.weiz_r1d(hit_list,:)=[];
-    spin_system.rlx.weiz_r1d(:,hit_list)=[];
-end
-if ~isempty(spin_system.rlx.weiz_r2d)
-    spin_system.rlx.weiz_r2d(hit_list,:)=[];
-    spin_system.rlx.weiz_r2d(:,hit_list)=[];
+
+% Restrict relaxation and magnetisation flux records to the retained particles
+for field={'flux_rate','srfk_mdepth','weiz_r1d','weiz_r2d'}
+    spin_system.rlx.(field{1})=pair_subset(spin_system.rlx.(field{1}),spin_map);
 end
 
-% Update scalar relaxation source spins
+% Reindex retained scalar relaxation source spins
 if ~isempty(spin_system.rlx.srsk_sources)
-    srsk_spins=zeros(1,spin_system.comp.nspins+numel(hit_list));
-    srsk_spins(spin_system.rlx.srsk_sources)=1; srsk_spins(hit_list)=[];
-    spin_system.rlx.srsk_sources=find(srsk_spins);
+    sources=false(size(retained));
+    sources(spin_system.rlx.srsk_sources)=true;
+    spin_system.rlx.srsk_sources=reshape(spin_map(sources&retained),1,[]);
 end
 
-% Update kinetics parameters
+% Reindex particles in each substance
 for n=1:numel(spin_system.chem.parts)
-    subsystem_idx=false(1,spin_system.comp.nspins+numel(hit_list));
-    subsystem_idx(spin_system.chem.parts{n})=true();
-    subsystem_idx(hit_list)=[];
-    spin_system.chem.parts{n}=find(subsystem_idx);
-end
-
-% Update magnetisation flux indices
-if ~isempty(spin_system.rlx.flux_rate)
-    spin_system.rlx.flux_rate(hit_list,:)=[];
-    spin_system.rlx.flux_rate(:,hit_list)=[];
+    spins=spin_map(spin_system.chem.parts{n});
+    spin_system.chem.parts{n}=reshape(spins(spins>0),1,[]);
 end
 
 % Rebuild the reaction atom maps in the surviving global spin index
-keep=setdiff(1:spin_system.comp.nspins+numel(hit_list),hit_list);
 for n=1:numel(spin_system.chem.reactions)
     reaction=spin_system.chem.reactions{n};
-    matching=reaction.matching;
-    matching(any(ismember(matching,hit_list),2),:)=[];
-    [~,reaction.matching]=ismember(matching,keep);
+    matching=reshape(spin_map(reaction.matching),size(reaction.matching));
+    reaction.matching=matching(all(matching>0,2),:);
     if isfield(reaction,'selector')&&ischar(reaction.selector{1})
-        [~,reaction.selector{2}]=ismember(reaction.selector{2},keep);
+        reaction.selector{2}(:)=spin_map(reaction.selector{2});
     end
     spin_system.chem.reactions{n}=reaction;
 end
@@ -290,10 +275,10 @@ if isfield(spin_system.inter.giant,'strength')
     spin_system.inter.giant=rmfield(spin_system.inter.giant,'strength');
     report(spin_system,'WARNING - assumption information must be re-created.');
 end
-if isfield(spin_system.inter.coupling,'strength')
-    spin_system.inter.coupling=rmfield(spin_system.inter.coupling,'strength');
-    report(spin_system,'WARNING - assumption information must be re-created.');
-end
+
+% Discard all coupling assumptions belonging to the old particle set
+fields=intersect({'strength','retention','rules'},fieldnames(spin_system.inter.coupling));
+spin_system.inter.coupling=rmfield(spin_system.inter.coupling,fields);
 
 % Rebuild descriptors, symmetry projectors, dimensions, offsets, and cache identity
 if exist('bas','var'), spin_system=basis(spin_system,bas); end
@@ -302,12 +287,16 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,hit_list)
+if ~isstruct(spin_system)
+    error('spin_system must be a Spinach data structure.');
+end
 if islogical(hit_list)
     if(numel(hit_list)~=spin_system.comp.nspins)
         error('the size of the hit mask does not match the number of spins in the system.');
     end
 else
-    if (~isnumeric(hit_list))||any(hit_list<1)||any(mod(hit_list,1)~=0)
+    if (~isnumeric(hit_list))||(~isreal(hit_list))||...
+       (~isvector(hit_list)&&~isempty(hit_list))||any(hit_list<1)||any(mod(hit_list,1)~=0)
         error('hit_list must be a logical mask or an array of positive integers.');
     end
     if numel(unique(hit_list))~=numel(hit_list)

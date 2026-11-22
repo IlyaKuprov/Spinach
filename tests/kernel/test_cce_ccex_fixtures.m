@@ -48,23 +48,21 @@ for f=1:numel(data)
     inter.coupling.matrix=cell(nb+1);
     inter.coordinates=mat2cell([center;xyz],ones(1,nb+1),3).';
     spin_system=create(sys,inter);
-    for j=1:nb+1
-        for k=1:nb+1
-            spin_system.inter.coupling.matrix{j,k}=zeros(3);
-        end
-    end
+    spin_system.inter.coupling.matrix=cell(0,3);
     gamma_n=6.728284;
     gamma_e=-17608.597050;
     for j=1:nb
         spin_system.inter.zeeman.matrix{j+1}(3,3)=-gamma_n*500*1000;
         r=xyz(j,:)-center;
-        spin_system.inter.coupling.matrix{1,j+1}=dipolar(r,gamma_e,gamma_n);
+        spin_system=cce_test_write(spin_system,[1 j+1],dipolar(r,gamma_e,gamma_n));
 
         % Match the external reference's explicit projected observed Sz model
-        spin_system.inter.coupling.matrix{1,j+1}(:,1:2)=0;
+        tensor_value=cce_test_read(spin_system,[1 j+1]);
+        tensor_value(:,1:2)=0;
+        spin_system=cce_test_write(spin_system,[1 j+1],tensor_value);
         for k=j+1:nb
             r=xyz(j,:)-xyz(k,:);
-            spin_system.inter.coupling.matrix{j+1,k+1}=dipolar(r,gamma_n,gamma_n);
+            spin_system=cce_test_write(spin_system,[j+1 k+1],dipolar(r,gamma_n,gamma_n));
         end
     end
 

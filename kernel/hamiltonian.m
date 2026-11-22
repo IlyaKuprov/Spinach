@@ -79,6 +79,11 @@ irr_comp{1}=zeros([spin_system.comp.nspins 8 3],'like',1i);  % Rank 1 [+1, 0, -1
 irr_comp{2}=zeros([spin_system.comp.nspins 8 5],'like',1i);  % Rank 2 [+2, +1, 0, -1, 2]
 
 % Process Zeeman interactions and NQI
+pairs=spin_system.inter.coupling.matrix;
+keys=reshape(cell2mat(pairs(:,1:2)),[],2);
+diagonal=find(keys(:,1)==keys(:,2));
+self=zeros(spin_system.comp.nspins,1);
+self(keys(diagonal,1))=diagonal;
 for n=1:spin_system.comp.nspins
     
     % Write the isotropic Zeeman part
@@ -193,10 +198,10 @@ for n=1:spin_system.comp.nspins
         end
         
         % Process quadrupolar interactions
-        if norm(spin_system.inter.coupling.matrix{n,n},2)>2*pi*spin_system.tols.inter_cutoff
+        if self(n)&&(norm(pairs{self(n),3},2)>2*pi*spin_system.tols.inter_cutoff)
             
             % Get spherical tensor components for NQIs
-            [iso_quad,lam_quad,phi_quad]=mat2sphten(spin_system.inter.coupling.matrix{n,n});
+            [iso_quad,lam_quad,phi_quad]=mat2sphten(pairs{self(n),3});
             
             % Catch disallowed components
             if (norm(iso_quad,2)>1e-6*norm(phi_quad,2))||...
@@ -211,7 +216,7 @@ for n=1:spin_system.comp.nspins
             end
             
             % Process the coupling
-            switch spin_system.inter.coupling.strength{n,n}
+            switch spin_system.inter.coupling.strength{self(n),3}
                 
                 case 'strong'
                     
@@ -281,10 +286,8 @@ clear('nL','nS','opL','opS','isotropic','ist_coeff','irr_comp',...
       'mask_a','mask_b','mask_c','zeeman_iso','n');
 
 % Discover significant coupling tensors and build interacting pair list
-[L,S]=find(cellfun(@(x)norm(x,2),spin_system.inter.coupling.matrix)>...
-                                 2*pi*spin_system.tols.inter_cutoff);
-quad_couplings=(L==S); L(quad_couplings)=[]; S(quad_couplings)=[];
-pair_list=[L S]; if isempty(pair_list), pair_list=[]; end
+active=find((keys(:,1)~=keys(:,2))&(cellfun(@(x)norm(x,2),pairs(:,3))>2*pi*spin_system.tols.inter_cutoff));
+pair_list=keys(active,:);
 
 % Preallocate spin indices
 nL=zeros(size(pair_list,1),3,3);
@@ -312,13 +315,13 @@ for n=1:size(pair_list,1)
     L=pair_list(n,1); S=pair_list(n,2);
     
     % Get the isotropic coupling constant
-    coupling_iso=trace(spin_system.inter.coupling.matrix{L,S})/3;
+    coupling_iso=trace(pairs{active(n),3})/3;
     
     % Filter out small isotropic parts
     if abs(coupling_iso)>2*pi*spin_system.tols.inter_cutoff
         
         % Process the coupling
-        switch spin_system.inter.coupling.strength{L,S}
+        switch spin_system.inter.coupling.strength{active(n),3}
             
             case {'strong','secular'}
                 
@@ -358,7 +361,7 @@ for n=1:size(pair_list,1)
     if build_aniso
         
         % Get spherical tensor components
-        [~,lam_coupling,phi_coupling]=mat2sphten(spin_system.inter.coupling.matrix{L,S});
+        [~,lam_coupling,phi_coupling]=mat2sphten(pairs{active(n),3});
         
         % Only process significant interaction anisotropies
         if (norm(lam_coupling,2)>spin_system.tols.liouv_zero)||...
@@ -373,7 +376,7 @@ for n=1:size(pair_list,1)
             end
             
             % Write irreducible spherical tensors
-            switch spin_system.inter.coupling.strength{L,S}
+            switch spin_system.inter.coupling.strength{active(n),3}
                 
                 case 'strong'
                     
@@ -921,11 +924,13 @@ if isfield(spin_system.inter,'modes')
         % Build the particle connectivity graph from every coupling channel
         chan_flds={'exchange','dispersive','kerr','longitudinal',...
                    'coupling_mod','zeeman_mod'};
-        conmat=logical(eye(spin_system.comp.nspins));
+        conmat=speye(spin_system.comp.nspins);
         for n=1:numel(chan_flds)
-            conmat=conmat|(~cellfun(@isempty,modes.(chan_flds{n})));
+            pairs=modes.(chan_flds{n});
+            conmat=conmat|sparse(cell2mat(pairs(:,1)),cell2mat(pairs(:,2)),true,...
+                                 spin_system.comp.nspins,spin_system.comp.nspins);
         end
-        conmat=sparse(conmat|conmat');
+        conmat=conmat|conmat';
 
         % Loop over connected subgraphs
         sci=scomponents(conmat);
@@ -1046,11 +1051,11 @@ if isfield(spin_system.inter,'modes')
     end
 
     % Process exchange coupling terms
-    [xrows,xcols]=find(~cellfun(@isempty,modes.exchange));
-    for n=1:numel(xrows)
+    pairs=modes.exchange;
+    for n=1:size(pairs,1)
 
         % Extract indices and the coupling constant
-        xr=xrows(n); xc=xcols(n); xj=modes.exchange{xr,xc};
+        [xr,xc,xj]=pairs{n,:};
 
         % Process the coupling
         switch mstr.exchange
@@ -1142,11 +1147,11 @@ if isfield(spin_system.inter,'modes')
     end
 
     % Process cross-Kerr coupling terms
-    [xrows,xcols]=find(~cellfun(@isempty,modes.kerr));
-    for n=1:numel(xrows)
+    pairs=modes.kerr;
+    for n=1:size(pairs,1)
 
         % Extract indices and the coupling constant
-        xr=xrows(n); xc=xcols(n); xj=modes.kerr{xr,xc};
+        [xr,xc,xj]=pairs{n,:};
 
         % Process the coupling
         switch mstr.kerr
@@ -1176,11 +1181,11 @@ if isfield(spin_system.inter,'modes')
     end
 
     % Process longitudinal coupling terms
-    [xrows,xcols]=find(~cellfun(@isempty,modes.longitudinal));
-    for n=1:numel(xrows)
+    pairs=modes.longitudinal;
+    for n=1:size(pairs,1)
 
         % Extract indices and the coupling constant
-        xr=xrows(n); xc=xcols(n); xj=modes.longitudinal{xr,xc};
+        [xr,xc,xj]=pairs{n,:};
 
         % Process the coupling
         switch mstr.longitudinal
@@ -1233,11 +1238,11 @@ if isfield(spin_system.inter,'modes')
     end
 
     % Process dispersive coupling terms
-    [xrows,xcols]=find(~cellfun(@isempty,modes.dispersive));
-    for n=1:numel(xrows)
+    pairs=modes.dispersive;
+    for n=1:size(pairs,1)
 
         % Extract indices and the coupling constant
-        xr=xrows(n); xc=xcols(n); xj=modes.dispersive{xr,xc};
+        [xr,xc,xj]=pairs{n,:};
 
         % Identify the spin and the mode
         if ismember(xr,mode_list), ms=xr; ss=xc; else, ms=xc; ss=xr; end
@@ -1276,10 +1281,10 @@ if isfield(spin_system.inter,'modes')
     for f=1:2
 
         % Find declared modulation entries
-        [xrows,xcols]=find(~cellfun(@isempty,modes.(mod_names{f})));
+        pairs=modes.(mod_names{f});
 
         % Move on if no entries are declared
-        if isempty(xrows), continue; end
+        if isempty(pairs), continue; end
 
         % Decide the retention
         switch mstr.(mod_names{f})
@@ -1292,11 +1297,10 @@ if isfield(spin_system.inter,'modes')
             case 'full'
 
                 % Loop over mode pairs
-                for n=1:numel(xrows)
+                for n=1:size(pairs,1)
 
                     % Extract mode indices and derivative orders
-                    k1=xrows(n); k2=xcols(n);
-                    dorders=modes.(mod_names{f}){k1,k2};
+                    [k1,k2,dorders]=pairs{n,:};
 
                     % Loop over derivative orders
                     for ord=1:numel(dorders)
@@ -1308,16 +1312,19 @@ if isfield(spin_system.inter,'modes')
                         [mops,midx,mcoeff]=mode_quads(ord,k1,k2);
 
                         % Find declared spin blocks
-                        [srows,scols]=find(~cellfun(@isempty,dorders{ord}));
+                        if f==1
+                            blocks=dorders{ord};
+                        else
+                            spins=find(~cellfun(@isempty,dorders{ord}));
+                            indices=num2cell(spins(:));
+                            blocks=[indices indices reshape(dorders{ord}(spins),[],1)];
+                        end
 
                         % Loop over spin blocks
-                        for m=1:numel(srows)
+                        for m=1:size(blocks,1)
 
                             % Extract the spin indices and the derivative block
-                            ns=srows(m); ps=scols(m); dblock=dorders{ord}{ns,ps};
-
-                            % Adjust indexing for field derivative vectors
-                            if f==2, ns=ps; end
+                            [ns,ps,dblock]=blocks{m,:};
 
                             % Move on if the block is insignificant
                             if norm(dblock(:),2)<spin_system.tols.liouv_zero, continue; end

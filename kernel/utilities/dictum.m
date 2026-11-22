@@ -38,21 +38,25 @@ function spin_system=dictum(spin_system,spins,strength)
 % Check consistency
 grumble(spin_system,spins,strength);
 
-% Numerical specification, coupling
-if isnumeric(spins)&&(numel(spins)==2)
-    
-    % Report previous assumption
-    report(spin_system,['spins ' num2str(spins(1)) ' (' spin_system.comp.isotopes{spins(1)} ...
-                        '), '    num2str(spins(2)) ' (' spin_system.comp.isotopes{spins(2)} ...
-                        ') coupling assumption: ' spin_system.inter.coupling.strength{spins(1),spins(2)}]);
-                                 
-    % Modify the assumption
-    spin_system.inter.coupling.strength{spins(1),spins(2)}=strength;
-    spin_system.inter.coupling.strength{spins(2),spins(1)}=strength;
-    
-    % Report the new assumption
-    report(spin_system,['changed on user''s request to: ' spin_system.inter.coupling.strength{spins(1),spins(2)}]);
-    
+% Override the selected directed coupling records in both directions
+if numel(spins)==2
+    pairs=spin_system.inter.coupling.strength;
+    for q=1:size(pairs,1)
+        n=pairs{q,1};
+        k=pairs{q,2};
+        if isnumeric(spins)
+            match=((n==spins(1))&&(k==spins(2)))||((k==spins(1))&&(n==spins(2)));
+        else
+            isotopes=spin_system.comp.isotopes([n k]);
+            match=isequal(isotopes,spins(:)')||isequal(fliplr(isotopes),spins(:)');
+        end
+        if match
+            report(spin_system,sprintf('spins %d, %d: %s changed to %s.',n,k,pairs{q,3},strength));
+            pairs{q,3}=strength;
+        end
+    end
+    spin_system.inter.coupling.strength=pairs;
+
 % Numerical specification, Zeeman
 elseif isnumeric(spins)&&isscalar(spins)
     
@@ -65,28 +69,6 @@ elseif isnumeric(spins)&&isscalar(spins)
     
     % Report the new assumption
     report(spin_system,['changed on user''s request to: ' spin_system.inter.zeeman.strength{spins}]);
-    
-% Isotope specification, coupling
-elseif iscell(spins)&&(numel(spins)==2)
-    
-    % Loop over spin pairs
-    for n=find(cellfun(@(x)strcmp(spins{1},x),spin_system.comp.isotopes))
-        for k=find(cellfun(@(x)strcmp(spins{2},x),spin_system.comp.isotopes))
-            
-            % Report previous assumption
-            report(spin_system,['spins ' num2str(n) ' (' spin_system.comp.isotopes{n} ...
-                                '), '    num2str(k) ' (' spin_system.comp.isotopes{k} ...
-                                ') coupling assumption: ' spin_system.inter.coupling.strength{n,k}]);
-            
-            % Modify the assumption
-            spin_system.inter.coupling.strength{n,k}=strength;
-            spin_system.inter.coupling.strength{k,n}=strength;
-            
-            % Report the new assumption
-            report(spin_system,['changed on user''s request to: ' spin_system.inter.coupling.strength{n,k}]);
-            
-        end
-    end
     
 % Isotope specification, Zeeman
 elseif iscell(spins)&&isscalar(spins)
@@ -150,4 +132,5 @@ end
 % It's too bad that stupidity isn't painful.
 %
 % Anton Szandor LaVey
+
 

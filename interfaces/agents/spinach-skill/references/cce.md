@@ -185,3 +185,5 @@ The compiler, partition selector, convergence driver, diagnostics, and orientati
 CPMG and ESEEM retain a floating-point propagation estimate per time and receiver, including the actual normalisation reference. A valid full-bath signal can exceed the numerical budget; zero elapsed time incurs no propagation error.
 
 For a paper-scale benchmark, select the material example by figure rather than assuming a common output shape. The diamond NV and SiC clock examples return order-resolved echoes; the VO(TPP) example returns register energies and fields as well as the proton echo and times. The Finland and OX063 examples compute the published powder-averaged pair-approximation curves, not small-cluster orientation demonstrations. The corresponding knowledge entries distinguish archived input realisations from independently generated baths and document numerical discrepancies.
+
+Internal model inspection: each unordered pair has a bare Cartesian tensor for graph scoring and a retained tensor for Hamiltonians. Read the retained tensor in ascending physical-ID order, transposing it for reversed sites; missing pairs have no coupling.

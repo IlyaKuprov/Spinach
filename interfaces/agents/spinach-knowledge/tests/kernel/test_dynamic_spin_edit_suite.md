@@ -1,5 +1,7 @@
 # tests/kernel/test_dynamic_spin_edit_suite.m
 
+The removal fixtures distinguish dropped pair records from retained records whose second endpoint is renumbered. Coupling strength labels, symmetry, and the assumption selector are discarded.
+
 Source: [tests/kernel/test_dynamic_spin_edit_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_spin_edit_suite.m)
 
 ## Purpose
@@ -44,3 +46,5 @@ a separate substance must retain its descriptor and settings.
 ## Reaction-record fixtures
 
 Synthetic editing objects carry an explicit empty reaction list. Merge tests retain empty chemistry, spin offsets, column-oriented part lists, and all non-chemical assertions. An explicit selector-loss record tests simultaneous substance and selector-spin offsets; with declared parts, correlation times concatenate per substance rather than using the retired partless radical-pair fields.
+
+The numeric assumption override is exercised on an existing directed coupling.

@@ -197,7 +197,7 @@ isotope2)` returns the dipolar coupling constant and tensor in **rad/s** from
 coordinates in angstrom, using free-particle magnetogyric ratios;
 `A=xyz2hfc(exyz,nxyz,isotope)` returns a point-dipole hyperfine tensor in
 **gauss** and is the one to use when an electron is involved. `conmat(xyz,r0)`
-builds a connectivity matrix; `nearest_spin` and `dihedral` are geometry
+builds a sparse logical connectivity matrix; `nearest_spin` and `dihedral` are geometry
 helpers.
 
 ## Magnetic susceptibility and paramagnetic shifts
@@ -327,6 +327,8 @@ local descriptor and apply the resulting masks at its offset.
 `sphten-liouv` refuses multiplicities above 16. `IK-DNP` requires both
 electrons and nuclei and nothing else in the system. `IK-SBS` requires both
 spins and bosonic modes (`C`, `V`, or `T` particles).
+
+Supply mode pair channels as particle-indexed cell arrays. In the compiled system, the six pair channels instead contain `{from,to,value}` records; spin pairs within a coupling modulation derivative use the same layout.
 
 ## Unit conversions on the way in
 
@@ -727,7 +729,7 @@ Linear contexts (`liquid`, `imaging`, `crystal`, `powder`, `device`, `floquet`, 
 
 ## Explicit point-to-point flux relaxation
 
-Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
+Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. Nonzero rates compile to directed `{source,destination,rate}` rows in `spin_system.rlx.flux_rate`, including diagonal bath rates, and the flux type is stored as `spin_system.rlx.flux_type`; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
 
 ## Native finite baths and observed transitions
 

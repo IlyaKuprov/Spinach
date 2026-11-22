@@ -473,14 +473,6 @@ if isfield(inter,'modes')
     spin_system.inter.modes.damp=zeros(1,spin_system.comp.nspins);
     spin_system.inter.modes.dephase=zeros(1,spin_system.comp.nspins);
 
-    % Preallocate pairwise coupling arrays
-    spin_system.inter.modes.exchange=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.kerr=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.longitudinal=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.dispersive=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.coupling_mod=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.zeeman_mod=cell(spin_system.comp.nspins);
-
     % Absorb mode frequencies
     if isfield(inter.modes,'frqs')
         for n=find(mode_mask)
@@ -575,104 +567,63 @@ if isfield(inter,'modes')
         end
     end
 
-    % Absorb significant exchange couplings
-    if isfield(inter.modes,'exchange')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.exchange));
-        for n=1:numel(rows)
-            if abs(inter.modes.exchange{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.exchange{rows(n),cols(n)}=...
-                2*pi*inter.modes.exchange{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - exchange coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
+    % Compile the significant scalar couplings in column-major order
+    pair_flds={'exchange','kerr','longitudinal','dispersive'};
+    for f=1:numel(pair_flds)
+        name=pair_flds{f};
+        pairs=cell(0,3);
+        if isfield(inter.modes,name)
+            pairs=cell_records(inter.modes.(name));
+            keep=cellfun(@(x)abs(x)>spin_system.tols.inter_cutoff,pairs(:,3));
+            for n=find(~keep)'
+                report(spin_system,['WARNING - ' name ' coupling ' int2str(pairs{n,1}) ',' ...
+                                    int2str(pairs{n,2}) ' is below the interaction cutoff, ignored.']);
             end
+            pairs=pairs(keep,:);
+            pairs(:,3)=cellfun(@(x)2*pi*x,pairs(:,3),'UniformOutput',false);
         end
+        spin_system.inter.modes.(name)=pairs;
     end
 
-    % Absorb significant cross-Kerr couplings
-    if isfield(inter.modes,'kerr')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.kerr));
-        for n=1:numel(rows)
-            if abs(inter.modes.kerr{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.kerr{rows(n),cols(n)}=...
-                2*pi*inter.modes.kerr{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - cross-Kerr coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
-            end
-        end
-    end
-
-    % Absorb significant longitudinal couplings
-    if isfield(inter.modes,'longitudinal')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.longitudinal));
-        for n=1:numel(rows)
-            if abs(inter.modes.longitudinal{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.longitudinal{rows(n),cols(n)}=...
-                2*pi*inter.modes.longitudinal{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - longitudinal coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
-            end
-        end
-    end
-
-    % Absorb significant dispersive couplings
-    if isfield(inter.modes,'dispersive')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.dispersive));
-        for n=1:numel(rows)
-            if abs(inter.modes.dispersive{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.dispersive{rows(n),cols(n)}=...
-                2*pi*inter.modes.dispersive{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - dispersive coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
-            end
-        end
-    end
-
-    % Absorb coupling tensor derivatives
-    if isfield(inter.modes,'coupling_mod')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.coupling_mod));
-        for n=1:numel(rows)
-            deriv_orders=inter.modes.coupling_mod{rows(n),cols(n)};
-            for m=1:numel(deriv_orders)
-                if ~isempty(deriv_orders{m})
-                    spin_system.inter.modes.coupling_mod{rows(n),cols(n)}{m}=...
-                    cellfun(@(x)2*pi*x,deriv_orders{m},'UniformOutput',false);
+    % Compile the tensor and field derivatives in angular frequency units
+    mod_flds={'coupling_mod','zeeman_mod'};
+    for f=1:numel(mod_flds)
+        name=mod_flds{f};
+        pairs=cell(0,3);
+        if isfield(inter.modes,name)
+            pairs=cell_records(inter.modes.(name));
+            for n=1:size(pairs,1)
+                orders=pairs{n,3};
+                last=find(~cellfun(@isempty,orders),1,'last');
+                if isempty(last), pairs{n,3}=[]; continue; end
+                orders=reshape(orders(1:last),1,[]);
+                for m=1:numel(orders)
+                    if isempty(orders{m}), continue; end
+                    if f==1
+                        tensors=cell_records(orders{m});
+                        tensors(:,3)=cellfun(@(x)2*pi*x,tensors(:,3),'UniformOutput',false);
+                        orders{m}=tensors;
+                    else
+                        orders{m}=cellfun(@(x)2*pi*x,orders{m},'UniformOutput',false);
+                    end
                 end
+                pairs{n,3}=orders;
             end
+            pairs=pairs(~cellfun(@isempty,pairs(:,3)),:);
         end
-    end
-
-    % Absorb effective field derivatives
-    if isfield(inter.modes,'zeeman_mod')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.zeeman_mod));
-        for n=1:numel(rows)
-            deriv_orders=inter.modes.zeeman_mod{rows(n),cols(n)};
-            for m=1:numel(deriv_orders)
-                if ~isempty(deriv_orders{m})
-                    spin_system.inter.modes.zeeman_mod{rows(n),cols(n)}{m}=...
-                    cellfun(@(x)2*pi*x,deriv_orders{m},'UniformOutput',false);
-                end
-            end
-        end
+        spin_system.inter.modes.(name)=pairs;
     end
 
     % Report mode parameters to the user
     summary_modes(spin_system,'bosonic mode summary');
 
     % Report mode couplings to the user
-    if ~all(cellfun(@isempty,[spin_system.inter.modes.exchange(:);
-                              spin_system.inter.modes.kerr(:);
-                              spin_system.inter.modes.longitudinal(:);
-                              spin_system.inter.modes.dispersive(:)]))
+    if any(cellfun(@(x)~isempty(spin_system.inter.modes.(x)),pair_flds))
         summary_mode_coup(spin_system,'summary of bosonic mode couplings (Hz)');
     end
 
     % Report modulation tensors to the user
-    if ~all(cellfun(@isempty,[spin_system.inter.modes.coupling_mod(:);
-                              spin_system.inter.modes.zeeman_mod(:)]))
+    if any(cellfun(@(x)~isempty(spin_system.inter.modes.(x)),mod_flds))
         summary_mode_mods(spin_system,'summary of spin Hamiltonian modulation by modes');
     end
 
@@ -929,8 +880,8 @@ end
     
 % Preallocate coupling tensor array
 report(spin_system,'initializing interaction arrays...');
-spin_system.inter.coupling.matrix=mat2cell(zeros(3*spin_system.comp.nspins),3*ones(spin_system.comp.nspins,1),...
-                                                                            3*ones(spin_system.comp.nspins,1));
+spin_system.inter.coupling.matrix=cell(0,3);
+
 % Process coordinates
 if isfield(inter,'coordinates')
 
@@ -971,7 +922,7 @@ else
     spin_system.inter.coordinates=cell(spin_system.comp.nspins,1);
     
     % Set proximity matrix to isolated spins
-    spin_system.inter.proxmatrix=speye(spin_system.comp.nspins,spin_system.comp.nspins);
+    spin_system.inter.proximity=cell(0,3);
     
 end
 
@@ -981,73 +932,42 @@ if isfield(inter,'coupling')
     % Inform the user
     report(spin_system,'processing coupling data...');
     
-    % Absorb eigenvalues and Euler angles
-    if isfield(inter.coupling,'eigs')
-        
-        % Get coupling norms
-        norms=cellfun(@(x)norm(diag(x),2),inter.coupling.eigs);
-        
-        % Find significant couplings (Hz at this point)
-        [rows,cols,~]=find(norms>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert Euler angles into DCM
-            if isempty(inter.coupling.euler{rows(n),cols(n)})
-                S=eye(3,3);
-            else
-                S=euler2dcm(inter.coupling.euler{rows(n),cols(n)});
+    % Convert occupied input cells one column at a time
+    formats={'eigs','matrix','scalar'};
+    blocks=cell(numel(formats),1);
+    for m=1:numel(formats)
+        if ~isfield(inter.coupling,formats{m}), continue; end
+        records=cell_records(inter.coupling.(formats{m}));
+        keep=false(size(records,1),1);
+        for q=1:size(records,1)
+            [n,k,component]=records{q,:};
+            if strcmp(formats{m},'eigs')
+                component=diag(component);
             end
-            
-            % Rotate and convert to rad/s
-            component=2*pi*S*diag(inter.coupling.eigs{rows(n),cols(n)})*S';
-            
-            % Tidy up the numerics
-            component=(component+component')/2;
-            
-            % Add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+component;
-        
+            if norm(component,2)<=spin_system.tols.inter_cutoff, continue; end
+
+            % Convert the specified representation to a Cartesian tensor in rad/s
+            switch formats{m}
+                case 'eigs'
+                    S=eye(3);
+                    if ~isempty(inter.coupling.euler{n,k})
+                        S=euler2dcm(inter.coupling.euler{n,k});
+                    end
+                    component=2*pi*S*component*S';
+                    component=(component+component')/2;
+                case 'matrix'
+                    component=2*pi*component;
+                case 'scalar'
+                    component=2*pi*eye(3)*component;
+            end
+            records{q,3}=component;
+            keep(q)=true;
+
         end
-        
+        blocks{m}=records(keep,:);
     end
- 
-    % Absorb coupling tensors
-    if isfield(inter.coupling,'matrix')
-        
-        % Find significant couplings using 2-norm criterion (Hz at this point)
-        [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.matrix)>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert to rad/s and add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*inter.coupling.matrix{rows(n),cols(n)};
-        
-        end
-        
-    end
-        
-    % Absorb scalar couplings
-    if isfield(inter.coupling,'scalar')
-        
-        % Find significant couplings using 2-norm criterion (Hz at this point)
-        [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.scalar)>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert to rad/s and add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*eye(3)*inter.coupling.scalar{rows(n),cols(n)};
-        
-        end
-        
-    end
-    
+    spin_system.inter.coupling.matrix=sum_couplings([spin_system.inter.coupling.matrix;vertcat(blocks{:})]);
+
 else
     
     % Warn the user that couplings have not been found
@@ -1055,35 +975,27 @@ else
 
 end
 
-% Clean up the result
-for n=1:spin_system.comp.nspins
-    for k=1:spin_system.comp.nspins
-
-        % Re-check all coupling tensors for significance in 2-norm and relevance
-        coupling_norm=norm(spin_system.inter.coupling.matrix{n,k},2);
-        if (coupling_norm==0)||(coupling_norm<2*pi*spin_system.tols.inter_cutoff)||...
-           (spin_system.comp.mults(n)==1)||((spin_system.comp.mults(k)==1)) % Ignore ghost spins
-       
-            % Set irrelevant tensors to empty
-            spin_system.inter.coupling.matrix{n,k}=[];
-            
-        end
-        
-    end
-end
-
-% Check for inter-subsystem couplings
+% Assign species numbers for the cross-species check
+species=zeros(spin_system.comp.nspins,1);
 for n=1:numel(spin_system.chem.parts)
-    for k=1:numel(spin_system.chem.parts)
-        if (n~=k)
-            coupling_block=spin_system.inter.coupling.matrix(spin_system.chem.parts{n},spin_system.chem.parts{k});
-            if ~all(cellfun(@isempty,coupling_block(:)))
-                error('Spinach:create:crossSubstanceCoupling',...
-                      'couplings detected between spins in different chemical species.');
-            end
-        end
+    species(spin_system.chem.parts{n})=n;
+end
+
+% Discard insignificant tensors and ghost-spin interactions
+pairs=spin_system.inter.coupling.matrix;
+keep=true(size(pairs,1),1);
+for q=1:size(pairs,1)
+    n=pairs{q,1};
+    k=pairs{q,2};
+    magnitude=norm(pairs{q,3},2);
+    keep(q)=(magnitude>0)&&(magnitude>=2*pi*spin_system.tols.inter_cutoff)&&...
+            (spin_system.comp.mults(n)>1)&&(spin_system.comp.mults(k)>1);
+    if keep(q)&&(species(n)~=species(k))
+        error('Spinach:create:crossSubstanceCoupling',...
+              'couplings detected between spins in different chemical species.');
     end
 end
+spin_system.inter.coupling.matrix=pairs(keep,:);
 
 % Report back to the user
 summary_couplings(spin_system,'summary of coupling tensors and their anisotropies (Hz)');
@@ -1110,14 +1022,15 @@ end
 % Absorb magnetisation flux rates
 if isfield(inter,'flux_rate')&&isfield(inter,'flux_type')
 
-    % Assign the data structure
-    spin_system.rlx.flux_rate=inter.flux_rate;
+    % Compile nonzero rates in column-major order
+    [rows,cols,vals]=find(inter.flux_rate);
+    spin_system.rlx.flux_rate=[num2cell(rows(:)) num2cell(cols(:)) num2cell(vals(:))];
     spin_system.rlx.flux_type=inter.flux_type;
 
 else
 
     % No magnetisation fluxes
-    spin_system.rlx.flux_rate=[];
+    spin_system.rlx.flux_rate=cell(0,3);
     spin_system.rlx.flux_type='';
 
 end
@@ -1198,20 +1111,16 @@ if ismember('SRFK',spin_system.rlx.theories)
 end
 
 % SRFK modulation depths
+spin_system.rlx.srfk_mdepth=cell(0,3);
 if isfield(inter,'srfk_mdepth')
-    spin_system.rlx.srfk_mdepth=inter.srfk_mdepth;
-else
-    spin_system.rlx.srfk_mdepth=[];
+    spin_system.rlx.srfk_mdepth=cell_records(inter.srfk_mdepth);
 end
-if ismember('SRFK',spin_system.rlx.theories)&&(~isempty(spin_system.rlx.srfk_mdepth))
-    for n=1:spin_system.comp.nspins
-        for k=1:spin_system.comp.nspins
-            if ~isempty(spin_system.rlx.srfk_mdepth{n,k})
-                report(spin_system,['SRFK modulation depth for spins ' ...
-                                    num2str(n) ',' num2str(k) ': ' ...
-                                    num2str(spin_system.rlx.srfk_mdepth{n,k}) ' Hz']);
-            end
-        end
+if ismember('SRFK',spin_system.rlx.theories)
+    srfk_mdepth=sortrows(spin_system.rlx.srfk_mdepth,[1 2]);
+    for n=1:size(srfk_mdepth,1)
+        report(spin_system,['SRFK modulation depth for spins ' ...
+                            num2str(srfk_mdepth{n,1}) ',' num2str(srfk_mdepth{n,2}) ': ' ...
+                            num2str(srfk_mdepth{n,3}) ' Hz']);
     end
 end
 
@@ -1411,9 +1320,10 @@ end
 
 % User-supplied Weizmann R1d relaxation rates
 if isfield(inter,'weiz_r1d')
-    spin_system.rlx.weiz_r1d=inter.weiz_r1d;
+    [rows,cols,vals]=find(inter.weiz_r1d);
+    spin_system.rlx.weiz_r1d=[num2cell(rows(:)) num2cell(cols(:)) num2cell(vals(:))];
 else
-    spin_system.rlx.weiz_r1d=[];
+    spin_system.rlx.weiz_r1d=cell(0,3);
 end
 
 % User-supplied Weizmann R2e relaxation rates
@@ -1446,9 +1356,10 @@ end
 
 % User-supplied Weizmann R2d relaxation rates
 if isfield(inter,'weiz_r2d')
-    spin_system.rlx.weiz_r2d=inter.weiz_r2d;
+    [rows,cols,vals]=find(inter.weiz_r2d);
+    spin_system.rlx.weiz_r2d=[num2cell(rows(:)) num2cell(cols(:)) num2cell(vals(:))];
 else
-    spin_system.rlx.weiz_r2d=[];
+    spin_system.rlx.weiz_r2d=cell(0,3);
 end
 
 % Report relaxation rates back to the user
@@ -1467,11 +1378,13 @@ end
 
 % Apply interaction drops
 if isfield(inter,'ignore')
+    keys=reshape(cell2mat(spin_system.inter.coupling.matrix(:,1:2)),[],2);
+    ignored=cellfun(@(x)x(:)',inter.ignore,'UniformOutput',false);
+    ignored=vertcat(ignored{:});
+    if ~isempty(ignored)
+        spin_system.inter.coupling.matrix(ismember(keys,[ignored;fliplr(ignored)],'rows'),:)=[];
+    end
     for n=1:numel(inter.ignore)
-        spin_system.inter.coupling.matrix{inter.ignore{n}(1),...
-                                          inter.ignore{n}(2)}=[];
-        spin_system.inter.coupling.matrix{inter.ignore{n}(2),...
-                                          inter.ignore{n}(1)}=[];
         report(spin_system,['Interactions between spins ' int2str(inter.ignore{n}(1)) ...
                                                   ' and ' int2str(inter.ignore{n}(2)) ...
                             ' ignored on user request.']);
@@ -1491,15 +1404,11 @@ end
 
 % Input validation function
 function grumble(sys,inter)
-
-% Check the output switch
 if isfield(sys,'output')
     if ~ischar(sys.output)
         error('sys.output must be a character string.');
     end
 end
-
-% Check the scratch folder
 if isfield(sys,'scratch')
     if ~ischar(sys.scratch)
         error('sys.scratch must be a character string.');
@@ -1508,8 +1417,6 @@ if isfield(sys,'scratch')
         error('the specified scratch directory does not exist.');
     end
 end
-
-% Check the disable switch
 if isfield(sys,'disable')
     if (~iscell(sys.disable))||any(~cellfun(@ischar,sys.disable))
         error('sys.disable must be a cell array of strings.');
@@ -1519,8 +1426,6 @@ if isfield(sys,'disable')
         error('unrecognised switch in sys.disable field.');
     end
 end
-
-% Check the enable switch
 if isfield(sys,'enable')
     if (~iscell(sys.enable))||any(~cellfun(@ischar,sys.enable))
         error('sys.enable must be a cell array of strings.');
@@ -1530,8 +1435,6 @@ if isfield(sys,'enable')
         error('unrecognised switch in sys.enable field.');
     end
 end
-
-% Check isotopes variable
 if ~isfield(sys,'isotopes')
     error('sys.isotopes subfield must be present.');
 elseif isempty(sys.isotopes)
@@ -1541,8 +1444,6 @@ elseif ~iscell(sys.isotopes)
 elseif ~all(cellfun(@ischar,sys.isotopes))
     error('all elements of sys.isotopes cell array must be character strings.');
 end
-
-% Check labels variable
 if isfield(sys,'labels')
     if ~iscell(sys.labels)
         error('sys.labels must be a cell array.');
@@ -1554,37 +1455,22 @@ if isfield(sys,'labels')
         error('the length of sys.labels must be the same as the length of sys.isotopes.');
     end
 end
-
-% Check order matrices
 if isfield(inter,'order_matrix')
-
-    % Make sure it's a cell array
     if ~iscell(inter.order_matrix)
         error('inter.order_matrix must be a cell array of 3x3 matrices.');
     end
-    
-    % Check cell array elements
     for n=1:numel(inter.order_matrix)
-
-        % Make sure they are 3x3 matrices
         if (~isnumeric(inter.order_matrix{n}))||(~ismatrix(inter.order_matrix{n}))||...
            (any(size(inter.order_matrix{n})~=[3 3]))||(~isreal(inter.order_matrix{n}))
             error('elements of inter.order_matrix must be 3x3 matrices of real numbers.');
         end
-
-        % Make sure they are traceless
         if trace(inter.order_matrix{n})>10*eps()
             error('elements of inter.order_matrix must be traceless 3x3 matrices.');
         end
-
-        % Make sure they are symmetric
         if norm(inter.order_matrix{n}-transpose(inter.order_matrix{n}),1)>10*eps()
             error('elements of inter.order_matrix must be symmetric 3x3 matrices.');
         end
-
     end
-
-    % Make sure it's consistent with chemistry
     if (~isfield(inter,'chem'))||(~isfield(inter.chem,'parts'))
         if numel(inter.order_matrix)~=1
             error('the number of matrices in inter.order_matrix much match the number of chemical subsystems.');
@@ -1593,10 +1479,7 @@ if isfield(inter,'order_matrix')
     if isfield(inter,'chem')&&isfield(inter.chem,'parts')&&(numel(inter.order_matrix)~=numel(inter.chem.parts))
         error('the number of matrices in inter.order_matrix much match the number of chemical subsystems.');
     end
-    
 end
-
-% Check magnet induction
 if ~isfield(sys,'magnet')
     error('magnet induction must be specified in sys.magnet varaible.');
 else
@@ -1604,42 +1487,24 @@ else
         error('sys.magnet must be a real number.');
     end
 end
-
-% Check Zeeman interactions
 if isfield(inter,'zeeman')
-    
-    % Check eigenvalues / Euler angles specification
     if isfield(inter.zeeman,'eigs')
-        
-        % Check type
         if (~iscell(inter.zeeman.eigs))||any(~cellfun(@isnumeric,inter.zeeman.eigs))
             error('inter.zeeman.eigs must be a cell array of empty vectors or 1x3 vectors.');
         end
-        
-        % Check dimensions
         if numel(inter.zeeman.eigs)~=numel(sys.isotopes)
             error('the number of elements in inter.zeeman.eigs must match the number of spins.');
         end
-        
-        % Make sure eulers exist
         if ~isfield(inter.zeeman,'euler')
             error('inter.zeeman.euler variable must be set together with inter.zeeman.eigs.');
         end
-        
-        % Make sure eulers are cells
         if (~iscell(inter.zeeman.euler))||any(~cellfun(@isnumeric,inter.zeeman.euler))
             error('inter.zeeman.euler must be a cell array of empty vectors or 1x3 vectors.');
         end
-        
-        % Make sure eulers have the correct length
         if ~all(size(inter.zeeman.eigs)==size(inter.zeeman.euler))
             error('inter.zeeman.eigs and inter.zeeman.euler variables must have the same dimension.');
         end
-        
-        % Make sure all non-empty elements are real 1x3 vectors
         for n=1:numel(sys.isotopes)
-            
-            % For eigenvalues
             if ~isempty(inter.zeeman.eigs{n})
                 if (~all(size(inter.zeeman.eigs{n})==[1 3]))||...
                    (~isnumeric(inter.zeeman.eigs{n}))||...
@@ -1647,8 +1512,6 @@ if isfield(inter,'zeeman')
                     error('non-empty elements of inter.zeeman.eigs must be real 1x3 vectors.');
                 end
             end
-            
-            % For Euler angles
             if ~isempty(inter.zeeman.euler{n})
                 if (~all(size(inter.zeeman.euler{n})==[1 3]))||...
                    (~isnumeric(inter.zeeman.euler{n}))||...
@@ -1656,21 +1519,13 @@ if isfield(inter,'zeeman')
                     error('non-empty elements of inter.zeeman.euler must be real 1x3 vectors.');
                 end
             end
-            
-            % For simultaneity
             if (isempty(inter.zeeman.eigs{n})&&(~isempty(inter.zeeman.euler{n})))||...
                (isempty(inter.zeeman.euler{n})&&(~isempty(inter.zeeman.eigs{n})))
                 error('inter.zeeman.eigs and inter.zeeman.euler must have identical non-empty cell patterns.');
             end
-            
         end
-        
     end
-    
-    % Check matrix specification
     if isfield(inter.zeeman,'matrix')
-        
-        % Check type
         if ~iscell(inter.zeeman.matrix)
             error('inter.zeeman.matrix must be a cell array of empty matrices or 3x3 matrices.');
         elseif size(inter.zeeman.matrix,1)~=1
@@ -1678,13 +1533,9 @@ if isfield(inter,'zeeman')
         elseif ~all(cellfun(@isnumeric,inter.zeeman.matrix))
             error('all elements of inter.zeeman.matrix cell array must be numeric.');
         end 
-        
-        % Check length
         if numel(inter.zeeman.matrix)~=numel(sys.isotopes)
             error('the number of elements in the inter.zeeman.matrix array should match the number of spins.');
         end
-        
-        % Make sure all non-empty elements are real 3x3 matrices
         for n=1:numel(sys.isotopes)
             if ~isempty(inter.zeeman.matrix{n})
                 if (~all(size(inter.zeeman.matrix{n})==[3 3]))||...
@@ -1694,23 +1545,14 @@ if isfield(inter,'zeeman')
                 end
             end
         end
-        
     end
-    
-    % Check scalars
     if isfield(inter.zeeman,'scalar')
-        
-        % Check type
         if ~iscell(inter.zeeman.scalar)||any(~cellfun(@isnumeric,inter.zeeman.scalar))
             error('inter.zeeman.scalar must be a cell array of empty matrices or 1x1 matrices.');
         end
-        
-        % Check length
         if numel(inter.zeeman.scalar)~=numel(sys.isotopes)
             error('the number of elements in the inter.zeeman.scalar array must match the number of spins.');
         end
-        
-        % Make sure all non-empty elements are real numbers
         for n=1:numel(sys.isotopes)
             if ~isempty(inter.zeeman.scalar{n})
                 if (numel(inter.zeeman.scalar{n})~=1)||...
@@ -1720,45 +1562,29 @@ if isfield(inter,'zeeman')
                 end
             end
         end
-        
     end
-    
 end
-
-% Check giant spin parameters
 if isfield(inter,'giant')
-    
-    % Check subfields
     if ~isfield(inter.giant,'coeff')
         error('giant spin model coefficients must be supplied in inter.giant.coeff cell array.');
     end
     if ~isfield(inter.giant,'euler')
         error('giant spin model Euler angles must be supplied in inter.giant.euler cell array.');
     end
-    
-    % Check the elements
     if numel(inter.giant.coeff)~=numel(sys.isotopes)
         error('the number of elements inter.giant.coeff must be equal to the number of spins.');
     end
     if numel(inter.giant.euler)~=numel(sys.isotopes)
         error('the number of elements inter.giant.euler must be equal to the number of spins.');
     end
-    
-    % Check the sub-elements
     for n=1:numel(inter.giant.coeff)
-        
-        % Enforce electrons
         if (~strcmp(sys.isotopes{n}(1),'E'))&&(~isempty(inter.giant.coeff{n}))
             error('giant spin model is only available for electron spins.');
         end
-        
-        % Enforce Euler angles
         if numel(inter.giant.coeff{n})~=numel(inter.giant.euler{n})
             error(['each spherical rank in the giant spin specification for spin '...
                     num2str(n) ' must have its Euler angles specified.']);
         end
-        
-        % Enforce sub-element numbers
         for k=1:numel(inter.giant.coeff{n})
             if numel(inter.giant.coeff{n}{k})~=2*k+1
                 error(['rank ' num2str(k) ' giant spin ST coefficient specification for spin '...
@@ -1769,28 +1595,16 @@ if isfield(inter,'giant')
                         num2str(n) ' must be a vector with three elements.']);
             end
         end
-        
     end
-    
 end
-
-% Check coordinates
 if isfield(inter,'coordinates')
-    
-    % Check type
     if ~iscell(inter.coordinates)||any(~cellfun(@isnumeric,inter.coordinates))
         error('inter.coordinates must be a cell array of empty vectors or 1x3 vectors.');
     end
-    
-    % Check size
     if numel(inter.coordinates)~=numel(sys.isotopes)
         error('the number of elements in inter.coordinates must match the number of spins.')
     end
-    
-    % Check contents
     for n=1:numel(sys.isotopes)
-        
-        % Make sure we have real 3-vectors
         if ~isempty(inter.coordinates{n})
             if (~all(size(inter.coordinates{n})==[1 3]))||...
                (~isnumeric(inter.coordinates{n}))||...
@@ -1798,243 +1612,127 @@ if isfield(inter,'coordinates')
                 error('non-empty elements of inter.coordinates must be real 1x3 vectors.');
             end
         end
-        
     end
-    
 end
-
-% Check periodic boundary conditions
 if isfield(inter,'pbc')
-    
-    % Check type
     if ~iscell(inter.pbc)||any(~cellfun(@isvector,inter.pbc))
         error('inter.pbc must be a cell array of row vectors.');
     end
-    
-    % Check element numbers
     if ~ismember(numel(inter.pbc),[0 1 2 3])
         error('inter.pbc cell array must have zero, one, two or three row vectors as elements.');
     end
-    
-    % Check vector dimensions
     for n=1:numel(inter.pbc)
         if (~all(size(inter.pbc{n})==[1 3]))||(~isreal(inter.pbc{n}))
             error('all elements of inter.pbc.cell array must be row vectors with three real elements.');
         end
     end
-    
-    % Check linear independence
     if ((numel(inter.pbc)==2)&&rank([inter.pbc{1}; inter.pbc{2}],1e-3)<2)||...
        ((numel(inter.pbc)==3)&&rank([inter.pbc{1}; inter.pbc{2}; inter.pbc{3}],1e-3)<3)
         error('the vectors supplied in inter.pbc must be lineary independent.');
     end
-    
 end
-            
-% Check couplings
 if isfield(inter,'coupling')
-    
-    % Check eigenvalues / Euler angles specification
-    if isfield(inter.coupling,'eigs')
-        
-        % Check type
-        if (~iscell(inter.coupling.eigs))||any(any(~cellfun(@isnumeric,inter.coupling.eigs)))
-            error('inter.coupling.eigs must be a cell array of empty vectors or 1x3 vectors.');
+    formats={'eigs','matrix','scalar'};
+    count=numel(sys.isotopes);
+    for m=1:numel(formats)
+        name=formats{m};
+        if ~isfield(inter.coupling,name), continue; end
+        table=inter.coupling.(name);
+        if ~iscell(table)||~isequal(size(table),[count count])
+            error('inter.coupling.%s must be a square cell array with one row per spin.',name);
         end
-        
-        % Check dimensions
-        if ~all(size(inter.coupling.eigs)==[numel(sys.isotopes) numel(sys.isotopes)])
-            error('both dimensions of inter.coupling.eigs must match the number of spins.');
+        if strcmp(name,'eigs')&&(~isfield(inter.coupling,'euler')||...
+           ~iscell(inter.coupling.euler)||~isequal(size(inter.coupling.euler),[count count]))
+            error('inter.coupling.eigs requires a matching inter.coupling.euler array.');
         end
-        
-        % Check quadratic couplings
-        for n=1:numel(sys.isotopes)
-            [~,mult]=spin(sys.isotopes{n});
-            if (norm(inter.coupling.eigs{n,n},1)>0)&&(mult<3)
-                error('quadratic couplings cannot be specified for spin-1/2 particles.');
-            elseif abs(sum(inter.coupling.eigs{n,n}))>1e-6
-                error('quadratic couplings cannot have a non-zero trace.');
+        for k=1:count
+            column=table(:,k);
+            if ~all(cellfun(@isnumeric,column))
+                error('inter.coupling.%s must contain numeric values.',name);
             end
-        end
-        
-        % Make sure eulers exist
-        if ~isfield(inter.coupling,'euler')
-            error('inter.coupling.euler array must be set together with inter.coupling.eigs.');
-        end
-        
-        % Make sure eulers are cells
-        if ~iscell(inter.coupling.euler)||any(any(~cellfun(@isnumeric,inter.coupling.euler)))
-            error('inter.coupling.euler must be a cell array of empty vectors or 1x3 vectors.');
-        end
-        
-        % Make sure eulers have the correct length
-        if ~all(size(inter.coupling.eigs)==size(inter.coupling.euler))
-            error('inter.coupling.eigs and inter.coupling.euler arrays must have the same dimension.');
-        end
-        
-        % Make sure all non-empty elements are real 1x3 vectors
-        for n=1:numel(sys.isotopes)
-            for k=1:numel(sys.isotopes)
-            
-                % For eigenvalues
-                if ~isempty(inter.coupling.eigs{n,k})
-                    if (~all(size(inter.coupling.eigs{n,k})==[1 3]))||...
-                       (~isnumeric(inter.coupling.eigs{n,k}))||...
-                       (~isreal(inter.coupling.eigs{n,k}))
-                        error('non-empty elements of inter.coupling.eigs must be real 1x3 vectors.');
-                    end
-                end
-                
-                % For Euler angles
-                if ~isempty(inter.coupling.euler{n,k})
-                    if (~all(size(inter.coupling.euler{n,k})==[1 3]))||...
-                       (~isnumeric(inter.coupling.euler{n,k}))||...
-                       (~isreal(inter.coupling.euler{n,k}))
-                        error('non-empty elements of inter.coupling.euler must be real 1x3 vectors.');
-                    end
-                end
-                
-                % For simultaneity
-                if (isempty(inter.coupling.eigs{n,k})&&(~isempty(inter.coupling.euler{n,k})))||...
-                   (isempty(inter.coupling.euler{n,k})&&(~isempty(inter.coupling.eigs{n,k})))
+            present=~cellfun(@isempty,column);
+            if strcmp(name,'eigs')
+                angles=inter.coupling.euler(:,k);
+                if ~all(cellfun(@isnumeric,angles))||~isequal(present,~cellfun(@isempty,angles))
                     error('inter.coupling.eigs and inter.coupling.euler must have identical non-empty cell patterns.');
                 end
-                
             end
-        end
-        
-    end
-    
-    % Check matrix specification
-    if isfield(inter.coupling,'matrix')
-        
-        % Check type
-        if ~iscell(inter.coupling.matrix)||any(any(~cellfun(@isnumeric,inter.coupling.matrix)))
-            error('inter.coupling.matrix must be a cell array of empty matrices or 3x3 matrices.');
-        end
-        
-        % Check dimensions
-        if ~all(size(inter.coupling.matrix)==[numel(sys.isotopes) numel(sys.isotopes)])
-            error('both dimensions of inter.coupling.matrix cell array should match the number of spins.');
-        end
-        
-        % Check quadratic couplings
-        for n=1:numel(sys.isotopes)
-            [~,mult]=spin(sys.isotopes{n});
-            if (norm(inter.coupling.matrix{n,n},1)>0)&&(mult==2)
-                error('quadratic couplings cannot be specified for spin-1/2 particles.');
-            elseif abs(trace(inter.coupling.matrix{n,n}))>1e-6
-                error('quadratic couplings cannot have a non-zero trace.');
-            end
-        end
-        
-        % Make sure all non-empty elements are real 3x3 matrices
-        for n=1:numel(sys.isotopes)
-            for k=1:numel(sys.isotopes)
-                if ~isempty(inter.coupling.matrix{n,k})
-                    if (~all(size(inter.coupling.matrix{n,k})==[3 3]))||...
-                       (~isnumeric(inter.coupling.matrix{n,k}))||...
-                       (~isreal(inter.coupling.matrix{n,k}))
-                        error('non-empty elements of inter.coupling.matrix must be real 3x3 matrices.');
-                    end
+            for n=find(present)'
+                value=column{n};
+                switch name
+                    case 'eigs'
+                        if ~isreal(value)||~isequal(size(value),[1 3])||...
+                           ~isreal(angles{n})||~isequal(size(angles{n}),[1 3])
+                            error('coupling eigenvalues and Euler angles must be real row triples.');
+                        end
+                    case 'matrix'
+                        if ~isreal(value)||~isequal(size(value),[3 3])
+                            error('non-empty elements of inter.coupling.matrix must be real 3x3 matrices.');
+                        end
+                    case 'scalar'
+                        if ~isreal(value)||~isscalar(value)
+                            error('non-empty elements of inter.coupling.scalar must be real numbers.');
+                        end
+                end
+                if n~=k, continue; end
+                [~,mult]=spin(sys.isotopes{n});
+                switch name
+                    case 'eigs'
+                        if (norm(value,1)>0)&&(mult<3)
+                            error('quadratic couplings cannot be specified for spin-1/2 particles.');
+                        elseif abs(sum(value))>1e-6
+                            error('quadratic couplings cannot have a non-zero trace.');
+                        end
+                    case 'matrix'
+                        if (norm(value,1)>0)&&(mult==2)
+                            error('quadratic couplings cannot be specified for spin-1/2 particles.');
+                        elseif abs(trace(value))>1e-6
+                            error('quadratic couplings cannot have a non-zero trace.');
+                        end
+                    case 'scalar'
+                        if value~=0
+                            error('scalar couplings cannot be quadratic.');
+                        end
                 end
             end
         end
-        
     end
-    
-    % Check scalars
-    if isfield(inter.coupling,'scalar')
-        
-        % Check type
-        if ~iscell(inter.coupling.scalar)||any(any(~cellfun(@isnumeric,inter.coupling.scalar)))
-            error('inter.coupling.scalar must be a cell array of empty matrices or 1x1 matrices.');
-        end
-        
-        % Check dimensions
-        if ~all(size(inter.coupling.scalar)==[numel(sys.isotopes) numel(sys.isotopes)])
-            error('both dimensions of inter.coupling.scalar array must match the number of spins.');
-        end
-        
-        % Make sure all non-empty elements are real numbers
-        if any(nonzeros(cellfun(@numel,inter.coupling.scalar))~=1)||...
-           any(nonzeros(~cellfun(@isnumeric,inter.coupling.scalar)))||...
-           any(nonzeros(~cellfun(@isreal,inter.coupling.scalar)))
-            error('non-empty elements of inter.coupling.scalar must be real numbers.');
-        end
-        
-        % Disallow quadratic scalar couplings
-        for n=1:numel(sys.isotopes)
-            if norm(inter.coupling.scalar{n,n},1)~=0
-                error('scalar couplings cannot be quadratic.');
-            end
-        end
-         
-    end
-    
 end
-
-% Check temperature - negative and complex values allowed
 if isfield(inter,'temperature')&&(~isempty(inter.temperature))
-    
-    % Check type and dimension
     if (~isnumeric(inter.temperature))||(numel(inter.temperature)~=1)
         error('inter.tempearture must be a number.');
     end
-    
 end
-
-% Check relaxation theory
 if isfield(inter,'relaxation')
-    
-    % Check type
     if (~iscell(inter.relaxation))||any(~cellfun(@ischar,inter.relaxation))
         error('inter.relaxation must be a cell array of strings.');
     end
-    
-    % Check relaxation theories
     if ~all(ismember(inter.relaxation,{'damp','t1_t2','redfield','lindblad','flux',...
                                        'nottingham','weizmann','SRFK','SRSK',...
                                        'naka-zwan'}))
         error('unrecognised relaxation theory specification.');
     end
-
-    % Refuse simultaneous Redfield and Nakajima-Zwanzig theories
     if all(ismember({'redfield','naka-zwan'},inter.relaxation))
         error('redfield and naka-zwan are alternative evaluations of the same kernel, specify one.');
     end
-    
-    % Enforce term retention policy specification
     if ~isfield(inter,'rlx_keep')
         error('relaxation superoperator term retention policy must be specified in inter.rlx_keep field.');
     end
-    
-    % Enforce relaxation destination
     if ~isfield(inter,'equilibrium')
         error('relaxation destination must be specified in inter.equilibrium variable.');
     end
-    
-    % Enforce correlation time with Redfield theory
     if ismember('redfield',inter.relaxation)&&(~isfield(inter,'tau_c'))
         error('correlation time(s) must be specified with Redfield theory.');
     end
-
-    % Enforce correlation time with Nakajima-Zwanzig theory
     if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'tau_c'))
         error('correlation time(s) must be specified with Nakajima-Zwanzig theory.');
     end
-
-    % Enforce kernel evaluation point with Nakajima-Zwanzig theory
     if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'nz_shift'))
         error('kernel evaluation point must be specified in inter.nz_shift with Nakajima-Zwanzig theory.');
     end
-
-    % Enforce kernel form with Nakajima-Zwanzig theory
     if ismember('naka-zwan',inter.relaxation)&&(~isfield(inter,'nz_onshell'))
         error('kernel form must be specified in inter.nz_onshell with Nakajima-Zwanzig theory.');
     end
-
-    % Check the Nakajima-Zwanzig kernel evaluation point
     if isfield(inter,'nz_shift')
         if ~ismember('naka-zwan',inter.relaxation)
             error('inter.nz_shift requires naka-zwan relaxation theory.');
@@ -2047,8 +1745,6 @@ if isfield(inter,'relaxation')
             error('inter.nz_shift must be a finite scalar with a non-negative real part.');
         end
     end
-
-    % Check the Nakajima-Zwanzig kernel form switch
     if isfield(inter,'nz_onshell')
         if ~ismember('naka-zwan',inter.relaxation)
             error('inter.nz_onshell requires naka-zwan relaxation theory.');
@@ -2057,97 +1753,62 @@ if isfield(inter,'relaxation')
             error('inter.nz_onshell must be a logical scalar.');
         end
     end
-    
-    % Enforce damping rate with isotropic damping
     if ismember('damp',inter.relaxation)&&(~isfield(inter,'damp_rate'))
         error('damping rate or tensor must be specified with non-selective damping.');
     end
-  
-    % Enforce R1 and R2 rates with T1,T2 approximation
     if ismember('t1_t2',inter.relaxation)&&((~isfield(inter,'r1_rates'))||...
                                             (~isfield(inter,'r2_rates')))
         error('R1 and R2 rates must be specified with extended T1,T2 relaxation theory.');
     end
-    
-    % Enforce R1 and R2 rates with Lindblad theory
     if ismember('lindblad',inter.relaxation)&&((~isfield(inter,'lind_r1_rates'))||...
                                                (~isfield(inter,'lind_r2_rates')))
         error('R1 and R2 rates must be specified with Lindblad relaxation theory.');
     end
-    
-    % Enforce R1e, R2e, R1n and R2n rates with Nottingham DNP theory
     if ismember('nottingham',inter.relaxation)&&...
        ((~isfield(inter,'nott_r1e'))||(~isfield(inter,'nott_r2e'))||...
         (~isfield(inter,'nott_r1n'))||(~isfield(inter,'nott_r2n')))
         error(['R1e, R2e, R1n and R2n rates must be specified with '...
                'Nottingham DNP relaxation theory.']);
     end
-    
-    % Enforce R1e, R2e, R1n and R2n rates with Weizmann DNP theory
     if ismember('weizmann',inter.relaxation)&&...
        ((~isfield(inter,'weiz_r1e'))||(~isfield(inter,'weiz_r2e'))||...
         (~isfield(inter,'weiz_r1n'))||(~isfield(inter,'weiz_r2n')))
         error(['R1e, R2e, R1n and R2n rates must be specified with '...
                'Weizmann DNP relaxation theory.']);
     end
-    
-    % Enforce R1d and R2d with Weizmann DNP theory
     if ismember('weizmann',inter.relaxation)&&...
        ((~isfield(inter,'weiz_r1d'))||(~isfield(inter,'weiz_r2d')))
         error('R1d and R2d rates must be specified with Weizmann DNP relaxation theory.');
     end
-    
-    % Enforce two electrons with Nottingham DNP theory
     if ismember('nottingham',inter.relaxation)&&(nnz(strcmp('E',sys.isotopes))~=2)
         error('Nottingham DNP relaxation theory requires two electrons.');
     end
-    
-    % Enforce correlation time with SRFK
     if ismember('SRFK',inter.relaxation)&&(~isfield(inter,'srfk_tau_c'))
         error('SRFK requires modulation correlation time to be specified in inter.srfk_tau_c variable.');
     end
-    
-    % Enforce modulation depth with SRFK
     if ismember('SRFK',inter.relaxation)&&(~isfield(inter,'srfk_mdepth'))
         error('SRFK requires modulation depths to be specified in inter.srfk_mdepth variable.');
     end
-
-    % Insist on source list with SRSK
     if ismember('SRSK',inter.relaxation)&&(~isfield(inter,'srsk_sources'))
         error('SRSK requires source spin list in inter.srsk_sources variable.');
     end
-    
 end
-
-% Check rotational correlation time
 if isfield(inter,'tau_c')
-    
     if ~iscell(inter.tau_c)
         error('inter.tau_c must be a cell array with the number of elements matching the number of chemical species.');
     end
-    
-    % Inspect the elements
     for s=1:numel(inter.tau_c)
-        
-        % Check type and dimension
         if (~isnumeric(inter.tau_c{s}))||(numel(inter.tau_c{s})>3)||(numel(inter.tau_c{s})==0)
             error('elements of inter.tau_c must be numeric vectors of size 1, 2 or 3.');
         end
-        
-        % Check value
         if (~isreal(inter.tau_c{s}))||any(inter.tau_c{s}<0)
             error('elements of inter.tau_c must be non-negative and real.');
         end
-        
-        % Enforce a rotational kernel theory if tau_c is specified
         if (~isfield(inter,'relaxation'))||...
            (~any(ismember({'redfield','naka-zwan'},inter.relaxation)))
             error('inter.tau_c requires Redfield or Nakajima-Zwanzig relaxation theory.');
         end
-        
     end
-    
-    % Match the chemistry
     if isfield(inter,'chem')&&isfield(inter.chem,'parts')
         if numel(inter.chem.parts)~=numel(inter.tau_c)
             error('the number of elements in inter.tau_c must match the number of chemical species.');
@@ -2155,13 +1816,8 @@ if isfield(inter,'tau_c')
     elseif numel(inter.tau_c)~=1
         error('a system with a single chemical species can only have one element in inter.tau_c cell array.');
     end
-    
 end
-
-% Check SRFK correlation time
 if isfield(inter,'srfk_tau_c')
-    
-    % Check type and dimension
     if ~iscell(inter.srfk_tau_c)
         error('inter.srfk_tau_c must be a cell array of 2-element vectors.');
     end
@@ -2172,160 +1828,96 @@ if isfield(inter,'srfk_tau_c')
             error('inter.srfk_tau_c must be a cell array of 2-element vectors.');
         end
     end
-    
-    % Enforce SRFK theory if srfk_tau_c is specified
     if (~isfield(inter,'relaxation'))||(~ismember('SRFK',inter.relaxation))
         error('inter.srfk_tau_c requires SRFK relaxation theory.');
     end
-    
 end
-
-% Check term retention
 if isfield(inter,'rlx_keep')
-    
-    % Check type
     if ~ischar(inter.rlx_keep)
         error('inter.rlx_keep must be a string.');
     end
-    
-    % Check contents
     if ~ismember(inter.rlx_keep,{'diagonal','kite','secular','labframe'})
         error('allowed values for inter.rlx_keep are ''diagonal'', ''kite'', ''secular'' and ''labframe''.');
     end
-    
 end
-
-% Check dynamic frequency shift retention
 if isfield(inter,'rlx_dfs')
-    
-    % Check type
     if ~ischar(inter.rlx_dfs)
         error('inter.rlx_dfs must be a string.');
     end
-    
-    % Check contents
     if ~ismember(inter.rlx_dfs,{'keep','ignore'})
         error('allowed values for inter.rlx_dfs are ''keep'' and ''ignore''.');
     end
-    
 end
-    
-% Check SRFK modulation depths
 if isfield(inter,'srfk_mdepth')
-
-    % Check type
-    if (~iscell(inter.srfk_mdepth))||(~all(cellfun(@isnumeric,inter.srfk_mdepth(:))))
+    if ~iscell(inter.srfk_mdepth)
         error('inter.srfk_mdepth must be a cell array of empty matrices or scalars.');
     end
-    
-    % Check dimensions
-    if ~all(size(inter.srfk_mdepth)==[numel(sys.isotopes) numel(sys.isotopes)])
+    if ~isequal(size(inter.srfk_mdepth),[numel(sys.isotopes) numel(sys.isotopes)])
         error('both dimensions of inter.srfk_mdepth array should match the number of spins.');
     end
-    
-    % Make sure all non-empty elements are non-negative real numbers
-    [rows,cols]=find(~cellfun(@isempty,inter.srfk_mdepth));
-    for n=1:numel(rows)
-        if (~isreal(inter.srfk_mdepth{rows(n),cols(n)}))||(inter.srfk_mdepth{rows(n),cols(n)}<0)
-            error('non-empty elements of inter.srfk_mdepth must be non-negative real numbers.');
+    for k=1:numel(sys.isotopes)
+        column=inter.srfk_mdepth(:,k);
+        if ~all(cellfun(@isnumeric,column))
+            error('inter.srfk_mdepth must be a cell array of empty matrices or scalars.');
         end
-    end
-    
-    % Disallow quadratic scalar couplings
-    for n=1:numel(sys.isotopes)
-        if norm(inter.srfk_mdepth{n,n},1)~=0
+        rows=find(~cellfun(@isempty,column));
+        for n=1:numel(rows)
+            if (~isreal(column{rows(n)}))||(column{rows(n)}<0)
+                error('non-empty elements of inter.srfk_mdepth must be non-negative real numbers.');
+            end
+        end
+        if norm(column{k},1)~=0
             error('scalar couplings cannot be quadratic.');
         end
     end
-    
-    % Enforce SRFK if SRFK modulation depths are specified
     if (~isfield(inter,'relaxation'))||(~ismember('SRFK',inter.relaxation))
         error('inter.srfk_mdepth requires SRFK relaxation theory.');
     end
-    
 end
-
-% Check equilibrium switch
 if isfield(inter,'equilibrium')
-    
-    % Check type
     if ~ischar(inter.equilibrium)
         error('inter.equilibrium must be a string.');
     end
-    
-    % Check contents
     if ~ismember(inter.equilibrium,{'zero','IME','dibari'})
         error('allowed values for inter.equilibrium are ''zero'', ''IME'' and ''dibari''.');
     end
-    
-    % Enforce temperature
     if ismember(inter.equilibrium,{'IME','dibari'})&&...
        (~isfield(inter,'temperature'))
         error('inter.temperature is required when relaxation has a target.');
     end
-    
 end
-
-% Check damping rate
 if isfield(inter,'damp_rate')
-
-    % Enforce isotropic damping if damp_rate is specified
     if (~isfield(inter,'relaxation'))||(~ismember('damp',inter.relaxation))
         error('inter.damp_rate can only be specified with damp relaxation theory.');
     end
-
-    % Check type
     if (~isnumeric(inter.damp_rate))||(~isreal(inter.damp_rate))||...
        ((~isscalar(inter.damp_rate))&&(~isequal(size(inter.damp_rate),[3 3])))
         error('inter.damp_rate must be a real scalar or a 3x3 matrix.');
     end
-    
-    % Check dimensions
     if ~all(eig(inter.damp_rate,'vector')>=0)
         error('inter.damp_rate must have non-negative eigenvalues.');
     end
-    
 end
-
-% Check R1 rates for T1/T2
 if isfield(inter,'r1_rates')
-    
-    % Check type and count
     if ~iscell(inter.r1_rates)
         error('inter.r1_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
     end
     if numel(inter.r1_rates)~=numel(sys.isotopes)
         error('element count in inter.r1_rates must match the number of spins.');
     end
-
-    % Check elements
     for n=1:numel(inter.r1_rates)
-
-        % Check scalar relaxation rates
         if isnumeric(inter.r1_rates{n})&&isscalar(inter.r1_rates{n})
-
-            % Must be real numbers, negative values allowed
-            % because rate subtraction scenarios can exist
             if ~isreal(inter.r1_rates{n})
                 error('scalars in inter.r1_rates must be real.');
             end
-        
-        % Check 3x3 relaxation rate tensors
         elseif isnumeric(inter.r1_rates{n})&&all(size(inter.r1_rates{n})==[3 3])
-
-            % Must be real symmetric, negative definite allowed
-            % because rate subtraction scenarios can exist
             if ~isreal(inter.r1_rates{n})
                 error('3x3 matrices in inter.r1_rates must be real.');
             end
             if norm(inter.r1_rates{n}-inter.r1_rates{n}',2)>1e-6*norm(inter.r1_rates{n},2)
                 error('3x3 matrices in inter.r1_rates must be symmetric.');
             end
-           
-        % Check function handles
         elseif isa(inter.r1_rates{n},'function_handle')
-            
-            % A good sanity test is that the function handles must be 2*pi periodic
             r1_func=inter.r1_rates{n}; test_angles=[2*pi*rand(), pi*rand(), 2*pi*rand()];
             test_values=[r1_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)     ),...
                          r1_func(test_angles(1)+2*pi,test_angles(2)     ,test_angles(3)     ),...
@@ -2336,62 +1928,34 @@ if isfield(inter,'r1_rates')
                (abs(test_values(3)-test_values(4))>1e-6*(abs(test_values(3))+abs(test_values(4))))
                 error('function handles in inter.r1_rates must be 2*pi periodic in all arguments.');
             end
-
         else
-
-            % Complain and bomb out
             error('inter.r1_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
-           
         end
-        
     end
-    
-    % Enforce T1,T2 theory if inter.r1_rates rates are specified
     if (~isfield(inter,'relaxation'))||(~ismember('t1_t2',inter.relaxation))
         error('inter.r1_rates may only be specified with T1,T2 relaxation theory.');
     end
-    
 end
-
-% Check R2 rates for T1/T2
 if isfield(inter,'r2_rates')
-    
-    % Check type and count
     if ~iscell(inter.r2_rates)
         error('inter.r2_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
     end
     if numel(inter.r2_rates)~=numel(sys.isotopes)
         error('element count in inter.r2_rates must match the number of spins.');
     end
-
-    % Check elements
     for n=1:numel(inter.r2_rates)
-
-        % Check scalar relaxation rates
         if isnumeric(inter.r2_rates{n})&&isscalar(inter.r2_rates{n})
-
-            % Must be real numbers, negative values allowed
-            % because rate subtraction scenarios can exist
             if ~isreal(inter.r2_rates{n})
                 error('scalars in inter.r2_rates must be real.');
             end
-        
-        % Check 3x3 relaxation rate tensors
         elseif isnumeric(inter.r2_rates{n})&&all(size(inter.r2_rates{n})==[3 3])
-
-            % Must be real symmetric, negative definite allowed
-            % because rate subtraction scenarios can exist
             if ~isreal(inter.r2_rates{n})
                 error('3x3 matrices in inter.r2_rates must be real.');
             end
             if norm(inter.r2_rates{n}-inter.r2_rates{n}',2)>1e-6*norm(inter.r2_rates{n},2)
                 error('3x3 matrices in inter.r2_rates must be symmetric.');
             end
-
-        % Check function handles
         elseif isa(inter.r2_rates{n},'function_handle')
-            
-            % A good sanity test is that the function handles must be 2*pi periodic
             r2_func=inter.r2_rates{n}; test_angles=[2*pi*rand(), pi*rand(), 2*pi*rand()];
             test_values=[r2_func(test_angles(1)     ,test_angles(2)     ,test_angles(3)     ),...
                          r2_func(test_angles(1)+2*pi,test_angles(2)     ,test_angles(3)     ),...
@@ -2402,348 +1966,207 @@ if isfield(inter,'r2_rates')
                (abs(test_values(3)-test_values(4))>1e-6*(abs(test_values(3))+abs(test_values(4))))
                 error('function handles in inter.r2_rates must be 2*pi periodic in all arguments.');
             end
-
         else
-
-            % Complain and bomb out
             error('inter.r2_rates must be a cell array of scalars, or 3x3 matrices, or function handles.');
-           
         end
-        
     end
-    
-    % Enforce T1,T2 theory if inter.r2_rates rates are specified
     if (~isfield(inter,'relaxation'))||(~ismember('t1_t2',inter.relaxation))
         error('inter.r2_rates may only be specified with T1,T2 relaxation theory.');
     end
-    
 end
-
-% Check simultaneous presence of both Lindblad rate sets
 if (isfield(inter,'lind_r1_rates')&&(~isfield(inter,'lind_r2_rates')))||...
    (~isfield(inter,'lind_r1_rates')&&(isfield(inter,'lind_r2_rates')))
     error('inter.lind_r1_rates and inter.lind_r2_rates are required simultaneously.');
 end
-
-% Check R1 rates for Lindblad
 if isfield(inter,'lind_r1_rates')
-    
-    % Check type and values
     if (~isvector(inter.lind_r1_rates))||(~isnumeric(inter.lind_r1_rates))||...
          any(inter.lind_r1_rates<0)||any(~isreal(inter.lind_r1_rates))
         error('inter.lind_r1_rates must be a vector of positive real numbers.');
     end
-    
-    % Check dimension
     if numel(inter.lind_r1_rates)~=numel(sys.isotopes)
         error('the number of elements in inter.lind_r1_rates must be equal to the number of spins.');
     end
-    
-    % Enforce Lindblad theory if inter.lind_r1_rates rates are specified
     if (~isfield(inter,'relaxation'))||(~ismember('lindblad',inter.relaxation))
         error('inter.lind_r1_rates can only be specified with Lindblad relaxation theory.');
     end
-    
 end
-
-% Check R2 rates for Lindblad
 if isfield(inter,'lind_r2_rates')
-    
-    % Check type and values
     if (~isvector(inter.lind_r2_rates))||(~isnumeric(inter.lind_r2_rates))||...
          any(inter.lind_r2_rates<0)||any(~isreal(inter.lind_r2_rates))
         error('inter.lind_r2_rates must be a vector of positive real numbers.');
     end
-    
-    % Check dimension
     if numel(inter.lind_r2_rates)~=numel(sys.isotopes)
         error('the number of elements in inter.lind_r2_rates must be equal to the number of spins.');
     end
-    
-    % Enforce Lindblad theory if inter.lind_r2_rates rates are specified
     if (~isfield(inter,'relaxation'))||(~ismember('lindblad',inter.relaxation))
         error('inter.lind_r2_rates can only be specified with Lindblad relaxation theory.');
     end
-    
 end
-
-% Check Lindblad relaxation rate sanity
 if isfield(inter,'lind_r1_rates')&&isfield(inter,'lind_r2_rates')&&...
    any(inter.lind_r2_rates(:)<inter.lind_r1_rates(:)/2)
     error('Lindblad relaxation theory forbids R2 < 0.5*R1 on thermodynamic grounds.');
 end
-
-% Check simultaneous presence of both Weizmann DNP rates
 if (isfield(inter,'weiz_r1e')&&(~isfield(inter,'weiz_r2e')))||...
    (~isfield(inter,'weiz_r1e')&&(isfield(inter,'weiz_r2e')))
     error('inter.weiz_r1e and inter.weiz_r2e are required simultaneously.');
 end
-
-% Check R1e rate for Weizmann DNP theory
 if isfield(inter,'weiz_r1e')
-    
-    % Check type and value
     if (~isnumeric(inter.weiz_r1e))||any(inter.weiz_r1e<0)||any(~isreal(inter.weiz_r1e))
         error('inter.weiz_r1e must be a positive real number.');
     end
-    
-    % Check dimension
     if numel(inter.weiz_r1e)~=1
         error('inter.weiz_r1e must have a single element.');
     end
-    
-    % Enforce Weizmann theory if inter.weiz_r1e is specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1e can only be specified with Weizmann DNP relaxation theory.');
     end
-    
 end
-
-% Check R2e rate for Weizmann DNP theory
 if isfield(inter,'weiz_r2e')
-    
-    % Check type and value
     if (~isnumeric(inter.weiz_r2e))||any(inter.weiz_r2e<0)||any(~isreal(inter.weiz_r2e))
         error('inter.weiz_r2e must be a positive real number.');
     end
-    
-    % Check dimension
     if numel(inter.weiz_r2e)~=1
         error('inter.weiz_r1e must have a single element.');
     end
-    
-    % Enforce Weizmann theory if inter.weiz_r2e is specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r2e can only be specified with Weizmann DNP relaxation theory.');
     end
-    
 end
-
-% Check Weizmann relaxation rate sanity
 if isfield(inter,'weiz_r1e')&&isfield(inter,'weiz_r2e')&&...
    any(inter.weiz_r2e(:)<inter.weiz_r1e(:)/2)
     error('Weizmann DNP relaxation theory forbids R2e < 0.5*R1e on thermodynamic grounds.');
 end
-
-% Check simultaneous presence of both Nottingham DNP rates
 if (isfield(inter,'nott_r1e')&&(~isfield(inter,'nott_r2e')))||...
    (~isfield(inter,'nott_r1e')&&(isfield(inter,'nott_r2e')))
     error('inter.nott_r1e and inter.nott_r2e are required simultaneously.');
 end
-
-% Check R1e rate for Nottingham DNP theory
 if isfield(inter,'nott_r1e')
-
-    % Check type and value
     if (~isnumeric(inter.nott_r1e))||any(inter.nott_r1e<0)||any(~isreal(inter.nott_r1e))
         error('inter.nott_r1e must be a positive real number.');
     end
-
-    % Check dimension
     if numel(inter.nott_r1e)~=1
         error('inter.nott_r1e must have a single element.');
     end
-
-    % Enforce Nottingham theory if inter.weiz_r1e is specified
     if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r1e can only be specified with Nottingham DNP relaxation theory.');
     end
-
 end
-
-% Check R2e rate for Nottingham DNP theory
 if isfield(inter,'nott_r2e')
-    
-    % Check type and value
     if (~isnumeric(inter.nott_r2e))||any(inter.nott_r2e<0)||any(~isreal(inter.nott_r2e))
         error('inter.nott_r2e must be a positive real number.');
     end
-    
-    % Check dimension
     if numel(inter.nott_r2e)~=1
         error('inter.nott_r2e must have a single element.');
     end
-    
-    % Enforce Nottingham theory if inter.weiz_r1e is specified
     if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r2e can only be specified with Nottingham DNP relaxation theory.');
     end
-    
 end
-
-% Check Nottingham DNP relaxation rate sanity
 if isfield(inter,'nott_r1e')&&isfield(inter,'nott_r2e')&&...
    any(inter.nott_r2e(:)<inter.nott_r1e(:)/2)
     error('Nottingham DNP relaxation theory forbids R2e < 0.5*R1e on thermodynamic grounds.');
 end
-
-% Check simultaneous presence of both Weizmann DNP rates
 if (isfield(inter,'weiz_r1n')&&(~isfield(inter,'weiz_r2n')))||...
    (~isfield(inter,'weiz_r1n')&&(isfield(inter,'weiz_r2n')))
     error('inter.weiz_r1n and inter.weiz_r2n are required simultaneously.');
 end
-
-% Check R1n rate for Weizmann DNP theory
 if isfield(inter,'weiz_r1n')
-    
-    % Check type and value
     if (~isnumeric(inter.weiz_r1n))||any(inter.weiz_r1n<0)||any(~isreal(inter.weiz_r1n))
         error('inter.weiz_r1n must be a positive real number.');
     end
-    
-    % Check dimension
     if numel(inter.weiz_r1n)~=1
         error('inter.weiz_r1n must have a single element.');
     end
-    
-    % Enforce Weizmann theory if inter.weiz_r1n is specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1n can only be specified with Weizmann DNP relaxation theory.');
     end
-    
 end
-
-% Check R2n rate for Weizmann DNP theory
 if isfield(inter,'weiz_r2n')
-    
-    % Check type and value
     if (~isnumeric(inter.weiz_r2n))||any(inter.weiz_r2n<0)||any(~isreal(inter.weiz_r2n))
         error('inter.weiz_r2n must be a positive real number.');
     end
-    
-    % Check dimension
     if numel(inter.weiz_r2n)~=1
         error('inter.weiz_r1e must have a single element.');
     end
-    
-    % Enforce Weizmann theory if inter.weiz_r2n is specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r2n can only be specified with Weizmann DNP relaxation theory.');
     end
-    
 end
-
-% Check Weizmann relaxation rate sanity
 if isfield(inter,'weiz_r1n')&&isfield(inter,'weiz_r2n')&&...
    any(inter.weiz_r2n(:)<inter.weiz_r1n(:)/2)
     error('Weizmann DNP relaxation theory forbids R2n < 0.5*R1n on thermodynamic grounds.');
 end
-
-% Check simultaneous presence of both Nottingham DNP rates
 if (isfield(inter,'nott_r1n')&&(~isfield(inter,'nott_r2n')))||...
    (~isfield(inter,'nott_r1n')&&(isfield(inter,'nott_r2n')))
     error('inter.nott_r1n and inter.nott_r2n are required simultaneously.');
 end
-
-% Check R1n rate for Nottingham DNP theory
 if isfield(inter,'nott_r1n')
-
-    % Check type and value
     if (~isnumeric(inter.nott_r1n))||any(inter.nott_r1n<0)||any(~isreal(inter.nott_r1n))
         error('inter.nott_r1n must be a positive real number.');
     end
-
-    % Check dimension
     if numel(inter.nott_r1n)~=1
         error('inter.nott_r1n must have a single element.');
     end
-
-    % Enforce Nottingham theory if inter.weiz_r1n is specified
     if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r1n can only be specified with Nottingham DNP relaxation theory.');
     end
-
 end
-
-% Check R2n rate for Nottingham DNP theory
 if isfield(inter,'nott_r2n')
-    
-    % Check type and value
     if (~isnumeric(inter.nott_r2n))||any(inter.nott_r2n<0)||any(~isreal(inter.nott_r2n))
         error('inter.nott_r2n must be a positive real number.');
     end
-    
-    % Check dimension
     if numel(inter.nott_r2n)~=1
         error('inter.nott_r2n must have a single element.');
     end
-    
-    % Enforce Nottingham theory if inter.weiz_r1e is specified
     if (~isfield(inter,'relaxation'))||(~ismember('nottingham',inter.relaxation))
         error('inter.nott_r2n can only be specified with Nottingham DNP relaxation theory.');
     end
-    
 end
-
-% Check Nottingham DNP relaxation rate sanity
 if isfield(inter,'nott_r1n')&&isfield(inter,'nott_r2n')&&...
    any(inter.nott_r2n(:)<inter.nott_r1n(:)/2)
     error('Nottingham DNP relaxation theory forbids R2n < 0.5*R1n on thermodynamic grounds.');
 end
-
-% Check simultaneous presence of both Weizmann DNP rates
 if (isfield(inter,'weiz_r1d')&&(~isfield(inter,'weiz_r2d')))||...
         (~isfield(inter,'weiz_r1d')&&(isfield(inter,'weiz_r2d')))
     error('inter.weiz_r1d and inter.weiz_r2d are required simultaneously.');
 end
-
-% Check R1d rates for Weizmann DNP theory
 if isfield(inter,'weiz_r1d')
-    
-    % Check type and values
-    if (~isnumeric(inter.weiz_r1d))||any(inter.weiz_r1d(:)<0)||(~isreal(inter.weiz_r1d))
+    if (~isnumeric(inter.weiz_r1d))||any(nonzeros(inter.weiz_r1d)<0)||(~isreal(inter.weiz_r1d))
         error('inter.weiz_r1d must be a matrix of non-negative real numbers.');
     end
-    
-    % Check dimension
     if any(size(inter.weiz_r1d)~=[numel(sys.isotopes) numel(sys.isotopes)])
         error('both dimensions of inter.weiz_r1d must be equal to the number of spins.');
     end
-    
-    % Enforce Weizmann theory if inter.weiz_r1d rates are specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r1d can only be specified with Weizmann DNP relaxation theory.');
     end
-    
 end
-
-% Check R2d rates
 if isfield(inter,'weiz_r2d')
-    
-    % Check type and values
-    if (~isnumeric(inter.weiz_r2d))||any(inter.weiz_r2d(:)<0)||(~isreal(inter.weiz_r2d))
+    if (~isnumeric(inter.weiz_r2d))||any(nonzeros(inter.weiz_r2d)<0)||(~isreal(inter.weiz_r2d))
         error('inter.weiz_r2d must be a matrix of non-negative real numbers.');
     end
-    
-    % Check dimension
     if any(size(inter.weiz_r2d)~=[numel(sys.isotopes) numel(sys.isotopes)])
         error('both dimensions of inter.weiz_r2d must be equal to the number of spins.');
     end
-    
-    % Enforce Weizmann theory if R2d rates are specified
     if (~isfield(inter,'relaxation'))||(~ismember('weizmann',inter.relaxation))
         error('inter.weiz_r2d can only be specified with Weizmann DNP relaxation theory.');
     end
-    
 end
-
-% Check Weizmann relaxation rate sanity
-if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')&&...
-   any(inter.weiz_r2d(:)<inter.weiz_r1d(:)/2)
-    error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
+if isfield(inter,'weiz_r1d')&&isfield(inter,'weiz_r2d')
+    idx=find(inter.weiz_r1d);
+    if any(inter.weiz_r2d(idx)<inter.weiz_r1d(idx)/2)
+        error('Weizmann DNP relaxation theory forbids R2d < 0.5*R1d on thermodynamic grounds.');
+    end
 end
-
-% Check magnetisation flux parameters
 if isfield(inter,'flux_rate')&&(~isfield(inter,'flux_type'))
     error('flux type (inter.flux_type) must be provided.');
 elseif isfield(inter,'flux_type')&&(~isfield(inter,'flux_rate'))
     error('flux rates (inter.flux_rate) must be provided.');
 end
-
 if isfield(inter,'flux_rate')
     if (~isnumeric(inter.flux_rate))||(~isreal(inter.flux_rate))||...
        (~ismatrix(inter.flux_rate))||...
-       (~all(isfinite(inter.flux_rate(:))))||...
+       (~all(isfinite(nonzeros(inter.flux_rate))))||...
        (size(inter.flux_rate,1)~=size(inter.flux_rate,2))
         error('inter.flux_rate must be a finite real square matrix.');
     end
@@ -2751,7 +2174,6 @@ if isfield(inter,'flux_rate')
         error('both dimensions of inter.flux_rate matrix must be equal to the number of spins.');
     end
 end
-
 if isfield(inter,'flux_type')
     if ~ischar(inter.flux_type)
         error('inter.flux_type must be a character string.');
@@ -2760,16 +2182,11 @@ if isfield(inter,'flux_type')
         error('incorrect flux type specification.');
     end
 end
-
-% Require flux parameters when the theory is enabled
 if isfield(inter,'relaxation')&&ismember('flux',inter.relaxation)&&...
    (~isfield(inter,'flux_rate')||~isfield(inter,'flux_type'))
     error('flux relaxation requires inter.flux_rate and inter.flux_type.');
 end
-
-% Check chemical kinetics
 if isfield(inter,'chem')
-
     retired={'rates','rp_theory','rp_rates','rp_electrons'};
     for n=1:numel(retired)
         if isfield(inter.chem,retired{n})
@@ -2786,37 +2203,23 @@ if isfield(inter,'chem')
         error('Spinach:create:reactionParts',...
               'inter.chem.reactions requires explicit inter.chem.parts.');
     end
-
-    % Check chemical species specification
     if isfield(inter.chem,'parts')
-
-        % Basic type checks
         if ~iscell(inter.chem.parts)||isempty(inter.chem.parts)||...
            ~all(cellfun(@(x)isnumeric(x)&&isreal(x)&&(isvector(x)||isempty(x)),inter.chem.parts))
             error('inter.chem.parts must be a non-empty cell array of numeric vectors or empty arrays.');
         end
-
-        % Chemiscal subsystem specification
         for n=1:numel(inter.chem.parts)
-
-            % Subsystem partitioning check
             for k=1:numel(inter.chem.parts)
                 if (n~=k)&&(~isempty(intersect(inter.chem.parts{n},inter.chem.parts{k})))
                     error('a given spin can only belong to one chemical subsystem in inter.chem.parts variable.');
                 end
             end
-
-            % Spin indexing check
             if any(inter.chem.parts{n}<1)||any(inter.chem.parts{n}>numel(sys.isotopes))||...
                any(mod(inter.chem.parts{n},1)~=0)||(numel(unique(inter.chem.parts{n}))~=numel(inter.chem.parts{n}))
                 error('elements of inter.chem.parts must be vectors of unique positive integers not exceeding the total number of spins.');
             end
-
         end
-
     end
-    
-    % Check initial concentrations
     if isfield(inter.chem,'concs')
         if (~isnumeric(inter.chem.concs))||(~isreal(inter.chem.concs))||...
            (~isvector(inter.chem.concs))||any(~isfinite(inter.chem.concs(:)))||...
@@ -2827,7 +2230,6 @@ if isfield(inter,'chem')
             error('the number of initial concentrations must be equal to the number of chemical species.');
         end
     end
-    
     if isfield(inter.chem,'reactions')
         if ~iscell(inter.chem.reactions)||...
            (~isvector(inter.chem.reactions)&&~isempty(inter.chem.reactions))
@@ -2911,10 +2313,7 @@ if isfield(inter,'chem')
             end
         end
     end
-    
 end
-
-% Check bosonic mode parameters
 boson_mask=~cellfun(@isempty,regexp(sys.isotopes,'^[CVT]\d+$','once'));
 if isfield(inter,'modes')
     if ~isstruct(inter.modes)
@@ -3117,8 +2516,6 @@ if isfield(inter,'modes')
         end
     end
 end
-
-% Check that bosonic modes carry no spin interactions
 if any(boson_mask)
     zeeman_flds={'eigs','euler','matrix','scalar'};
     for m=1:numel(zeeman_flds)
@@ -3167,8 +2564,6 @@ if any(boson_mask)
         end
     end
 end
-
-% Check the drop list
 if isfield(inter,'ignore')
     if ~iscell(inter.ignore)
         error('inter.ignore must be a cell array of two-element vectors.');
@@ -3186,7 +2581,6 @@ if isfield(inter,'ignore')
         end
     end
 end
-
 end
 
 % Those who beat their swords into plowshares will till 

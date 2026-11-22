@@ -1,0 +1,3 @@
+# kernel/utilities/pair_subset.m
+
+`pair_subset(pairs,spin_map)` restricts K-by-3 ordered interaction records and maps their endpoints. The caller supplies one old-to-new index column, with zeros for excluded particles and consecutive positive values in old-index order. A record survives only if both endpoints survive; diagonal keys and arbitrary row payloads are handled in the same way. The order-preserving map keeps destination-major sorting and permits the same map to be reused for multiple lists without rebuilding an index or visiting every possible pair. Empty results are 0-by-3 cells. Used by `basis` to extract a substance and by `kill_spin` to remove particles.

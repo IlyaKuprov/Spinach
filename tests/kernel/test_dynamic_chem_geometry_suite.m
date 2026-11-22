@@ -108,9 +108,7 @@ spin_system.inter.coordinates={[0 0 0],[2 0 0],[0.5 0 0]};
 spin_system.chem.parts={[1 2],3};
 
 % Define coupling tensor cells
-spin_system.inter.coupling.matrix=cell(3,3);
-spin_system.inter.coupling.matrix{1,2}=diag([1 2 3]);
-spin_system.inter.coupling.matrix{2,1}=diag([4 5 6]);
+spin_system.inter.coupling.matrix={2,1,diag([4 5 6]);1,2,diag([1 2 3])};
 
 % Define Zeeman frequencies with known isotropic offsets
 basefrqs=2*pi*[100e6 25e6 10e6];

@@ -32,40 +32,40 @@ report(spin_system,'Prt A   Prt B   Coupling type       Amplitude, Hz   ');
 report(spin_system,'----------------------------------------------------');
 
 % Print exchange couplings
-[rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.exchange));
-for n=1:numel(rows)
-    report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
+pairs=spin_system.inter.modes.exchange;
+for n=1:size(pairs,1)
+    report(spin_system,[pad(num2str(pairs{n,1}),8) pad(num2str(pairs{n,2}),8)...
                         pad('exchange',20)...
-                        num2str(spin_system.inter.modes.exchange{rows(n),cols(n)}/(2*pi),'%+10.4e')]);
+                        num2str(pairs{n,3}/(2*pi),'%+10.4e')]);
 end
 
 % Print cross-Kerr couplings
-[rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.kerr));
-for n=1:numel(rows)
-    report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
+pairs=spin_system.inter.modes.kerr;
+for n=1:size(pairs,1)
+    report(spin_system,[pad(num2str(pairs{n,1}),8) pad(num2str(pairs{n,2}),8)...
                         pad('cross-Kerr',20)...
-                        num2str(spin_system.inter.modes.kerr{rows(n),cols(n)}/(2*pi),'%+10.4e')]);
+                        num2str(pairs{n,3}/(2*pi),'%+10.4e')]);
 end
 
 % Print longitudinal and radiation pressure couplings
-[rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.longitudinal));
-for n=1:numel(rows)
-    if all(ismember(spin_system.comp.types([rows(n) cols(n)]),{'C','V','T'}))
+pairs=spin_system.inter.modes.longitudinal;
+for n=1:size(pairs,1)
+    if all(ismember(spin_system.comp.types([pairs{n,1} pairs{n,2}]),{'C','V','T'}))
         coup_name='radiation pressure';
     else
         coup_name='longitudinal';
     end
-    report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
+    report(spin_system,[pad(num2str(pairs{n,1}),8) pad(num2str(pairs{n,2}),8)...
                         pad(coup_name,20)...
-                        num2str(spin_system.inter.modes.longitudinal{rows(n),cols(n)}/(2*pi),'%+10.4e')]);
+                        num2str(pairs{n,3}/(2*pi),'%+10.4e')]);
 end
 
 % Print dispersive couplings
-[rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.dispersive));
-for n=1:numel(rows)
-    report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
+pairs=spin_system.inter.modes.dispersive;
+for n=1:size(pairs,1)
+    report(spin_system,[pad(num2str(pairs{n,1}),8) pad(num2str(pairs{n,2}),8)...
                         pad('dispersive',20)...
-                        num2str(spin_system.inter.modes.dispersive{rows(n),cols(n)}/(2*pi),'%+10.4e')]);
+                        num2str(pairs{n,3}/(2*pi),'%+10.4e')]);
 end
 report(spin_system,'====================================================');
 

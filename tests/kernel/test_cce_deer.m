@@ -122,7 +122,7 @@ result=test_true(result,'DEER axial check respects site filters',...
 
 % Reject projected dynamics that discard actual observed spin transitions
 transverse=ss;
-transverse.inter.coupling.matrix{1,2}=diag([2 0 0]);
+transverse=cce_test_write(transverse,[1 2],diag([2 0 0]));
 projected=rmfield(q,'pump');
 projected.output='signal';
 projected.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
@@ -361,7 +361,7 @@ for method={'cce','mecce','megcce'}
         difference=Inf;
         try
             with_radius=cce_compile(ss,r,'labframe');
-            difference=double(~isequaln(with_radius.retained,reference.retained));
+            difference=double(~isequaln(with_radius.pairs,reference.pairs));
         catch
             passed=false;
         end
@@ -568,7 +568,7 @@ end
 
 % A finite radius excludes an actual polarised exterior coupling
 field_model=cce_compile(spatial,base,'labframe');
-field_model.retained{1,3}=diag([0 0 4]);
+field_model.pairs(end+1)=struct('ids',[1 3],'tensor',zeros(3),'retained',diag([0 0 4]));
 field_model.parameters.cce.meanfield_radius=2;
 [near,~]=cce_subsystem(field_model,2,struct(),[]);
 [h_near,~,~]=cce_generators(near,field_model.parameters,[]);

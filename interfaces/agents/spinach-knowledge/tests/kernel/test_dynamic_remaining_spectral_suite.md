@@ -39,3 +39,5 @@ The function takes no inputs. The eigensolver checks include overlapping symmetr
 
 The synthetic compiled fixtures use per-substance descriptor cells and offsets.
 The local symmetry service returns projector cells and dimensions in `sym_fact`.
+
+The uncoupled fixture has no compiled coupling records.

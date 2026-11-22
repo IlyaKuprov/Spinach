@@ -33,114 +33,52 @@ report(spin_system,['dipolar interaction distance threshold: ' ...
                     num2str(spin_system.tols.prox_cutoff) ' Angstrom.']);
 report(spin_system,'running dipolar interaction network analysis...');
 
-% Preallocate distance vector array
-distvects=cell(spin_system.comp.nspins,spin_system.comp.nspins);
-
-% Loop over chemical species
-for m=1:numel(spin_system.chem.parts)
-    
-    % Extract the spin list
-    spin_list=spin_system.chem.parts{m};
-    
-    % Loop over atom pairs
-    for n=spin_list
-        for k=spin_list
-            
-            % Only proceed if coordinates are specified
-            if (~isempty(spin_system.inter.coordinates{n}))&&...
-               (~isempty(spin_system.inter.coordinates{k}))&&(n~=k)
-                
-                % Determine possible distance vectors from n to k
-                if isempty(spin_system.inter.pbc)
-                    
-                    % Compute the distance vector for standalone system
-                    dv=spin_system.inter.coordinates{k}-...
-                       spin_system.inter.coordinates{n};
-                    
-                elseif isscalar(spin_system.inter.pbc)
-                    
-                    % Preallocate distance vector array
-                    nvecs=2*spin_system.tols.dd_ncells+1; dv=zeros(nvecs,3);
-                    
-                    % Compute distance vectors with 1D periodic boundary
-                    linear_index=1;
-                    for p=-spin_system.tols.dd_ncells:spin_system.tols.dd_ncells
-                        dv(linear_index,:)=spin_system.inter.coordinates{k}+...
-                                           p*spin_system.inter.pbc{1}-...
-                                           spin_system.inter.coordinates{n};
-                        linear_index=linear_index+1;
-                    end
-                    
-                elseif numel(spin_system.inter.pbc)==2
-                    
-                    % Preallocate distance vector array
-                    nvecs=(2*spin_system.tols.dd_ncells+1)^2; dv=zeros(nvecs,3);
-                    
-                    % Compute distance vectors with 2D periodic boundary
-                    linear_index=1;
-                    for p=-spin_system.tols.dd_ncells:spin_system.tols.dd_ncells
-                        for q=-spin_system.tols.dd_ncells:spin_system.tols.dd_ncells
-                            dv(linear_index,:)=spin_system.inter.coordinates{k}+...
-                                               p*spin_system.inter.pbc{1}+...
-                                               q*spin_system.inter.pbc{2}-...
-                                               spin_system.inter.coordinates{n};
-                            linear_index=linear_index+1;                
-                        end
-                    end
-                    
-                elseif numel(spin_system.inter.pbc)==3
-                    
-                    % Preallocate distance vector array
-                    nvecs=(2*spin_system.tols.dd_ncells+1)^3; dv=zeros(nvecs,3);
-                    
-                    % Compute distance vectors with 3D periodic boundary
-                    linear_index=1;
-                    for p=-spin_system.tols.dd_ncells:spin_system.tols.dd_ncells
-                        for q=-spin_system.tols.dd_ncells:spin_system.tols.dd_ncells
-                            for r=-spin_system.tols.dd_ncells:spin_system.tols.dd_ncells
-                                dv(linear_index,:)=spin_system.inter.coordinates{k}+...
-                                                   p*spin_system.inter.pbc{1}+...
-                                                   q*spin_system.inter.pbc{2}+...
-                                                   r*spin_system.inter.pbc{3}-...
-                                                   spin_system.inter.coordinates{n};
-                                linear_index=linear_index+1;
-                            end
-                        end
-                    end
-                    
-                else
-                    
-                    % Complain and bomb out
-                    error('PBC translation vector array has invalid dimensions.');
-                    
-                end
-                
-                % Ignore distance vectors that are longer than the threshold
-                dv=dv(sqrt(sum(dv.^2,2))<spin_system.tols.prox_cutoff,:);
-                
-                % Detect atomic collisions
-                if any(sqrt(sum(dv.^2,2))<0.5)
-                    
-                    % Bomb out for distances closer than 0.5 Angstrom
-                    error(['collision detected between spin ' num2str(n)...
-                           ' and spin ' num2str(k) ' or their PBC images.']);
-                    
-                end
-                
-                % Assign the cell array
-                if ~isempty(dv), distvects{n,k}=dv; end
-                
-            end
-        end
-    end
-    
+% Enumerate translations in the order used for the tensor sum
+axes=spin_system.inter.pbc;
+shifts=zeros(1,0);
+for d=1:numel(axes)
+    shells=(-spin_system.tols.dd_ncells:spin_system.tols.dd_ncells)';
+    shifts=[repelem(shifts,numel(shells),1) repmat(shells,size(shifts,1),1)];
 end
 
-% Get proximity matrix
-spin_system.inter.proxmatrix=sparse(~cellfun(@isempty,distvects));
+% Collect displacement vectors within each chemical species
+blocks=cell(numel(spin_system.chem.parts),size(shifts,1));
+for m=1:numel(spin_system.chem.parts)
 
-% Find interacting atom pairs
-[rows,cols,~]=find(spin_system.inter.proxmatrix);
+    % Omit atoms without coordinates
+    spins=spin_system.chem.parts{m};
+    spins=spins(~cellfun(@isempty,spin_system.inter.coordinates(spins)));
+    xyz=vertcat(spin_system.inter.coordinates{spins});
+    if isempty(xyz)||(spin_system.tols.prox_cutoff==0), continue; end
+
+    % Search the reference cell against each translated cell
+    for t=1:size(shifts,1)
+        images=xyz;
+        for d=1:numel(axes)
+            images=images+shifts(t,d)*axes{d};
+        end
+        [from,to]=nearby_points(xyz,images,spin_system.tols.prox_cutoff);
+        dv=images(to,:)-xyz(from,:);
+        keep=(from~=to)&(vecnorm(dv,2,2)<spin_system.tols.prox_cutoff);
+        keys=[from(keep) to(keep)];
+        blocks{m,t}=[reshape(spins(keys),size(keys)) dv(keep,:)];
+    end
+
+end
+
+% Group all retained images of each ordered pair
+hits=vertcat(blocks{:});
+prox=cell(0,3);
+if ~isempty(hits)
+    hits=sortrows(hits,[2 1]);
+    starts=[1;find(any(diff(hits(:,1:2),1,1),2))+1];
+    lengths=diff([starts;size(hits,1)+1]);
+    prox=[num2cell(hits(starts,1:2)) mat2cell(hits(:,3:5),lengths,3)];
+end
+spin_system.inter.proximity=prox;
+rows=cell2mat(prox(:,1));
+cols=cell2mat(prox(:,2));
+tensors=prox;
 
 % Report to the user
 report(spin_system,['found ' num2str(numel(rows)/2) ' spin pair(s) with distance under the '...
@@ -149,14 +87,22 @@ report(spin_system,['found ' num2str(numel(rows)/2) ' spin pair(s) with distance
 % Loop over interacting atom pairs
 for n=1:numel(rows)
     
+    % Accumulate couplings from individual periodic images
+    tensors{n,3}=zeros(3);
+
     % Loop over PBC directions
-    for k=1:size(distvects{rows(n),cols(n)},1)
+    for k=1:size(prox{n,3},1)
         
         % Get the distance
-        distance=norm(distvects{rows(n),cols(n)}(k,:),2);
+        distance=norm(prox{n,3}(k,:),2);
         
+        % Reject atomic collisions
+        if distance<0.5
+            error('collision detected between spin %d and spin %d or their PBC images.',rows(n),cols(n));
+        end
+
         % Get the ort
-        ort=distvects{rows(n),cols(n)}(k,:)/distance;
+        ort=prox{n,3}(k,:)/distance;
         
         % Compute the dipolar interaction prefactor (0.5 due to double counting)
         A=0.5*spin_system.inter.gammas(rows(n))*spin_system.inter.gammas(cols(n))*...
@@ -177,16 +123,14 @@ for n=1:numel(rows)
         D=D-eye(3)*trace(D)/3;
         
         % Add to the total
-        if isempty(spin_system.inter.coupling.matrix{rows(n),cols(n)})
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=D;
-        else
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+D;
-        end
-        
+        tensors{n,3}=tensors{n,3}+D;
+
     end
     
 end
+
+% Combine point dipoles with any existing tensors
+spin_system.inter.coupling.matrix=sum_couplings([spin_system.inter.coupling.matrix;tensors]);
 
 end
 
@@ -201,4 +145,5 @@ end
 % be satisfied with not understanding. 
 %
 % Richard Dawkins
+
 

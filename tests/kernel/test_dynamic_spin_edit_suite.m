@@ -30,9 +30,10 @@ trimmed=kill_spin(spin_system,2);
 result=test_true(result,'kill_spin numeric identities',trimmed.comp.nspins==2&&...
                  isequal(trimmed.comp.isotopes,{'1H','13C'})&&isequal(trimmed.comp.labels,{'h','c2'}),...
                  'removing spin two must delete the second isotope and label, and decrement nspins');
-result=test_true(result,'kill_spin numeric dimensions',numel(trimmed.inter.coordinates)==2&&...
-                 isequal(size(trimmed.inter.coupling.matrix),[2 2])&&isequal(size(trimmed.inter.proxmatrix),[2 2]),...
-                 'coordinate, coupling, and proximity arrays must shrink with the spin count');
+result=test_true(result,'kill_spin numeric records',numel(trimmed.inter.coordinates)==2&&...
+                 isequal(trimmed.inter.coupling.matrix,{1,2,3*eye(3)})&&...
+                 isequal(trimmed.inter.proximity,{1,2,[0 1 0]}),...
+                 'coupling and proximity records touching a removed spin disappear; surviving keys are reindexed');
 result=test_true(result,'kill_spin chemical part update',isequal(trimmed.chem.parts,{[1 2]}),...
                  'chemical part indices must be renumbered after a spin is removed');
 result=test_true(result,'kill_spin particle types',isequal(trimmed.comp.types,{'S','S'}),...
@@ -57,7 +58,8 @@ stale.comp.sym_group={'S2'}; stale.comp.sym_spins={[2 3]}; stale.comp.sym_a1g_on
 stale.inter.assumptions='nmr';
 stale.inter.zeeman.strength={'secular','secular','secular'};
 stale.inter.giant.strength={[],[],[]};
-stale.inter.coupling.strength=cell(3,3);
+stale.inter.coupling.matrix=spin_system.inter.coupling.matrix;
+stale.inter.coupling.strength={1,2,'secular';1,3,'strong'};
 stale=kill_spin(stale,2);
 result=test_true(result,'kill_spin stale metadata',isequal(stale.bas.nstates,16)&&...
                  isequal(stale.bas.offsets,[0;16])&&~isfield(stale.comp,'sym_group')&&...
@@ -207,7 +209,7 @@ assumed=local_assumed_spin_system();
 assumed=dictum(assumed,1,'strong');
 assumed=dictum(assumed,[1 2],'weak');
 result=test_true(result,'dictum numeric overrides',strcmp(assumed.inter.zeeman.strength{1},'strong')&&...
-                 strcmp(assumed.inter.coupling.strength{1,2},'weak'),...
+                 strcmp(assumed.inter.coupling.strength{1,3},'weak'),...
                  'numeric dictum calls must replace Zeeman and coupling strength assumptions in place');
 assumed=dictum(assumed,{'13C'},'secular');
 result=test_true(result,'dictum isotope override',strcmp(assumed.inter.zeeman.strength{2},'secular'),...
@@ -315,20 +317,20 @@ spin_system.inter.basefrqs=2*pi*[100e6 25e6 25e6];
 spin_system.inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 spin_system.inter.zeeman.ddscal={eye(3),eye(3),eye(3)};
 spin_system.inter.giant.coeff={[],[],[]};
-spin_system.inter.coupling.matrix=cell(3,3);
+spin_system.inter.coupling.matrix={1,2,2*eye(3);1,3,3*eye(3)};
 spin_system.inter.coordinates={[0 0 0],[1 0 0],[0 1 0]};
-spin_system.inter.proxmatrix=zeros(3,3);
+spin_system.inter.proximity={1,2,[1 0 0];1,3,[0 1 0]};
 
 % Define relaxation arrays affected by spin removal
 spin_system.rlx.r1_rates=[];
 spin_system.rlx.r2_rates=[];
 spin_system.rlx.lind_r1_rates=[];
 spin_system.rlx.lind_r2_rates=[];
-spin_system.rlx.srfk_mdepth=[];
-spin_system.rlx.weiz_r1d=[];
-spin_system.rlx.weiz_r2d=[];
+spin_system.rlx.srfk_mdepth=cell(0,3);
+spin_system.rlx.weiz_r1d=cell(0,3);
+spin_system.rlx.weiz_r2d=cell(0,3);
 spin_system.rlx.srsk_sources=[1 3];
-spin_system.rlx.flux_rate=[];
+spin_system.rlx.flux_rate=cell(0,3);
 spin_system.rlx.flux_type='';
 
 % Define chemistry arrays affected by spin removal
@@ -343,8 +345,7 @@ function spin_system=local_assumed_spin_system()
 % Start from the edit fixture and add assumption fields
 spin_system=local_edit_spin_system();
 spin_system.inter.zeeman.strength={'secular','secular','secular'};
-spin_system.inter.coupling.strength=cell(3,3);
-spin_system.inter.coupling.strength(:)={'secular'};
+spin_system.inter.coupling.strength={1,2,'secular';1,3,'strong'};
 
 end
 

@@ -39,3 +39,5 @@ Enumerate a deterministic subset-closed CCE cluster family.
 - [cce_reduce.m](cce_reduce.md)
 
 Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.
+
+The sparse bath-to-group incidence matrix collapses physical edges and inter-group scores; within-group diagonals are excluded from ranking.

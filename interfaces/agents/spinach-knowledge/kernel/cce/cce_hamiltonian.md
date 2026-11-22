@@ -38,3 +38,5 @@ Build one cluster Hamiltonian in observed-spin system-then-bath tensor order.
 - [cce_compile.m](cce_compile.md)
 
 The retained service uses the native compilation/input boundary: physical models come from cce_compile, and generated baths enter canonical sys/inter through spin_bath.
+
+Each unordered model pair supplies its retained tensor in ascending site order and its transpose in reverse order. Missing pairs contribute no field.

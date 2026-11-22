@@ -30,4 +30,4 @@ Each retained image contributes a dipolar tensor proportional to `gamma_n*gamma_
 
 The proximity records store every retained displacement vector per directed pair. Each periodic image is searched against cutoff-sized bins of atoms, without constructing a pair table.
 
-Newly occupied coupling keys acquire strengths from the active assumption, retention and pair selectors. Existing strength overrides remain unchanged.
+The function does not read or modify interaction strength assumptions. When it adds couplings to a system on which `assume` has already been called, call `assume` again before requesting a Hamiltonian.

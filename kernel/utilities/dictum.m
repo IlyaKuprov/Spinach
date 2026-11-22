@@ -40,7 +40,6 @@ grumble(spin_system,spins,strength);
 
 % Override the selected directed coupling records in both directions
 if numel(spins)==2
-    spin_system.inter.coupling.rules(end+1,:)={spins,strength};
     pairs=spin_system.inter.coupling.strength;
     for q=1:size(pairs,1)
         n=pairs{q,1};

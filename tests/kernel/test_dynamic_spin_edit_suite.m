@@ -344,7 +344,6 @@ function spin_system=local_assumed_spin_system()
 
 % Start from the edit fixture and add assumption fields
 spin_system=local_edit_spin_system();
-spin_system.inter.coupling.rules=cell(0,2);
 spin_system.inter.zeeman.strength={'secular','secular','secular'};
 spin_system.inter.coupling.strength={1,2,'secular';1,3,'strong'};
 

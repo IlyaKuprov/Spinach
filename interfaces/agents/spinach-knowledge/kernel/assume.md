@@ -28,5 +28,3 @@ The assumptions argument must be a character string, and the source accepts two 
 [Spin Dynamics Wiki: assume.m](https://spindynamics.org/wiki/index.php?title=assume.m)
 
 The cavity exclusions test whether longitudinal or modulation records exist, not whether their payloads have nonzero norm.
-
-The retention selection is stored alongside the compiled coupling strengths so that dipolar pairs introduced after this call inherit the same frame and retention.

@@ -31,5 +31,3 @@ Overrides default assumptions about which interaction terms survive rotating fra
 
 - Source: [kernel/utilities/dictum.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/dictum.m)
 - Spin Dynamics Wiki: [dictum.m](https://spindynamics.org/wiki/index.php?title=dictum.m)
-
-Pair selectors are retained in call order: a subsequent dipolar update applies the same overrides to newly occupied coupling keys.

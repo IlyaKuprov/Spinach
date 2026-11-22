@@ -132,26 +132,6 @@ end
 % Combine point dipoles with any existing tensors
 spin_system.inter.coupling.matrix=sum_couplings([spin_system.inter.coupling.matrix;tensors]);
 
-% Assign strengths to newly introduced pairs without changing existing labels
-if isfield(spin_system.inter.coupling,'retention')
-    labels=spin_system.inter.coupling.strength;
-    pairs=spin_system.inter.coupling.matrix;
-    [known,idx]=ismember(reshape(cell2mat(pairs(:,1:2)),[],2),reshape(cell2mat(labels(:,1:2)),[],2),'rows');
-    if any(~known)
-        added=spin_system;
-        added.sys.output='hush';
-        added.inter.coupling.matrix=pairs(~known,:);
-        added=assume(added,spin_system.inter.assumptions,spin_system.inter.coupling.retention);
-        rules=spin_system.inter.coupling.rules;
-        for q=1:size(rules,1)
-            added=dictum(added,rules{q,:});
-        end
-        pairs(~known,3)=added.inter.coupling.strength(:,3);
-        pairs(known,3)=labels(idx(known),3);
-        spin_system.inter.coupling.strength=pairs;
-    end
-end
-
 end
 
 % Consistency enforcement

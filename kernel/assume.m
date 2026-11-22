@@ -77,9 +77,6 @@ end
 
 % Store the assumption specification
 spin_system.inter.assumptions=assumptions;
-spin_system.inter.coupling.rules=cell(0,2);
-spin_system.inter.coupling.retention='';
-if exist('retention','var'), spin_system.inter.coupling.retention=retention; end
 
 % Preallocate the arrays
 spin_system.inter.zeeman.strength=cell(spin_system.comp.nspins,1);

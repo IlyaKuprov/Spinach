@@ -2,6 +2,7 @@
 % containing only one instance of a user specified isotope or iso-
 % tope tuple that is deemed "dilute". All spin system data is upda-
 % ted accordingly. An existing basis is rebuilt for each isotopomer.
+% Compiled interactions follow the retained particles through kill_spin.
 % Syntax:
 %
 %          subsystems=dilute(spin_system,isotope,tuples)
@@ -18,7 +19,7 @@
 %                    a single instance of the isoto-
 %                    pe, 2 returns all subsystems
 %                    where two instances of the iso-
-%                    tope are present, etc.
+%                    tope are present, etc. The default is 1.
 %
 % Outputs:
 %
@@ -39,7 +40,7 @@ function subsystems=dilute(spin_system,isotope,tuples)
 if ~exist('tuples','var'), tuples=1; end
 
 % Check consistency
-grumble(isotope,tuples);
+grumble(spin_system,isotope,tuples);
 
 % Inform the user
 report(spin_system,['treating ' isotope ' as a dilute, ' ... 
@@ -64,7 +65,7 @@ combos=unique(sort(combos,2),'rows');
 % Preallocate the answer
 subsystems=cell(size(combos,1),1);
 
-% Create new spin systems
+% Remove other instances and reindex the retained interactions
 for n=1:size(combos,1)
     subsystems{n}=kill_spin(spin_system,setdiff(dilute_spins,combos(n,:)));
 end
@@ -75,7 +76,10 @@ report(spin_system,[num2str(numel(subsystems)) ' spin subsystems returned.']);
 end
 
 % Consistency enforcement
-function grumble(isotope,tuples)
+function grumble(spin_system,isotope,tuples)
+if ~isstruct(spin_system)
+    error('spin_system must be a Spinach data structure.');
+end
 if ~ischar(isotope)
     error('isotope must be a character string.');
 end
@@ -90,4 +94,5 @@ end
 % Albert Einstein, in a 1919 postcard to his 
 % mother telling her that his general theory
 % of relativity had been proven.
+
 

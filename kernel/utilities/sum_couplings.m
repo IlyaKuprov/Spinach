@@ -2,11 +2,17 @@
 %
 %                    pairs=sum_couplings(pairs)
 %
-% Parameters and outputs:
+% Parameters:
 %
-%    pairs - cell rows {from,to,tensor} in rad/s; output contains one
-%            sum per key, sorted by to, then by from. Equal keys are
-%            summed in their original order.
+%    pairs - K-by-3 cell array of {from,to,tensor} rows; tensors are 3-by-3
+%            Cartesian matrices in rad/s
+%
+% Outputs:
+%
+%    pairs - one sum per ordered key, sorted by to, then by from; equal
+%            keys are accumulated in their original input order
+%
+% talos@spindynamics.org
 
 function pairs=sum_couplings(pairs)
 
@@ -32,7 +38,7 @@ end
 
 % Consistency enforcement
 function grumble(pairs)
-if (~iscell(pairs))||(size(pairs,2)~=3)
+if (~iscell(pairs))||(~ismatrix(pairs))||(size(pairs,2)~=3)
     error('pairs must be a three-column cell array.');
 end
 end

@@ -31,11 +31,11 @@
 
 function spin_system=basis(spin_system,bas)
 
+% Check consistency
+grumble(spin_system,bas);
+
 % Show the banner
 banner(spin_system,'basis_banner');
-
-% Check the input
-grumble(spin_system,bas);
 
 % Store per-substance settings and allocate the compiled layout
 spin_system.bas=bas;
@@ -51,6 +51,7 @@ spin_system.bas.sym_fact=repmat(struct('irr_dimensions',[],...
 
 % Construct each substance with local spin columns
 fields=setdiff(fieldnames(bas),{'formalism'});
+spin_map=zeros(spin_system.comp.nspins,1);
 for s=1:nsubst
 
     % Extract this substance's input options
@@ -69,27 +70,28 @@ for s=1:nsubst
 
     % Restrict component and interaction arrays to this substance
     spins=spin_system.chem.parts{s};
+    spin_map(spins)=1:numel(spins);
     local_system=spin_system;
     local_system.comp.nspins=numel(spins);
     local_system.comp.isotopes=spin_system.comp.isotopes(spins);
     local_system.comp.mults=spin_system.comp.mults(spins);
     local_system.comp.types=spin_system.comp.types(spins);
     local_system.chem.parts={1:numel(spins)};
-    local_system.inter.coupling.matrix=substance_pairs(spin_system.inter.coupling.matrix,spins);
-    local_system.inter.proximity=substance_pairs(spin_system.inter.proximity,spins);
+    local_system.inter.coupling.matrix=pair_subset(spin_system.inter.coupling.matrix,spin_map);
+    local_system.inter.proximity=pair_subset(spin_system.inter.proximity,spin_map);
     local_system.inter.zeeman.matrix=spin_system.inter.zeeman.matrix(spins);
     local_system.inter.giant.coeff=spin_system.inter.giant.coeff(spins);
     if isfield(spin_system.inter,'modes')
         mode_fields={'exchange','kerr','longitudinal','dispersive','coupling_mod','zeeman_mod'};
         for n=1:numel(mode_fields)
             pairs=spin_system.inter.modes.(mode_fields{n});
-            pairs=substance_pairs(pairs,spins);
+            pairs=pair_subset(pairs,spin_map);
             if ismember(mode_fields{n},{'coupling_mod','zeeman_mod'})
                 for k=1:size(pairs,1)
                     for m=1:numel(pairs{k,3})
                         if isempty(pairs{k,3}{m}), continue; end
                         if strcmp(mode_fields{n},'coupling_mod')
-                            pairs{k,3}{m}=substance_pairs(pairs{k,3}{m},spins);
+                            pairs{k,3}{m}=pair_subset(pairs{k,3}{m},spin_map);
                         else
                             pairs{k,3}{m}=pairs{k,3}{m}(spins);
                         end
@@ -99,6 +101,9 @@ for s=1:nsubst
             local_system.inter.modes.(mode_fields{n})=pairs;
         end
     end
+
+    % Clear this substance from the old-to-new particle map
+    spin_map(spins)=0;
 
     % Translate global numeric filter labels into local spin indices
     for field={'longitudinal','zero_quantum'}
@@ -244,16 +249,6 @@ end
 spin_system.bas.basis_hash=md5_hash({spin_system.bas.basis,...
                                    spin_system.bas.nstates,spin_system.chem.parts});
 
-end
-
-% Restrict an ordered pair list to a locally numbered substance
-function pairs=substance_pairs(pairs,spins)
-[inside,keys]=ismember(reshape(cell2mat(pairs(:,1:2)),[],2),spins);
-keep=all(inside,2);
-pairs=pairs(keep,:);
-pairs(:,1:2)=num2cell(keys(keep,:));
-[~,order]=sortrows(keys(keep,:),[2 1]);
-pairs=pairs(order,:);
 end
 
 % Consistency enforcement

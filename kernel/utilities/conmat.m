@@ -68,7 +68,7 @@ end
 
 % Consistency enforcement
 function grumble(xyz,images,r0)
-if (~isnumeric(xyz))||(~isreal(xyz))||(size(xyz,2)~=3)
+if (~isnumeric(xyz))||(~isreal(xyz))||(~ismatrix(xyz))||(size(xyz,2)~=3)
     error('xyz must be a real matrix with three columns.');
 end
 if (~isnumeric(images))||(~isreal(images))||(~isequal(size(images),size(xyz)))

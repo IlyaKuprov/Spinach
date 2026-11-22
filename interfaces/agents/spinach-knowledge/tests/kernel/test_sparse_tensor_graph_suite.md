@@ -37,5 +37,3 @@ The function takes no inputs.
 ## References
 
 - Source file: https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_sparse_tensor_graph_suite.m
-
-The cutoff search produces six directed neighbour records on the four-site geometry, compared against an explicit graph.

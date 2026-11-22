@@ -1,6 +1,6 @@
 # tests/kernel/test_dynamic_spin_edit_suite.m
 
-The removal fixtures distinguish dropped pair records from retained records whose second endpoint is renumbered. The surviving compiled strength label stays paired with the surviving tensor, while symmetry and the assumption selector are discarded.
+The removal fixtures distinguish dropped pair records from retained records whose second endpoint is renumbered. Coupling strength labels, symmetry, and the assumption selector are discarded.
 
 Source: [tests/kernel/test_dynamic_spin_edit_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_spin_edit_suite.m)
 

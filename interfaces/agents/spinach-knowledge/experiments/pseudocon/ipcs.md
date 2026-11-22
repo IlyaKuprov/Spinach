@@ -28,5 +28,3 @@ The implementation scales the optimised source variable by `1e3` for `kuprov` an
 
 - [10.1039/C4CP03106G](https://doi.org/10.1039/C4CP03106G)
 - [Spin Dynamics Wiki: ipcs.m](https://spindynamics.org/wiki/index.php?title=ipcs.m)
-
-The molecular overlay uses the ordered neighbour records at 1.6 Å to prepare a reusable sparse bond graph.

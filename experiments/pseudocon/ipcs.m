@@ -192,9 +192,7 @@ end
 
 % Pre-compute atom connectivity matrix
 if isfield(parameters,'xyz_all')
-    pairs=conmat(parameters.xyz_all,parameters.xyz_all,1.6);
-    natoms=size(parameters.xyz_all,1);
-    conmatrix=sparse(cell2mat(pairs(:,1)),cell2mat(pairs(:,2)),true,natoms,natoms);
+    conmatrix=conmat(parameters.xyz_all,1.6);
 end
 
 % Index the active space
@@ -622,5 +620,4 @@ end
 % I move on to the next thing.
 %
 % James Cameron
-
 

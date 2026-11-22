@@ -25,8 +25,7 @@
 %        IK-DNP or IK-SBS losing a required particle class switches to
 %        IK-0 at the surviving class depth, without connectivity pruning.
 %        Symmetry and assumption information is cleared; call assume
-%        again before constructing a Hamiltonian. Existing coupling
-%        strength records follow their tensor keys. Mode strengths are
+%        again before constructing a Hamiltonian. Mode strengths are
 %        cleared; the mode container is removed when no bosonic
 %        particles remain. Spin-free substances are retained.
 %
@@ -157,11 +156,8 @@ spin_system.inter.zeeman.ddscal(hit_list)=[];
 % Update giant spin Hamiltonian terms
 spin_system.inter.giant.coeff(hit_list)=[];
 
-% Restrict the tensor and strength records to the same retained keys
+% Restrict the tensor records to the retained keys
 spin_system.inter.coupling.matrix=pair_subset(spin_system.inter.coupling.matrix,spin_map);
-if isfield(spin_system.inter.coupling,'strength')
-    spin_system.inter.coupling.strength=pair_subset(spin_system.inter.coupling.strength,spin_map);
-end
 
 % Update coordinates
 spin_system.inter.coordinates(hit_list)=[];
@@ -279,6 +275,10 @@ if isfield(spin_system.inter.giant,'strength')
     spin_system.inter.giant=rmfield(spin_system.inter.giant,'strength');
     report(spin_system,'WARNING - assumption information must be re-created.');
 end
+
+% Discard all coupling assumptions belonging to the old particle set
+fields=intersect({'strength','retention','rules'},fieldnames(spin_system.inter.coupling));
+spin_system.inter.coupling=rmfield(spin_system.inter.coupling,fields);
 
 % Rebuild descriptors, symmetry projectors, dimensions, offsets, and cache identity
 if exist('bas','var'), spin_system=basis(spin_system,bas); end

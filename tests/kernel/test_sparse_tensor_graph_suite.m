@@ -65,9 +65,7 @@ result=test_close(result,'swizzle tuple set',sortrows(tuples),tuples_ref,1e-15,1
 % Check molecular connectivity on a four-point geometry
 xyz=[0 0 0;0.5 0 0;2 0 0;0 0.5 0];
 conn_ref=double([0 1 0 1;1 0 0 1;0 0 0 0;1 1 0 0]);
-pairs=conmat(xyz,xyz,0.75);
-conn=sparse(cell2mat(pairs(:,1)),cell2mat(pairs(:,2)),1,4,4);
-result=test_close(result,'conmat four-point graph',conn,conn_ref,1e-15,1e-15,...
+result=test_close(result,'conmat four-point graph',double(conmat(xyz,0.75)),conn_ref,1e-15,1e-15,...
                   'conmat connects points whose Euclidean separation is below the cutoff');
 
 % Check simple first-fit bin packing indices

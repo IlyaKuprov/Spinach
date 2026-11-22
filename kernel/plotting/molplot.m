@@ -28,18 +28,15 @@ grumble(xyz,conmatrix);
 
 % Get the connectivity matrix
 if isempty(conmatrix)
-    pairs=conmat(xyz,xyz,1.6);
-    rows=cell2mat(pairs(:,1));
-    cols=cell2mat(pairs(:,2));
-else
-    [rows,cols]=find(conmatrix);
+    conmatrix=conmat(xyz,1.6);
 end
 
 % Prepare coordinate arrays
-nbonds=numel(rows);
+nbonds=nnz(conmatrix);
 X=zeros(1,3*nbonds);
 Y=zeros(1,3*nbonds);
 Z=zeros(1,3*nbonds);
+[rows,cols]=find(conmatrix);
 for n=1:nbonds
     X((3*(n-1)+1):(3*n))=[xyz(rows(n),1) xyz(cols(n),1) NaN];
     Y((3*(n-1)+1):(3*n))=[xyz(rows(n),2) xyz(cols(n),2) NaN];
@@ -69,5 +66,4 @@ end
 % we must supply our own light.
 % 
 % Stanley Kubrick
-
 

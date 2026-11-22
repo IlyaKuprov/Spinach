@@ -15,13 +15,12 @@ function result=test_flux_relaxation()
 result=new_test_result('kernel/flux_relaxation','Flux relaxation switch',...
                        'Activation, additivity, ownership and validation.');
 sys.magnet=9.4; sys.isotopes={'1H','1H'}; sys.parallel={'local',1};
-sys.output='hush'; sys.disable={'hygiene'}; sys.parprops={};
+sys.output='console'; sys.disable={'hygiene'}; sys.parprops={};
 inter.zeeman.scalar={0,0}; inter.flux_rate=[0 3;7 0];
 inter.flux_type='intramolecular'; inter.rlx_keep='labframe';
 inter.equilibrium='zero'; inter.relaxation={'flux'};
 bas.formalism='sphten-liouv'; bas.approximation={'none'};
-loud=sys; loud.output='console';
-summary=evalc('s=create(loud,inter);'); s=basis(s,bas);
+[summary,s]=evalc('create(sys,inter);'); s=basis(s,bas);
 F=rlx_flux(s); s.sys.output='hush';
 
 % Check a directed column against the two-site transfer equation
@@ -48,7 +47,7 @@ result=test_close(result,'flux theory array shape',relaxation(shaped),F,0,0,...
 
 % Stored rates do not enable the mechanism
 without=rmfield(inter,'relaxation');
-quiet=evalc('off=create(loud,without);'); off=basis(off,bas);
+[quiet,off]=evalc('create(sys,without);'); sys.output='hush'; off=basis(off,bas);
 result=test_close(result,'flux inactive without switch',relaxation(off),...
                   sparse(size(F,1),size(F,2)),0,0,...
                   'Flux parameters alone are inert.');
@@ -135,7 +134,8 @@ result=test_true(result,'merge top-level fields',...
                  isequal(merged.flux_rate,zeros(2)),...
                  'Merge keeps top-level flux configuration.');
 b=a; b.flux_rate=[0 1;2 0]; rejected=false;
-try, merge_inp({part,part},{a,b}); catch, rejected=true; end
+try
+    merge_inp({part,part},{a,b}); catch, rejected=true; end
 result=test_true(result,'merge shape validation',rejected,...
                  'Subsystem rate shape must match its spins.');
 reduced=kill_spin(s,2);

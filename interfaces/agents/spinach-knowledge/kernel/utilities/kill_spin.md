@@ -14,7 +14,7 @@ A compiled basis is rebuilt from retained per-substance input settings. Manual c
 
 Correlation depths are capped by the remaining local population without increasing already smaller depths. IK-DNP uses surviving electron and nucleus counts; IK-SBS uses mode, mode-plus-spin, and nontrivial-spin counts, matching `basis` validation. If either approximation loses a required particle class, that substance switches to IK-0 at the surviving class depth, at least one, without graph-based connectivity pruning. Other substances keep their own settings. An empty substance uses `none` and retains its unit coordinate.
 
-Connectivity, permutation-symmetry settings, and Hamiltonian assumptions are discarded because they describe the old particle set. Zeeman, giant-spin, and mode strengths derived from those assumptions are likewise invalidated. The compiled coupling strength records, if present, follow the same keys as the coupling tensors; these retained labels are not a substitute for reassessing the assumptions. Reapply `assume` before constructing a new Hamiltonian; warnings identify cleared assumption information.
+Connectivity, permutation-symmetry settings, and Hamiltonian assumptions are discarded because they describe the old particle set. Zeeman, giant-spin, and mode strengths derived from those assumptions are likewise invalidated. Coupling strengths and their associated override rules are also discarded. Reapply `assume` before constructing a new Hamiltonian; warnings identify cleared assumption information.
 
 Source: [kernel/utilities/kill_spin.m](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/kill_spin.m). [Wiki](https://spindynamics.org/wiki/index.php?title=kill_spin.m).
 

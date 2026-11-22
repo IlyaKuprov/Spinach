@@ -118,7 +118,7 @@ scores(1:n+1:end)=0;
 % Apply only the explicitly requested graph criterion
 switch parameters.graph.mode
     case 'complete'
-        adjacency=~eye(n);
+        adjacency=~speye(n);
     case 'distance'
         xyz=model.coordinates_A(bath_pos,:);
         radius=parameters.graph.radius;
@@ -130,14 +130,8 @@ switch parameters.graph.mode
             adjacency=logical(sites*sites.');
         else
 
-            % Enlarge the strict neighbour search to include the cutoff shell
-            limit=radius;
-            if isfinite(radius)
-                limit=radius+eps(radius);
-            end
-            neighbours=conmat(xyz,xyz,limit);
-            origins=cell2mat(neighbours(:,1));
-            targets=cell2mat(neighbours(:,2));
+            % Include all pairs on the cutoff shell
+            [origins,targets]=nearby_points(xyz,xyz,radius);
             adjacency=sparse(origins,targets,true,n,n);
         end
     case 'coupling'

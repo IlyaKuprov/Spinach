@@ -29,3 +29,5 @@ Each retained image contributes a dipolar tensor proportional to `gamma_n*gamma_
 - Spinach Wiki page for `dipolar.m`: [https://spindynamics.org/wiki/index.php?title=dipolar.m](https://spindynamics.org/wiki/index.php?title=dipolar.m)
 
 The proximity records store every retained displacement vector per directed pair. Each periodic image is searched against cutoff-sized bins of atoms, without constructing a pair table.
+
+Newly occupied coupling keys acquire strengths from the active assumption, retention and pair selectors. Existing strength overrides remain unchanged.

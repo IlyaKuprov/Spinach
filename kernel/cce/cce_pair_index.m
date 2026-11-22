@@ -13,6 +13,8 @@
 %
 %    tensors - cell row; tensors{1+index(a,b)} acts on sites a,b,
 %              with a shared zero tensor for absent pairs
+%
+% talos@spindynamics.org
 
 function [index,tensors]=cce_pair_index(model)
 

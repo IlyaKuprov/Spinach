@@ -99,7 +99,7 @@ result=test_true(result,'original flux inputs retained',...
 for type={'intermolecular','intramolecular'}
     s.rlx.flux_type=type{1};
     result=test_close(result,[type{1} ' full flux generator'],...
-                      relaxation(s),flux_row_mask(s,inter.flux_rate),0,0,...
+                      relaxation(s),original_flux(s,inter.flux_rate),0,0,...
                       'single-spin gains, losses, correlations, and diagonal rates match the original generator');
 end
 result=test_close(result,'flux not duplicated in kinetics',kinetics(s),...
@@ -111,7 +111,7 @@ multi=inter; multi.chem.parts={[1 3],2}; multi.chem.concs=[1 1];
 local=bas; local.approximation={'none','none'};
 m=test_spin_system(sys,multi,local);
 result=test_close(result,'flux across local descriptor blocks',...
-                  relaxation(m),flux_row_mask(m,inter.flux_rate),0,0,...
+                  relaxation(m),original_flux(m,inter.flux_rate),0,0,...
                   'global spin labels are translated to local descriptor columns and offsets');
 
 % Relaxation retention and thermalisation must not act on the flux generator
@@ -127,13 +127,13 @@ for keep={'diagonal','secular','labframe'}
         end
         bare=work; bare.rlx.flux_rate=cell(0,3); bare.rlx.flux_type='';
         result=test_close(result,['flux after ' keep{1} ' ' destination{1}],...
-                          relaxation(work)-relaxation(bare),flux_row_mask(work,inter.flux_rate),1e-12,1e-12,...
+                          relaxation(work)-relaxation(bare),original_flux(work,inter.flux_rate),1e-12,1e-12,...
                           'flux is added after relaxation processing, as the old separate K was');
     end
 end
 work.tols.rlx_zero=1e5;
 result=test_close(result,'flux bypasses relaxation zero threshold',...
-                  relaxation(work),flux_row_mask(work,inter.flux_rate),0,0,...
+                  relaxation(work),original_flux(work,inter.flux_rate),0,0,...
                   'relaxation-specific numerical thresholds must not erase historical flux');
 
 % Original no-flux defaults and paired-field validation remain unchanged
@@ -170,6 +170,37 @@ catch err
 end
 result=test_true(result,'original tensor-label compatibility',rejected,...
                  'different local tensor ranks retain the original basis-mismatch rejection');
+
+end
+
+% Historical row-mask definition, evaluated on the current direct-sum row labels
+function F=original_flux(s,flux_rate)
+
+% Embed local descriptors only in this small independent regression reference
+b=zeros(s.bas.offsets(end),s.comp.nspins);
+for n=1:numel(s.chem.parts)
+    rows=(s.bas.offsets(n)+1):s.bas.offsets(n+1);
+    b(rows,s.chem.parts{n})=s.bas.basis{n};
+end
+orders=sum(logical(b),2); F=sparse(size(b,1),size(b,1));
+[from,to,rates]=find(flux_rate);
+for n=1:numel(rates)
+    for order=1:2
+        mask=(orders==1);
+        if order==2, mask=(orders>1); end
+        source=mask&(b(:,from(n))~=0);
+        destin=mask&(b(:,to(n))~=0);
+        if (order==1)||strcmp(s.rlx.flux_type,'intramolecular')
+            stationary=source&destin;
+            source=xor(source,stationary); destin=xor(destin,stationary);
+            if ~isequal(b(source,from(n)),b(destin,to(n)))
+                error('reference tensor labels do not match.');
+            end
+            F=F+rates(n)*sparse(find(destin),find(source),ones(nnz(source),1),size(F,1),size(F,2));
+        end
+        F=F-rates(n)*spdiags(double(source),0,size(F,1),size(F,2));
+    end
+end
 
 end
 

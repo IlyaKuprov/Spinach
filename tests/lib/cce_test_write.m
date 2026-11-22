@@ -12,6 +12,8 @@
 % Outputs:
 %
 %    system - modified fixture with canonical ordered coupling records
+%
+% talos@spindynamics.org
 
 function system=cce_test_write(system,ids,tensor)
 

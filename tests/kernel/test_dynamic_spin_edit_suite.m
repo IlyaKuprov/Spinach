@@ -64,9 +64,8 @@ stale=kill_spin(stale,2);
 result=test_true(result,'kill_spin stale metadata',isequal(stale.bas.nstates,16)&&...
                  isequal(stale.bas.offsets,[0;16])&&~isfield(stale.comp,'sym_group')&&...
                  ~isfield(stale.inter,'assumptions')&&~isfield(stale.inter.zeeman,'strength')&&...
-                 ~isfield(stale.inter.giant,'strength')&&...
-                 isequal(stale.inter.coupling.strength,{1,2,'strong'}),...
-                 'rebuild the basis, clear assumptions, and remap the labels on retained coupling keys');
+                 ~isfield(stale.inter.giant,'strength')&&~isfield(stale.inter.coupling,'strength'),...
+                 'the basis must be rebuilt, and stale symmetry and assumptions cleared on spin removal');
 
 % Remove isotope filters only when their substance loses the last match
 sys.magnet=0; sys.isotopes={'1H','13C','13C','1H','13C'};
@@ -345,6 +344,7 @@ function spin_system=local_assumed_spin_system()
 
 % Start from the edit fixture and add assumption fields
 spin_system=local_edit_spin_system();
+spin_system.inter.coupling.rules=cell(0,2);
 spin_system.inter.zeeman.strength={'secular','secular','secular'};
 spin_system.inter.coupling.strength={1,2,'secular';1,3,'strong'};
 

@@ -196,8 +196,8 @@ To compute a tensor by hand instead: `[d,alp,bet,gam,M]=xyz2dd(r1,r2,isotope1,
 isotope2)` returns the dipolar coupling constant and tensor in **rad/s** from
 coordinates in angstrom, using free-particle magnetogyric ratios;
 `A=xyz2hfc(exyz,nxyz,isotope)` returns a point-dipole hyperfine tensor in
-**gauss** and is the one to use when an electron is involved. `conmat(xyz,xyz,r0)`
-returns directed neighbour records with displacement vectors; `nearest_spin` and `dihedral` are geometry
+**gauss** and is the one to use when an electron is involved. `conmat(xyz,r0)`
+builds a sparse logical connectivity matrix; `nearest_spin` and `dihedral` are geometry
 helpers.
 
 ## Magnetic susceptibility and paramagnetic shifts

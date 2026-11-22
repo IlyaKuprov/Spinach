@@ -11,6 +11,8 @@
 % Outputs:
 %
 %    tensor - 3-by-3 coupling in rad/s, zero for absent directions
+%
+% talos@spindynamics.org
 
 function tensor=cce_test_read(system,ids)
 

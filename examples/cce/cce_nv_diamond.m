@@ -39,18 +39,22 @@ for n=1:count
 end
 
 % The cluster graph contains precisely the retained carbon-carbon dipoles
-neighbours=conmat(xyz,xyz,6+eps(6));
-from=cell2mat(neighbours(:,1));
-to=cell2mat(neighbours(:,2));
-adjacency=sparse(from,to,true,count,count);
-for p=find(from<to).'
+adjacency=false(count);
+for n=1:count
 
-    % Cartesian carbon-carbon coupling in Hz
-    separation=neighbours{p,3};
-    distance=norm(separation);
-    direction=separation/distance;
-    strength=1.05457172*gamma_c^2*1000/(2*pi*distance^3);
-    inter.coupling.matrix{from(p)+1,to(p)+1}=strength*(eye(3)-3*(direction.'*direction));
+    % Get neighbours within the pair cutoff, without counting pairs twice
+    separation=xyz-xyz(n,:);
+    distance=vecnorm(separation,2,2);
+    for k=find((distance<=6)&((1:count).'>n)).'
+
+        % Cartesian carbon-carbon coupling in Hz
+        direction=separation(k,:)/distance(k);
+        strength=1.05457172*gamma_c^2*1000/(2*pi*distance(k)^3);
+        inter.coupling.matrix{n+1,k+1}=strength*(eye(3)-3*(direction.'*direction));
+        adjacency(n,k)=true;
+        adjacency(k,n)=true;
+
+    end
 
 end
 
@@ -64,7 +68,7 @@ parameters.transition.ms=[0 -1];
 parameters.times=linspace(0,1e-4,501);
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','explicit','adjacency',adjacency);
+parameters.cce.graph=struct('mode','explicit','adjacency',sparse(adjacency));
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...

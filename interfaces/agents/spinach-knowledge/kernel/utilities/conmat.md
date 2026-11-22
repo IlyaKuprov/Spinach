@@ -1,13 +1,6 @@
 # kernel/utilities/conmat.m
 
-The call `pairs=conmat(xyz,images,r0)` returns ordered records
-`{from,to,images(to,:)-xyz(from,:)}` strictly inside the cutoff. Both
-coordinate arrays contain the same atoms in the same order, in one reference
-cell and one translated image cell. Use the same array twice for an isolated
-molecule. Self images are excluded; zero cutoff returns no records.
-
-Only occupied cutoff-sized cells and their neighbours are examined. Records
-are sorted by destination and then source, without a square coordinate mask.
+The call `conmat(xyz,r0)` returns symmetric sparse logical connectivity with an empty diagonal. Each Cartesian separation must be strictly less than the cutoff and the Euclidean length must not exceed it. Distinct coincident points are connected. Occupied spatial bins limit the candidate search without allocating a dense pair mask.
 
 ## References
 

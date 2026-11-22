@@ -75,7 +75,7 @@ parfor n=1:size(traj,3)
                                    double(traj_slice(:,6)');
                                    double(traj_slice(:,7)');
                                    double(traj_slice(:,8)')}; 
-    spinsys_loc.inter.pbc={}; spinsys_loc=assume(dipolar(spinsys_loc),'labframe');
+    spinsys_loc.inter.pbc={}; spinsys_loc=dipolar(spinsys_loc);
 
     % Get the anisotropic part of the Hamiltonian
     [~,Q]=hamiltonian(spinsys_loc); H1{n}=orientation(Q,[0,0,0]);
@@ -94,7 +94,7 @@ spin_system.inter.coordinates={double(traj(:,1,ref_frame)');
                                double(traj(:,6,ref_frame)');
                                double(traj(:,7,ref_frame)');
                                double(traj(:,8,ref_frame)')};
-spin_system.inter.pbc={}; spin_system=assume(dipolar(spin_system),'labframe');
+spin_system.inter.pbc={}; spin_system=dipolar(spin_system);
 
 % Get analytical Redfield matrix
 R_red=relaxation(spin_system);
@@ -120,5 +120,4 @@ kylabel('relaxation rates, rot. diff.');
 xlim padded; ylim padded; kgrid; box on;
 
 end
-
 

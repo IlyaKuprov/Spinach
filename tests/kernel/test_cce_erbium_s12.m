@@ -79,8 +79,7 @@ end
 sys.magnet=0.067;
 sys.output='hush';
 sys.parallel={'processes',1};
-inter.coupling.hyperfine=1e30*hyperfine/(2*pi);
-inter.coupling.nuclear=1e30*dipolar/(2*pi);
+sys.enable={'secular_pairs'};
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
 parameters.orientation=deg2rad([0 90 133.5]);
@@ -93,6 +92,8 @@ parameters.cce.numerics=struct('atol',0,'max_memory_bytes',32*(4+numel(times)));
 expected=[pair_ref reference];
 for n=2:3
     sys.isotopes=[{'E'} repmat({'183W'},1,n)];
+    inter.zeeman.scalar=cell(size(sys.isotopes));
+    inter.zeeman.scalar{1}=8.38;
     inter.coordinates=num2cell([zeros(1,3); 1e10*xyz(1:n,:)],2);
     spin_system=create(sys,inter);
     [answer,details]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
@@ -115,8 +116,7 @@ result=test_true(result,'Reported screening bound',...
 parameters.cce.numerics.atol=0;
 
 % With no couplings every flip-flop splitting vanishes
-inter.coupling.hyperfine=0;
-inter.coupling.nuclear=0;
+inter.coordinates{1}=[];
 spin_system=create(sys,inter);
 answer=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 result=test_true(result,'Zero splitting',all(answer==1),...

@@ -17,13 +17,21 @@ sys.magnet=1.2414;
 sys.isotopes=[{'E'} repmat({'1H'},1,size(protons,1))];
 sys.parallel={'processes',1};
 sys.output='hush';
-inter.coordinates=num2cell([zeros(1,3); protons(:,1:3)],2);
-inter.coupling.hyperfine=reshape(protons(:,4:12).',3,3,[])/(2*pi);
-inter.coupling.nuclear=xyz2dd([0 0 0],[1 0 0],'1H','1H')/(2*pi);
+sys.enable={'secular_pairs'};
+inter.coordinates=[{[]}; num2cell(protons(:,1:3),2)];
+inter.coupling.matrix=cell(numel(sys.isotopes));
+for k=1:size(protons,1)
+    inter.coupling.matrix{1,k+1}=reshape(protons(k,4:12),3,3)/(2*pi);
+end
 
 % Three protons per methyl group share a tunnel splitting (kHz)
 splittings=[54.5 4.8 4.8 54.5 54.5 4.8 54.5 4.8 4.8 54.5 54.5 4.8];
-inter.tunnel_splittings=kron(spdiags(1e3*splittings.',0,12,12),ones(3)-eye(3));
+inter.coupling.scalar=cell(numel(sys.isotopes));
+for k=1:numel(splittings)
+    sites=3*k+(-1:1);
+    inter.coupling.scalar(sites(1),sites(2:3))={-2e3*splittings(k)/3};
+    inter.coupling.scalar{sites(2),sites(3)}=-2e3*splittings(k)/3;
+end
 
 % Evaluate the complete secular pair expansion at every powder node before averaging
 parameters.observed=1;

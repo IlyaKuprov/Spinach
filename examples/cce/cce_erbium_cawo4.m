@@ -36,15 +36,8 @@ lattice=(repmat(cells,4,1)+repelem(sites,size(cells,1),1)).*cell_size;
 lattice=lattice(vecnorm(lattice,2,2)<=radius,:);
 n_amorphous=10346;
 
-% Express the paper's dipolar prefactors in Hz Angstrom cubed
-mu0=1.25663706127e-6;
-hbar=6.62607015e-34/(2*pi);
-mu_bohr=9.2740100657e-24;
-gamma_w=spin('183W');
-g_perp=8.38;
-convert=1e30/(2*pi);
-inter.coupling.hyperfine=convert*mu0/(4*pi)*g_perp*mu_bohr*gamma_w;
-inter.coupling.nuclear=convert*mu0/(4*pi)*hbar*gamma_w^2;
+% Effective electron g factor is specified for each physical bath below
+sys.enable={'secular_pairs'};
 sys.magnet=0.067;
 sys.parallel={'processes',8};
 sys.output='hush';
@@ -64,7 +57,7 @@ for n=1:n_configs
 end
 
 % Set up the first physical bath on the head node so create configures the pool
-first_bath=bath_system(sys,inter,occupied{1});
+first_bath=bath_system(sys,occupied{1});
 
 % Evaluate each independently created bath on a worker
 realisations=zeros(numel(parameters.times),n_configs,2);
@@ -74,9 +67,9 @@ parfor n=1:n_configs
     if n==1
         lattice_bath=first_bath;
     else
-        lattice_bath=bath_system(sys,inter,occupied{n});
+        lattice_bath=bath_system(sys,occupied{n});
     end
-    continuum_bath=bath_system(sys,inter,amorphous{n});
+    continuum_bath=bath_system(sys,amorphous{n});
     lattice_echo=clexpn(lattice_bath,@hahn_echo,parameters,'labframe');
     random_echo=clexpn(continuum_bath,@hahn_echo,parameters,'labframe');
     realisations(:,n,:)=reshape([lattice_echo random_echo],numel(parameters.times),1,2);
@@ -95,10 +88,12 @@ kgrid();
 end
 
 % Create one compact physical bath with the central electron first
-function spin_system=bath_system(sys,inter,coords)
+function spin_system=bath_system(sys,coords)
 
 % Assign physical IDs with the central electron first
 sys.isotopes=[{'E'} repmat({'183W'},1,size(coords,1))];
+inter.zeeman.scalar=cell(size(sys.isotopes));
+inter.zeeman.scalar{1}=8.38;
 inter.coordinates=num2cell([zeros(1,3); 1e10*coords],2);
 spin_system=create(sys,inter);
 

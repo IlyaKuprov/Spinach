@@ -20,13 +20,9 @@
 %  spin_system   - the primary object used by Spinach
 %                  to store simulation information
 %
-% For compact point-dipole baths, inter.coordinates supplies every site in
-% Angstrom, with the effective electron first. inter.coupling has
-% nuclear (Hz Angstrom^3) and hyperfine (Hz Angstrom^3 for a point dipole,
-% or 3-by-3-by-N tensors in Hz for N nuclei). inter.tunnel_splittings, if
-% present, is a sparse symmetric N-by-N matrix in Hz, with zero diagonal.
-% This representation is for the projected analytical clexpn Hahn path;
-% no dense interaction matrix or geometry-based pair cutoff is created.
+% sys.enable={'secular_pairs'} defers point-dipole interactions to the
+% analytical Hahn calculation. Positions, g factors, hyperfine tensors,
+% and exchange couplings use the ordinary Spinach input conventions.
 %
 % Note: inter.modes.carriers declares, for each bosonic mode, the labo-
 %       ratory frequency of the rotating frame in which inter.modes.frqs
@@ -935,21 +931,17 @@ else
     
 end
     
-% Store either compact point-dipole geometry or the ordinary interaction tables
-if isfield(inter,'coupling')&&any(isfield(inter.coupling,{'hyperfine','nuclear'}))
+% Defer point-dipole pairs without allocating an all-pairs tensor table
+if ismember('secular_pairs',spin_system.sys.enable)
 
-    % Canonicalise positions and angular-frequency inputs without enumerating pairs
-    model=inter.coupling;
+    % Store positions and convert only explicitly supplied interactions to rad/s
     spin_system.inter.coordinates=inter.coordinates;
-    spin_system.inter.coupling.nuclear=2*pi*double(model.nuclear);
-    spin_system.inter.coupling.hyperfine=2*pi*double(model.hyperfine);
-    n_bath=spin_system.comp.nspins-1;
-    if isfield(inter,'tunnel_splittings')
-        spin_system.inter.tunnel_splittings=2*pi*double(inter.tunnel_splittings);
-    else
-        spin_system.inter.tunnel_splittings=sparse(n_bath,n_bath);
+    if isfield(inter,'coupling')&&isfield(inter.coupling,'matrix')
+        spin_system.inter.coupling.matrix=cellfun(@(x)2*pi*x,inter.coupling.matrix,'UniformOutput',false);
     end
-    report(spin_system,'stored compact point-dipole geometry for the analytical Hahn expansion.');
+    if isfield(inter,'coupling')&&isfield(inter.coupling,'scalar')
+        spin_system.inter.coupling.scalar=cellfun(@(x)2*pi*x,inter.coupling.scalar,'UniformOutput',false);
+    end
 
 else
 
@@ -1553,7 +1545,7 @@ if isfield(sys,'enable')
         error('sys.enable must be a cell array of strings.');
     end
     if any(~ismember(sys.enable,{'zte','gpu','op_cache','greedy','paranoia','sodd',...
-                                 'cowboy','polyadic','prop_cache','ham_cache'}))
+                                 'cowboy','polyadic','prop_cache','ham_cache','secular_pairs'}))
         error('unrecognised switch in sys.enable field.');
     end
 end
@@ -1830,55 +1822,24 @@ if isfield(inter,'coordinates')
     
 end
 
-% Check the compact point-dipole declaration
-if isfield(inter,'coupling')&&any(isfield(inter.coupling,{'hyperfine','nuclear'}))
-    model=inter.coupling;
-    n_bath=numel(sys.isotopes)-1;
-    if any(~ismember(fieldnames(inter),{'coordinates','coupling',...
-                                        'tunnel_splittings','chem','temperature'}))||...
-       ~isfield(inter.chem,'parts')||~isequal(inter.chem.parts,{1:(n_bath+1)})||...
-       isfield(inter.chem,'reactions')
-        error('Compact dipolar geometry cannot be combined with other interactions or chemical subsystems.');
+% Restrict deferred interactions to the supported secular pair model
+if isfield(sys,'enable')&&ismember('secular_pairs',sys.enable)
+    if any(~ismember(fieldnames(inter),{'coordinates','coupling','zeeman','chem','temperature'}))||...
+       ~isequal(inter.chem.parts,{1:numel(sys.isotopes)})||isfield(inter.chem,'reactions')
+        error('Unsupported interaction or chemistry for deferred secular pairs.');
     end
-    if ~isfield(inter,'coordinates')||any(cellfun(@isempty,inter.coordinates))
-        error('Compact dipolar geometry requires all site coordinates.');
+    if ~isfield(inter,'coordinates')||any(cellfun(@isempty,inter.coordinates(2:end)))||...
+       numel(sys.isotopes)<2||~strcmp(sys.isotopes{1},'E')||...
+       ~all(strcmp(sys.isotopes(2:end),sys.isotopes{2}))||~isnucleus(sys.isotopes{2})
+        error('Secular pairs require one electron and a located bath of identical nuclei.');
     end
-    xyz=vertcat(inter.coordinates{:});
-    if any(~isfinite(xyz),'all')||size(unique(xyz,'rows'),1)~=n_bath+1
-        error('Compact dipolar coordinates must be finite and distinct.');
+    [~,mult]=spin(sys.isotopes{2});
+    if mult~=2||~isfinite(sys.magnet)||sys.magnet<=0
+        error('Secular pairs require spin-1/2 nuclei and a positive finite field.');
     end
-    if n_bath<1||~strcmp(sys.isotopes{1},'E')||...
-       ~all(strcmp(sys.isotopes(2:end),sys.isotopes{2}))||...
-       ~isfinite(sys.magnet)||sys.magnet<=0
-        error('Compact dipolar geometry requires an effective electron, identical bath spins, and positive field.');
+    if isfield(inter,'coupling')&&any(~ismember(fieldnames(inter.coupling),{'matrix','scalar'}))
+        error('Use Cartesian hyperfine tensors and isotropic bath exchange for secular pairs.');
     end
-    [gamma,mult]=spin(sys.isotopes{2});
-    if mult~=2||gamma==0||startsWith(sys.isotopes{2},'E')
-        error('Compact dipolar baths require magnetic spin-1/2 nuclei.');
-    end
-    if ~isstruct(model)||~isscalar(model)||...
-       ~all(isfield(model,{'nuclear','hyperfine'}))||numel(fieldnames(model))~=2
-        error('inter.coupling must contain nuclear and hyperfine.');
-    end
-    if ~isnumeric(model.nuclear)||~isreal(model.nuclear)||...
-       ~isscalar(model.nuclear)||~isfinite(2*pi*double(model.nuclear))
-        error('Compact nuclear dipolar prefactor must be a finite real scalar in Hz Angstrom^3.');
-    end
-    hf=model.hyperfine;
-    if ~isnumeric(hf)||~isreal(hf)||any(~isfinite(2*pi*double(hf)),'all')||...
-       ~(isscalar(hf)||(size(hf,1)==3&&size(hf,2)==3&&numel(hf)==9*n_bath&&ndims(hf)<=3))
-        error('Compact hyperfine data must be a finite real prefactor or a 3-by-3-by-N tensor array.');
-    end
-    if isfield(inter,'tunnel_splittings')
-        tunnel=inter.tunnel_splittings;
-        if ~issparse(tunnel)||~isnumeric(tunnel)||~isreal(tunnel)||...
-           ~isequal(size(tunnel),[n_bath n_bath])||any(diag(tunnel))||...
-           ~issymmetric(tunnel)||any(~isfinite((8*pi/3)*nonzeros(tunnel)))
-            error('Tunnel splittings must be a finite real symmetric sparse bath matrix with zero diagonal.');
-        end
-    end
-elseif isfield(inter,'tunnel_splittings')
-    error('Tunnel splittings require compact dipolar geometry.');
 end
 
 % Check periodic boundary conditions

@@ -36,21 +36,50 @@ reduced.by_order_reason=repmat({'ok'},shape);
 if order==2
 
     % Project central hyperfine interactions along the field in the molecular frame
-    model=spin_system.inter.coupling;
     R=euler2dcm(parameters.orientation);
     axis=R(3,:).';
-    xyz=vertcat(spin_system.inter.coordinates{2:end})-spin_system.inter.coordinates{1};
-    if isscalar(model.hyperfine)
+    xyz=vertcat(spin_system.inter.coordinates{2:end});
+    bath=spin_system.comp.isotopes{2};
+    gamma=spin(bath);
+    scale=1e30*spin_system.tols.mu0/(4*pi);
+    dipolar=scale*spin_system.tols.hbar*gamma^2;
+    hf=zeros(size(xyz,1),1);
+    if ~isempty(spin_system.inter.coordinates{1})
+        xyz=xyz-spin_system.inter.coordinates{1};
         dist=vecnorm(xyz,2,2);
-        hf=model.hyperfine*(1-3*((xyz*axis)./dist).^2)./dist.^3;
-    else
-        hf=(kron(axis,axis).'*reshape(model.hyperfine,9,[])).';
+        if any(dist==0), error('A bath nucleus coincides with the electron.'); end
+        g=spin_system.tols.freeg*spin_system.inter.zeeman.ddscal{1};
+        hf=scale*spin_system.tols.muB*gamma*((axis.'*g*axis)-...
+           3*((xyz*g.'*axis).*(xyz*axis))./dist.^2)./dist.^3;
+    end
+
+    % Add measured electron-nuclear tensors in physical spin order
+    if isfield(spin_system.inter,'coupling')&&isfield(spin_system.inter.coupling,'matrix')
+        tensors=spin_system.inter.coupling.matrix;
+        if any(~cellfun(@isempty,tensors(2:end,:)),'all')||~isempty(tensors{1,1})
+            error('Secular pair hyperfine tensors must be supplied in the electron row.');
+        end
+        for k=find(~cellfun(@isempty,tensors(1,2:end)))
+            hf(k)=hf(k)+axis.'*tensors{1,k+1}*axis;
+        end
+    end
+
+    % Isotropic bath exchange J adds J/2 to the flip-flop matrix element
+    exchange=sparse(size(xyz,1),size(xyz,1));
+    if isfield(spin_system.inter,'coupling')&&isfield(spin_system.inter.coupling,'scalar')
+        scalars=spin_system.inter.coupling.scalar;
+        [rows,cols]=find(~cellfun(@isempty,scalars));
+        if any(rows==1)||any(cols<=rows)
+            error('Supply bath exchange in the upper triangle in physical spin order.');
+        end
+        vals=cell2mat(scalars(~cellfun(@isempty,scalars)));
+        exchange=sparse(cols-1,rows-1,vals,size(xyz,1),size(xyz,1));
     end
 
     % Stream the complete pair family and retain only its product and screening bound
     numerics=parameters.cce.numerics;
-    [reduced.by_order(:,:,3),omitted]=cce_pair_product(xyz,axis,hf,model.nuclear,...
-                                                     spin_system.inter.tunnel_splittings,...
+    [reduced.by_order(:,:,3),omitted]=cce_pair_product(xyz,axis,hf,dipolar,...
+                                                     exchange,...
                                                      parameters.times.',numerics.atol,...
                                                      numerics.max_memory_bytes);
     reduced.by_order_error(:,:,3)=omitted;
@@ -70,7 +99,7 @@ end
 % Enforce the physical and algorithmic domain of the approximation
 function grumble(spin_system,p,sequence,assumptions)
 c=p.cce;
-if ~isfield(spin_system.inter.coupling,'hyperfine')||...
+if ~ismember('secular_pairs',spin_system.sys.enable)||...
    ~isequal(sequence,@hahn_echo)||~strcmp(assumptions,'labframe')||...
    ~isequal(p.observed,1)||~isequal(c.bath_spins,2:spin_system.comp.nspins)||...
    ~isfield(p,'transition')||~isfield(p.transition,'ms')||...

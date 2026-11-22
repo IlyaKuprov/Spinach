@@ -1,6 +1,6 @@
 % Stream the secular spin-1/2 Hahn pair product. Syntax:
 %
-%  [echo,omitted]=cce_pair_product(xyz,axis,hf,dipolar,tunnel,times,atol,bytes)
+%  [echo,omitted]=cce_pair_product(xyz,axis,hf,dipolar,exchange,times,atol,bytes)
 %
 % Parameters:
 %
@@ -8,7 +8,7 @@
 %   axis    - 3-by-1 unit field direction in the coordinate frame
 %   hf      - N-by-1 longitudinal hyperfine coefficients in rad/s
 %   dipolar - nuclear point-dipole prefactor in rad/s times length cubed
-%   tunnel  - sparse N-by-N symmetric tunnelling splittings in rad/s
+%   exchange  - sparse N-by-N lower triangle of isotropic bath exchange in rad/s
 %   times   - nonnegative column of total echo times in seconds
 %   atol    - absolute echo-loss budget for screening weak pairs
 %   bytes   - positive working-memory budget in bytes
@@ -19,14 +19,14 @@
 %   omitted - uniform bound on screened echo loss, excluding roundoff
 %
 % The two branches in the flip-flop subspace are
-% H_±=[-(Dzz+4*t/3)*sigma_x ± delta_A*sigma_z]/4, up to identity.
+% H_±=[-(Dzz-2*J)*sigma_x ± delta_A*sigma_z]/4, up to identity.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [echo,omitted]=cce_pair_product(xyz,axis,hf,dipolar,tunnel,times,atol,bytes)
+function [echo,omitted]=cce_pair_product(xyz,axis,hf,dipolar,exchange,times,atol,bytes)
 
 % Check consistency
-grumble(xyz,axis,hf,dipolar,tunnel,times,atol,bytes);
+grumble(xyz,axis,hf,dipolar,exchange,times,atol,bytes);
 
 % Budget row work arrays and simultaneous pair-by-time temporaries
 n_spins=size(xyz,1);
@@ -39,7 +39,7 @@ angles=times.'/8;
 max_angle=max(angles);
 log_echo=zeros(1,numel(times));
 omitted=0;
-has_tunnel=nnz(tunnel)>0;
+has_exchange=nnz(exchange)>0;
 for n=1:(n_spins-1)
     for k=(n+1):block:n_spins
 
@@ -48,8 +48,8 @@ for n=1:(n_spins-1)
         delta=xyz(partners,:)-xyz(n,:);
         dist=vecnorm(delta,2,2);
         pair=dipolar*(1-3*((delta*axis)./dist).^2)./dist.^3;
-        if has_tunnel
-            pair=pair+(4/3)*full(tunnel(partners,n));
+        if has_exchange
+            pair=pair-2*full(exchange(partners,n));
         end
         detuning=hf(n)-hf(partners);
 
@@ -78,7 +78,7 @@ echo=exp(log_echo).';
 end
 
 % Check the numerical kernel inputs and dimensions
-function grumble(xyz,axis,hf,dipolar,tunnel,times,atol,bytes)
+function grumble(xyz,axis,hf,dipolar,exchange,times,atol,bytes)
 n_spins=size(xyz,1);
 if ~isnumeric(xyz)||~isreal(xyz)||~ismatrix(xyz)||size(xyz,2)~=3||...
    any(~isfinite(xyz),'all')||size(unique(xyz,'rows'),1)~=n_spins
@@ -94,8 +94,8 @@ end
 if ~isnumeric(dipolar)||~isreal(dipolar)||~isscalar(dipolar)||~isfinite(dipolar)
     error('dipolar must be a finite real scalar.');
 end
-if ~issparse(tunnel)||~isreal(tunnel)||~isequal(size(tunnel),[n_spins n_spins])
-    error('tunnel must be a real N-by-N sparse matrix.');
+if ~issparse(exchange)||~isreal(exchange)||~isequal(size(exchange),[n_spins n_spins])
+    error('exchange must be a real N-by-N sparse matrix.');
 end
 if ~isnumeric(times)||~isreal(times)||~iscolumn(times)||isempty(times)||...
    any(~isfinite(times)|times<0)

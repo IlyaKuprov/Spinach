@@ -19,14 +19,14 @@ sys.parallel={'processes',1};
 sys.output='hush';
 sys.enable={'secular_pairs'};
 inter.coordinates=[{[]}; num2cell(protons(:,1:3),2)];
-inter.coupling.matrix=cell(numel(sys.isotopes));
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
 for k=1:size(protons,1)
     inter.coupling.matrix{1,k+1}=reshape(protons(k,4:12),3,3)/(2*pi);
 end
 
 % Three protons per methyl group share a tunnel splitting (kHz)
 splittings=[54.5 4.8 4.8 54.5 54.5 4.8 54.5 4.8 4.8 54.5 54.5 4.8];
-inter.coupling.scalar=cell(numel(sys.isotopes));
+inter.coupling.scalar=cell(numel(sys.isotopes),numel(sys.isotopes));
 for k=1:numel(splittings)
     sites=3*k+(-1:1);
     inter.coupling.scalar(sites(1),sites(2:3))={-2e3*splittings(k)/3};

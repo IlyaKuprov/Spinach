@@ -19,7 +19,7 @@ sys.parallel={'processes',1};
 sys.output='hush';
 sys.enable={'secular_pairs'};
 inter.coordinates=[{[]}; num2cell(protons(:,1:3),2)];
-inter.coupling.matrix=cell(numel(sys.isotopes));
+inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
 for k=1:size(protons,1)
     inter.coupling.matrix{1,k+1}=reshape(protons(k,4:12),3,3)/(2*pi);
 end

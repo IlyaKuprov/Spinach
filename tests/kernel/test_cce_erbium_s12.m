@@ -105,6 +105,29 @@ for n=2:3
                      'The reference and every singleton refocus exactly.');
 end
 
+% Opposite explicit hyperfine tensors cancel the native electron dipole
+mixed=inter;
+mixed.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+for k=1:size(xyz,1)
+    r=xyz(k,:); u=r.'/norm(r);
+    mixed.coupling.matrix{1,k+1}=hyperfine*(eye(3)-3*(u*u.'))/(2*pi*norm(r)^3);
+end
+mixed_system=create(sys,mixed);
+cancelled=clexpn(mixed_system,@hahn_echo,parameters,'labframe');
+result=test_close(result,'Mixed hyperfine cancellation',cancelled,ones(size(times)),1e-12,0,...
+                  'Measured and point-dipole tensors must add with the native electron sign.');
+
+% Unequal nuclear shifts do not refocus as a common frequency
+mixed.zeeman.scalar{2}=10;
+mixed_system=create(sys,mixed);
+rejected=false;
+try
+    clexpn(mixed_system,@hahn_echo,parameters,'labframe');
+catch exception
+    rejected=contains(exception.message,'common nuclear Zeeman');
+end
+result=test_true(result,'Unequal nuclear shifts',rejected,'A bath detuning must not be silently discarded.');
+
 % The reported pruning bound must contain the measured change from no screening
 exact=answer;
 parameters.cce.numerics.atol=3;

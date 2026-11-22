@@ -49,7 +49,7 @@ if order==2
         dist=vecnorm(xyz,2,2);
         if any(dist==0), error('A bath nucleus coincides with the electron.'); end
         g=spin_system.tols.freeg*spin_system.inter.zeeman.ddscal{1};
-        hf=scale*spin_system.tols.muB*gamma*((axis.'*g*axis)-...
+        hf=-scale*spin_system.tols.muB*gamma*((axis.'*g*axis)-...
            3*((xyz*g.'*axis).*(xyz*axis))./dist.^2)./dist.^3;
     end
 
@@ -99,6 +99,10 @@ end
 % Enforce the physical and algorithmic domain of the approximation
 function grumble(spin_system,p,sequence,assumptions)
 c=p.cce;
+shifts=spin_system.inter.zeeman.matrix(2:end);
+if ~all(cellfun(@(z)isequal(z,shifts{1}),shifts))
+    error('clexpn:analyticalHahn','Secular pairs require a common nuclear Zeeman tensor.');
+end
 if ~ismember('secular_pairs',spin_system.sys.enable)||...
    ~isequal(sequence,@hahn_echo)||~strcmp(assumptions,'labframe')||...
    ~isequal(p.observed,1)||~isequal(c.bath_spins,2:spin_system.comp.nspins)||...

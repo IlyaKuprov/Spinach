@@ -23,7 +23,6 @@ neighbours=[sites(2:end) sites(1)];
 sys.magnet=0;
 sys.isotopes=[{'E'} repmat({'13C'},1,nbath)];
 sys.output='hush';
-sys.parallel={'processes',1};
 inter.zeeman.matrix=repmat({zeros(3)},1,nbath+1);
 inter.coupling.matrix=cell(nbath+1);
 for n=1:nbath
@@ -34,9 +33,8 @@ for n=1:nbath
 
 end
 
-% Neel product state and equal raising and lowering jump rates
-configuration.bath_ids=sites;
-configuration.bath_rho=repmat({diag([1 0]),diag([0 1])},1,nbath/2);
+% Néel product state and equal raising and lowering jump rates
+bath_rho=repmat({diag([1 0]),diag([0 1])},1,nbath/2);
 jumps=repmat(struct('support',0,'operator','L+','rate',0.01),1,2*nbath);
 for n=1:nbath
 
@@ -47,49 +45,29 @@ for n=1:nbath
 
 end
 
-% Compile the projected model with frozen exterior Néel fields
+% Specify the periodic cluster graph and frozen exterior Néel state
+adjacency=sparse(1:nbath,[2:nbath 1],true,nbath,nbath);
+parameters.cce.graph=struct('mode','explicit','adjacency',adjacency|adjacency.');
+parameters.cce.expansion='periodic_segments';
+parameters.cce.order=5;
+parameters.cce.bath_spins=sites;
+parameters.cce.bath_state=struct('mode','explicit_product','rho',{bath_rho});
+parameters.cce.meanfield='static';
+parameters.cce.approximation='projected';
+
+% Simulate the projected free induction with native retained-cluster jumps
 times=0:0.1:20;
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
 parameters.times=times;
 parameters.output='signal';
-parameters.cce.approximation='projected';
-parameters.cce.meanfield='static';
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
+parameters.bath_jumps=jumps;
+
+% Allow for accumulated error in the order-five product and its denominator
+parameters.cce.numerics=struct('atol',1e-7,'rtol',1e-8,'max_memory_bytes',2^29);
 spin_system=create(sys,inter);
-model=cce_compile(spin_system,parameters,'labframe');
-model.formalism='zeeman-liouv';
-parameters=model.parameters;
-
-% Propagate each contiguous segment, with jumps active only on retained sites
-coherence=zeros(numel(times),5);
-shorter=ones(numel(times),1);
-for n=1:5
-
-    % Compute the twelve raw segment signals at this expansion order
-    segments=zeros(numel(times),nbath);
-    for k=1:nbath
-
-        % Build the native projected GKSL generator for the selected physical sites
-        retained=sites(mod(k-1+(0:n-1),nbath)+1);
-        parameters.bath_jumps=jumps(ismember([jumps.support],retained));
-        subsystem=cce_subsystem(model,retained,configuration,[]);
-        [H,R,K,cluster_params]=cce_generators(subsystem,parameters,[]);
-
-        % Keep the local-jump Liouvillian sparse during exponential action
-        H.left=sparse(H.left);
-        H.right=sparse(H.right);
-        H.dissipator=sparse(H.dissipator);
-        segments(:,k)=free_evolution(subsystem,cluster_params,H,R,K);
-
-    end
-
-    % Only maximal segments and their adjacent overlaps survive on the ring
-    segment_product=prod(segments,2);
-    coherence(:,n)=abs(segment_product./shorter);
-    shorter=segment_product;
-
-end
+[~,details]=clexpn(spin_system,@free_evolution,parameters,'labframe');
+coherence=abs(reshape(details.reduction.by_order(:,1,2:end),numel(times),[]));
 
 % Plot the five ME-CCE curves and the published exact marker centres
 exact=readmatrix(fullfile(fileparts(mfilename('fullpath')),...

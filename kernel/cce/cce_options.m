@@ -30,10 +30,15 @@
 % mixed product bath density, no mean field, power-counting reduction, and
 % averaging completed expansions. Explicit physical populations, quadrupoles,
 % polarisation, jump directions/rates, and second-order projection are never
-% invented. Canonical tensors and declared pump frequencies are not converted.
+% invented. For closed-system Hilbert Hahn echoes with an energy-level
+% transition and ideal midpoint pi pulse, cce.projection='conditional' explicitly drops register-changing
+% matrix elements instead of requiring invariant observed manifolds.
+% Canonical tensors and declared pump frequencies are not converted.
 % noise.descriptors contains operators, spins, and coefficient; its physical
 % validation and retained-cluster matrix construction belong to noise_correlation.
-% New experiment-specific fields must be added explicitly to this contract.
+% Periodic segments require fixed-order projected free induction, a single
+% cycle, and an explicit static exterior product state. Exterior jumps are
+% omitted in this approximation; active jumps with split support are refused.
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -256,7 +261,7 @@ end
 if ~isfield(p,'cce')
     return;
 end
-fields(p.cce,{'approximation','bath_spins','order','expansion','groups','partition',...
+fields(p.cce,{'approximation','projection','bath_spins','order','expansion','groups','partition',...
               'graph','interaction_cutoff','bath_radius','bath_state',...
               'meanfield','meanfield_radius','interlaced','averaging','reducer',...
               'numerics','backend','basis','second_order','convergence','parallel',...
@@ -297,10 +302,10 @@ if ~isempty(intersect(ids,bath))
     error('cce_options:ownership','Observed and bath spin IDs must be disjoint.');
 end
 choice(c.approximation,{'projected','generalized'},'cce.approximation');
-choice(c.expansion,{'standard','partition','disjoint','disjoint_inter'},'cce.expansion');
+choice(c.expansion,{'standard','partition','disjoint','disjoint_inter','periodic_segments'},'cce.expansion');
 choice(c.averaging,{'after_expansion','internal_then_expansion'},'cce.averaging');
 choice(c.reducer,{'powers','direct'},'cce.reducer');
-choice(c.backend,{'auto','direct','stock'},'cce.backend');
+choice(c.backend,{'auto','direct','stock','analytical_hahn'},'cce.backend');
 choice(c.meanfield,{'none','static'},'cce.meanfield');
 choice(c.numerics.zero_policy,{'mask','error'},'cce.numerics.zero_policy');
 choice(c.numerics.precision,{'double'},'cce.numerics.precision');
@@ -332,6 +337,18 @@ if c.second_order.enabled&&(~strcmp(c.approximation,'projected')||...
    ~all(isfield(c.second_order,{'gap_tolerance','overlap_tolerance'})))
     error('cce_options:second_order','Second-order projection requires projected evolution and explicit gap/overlap criteria.');
 end
+if isfield(c,'projection')
+    choice(c.projection,{'invariant','conditional'},'cce.projection');
+    if strcmp(c.projection,'conditional')&&...
+       (~strcmp(c.approximation,'projected')||c.second_order.enabled||...
+        ~isfield(p,'transition')||~isfield(p.transition,'levels')||isfield(p,'refocusing')||...
+        (isfield(p,'bath_jumps')&&~isempty(p.bath_jumps))||...
+        (isfield(c,'basis')&&isfield(c.basis,'formalism')&&~strcmp(c.basis.formalism,'zeeman-hilb'))||...
+        (isfield(system,'bas')&&~strcmp(system.bas.formalism,'zeeman-hilb'))||...
+        ~(isequal(experiment,@hahn_echo)||isequal(experiment,@cce_compile)))
+        error('cce_options:projection','Conditional projection requires a closed-system Hilbert Hahn echo with energy-level selection, an ideal midpoint pulse, and no second-order correction.');
+    end
+end
 for name={'gap_tolerance','overlap_tolerance'}
     if isfield(c.second_order,name{1})
         nonnegative(c.second_order.(name{1}),['cce.second_order.' name{1}],false);
@@ -349,7 +366,17 @@ if isfield(c,'groups')
         error('cce_options:groups','Groups must partition the selected bath exactly once.');
     end
 end
-if ~strcmp(c.expansion,'standard')&&~isfield(c,'groups')&&~isfield(c,'partition')
+if strcmp(c.expansion,'periodic_segments')
+    if (~isequal(experiment,@free_evolution)&&~isequal(experiment,@cce_compile))||...
+       ~strcmp(c.approximation,'projected')||~strcmp(c.meanfield,'static')||...
+       ~strcmp(c.bath_state.mode,'explicit_product')||~strcmp(c.reducer,'powers')||...
+       isempty(c.order)||c.order<1||c.order>=numel(bath)||...
+       any(isfield(c,{'groups','partition','convergence','meanfield_radius'}))||...
+       (isfield(p,'output')&&~strcmp(p.output,'signal'))
+        error('cce_options:periodicSegments',...
+              'Periodic segments require a truncated, projected free-induction signal with fixed exterior states.');
+    end
+elseif ~strcmp(c.expansion,'standard')&&~isfield(c,'groups')&&~isfield(c,'partition')
     error('cce_options:partition','Partitioned expansion needs groups or an explicit partition policy.');
 end
 if ~isfield(c.graph,'mode')

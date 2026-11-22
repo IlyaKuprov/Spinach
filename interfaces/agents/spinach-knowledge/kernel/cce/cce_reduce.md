@@ -18,6 +18,7 @@ Reduce raw cluster observables with conditioned multiplicative or additive recur
 
 - Accepts the empty-cluster baseline followed by one raw record per retained cluster; the integer-power and direct recursive forms use the same subset-closed family.
 - The multiplicative reducer accumulates log magnitudes and phases without replacing zero denominators by epsilon. Near-unresolved factors are masked or raise an error according to `zero_policy`.
+- Periodic-segment reduction uses the same signed-power conditioning on raw, unnormalised segment traces: at positive order, only the current and immediately preceding segment lengths survive (the order-one denominator is unity).
 - Noise uses additive connected-cluster subtraction with the reduction algebra selected by the native experiment contract.
 
 ## Inputs and outputs

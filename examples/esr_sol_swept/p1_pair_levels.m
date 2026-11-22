@@ -7,10 +7,13 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function cce_p1_electron_bath()
+function p1_pair_levels()
 
 % NV frame and the aligned and tilted Jahn-Teller axes
-magnet=0.05;
+sys.magnet=0.05;
+sys.isotopes={'E','E','14N','14N'};
+bas.formalism='zeeman-hilb';
+bas.approximation={'none'};
 z_axis=[1 1 1]/sqrt(3);
 x_axis=[1 -1 0]/sqrt(2);
 frame=[x_axis;cross(z_axis,x_axis);z_axis];
@@ -26,34 +29,41 @@ for n=1:2
 
 end
 
-% Spin operators and the nuclear product basis in Fig. 5b order
-S=pauli(2);
-I=pauli(3);
+% Fig. 5b nuclear ordering within the two opposite electron configurations
 projections=[-1 -1; 0 -1; -1 0; 1 -1; 0 0; -1 1; 1 0; 0 1; 1 1];
 nuc_idx=3*(1-projections(:,1))+2-projections(:,2);
-Z=full(diag(I.z));
-z_nuc=[repelem(Z,3) repmat(Z,3,1)];
-z_nuc=z_nuc(nuc_idx,:);
-electron_idx=[2 3];
-z_elec=[kron(diag(S.z),ones(2,1)) kron(ones(2,1),diag(S.z))];
-z_elec=full(z_elec(electron_idx,:));
-F=kron(kron(S.p,S.m)+kron(S.m,S.p),kron(I.u,I.u));
-allowed=full(F(9*(electron_idx(1)-1)+nuc_idx,9*(electron_idx(2)-1)+nuc_idx)~=0);
+states=[9+nuc_idx 18+nuc_idx];
 
 % Model choices in panel order a, c, d
 axis_ids=[1 1;1 1;1 2];
 hf_on=[false true true];
 model_names={'(a) Hyperfine off','(c) Aligned JT axes','(d) One tilted JT axis'};
-omega_n=-spin('14N')*magnet/(2*pi*1e6);
 energies=zeros(9,2,3);
 channels=false(9,9,3);
 for n=1:3
 
-    % Diabatic pair energies and resonances to floating-point precision
-    azz=hf_on(n)*cellfun(@(tensor) tensor(3,3),hyperfine(axis_ids(n,:)));
-    levels=omega_n*sum(z_nuc,2)+(z_nuc.*azz)*z_elec.';
+    % Set each electron-nitrogen hyperfine tensor in Hz
+    inter.coupling.matrix=cell(4);
+    for k=1:2
+        inter.coupling.matrix{k,k+2}=hf_on(n)*1e6*hyperfine{axis_ids(n,k)};
+    end
+    spin_system=create(sys,inter);
+    spin_system=basis(spin_system,bas);
+    spin_system=assume(spin_system,'labframe');
+
+    % Read diabatic product-state energies, not mixed eigenvalues
+    [H,Q]=hamiltonian(spin_system);
+    diagonal=full(diag(H+orientation(Q,[0 0 0])))/(2*pi*1e6);
+    levels=diagonal(states);
+
+    % Electron flip-flops conserve both nuclear projections
+    F=operator(spin_system,{'L+','L-'},{1,2});
+    allowed=full(F(states(:,1),states(:,2))~=0);
     energies(:,:,n)=levels;
-    channels(:,:,n)=allowed&(abs(levels(:,1)-levels(:,2).')<=eps(max(abs(levels),[],'all')));
+
+    % Cancellation of the common electron Zeeman terms sets the roundoff scale
+    tolerance=size(H,1)*eps(norm(diagonal,inf));
+    channels(:,:,n)=allowed&(abs(levels(:,1)-levels(:,2).')<=tolerance);
 
 end
 

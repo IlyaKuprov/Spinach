@@ -12,12 +12,15 @@
 % parameters.bath_jumps uses support, operator, and rate; supported spin
 % descriptors are L+, L-, Lx, Ly, and Lz, or explicit ordered matrices.
 % Zero-rate jumps are omitted before closure checks; active split supports
-% and exterior jumps driving a frozen mean field are refused.
+% and exterior jumps driving a frozen mean field are refused, except that
+% periodic_segments explicitly freezes the exterior and omits exterior jumps.
 % Projected H has kind='cce_projected', left/right Hamiltonians and a
 % dissipator acting on column-vectorised bath coherence. R and K are []:
 % the tagged object, not numeric addition, goes to cce_evolution. Swap
 % left/right and reverse the projected dissipator with swap_matrix for
 % a refocusing pulse. These tags are never stock pulse-sequence inputs.
+% Conditional midpoint Hahn projection omits the isolated register terms:
+% their two scalar phases cancel exactly between equal swapped intervals.
 % parameters.cce.backend selects auto/direct/stock. The returned
 % parameters.cce_aux contains ordering, Hamiltonian, and rounding metadata.
 % Master-equation cce_aux.generator retains the physical Hamiltonians,
@@ -47,6 +50,7 @@ ids=cluster_system.physical_ids;
 d=cluster_system.dimension;
 db=cluster_system.bath_dimension;
 projected=strcmp(parameters.cce.approximation,'projected');
+periodic=strcmp(model.parameters.cce.expansion,'periodic_segments');
 jumps=[];
 if isfield(parameters,'bath_jumps')
     jumps=parameters.bath_jumps;
@@ -192,7 +196,12 @@ if projected
     H.hamiltonian_abs_error_bound=meta.roundoff_bound;
     H.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)||strcmp(cluster_system.formalism,'zeeman-liouv')
-        [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb);
+        [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb,periodic);
+        if periodic
+            H.left=sparse(H.left);
+            H.right=sparse(H.right);
+            H.dissipator=sparse(H.dissipator);
+        end
 
         % Map each column-major bath entry to its transposed position
         labels=reshape(1:db^2,db,db).';
@@ -206,7 +215,7 @@ elseif strcmp(cluster_system.formalism,'zeeman-liouv')
     % Column-major vectorisation fixes the transposes and the relaxation sign
     memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*d^4));
     H=kron(eye(d),ham)-kron(ham.',eye(d));
-    [R,jump_records]=dissipator(cluster_system,jumps,[],[]);
+    [R,jump_records]=dissipator(cluster_system,jumps,[],[],false);
     K=zeros(size(H));
 else
     H=ham;
@@ -261,6 +270,9 @@ if strcmp(backend,'direct')&&~model.direct_supported
     error('cce_generators:backend','The requested direct approximation is unsupported.');
 end
 ids=system.physical_ids;
+conditional=isfield(parameters.cce,'projection')&&strcmp(parameters.cce.projection,'conditional');
+observed=ismember(ids,model.observed_ids);
+locals=~(conditional&observed);
 dims=system.multiplicities;
 dimension=system.dimension;
 memory_guard(parameters,16*dimension^2*(12+3*numel(ids)));
@@ -295,73 +307,81 @@ if strcmp(backend,'direct')
     operations=0;
     for n=1:numel(ids)
 
-        % Select Zeeman components and rotating-frame carrier convention
+        % The isolated register phase cancels in the symmetric Hahn sequence
         id=ids(n);
-        tensor=model.zeeman{id};
-        strength=model.spin_system.inter.zeeman.strength{id};
-        field=zeros(1,3);
-        isotropic=trace(model.spin_system.inter.zeeman.matrix{id})/3;
-        anisotropic=tensor-isotropic*eye(3);
-        [~,rank_one,rank_two]=mat2sphten(model.spin_system.inter.zeeman.matrix{id});
-        if norm(rank_one,2)<=model.spin_system.tols.liouv_zero&&...
-           norm(rank_two,2)<=model.spin_system.tols.liouv_zero
-            anisotropic=zeros(3);
-        end
-        switch strength
-            case 'full'
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero
-                    isotropic=0;
-                end
-                field=anisotropic(3,:)+[0 0 isotropic];
-            case 'secular'
-                isotropic=isotropic-model.spin_system.inter.basefrqs(id);
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero
-                    isotropic=0;
-                end
-                field(3)=anisotropic(3,3)+isotropic;
-            case 'ignore'
+        if locals(n)
 
-                % No local Zeeman term retained
-            otherwise
-                error('unvalidated direct Zeeman retention.');
-        end
-        for axis=1:3
-            term=field(axis)*ops{n,axis};
-            H=H+term;
-            sum_norm=sum_norm+norm(term,'fro');
-            operations=operations+1;
-        end
+            % Select Zeeman components and rotating-frame carrier convention
+            tensor=model.zeeman{id};
+            strength=model.spin_system.inter.zeeman.strength{id};
+            field=zeros(1,3);
+            isotropic=trace(model.spin_system.inter.zeeman.matrix{id})/3;
+            anisotropic=tensor-isotropic*eye(3);
+            [~,rank_one,rank_two]=mat2sphten(model.spin_system.inter.zeeman.matrix{id});
+            if norm(rank_one,2)<=model.spin_system.tols.liouv_zero&&...
+               norm(rank_two,2)<=model.spin_system.tols.liouv_zero
+                anisotropic=zeros(3);
+            end
+            switch strength
+                case 'full'
+                    if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                        isotropic=0;
+                    end
+                    field=anisotropic(3,:)+[0 0 isotropic];
+                case 'secular'
+                    isotropic=isotropic-model.spin_system.inter.basefrqs(id);
+                    if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                        isotropic=0;
+                    end
+                    field(3)=anisotropic(3,3)+isotropic;
+                case 'ignore'
 
-        % Apply the stock on-site quadratic retention convention
-        tensor=model.quadratic{id};
-        strength=model.quadratic_strength{id};
-        switch strength
-            case 'strong'
-
-                % Keep the full symmetric traceless tensor
-            case 'secular'
-                tensor=diag([-tensor(3,3)/2 -tensor(3,3)/2 tensor(3,3)]);
-            case 'zz'
-                if norm(tensor,2)>2*pi*model.spin_system.tols.inter_cutoff
-                    error('zz on-site quadratic retention is undefined by Spinach.');
-                end
-                tensor=zeros(3);
-            case 'ignore'
-                tensor=zeros(3);
-            otherwise
-                error('unvalidated direct quadratic retention.');
-        end
-        for axis=1:3
-            for other=1:3
-                term=tensor(axis,other)*(ops{n,axis}*ops{n,other});
+                    % No local Zeeman term retained
+                otherwise
+                    error('unvalidated direct Zeeman retention.');
+            end
+            for axis=1:3
+                term=field(axis)*ops{n,axis};
                 H=H+term;
                 sum_norm=sum_norm+norm(term,'fro');
-                operations=operations+dimension;
+                operations=operations+1;
             end
+
+            % Apply the stock on-site quadratic retention convention
+            tensor=model.quadratic{id};
+            strength=model.quadratic_strength{id};
+            switch strength
+                case 'strong'
+
+                    % Keep the full symmetric traceless tensor
+                case 'secular'
+                    tensor=diag([-tensor(3,3)/2 -tensor(3,3)/2 tensor(3,3)]);
+                case 'zz'
+                    if norm(tensor,2)>2*pi*model.spin_system.tols.inter_cutoff
+                        error('zz on-site quadratic retention is undefined by Spinach.');
+                    end
+                    tensor=zeros(3);
+                case 'ignore'
+                    tensor=zeros(3);
+                otherwise
+                    error('unvalidated direct quadratic retention.');
+            end
+            for axis=1:3
+                for other=1:3
+                    term=tensor(axis,other)*(ops{n,axis}*ops{n,other});
+                    H=H+term;
+                    sum_norm=sum_norm+norm(term,'fro');
+                    operations=operations+dimension;
+                end
+            end
+
         end
 
         % Sum each physical pair once, using combined ordered-cell tensors
         for k=n+1:numel(ids)
+            if conditional&&observed(n)&&observed(k)
+                continue
+            end
             tensor=tensors{1+pair_index(id,ids(k))};
             for axis=1:3
                 for other=1:3
@@ -382,6 +402,17 @@ else
         system=rmfield(system,'bas');
     end
     system=kill_spin(system,setdiff(model.physical_ids,ids));
+    if conditional
+
+        % Remove only pure-register terms before stock Hamiltonian construction
+        register=find(ismember(sort(ids),model.observed_ids));
+        system.inter.zeeman.matrix(register)={zeros(3)};
+        system.inter.basefrqs(register)=0;
+        keys=reshape(cell2mat(system.inter.coupling.matrix(:,1:2)),[],2);
+        system.inter.coupling.matrix(all(ismember(keys,register),2),:)=[];
+        system.inter.giant.coeff(register)={[]};
+
+    end
     basis_parameters.formalism='zeeman-hilb';
     basis_parameters.approximation={'none'};
     system=basis(system,basis_parameters);
@@ -426,8 +457,19 @@ end
 % Report the unsymmetrised residual and a dimension/operation roundoff bound
 meta.antihermitian_residual=norm(H-H','fro');
 roundoff=operations*eps/(1-operations*eps);
-meta.roundoff_bound=roundoff*max(sum_norm,realmin)+...
-                    dimension*model.canonical_roundoff;
+canonical_roundoff=model.canonical_roundoff;
+if conditional
+
+    % Only retained bath Zeeman terms enter the centred Hamiltonian
+    canonical_roundoff=0;
+    for id=ids(locals)
+        canonical_roundoff=canonical_roundoff+27*eps*...
+            (norm(model.spin_system.inter.zeeman.matrix{id},'fro')+...
+             abs(model.spin_system.inter.basefrqs(id)));
+    end
+
+end
+meta.roundoff_bound=roundoff*max(sum_norm,realmin)+dimension*canonical_roundoff;
 if meta.antihermitian_residual>2*meta.roundoff_bound
     error('Hamiltonian has a non-roundoff anti-Hermitian residual.');
 end
@@ -449,7 +491,7 @@ meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
 end
 
 % Assemble loss and jump terms for conventional or conditional density blocks
-function [R,records]=dissipator(system,jumps,va,vb)
+function [R,records]=dissipator(system,jumps,va,vb,omit_exterior)
 
 % Select the density dimension after the caller's allocation preflight
 ids=system.physical_ids;
@@ -471,7 +513,7 @@ for k=1:numel(jumps)
     end
     included=ismember(jump.support,ids);
     if ~any(included)
-        if any(ismember(jump.support,system.configuration.exterior_ids))
+        if ~omit_exterior&&any(ismember(jump.support,system.configuration.exterior_ids))
             error('cce:exteriorJump','An active exterior jump cannot drive a frozen mean field.');
         end
         continue

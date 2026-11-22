@@ -144,6 +144,61 @@ result=test_true(result,'second-order graph approximation explicit',...
                  max(abs(approximate-reference))>0.4,...
                  'Only an explicitly approximate graph may omit the induced pair.');
 
+% Compare the explicit midpoint Hahn approximation against two conditional histories
+system.inter.zeeman.matrix{2}=630*eye(3);
+system=cce_test_write(system,[1 2],[100 0 240; 0 0 0; 0 0 0]);
+p.transition=struct('spins',1,'levels',[1 2]);
+p.times=[0 0.001 0.003];
+p.cce.bath_spins=2;
+p.cce.order=1;
+p.cce.second_order.enabled=false;
+z=diag([1 -1])/2;
+ha=630*z-120*x;
+hb=630*z+120*x;
+reference=ones(numel(p.times),1);
+for k=2:numel(p.times)
+
+    % Evaluate the two histories without invoking the native retained generator
+    ua=expm(-0.5i*p.times(k)*ha);
+    ub=expm(-0.5i*p.times(k)*hb);
+    reference(k)=trace(ua*ub*(ub*ua)')/2;
+
+end
+
+% The same transverse coupling must still be rejected by invariant projection
+rejected=false;
+try
+    clexpn(system,@hahn_echo,p,'labframe');
+catch exception
+    rejected=strcmp(exception.identifier,'cce:population_transfer');
+end
+result=test_true(result,'invariant Hahn rejects register mixing',rejected,...
+                 'The opt-in conditional approximation must not change the default.');
+
+% Exercise both retained-Hamiltonian backends through the registered experiment
+p.cce.projection='conditional';
+for backend={'direct','stock'}
+
+    % Check the complex response before the plotted real part or magnitude
+    p.cce.backend=backend{1};
+    [actual,details]=clexpn(system,@hahn_echo,p,'labframe');
+    bound=norm(details.raw{1}(2).abs_error_bound)+numel(reference)*eps;
+    result=test_close(result,['conditional Hahn ' backend{1}],actual,reference,bound,0,...
+                      'The isolated register phase cancels but both bath terms remain.');
+
+end
+
+% An off-centre pulse would not cancel the isolated register phase
+p.refocusing=struct('spins',1,'axis','x','angle',pi,'fraction',0.25);
+rejected=false;
+try
+    clexpn(system,@hahn_echo,p,'labframe');
+catch exception
+    rejected=strcmp(exception.identifier,'cce_options:projection');
+end
+result=test_true(result,'conditional Hahn rejects off-centre refocusing',rejected,...
+                 'The approximation is restricted to the ideal midpoint pulse.');
+
 end
 
 

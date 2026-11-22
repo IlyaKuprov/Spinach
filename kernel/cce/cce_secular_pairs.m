@@ -32,37 +32,10 @@ grumble(xyz,field_axis,hyperfine,dipolar,times,abs_tol);
 distance=vecnorm(xyz,2,2);
 couplings=hyperfine*(1-3*((xyz*field_axis)./distance).^2)./distance.^3;
 
-% Multiply all irreducible pair echoes; each singleton Hahn echo is unity
-log_echo=zeros(1,numel(times));
+% Evaluate the same secular model used by the compact Hahn context
 n_spins=size(xyz,1);
-pair_tol=abs_tol/max(1,n_spins*(n_spins-1)/2);
-max_angle=max(times)/8;
-for n=1:(n_spins-1)
-
-    % Nuclear secular Dzz and hyperfine difference for all partners of site n
-    delta_r=xyz(n+1:end,:)-xyz(n,:);
-    distance=vecnorm(delta_r,2,2);
-    pair=dipolar*(1-3*((delta_r*field_axis)./distance).^2)./distance.^3;
-    detuning=couplings(n)-couplings(n+1:end);
-
-    % In the flip-flop subspace H_±=(-Dzz σx ± ΔA σz)/4 up to identity
-    freq=hypot(pair,detuning);
-    active=freq>0;
-    freq=freq(active);
-    contrast=(2*(pair(active)./freq).*(detuning(active)./freq)).^2;
-
-    % Omit only losses bounded by the per-pair share of the error budget
-    keep=contrast.*min(1,(max_angle*freq).^4)>pair_tol;
-    if any(keep)
-
-        % Accumulate pair products in log space without discarding weak retained losses
-        losses=contrast(keep).*sin(freq(keep).*(times.'/8)).^4;
-        log_echo=log_echo+sum(log1p(-losses),1);
-
-    end
-
-end
-echo=exp(log_echo).';
+echo=cce_pair_product(xyz,field_axis,couplings,dipolar,sparse(n_spins,n_spins),...
+                      times,abs_tol,Inf);
 
 end
 

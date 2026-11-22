@@ -146,7 +146,13 @@ end
 if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_bytes
     error('cce_schedule:memory','Raw ledger and simultaneous dense storage exceed memory budget.');
 end
-model.clusters=clusters;
+
+% Keep the full family out of conventional worker payloads
+if strcmp(options.bath_state.mode,'interlaced')
+    model.clusters=clusters;
+end
+task_clusters=[struct('id',uint64(0),'sites',[]);...
+               struct('id',{clusters.id},'sites',{clusters.sites}).'];
 
 % Hash physical and experiment inputs, not checkpoint filenames or resume switches
 payload=struct('model',model,'clusters',clusters,'ensemble',ensemble,...
@@ -179,10 +185,13 @@ for n=1:ns
 end
 [ids,order]=sortrows(ids,[1 2 3]);
 indices=indices(order,:);
+positions=zeros(size(order));
+positions(order)=1:numel(order);
 identity=struct();
 if isfield(options,'checkpoint')
 
     % Available memory is a dispatch limit, not part of the physical calculation
+    payload.model.clusters=clusters;
     physical=payload;
     physical.parameters.cce.numerics=rmfield(physical.parameters.cce.numerics,'max_memory_bytes');
     physical.model.parameters.cce.numerics=rmfield(physical.model.parameters.cce.numerics,'max_memory_bytes');
@@ -215,13 +224,15 @@ for b=1:batch_size:numel(pending)
     selected=pending(b:min(b+batch_size-1,numel(pending)));
     records=cell(numel(selected),1);
     tasks=indices(selected,:);
+    local_clusters=task_clusters(tasks(:,2));
+    configuration_ids=tasks(:,1);
     if strcmp(mode,'serial')
         for j=1:numel(selected)
-            records{j}=native_task(model,clusters,ensemble,schedule,parameters,evaluator,tasks(j,:));
+            records{j}=native_task(model,local_clusters(j),ensemble,schedule,parameters,evaluator,configuration_ids(j));
         end
     else
         parfor (j=1:numel(selected),workers)
-            records{j}=native_task(model,clusters,ensemble,schedule,parameters,evaluator,tasks(j,:));
+            records{j}=native_task(model,local_clusters(j),ensemble,schedule,parameters,evaluator,configuration_ids(j));
         end
     end
     state.records(selected)=records;
@@ -234,7 +245,7 @@ raw=cell(1,ns);
 for n=1:ns
     records=cell(1,nc);
     for k=1:nc
-        position=find(indices(:,1)==n&indices(:,2)==k,1);
+        position=positions((n-1)*nc+k);
         records{k}=state.records{position};
     end
     if strcmp(options.bath_state.mode,'interlaced')
@@ -246,14 +257,12 @@ end
 end
 
 % Invoke exactly the registered evaluator on ordinary and conditioned paths
-function raw=native_task(model,clusters,ensemble,schedule,parameters,evaluator,index)
-cluster=struct('id',0,'sites',[]);
-if index(2)>1
-    cluster=clusters(index(2)-1);
-end
+function raw=native_task(model,cluster,ensemble,schedule,parameters,evaluator,config_id)
+
+% Keep conditioned tasks on the same physical family and configuration
 if strcmp(parameters.cce.bath_state.mode,'interlaced')
-    parameters.cce.interlaced.reference_state=index(1);
-    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.bath_ids)),clusters));
+    parameters.cce.interlaced.reference_state=config_id;
+    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.bath_ids)),model.clusters));
     if complete&&~isequal(sort(cluster.sites),sort(model.bath_ids))
         channels=1;
         if isfield(parameters,'coil')&&iscell(parameters.coil)
@@ -262,7 +271,7 @@ if strcmp(parameters.cce.bath_state.mode,'interlaced')
         raw=struct('cluster_id',cluster.id,'value',NaN(numel(parameters.times),channels),...
                    'abs_error_bound',Inf(numel(parameters.times),channels),...
                    'valid',false(numel(parameters.times),channels),...
-                   'weight',ensemble.spin_config(index(1)).weight,...
+                   'weight',ensemble.spin_config(config_id).weight,...
                    'condition_sites',{{}},'assignment_count',0,'reference',[],...
                    'reference_error',[],'full_bath',false,'kind','not_evaluated');
         if strcmp(model.formalism,'zeeman-liouv')||...
@@ -273,7 +282,7 @@ if strcmp(parameters.cce.bath_state.mode,'interlaced')
         raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator);
     end
 else
-    raw=evaluator(model,cluster,ensemble.spin_config(index(1)),schedule,parameters);
+    raw=evaluator(model,cluster,ensemble.spin_config(config_id),schedule,parameters);
 end
 end
 

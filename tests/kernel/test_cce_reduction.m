@@ -70,6 +70,43 @@ end
 result=test_close(result,'All order prefixes',prefix_error,0,3e-13,0,...
                   'powers are recomputed for each prefix rather than reused from maximum order');
 
+% Periodic segments cancel all but the two adjacent length tiers
+cycle=graph;
+cycle.adjacency(1,4)=true;
+cycle.adjacency(4,1)=true;
+segment_par=parameters;
+segment_par.expansion='periodic_segments';
+segments=cce_clusters(model,cycle,segment_par);
+segment_raw=repmat(raw(1),numel(segments)+1,1);
+for k=1:numel(segments)
+
+    % Assign unrelated complex traces so an extra baseline factor cannot cancel
+    segment_raw(k+1).cluster_id=segments(k).id;
+    segment_raw(k+1).value=exp((-0.01*k+0.07i*k)*time);
+
+end
+periodic=cce_reduce(segment_raw,segments,segment_par);
+orders=[0 segments.order];
+result=test_true(result,'Only periodic segments',isequal(segments(1).actual_counts,[4 4 4]),...
+                 'the cycle includes the wrap-around bond without disconnected subsets');
+for n=1:3
+
+    % Compare signed powers with adjacent-order products of the unnormalised traces
+    expected=prod([segment_raw(orders==n).value],2);
+    if n>1
+        expected=expected./prod([segment_raw(orders==n-1).value],2);
+    end
+    result=test_close(result,sprintf('Periodic segment order %d',n),...
+                      periodic.by_order(:,:,n+1),expected,3e-13,3e-13,...
+                      'each smaller segment cancels except the adjacent overlap');
+
+end
+segment_raw(find(orders==2,1)).value(2)=0;
+periodic=cce_reduce(segment_raw,segments,segment_par);
+result=test_true(result,'Unresolved periodic overlap',~periodic.valid(2)&&...
+                 strcmp(periodic.reason{2},'denominator_unresolved'),...
+                 'a zero length-two trace makes the length-three ratio unresolved');
+
 % Additive quadratic set functions have known singleton and pair cumulants
 parameters.method='noise';
 parameters.order=4;

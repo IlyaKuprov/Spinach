@@ -21,7 +21,6 @@ gamma_e=-17608.59705;
 sys.magnet=0.05;
 sys.isotopes=[{'E3'} repmat({'13C'},1,count)];
 sys.output='hush';
-sys.parallel={'processes',1};
 shift=1e6*(gamma_c*1e7/spin('13C')-1);
 inter.zeeman.matrix=[{zeros(3)} repmat({shift*eye(3)},1,count)];
 
@@ -38,25 +37,9 @@ for n=1:count
 
 end
 
-% The cluster graph contains precisely the retained carbon-carbon dipoles
-adjacency=false(count);
-for n=1:count
-
-    % Get neighbours within the pair cutoff, without counting pairs twice
-    separation=xyz-xyz(n,:);
-    distance=vecnorm(separation,2,2);
-    for k=find((distance<=6)&((1:count).'>n)).'
-
-        % Cartesian carbon-carbon coupling in Hz
-        direction=separation(k,:)/distance(k);
-        strength=1.05457172*gamma_c^2*1000/(2*pi*distance(k)^3);
-        inter.coupling.matrix{n+1,k+1}=strength*(eye(3)-3*(direction.'*direction));
-        adjacency(n,k)=true;
-        adjacency(k,n)=true;
-
-    end
-
-end
+% Let create build the carbon-carbon dipoles within 6 Angstrom
+sys.tols.prox_cutoff=6;
+inter.coordinates=[{[]}; num2cell(xyz,2)];
 
 % Native projected CCE for the 0/-1 transition
 bas.formalism='zeeman-hilb';
@@ -68,7 +51,7 @@ parameters.transition.ms=[0 -1];
 parameters.times=linspace(0,1e-4,501);
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','explicit','adjacency',sparse(adjacency));
+parameters.cce.graph=struct('mode','coupling','threshold',0);
 parameters.cce.bath_state.mode='mixed_product';
 parameters.cce.basis=bas;
 parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...

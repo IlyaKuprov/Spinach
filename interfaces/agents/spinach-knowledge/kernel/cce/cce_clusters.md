@@ -2,7 +2,7 @@
 
 ## Native role and invocation
 
-Internal deterministic, downward-closed cluster-family enumerator. clexpn supplies a compiled model and resolved selection policy.
+Internal deterministic cluster-family enumerator. clexpn supplies a compiled model and resolved selection policy.
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
@@ -18,6 +18,7 @@ Enumerate a deterministic subset-closed CCE cluster family.
 
 - When `numerics.max_memory_bytes` is supplied, graph/frontier growth, closure/sorting copies, decimal family signatures, and final cluster/subset metadata are checked before allocation (`cce_clusters:memory`). A cluster-count cap does not substitute for a byte budget; standalone combinatorial calls without `numerics` retain their existing unbudgeted contract.
 - Enumerates connected candidate clusters through the requested order; disconnected subsets required by retained clusters are restored for recursive reduction.
+- `periodic_segments` requires a single cycle and a truncated order and keeps only contiguous segments; disconnected subsets are not restored.
 - Applies optional per-order cluster caps and explicit group-cluster selection deterministically, preserving physical-ID and subset bookkeeping.
 - Partition mode expands group clusters into physical sites, so the reported order counts groups, not physical spins.
 

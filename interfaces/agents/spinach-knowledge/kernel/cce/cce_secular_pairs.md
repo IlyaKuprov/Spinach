@@ -1,6 +1,6 @@
 # kernel/cce/cce_secular_pairs.m
 
-[`cce_secular_pairs`](../../../../../kernel/cce/cce_secular_pairs.m) computes a secular CCE-2 Hahn echo for an unpolarised bath of identical spin-½ nuclei with longitudinal dipolar hyperfine couplings. It is the analytical pair calculator used by the Er:CaWO₄ figure example, not a substitute for `clexpn` with arbitrary Hamiltonians or bath preparations.
+[`cce_secular_pairs`](../../../../../kernel/cce/cce_secular_pairs.m) computes a secular CCE-2 Hahn echo for an unpolarised bath of identical spin-½ nuclei with longitudinal dipolar hyperfine couplings. This direct helper and the compact `clexpn` Hahn route share the streamed pair reduction. The Er:CaWO₄ demonstration uses the native context with a compact created system.
 
 ```matlab
 echo=cce_secular_pairs(xyz,field_axis,hyperfine,dipolar,times,abs_tol)

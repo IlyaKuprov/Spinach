@@ -3,7 +3,10 @@
 % ensemble means over 50 independently sampled baths of each type.
 % Numerical inputs are from the authors' Fortran and supplemental theory
 % in doi:10.7910/DVN/9VSAUT. Original bath realisations and seeds were not
-% archived; the continuum is sampled uniformly with no hard core.
+% archived. The amorphous sampling in the authors' Fortran sets no minimum
+% distance and lets nuclei overlap; this is corrected here by rejecting
+% continuum sites closer than 1.12 Angstrom, twice the Shannon crystal
+% radius of four-coordinate W(6+).
 %
 % ilya.kuprov@weizmann.ac.il
 
@@ -13,6 +16,7 @@ function cce_erbium_cawo4()
 cell_size=1e-10*[5.2429 5.2429 11.3737];
 radius=11e-9;
 abundance=0.145;
+min_dist=2*0.56e-10;
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
 parameters.orientation=deg2rad([0 90 133.5]);
@@ -47,12 +51,27 @@ occupied=cell(n_configs,1);
 amorphous=cell(n_configs,1);
 for n=1:n_configs
 
-    % Select isotope sites by Bernoulli occupancy and sample uniform continuum positions
+    % Select isotope sites by Bernoulli occupancy
     stream=RandStream('mrg32k3a','Seed',1);
     stream.Substream=n;
     occupied{n}=lattice(rand(stream,size(lattice,1),1)<abundance,:);
-    directions=randn(stream,n_amorphous,3);
-    amorphous{n}=radius*rand(stream,n_amorphous,1).^(1/3).*directions./vecnorm(directions,2,2);
+
+    % Add uniform continuum sites one at a time
+    amorphous{n}=zeros(n_amorphous,3);
+    k=0;
+    while k<n_amorphous
+
+        % Draw a trial site uniformly within the bath sphere
+        direction=randn(stream,1,3);
+        site=radius*rand(stream)^(1/3)*direction/norm(direction,2);
+
+        % Accept the site if it respects the hard core
+        if all(vecnorm(amorphous{n}(1:k,:)-site,2,2)>=min_dist)
+            k=k+1;
+            amorphous{n}(k,:)=site;
+        end
+
+    end
 
 end
 

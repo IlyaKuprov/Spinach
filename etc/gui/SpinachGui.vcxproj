@@ -106,13 +106,10 @@
     <ClCompile Include="3D Engine\MetaBall.cpp" />
     <ClCompile Include="3D Engine\OpenGL.cpp" />
     <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="IO Formats\COSMOS.cpp" />
     <ClCompile Include="FilterFile.cpp" />
-    <ClCompile Include="IO Formats\ADF.cpp" />
     <ClCompile Include="IO Formats\Castep.cpp" />
     <ClCompile Include="IO Formats\EasySpin.cpp" />
     <ClCompile Include="IO Formats\Gauss.cpp" />
-    <ClCompile Include="IO Formats\GAMESS.cpp" />
     <ClCompile Include="IO Formats\IOSpinSystem.cpp" />
     <ClCompile Include="IO Formats\MOL.cpp" />
     <ClCompile Include="IO Formats\Orca.cpp" />
@@ -142,17 +139,14 @@
     <ClInclude Include="BalloonToolTip.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="IO Formats\COSMOS.h" />
     <ClInclude Include="FilterFile.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="IO Formats\ADF.h" />
     <ClInclude Include="IO Formats\Castep.h" />
     <ClInclude Include="IO Formats\EasySpin.h">
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="IO Formats\Gauss.h" />
-    <ClInclude Include="IO Formats\GAMESS.h" />
     <ClInclude Include="IO Formats\IOSpinSystem.h" />
     <ClInclude Include="IO Formats\MOL.h" />
     <ClInclude Include="IO Formats\Orca.h" />

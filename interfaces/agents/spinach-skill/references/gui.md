@@ -31,7 +31,7 @@ H -0.240  0.927  0.000
 
 ## From quantum chemistry output to a calculation
 
-Select the reader for the **program**, not just the filename suffix. Pick one independently identifiable atom, one nonzero diagonal, one off-diagonal and, where available, a coupling pair from the original output. Check their isotope, frame, unit and imported values. When filtering is offered, distinguish exclusion from the model from hiding a term in Visualization. Record the threshold and the shielding reference if either affects the model.
+For electronic-structure data choose Gaussian, ORCA or CASTEP. Select the reader for the **program**, not just the filename suffix. Pick one independently identifiable atom, one nonzero diagonal, one off-diagonal and, where available, a coupling pair from the original output. Check their isotope, frame, unit and imported values. When filtering is offered, distinguish exclusion from the model from hiding a term in Visualization. Record the threshold and the shielding reference if either affects the model.
 
 Use **Spinach export** for a MATLAB spin-system function. Check the isotope ordering, empty electron coordinate slots, coupling units and the lab-frame Zeeman matrices in the generated file. A quadrupole tensor should be traceless, and a Gaussian susceptibility should have a centre at the origin. The editable SpinXML writer does not preserve the separate molecular susceptibility field; keep the calculation output. Use a valid MATLAB function name when saving. Run the generated function with Spinach on the MATLAB path before claiming it executes; creating a system and basis does not by itself calculate an experimental observable.
 
@@ -40,3 +40,5 @@ For EasySpin, SIMPSON and SpinEvolution, use the corresponding exporter and insp
 ## Where to investigate discrepancies
 
 If coordinate magnitudes are wrong, inspect the selected reader and its input units before the renderer. If principal values match but the axes differ, compare the local tensor, frame chain and lab-frame rotation. If the saved scientific values agree but the view differs, isolate the atom, bond or tensor display pass, selection state and visibility controls. Use the source-matched knowledge leaves under spinach-knowledge/etc/gui for the specific component; the MATLAB interfaces/spinxml code is a separate implementation.
+
+The editor accepts up to 4096 atoms; electron spin sites do not count towards this limit.

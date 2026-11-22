@@ -113,7 +113,7 @@ if isfield(parameters,'grid')
         grid.(field{1})=double(data(indices));
     end
     grid.weights=grid.weights/sum(grid.weights);
-    if ~isempty(getCurrentTask())&&~isfield(spin_system.inter,'dipolar_geometry')
+    if ~isempty(getCurrentTask())&&~isfield(spin_system.inter.coupling,'hyperfine')
         parameters.cce.parallel.mode='serial';
     end
 end
@@ -302,7 +302,7 @@ pulse_sequence=schedule.pulse_sequence;
 contract=schedule.contract;
 
 % Reduce an implicit complete family under the analytical Hahn assumptions
-if isfield(spin_system.inter,'dipolar_geometry')
+if isfield(spin_system.inter.coupling,'hyperfine')
     diagnostics.reduction=cce_analytical_hahn(spin_system,parameters,pulse_sequence,assumptions);
     diagnostics.policy=policy;
     diagnostics.policy.backend='analytical_hahn';

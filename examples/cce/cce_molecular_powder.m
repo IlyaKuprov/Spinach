@@ -18,8 +18,8 @@ sys.isotopes=[{'E'} repmat({'1H'},1,size(protons,1))];
 sys.parallel={'processes',1};
 sys.output='hush';
 inter.coordinates=num2cell([zeros(1,3); protons(:,1:3)],2);
-inter.dipolar_geometry.hyperfine=reshape(protons(:,4:12).',3,3,[])/(2*pi);
-inter.dipolar_geometry.nuclear=xyz2dd([0 0 0],[1 0 0],'1H','1H')/(2*pi);
+inter.coupling.hyperfine=reshape(protons(:,4:12).',3,3,[])/(2*pi);
+inter.coupling.nuclear=xyz2dd([0 0 0],[1 0 0],'1H','1H')/(2*pi);
 
 % Evaluate the complete secular pair expansion at every powder node before averaging
 parameters.observed=1;

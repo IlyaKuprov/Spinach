@@ -36,10 +36,10 @@ reduced.by_order_reason=repmat({'ok'},shape);
 if order==2
 
     % Project central hyperfine interactions along the field in the molecular frame
-    model=spin_system.inter.dipolar_geometry;
+    model=spin_system.inter.coupling;
     R=euler2dcm(parameters.orientation);
     axis=R(3,:).';
-    xyz=model.xyz(2:end,:)-model.xyz(1,:);
+    xyz=vertcat(spin_system.inter.coordinates{2:end})-spin_system.inter.coordinates{1};
     if isscalar(model.hyperfine)
         dist=vecnorm(xyz,2,2);
         hf=model.hyperfine*(1-3*((xyz*axis)./dist).^2)./dist.^3;
@@ -70,7 +70,7 @@ end
 % Enforce the physical and algorithmic domain of the approximation
 function grumble(spin_system,p,sequence,assumptions)
 c=p.cce;
-if ~isfield(spin_system.inter,'dipolar_geometry')||...
+if ~isfield(spin_system.inter.coupling,'hyperfine')||...
    ~isequal(sequence,@hahn_echo)||~strcmp(assumptions,'labframe')||...
    ~isequal(p.observed,1)||~isequal(c.bath_spins,2:spin_system.comp.nspins)||...
    ~isfield(p,'transition')||~isfield(p.transition,'ms')||...

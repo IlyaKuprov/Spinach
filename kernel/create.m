@@ -21,7 +21,7 @@
 %                  to store simulation information
 %
 % For compact point-dipole baths, inter.coordinates supplies every site in
-% Angstrom, with the effective electron first. inter.dipolar_geometry has
+% Angstrom, with the effective electron first. inter.coupling has
 % nuclear (Hz Angstrom^3) and hyperfine (Hz Angstrom^3 for a point dipole,
 % or 3-by-3-by-N tensors in Hz for N nuclei). inter.tunnel_splittings, if
 % present, is a sparse symmetric N-by-N matrix in Hz, with zero diagonal.
@@ -936,14 +936,13 @@ else
 end
     
 % Store either compact point-dipole geometry or the ordinary interaction tables
-if isfield(inter,'dipolar_geometry')
+if isfield(inter,'coupling')&&any(isfield(inter.coupling,{'hyperfine','nuclear'}))
 
     % Canonicalise positions and angular-frequency inputs without enumerating pairs
-    model=inter.dipolar_geometry;
+    model=inter.coupling;
     spin_system.inter.coordinates=inter.coordinates;
-    spin_system.inter.dipolar_geometry=struct('xyz',vertcat(inter.coordinates{:}),...
-                                              'nuclear',2*pi*double(model.nuclear),...
-                                              'hyperfine',2*pi*double(model.hyperfine));
+    spin_system.inter.coupling.nuclear=2*pi*double(model.nuclear);
+    spin_system.inter.coupling.hyperfine=2*pi*double(model.hyperfine);
     n_bath=spin_system.comp.nspins-1;
     if isfield(inter,'tunnel_splittings')
         spin_system.inter.tunnel_splittings=2*pi*double(inter.tunnel_splittings);
@@ -1832,10 +1831,10 @@ if isfield(inter,'coordinates')
 end
 
 % Check the compact point-dipole declaration
-if isfield(inter,'dipolar_geometry')
-    model=inter.dipolar_geometry;
+if isfield(inter,'coupling')&&any(isfield(inter.coupling,{'hyperfine','nuclear'}))
+    model=inter.coupling;
     n_bath=numel(sys.isotopes)-1;
-    if any(~ismember(fieldnames(inter),{'coordinates','dipolar_geometry',...
+    if any(~ismember(fieldnames(inter),{'coordinates','coupling',...
                                         'tunnel_splittings','chem','temperature'}))||...
        ~isfield(inter.chem,'parts')||~isequal(inter.chem.parts,{1:(n_bath+1)})||...
        isfield(inter.chem,'reactions')
@@ -1859,7 +1858,7 @@ if isfield(inter,'dipolar_geometry')
     end
     if ~isstruct(model)||~isscalar(model)||...
        ~all(isfield(model,{'nuclear','hyperfine'}))||numel(fieldnames(model))~=2
-        error('inter.dipolar_geometry must contain nuclear and hyperfine.');
+        error('inter.coupling must contain nuclear and hyperfine.');
     end
     if ~isnumeric(model.nuclear)||~isreal(model.nuclear)||...
        ~isscalar(model.nuclear)||~isfinite(2*pi*double(model.nuclear))

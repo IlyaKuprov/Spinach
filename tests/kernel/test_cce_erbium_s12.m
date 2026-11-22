@@ -79,8 +79,8 @@ end
 sys.magnet=0.067;
 sys.output='hush';
 sys.parallel={'processes',1};
-inter.dipolar_geometry.hyperfine=1e30*hyperfine/(2*pi);
-inter.dipolar_geometry.nuclear=1e30*dipolar/(2*pi);
+inter.coupling.hyperfine=1e30*hyperfine/(2*pi);
+inter.coupling.nuclear=1e30*dipolar/(2*pi);
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
 parameters.orientation=deg2rad([0 90 133.5]);
@@ -115,8 +115,8 @@ result=test_true(result,'Reported screening bound',...
 parameters.cce.numerics.atol=0;
 
 % With no couplings every flip-flop splitting vanishes
-inter.dipolar_geometry.hyperfine=0;
-inter.dipolar_geometry.nuclear=0;
+inter.coupling.hyperfine=0;
+inter.coupling.nuclear=0;
 spin_system=create(sys,inter);
 answer=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 result=test_true(result,'Zero splitting',all(answer==1),...

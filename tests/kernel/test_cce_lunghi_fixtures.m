@@ -72,8 +72,8 @@ for case_id=1:2
     end
     d=input.center.D_kHz(1);
     e=input.center.D_kHz(2);
-    ss.inter.coupling.matrix{1,1}=2*pi*1000*diag([-d/3+e -d/3-e 2*d/3]);
-    ss.inter.coupling.matrix{1,2}=2*pi*1000*input.center.A_kHz.';
+    ss=cce_test_write(ss,[1 1],2*pi*1000*diag([-d/3+e -d/3-e 2*d/3]));
+    ss=cce_test_write(ss,[1 2],2*pi*1000*input.center.A_kHz.');
 
     % Construct source-convention point dipoles independently of the CCE builder
     for j=1:4
@@ -82,7 +82,7 @@ for case_id=1:2
             distance=norm(r);
             tensor=1.05457172*(eye(3)-3*(r.'*r)/distance^2)/distance^3;
             tensor=gyros{j}*tensor*gyros{k};
-            ss.inter.coupling.matrix{j,k}=1000*tensor.';
+            ss=cce_test_write(ss,[j k],1000*tensor.');
         end
     end
 

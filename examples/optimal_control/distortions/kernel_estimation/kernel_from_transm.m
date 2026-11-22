@@ -8,8 +8,7 @@
 % The measurement has no phase information; the kernel is
 % therefore taken to be the minimum-phase kernel with the
 % measured amplitude spectrum, obtained by the real cepstrum
-% (Kramers-Kronig) construction. The zero-phase alternative
-% would be symmetric in time and thus non-causal.
+% (Kramers-Kronig) construction.
 %
 % Rob Hunter, Hassane el-Mkami, Graham Smith,
 % Yujie Zhao, Shebha Anandhi Jegadeesan,
@@ -28,7 +27,6 @@ kfigure(); scale_figure([0.75 1.00]);
 subplot(2,1,1); plot(freq_axis_ghz,amp,'Color',[0.85 0.85 0.85]);
 hold on; kxlabel('frequency, GHz'); kgrid; xlim tight;
 kylabel('filter ampl.'); ylim padded;
-ktitle('transmission spectrum');
 
 % Get apodisation weights
 leave_intact=(freq_axis_ghz>93.4)&...
@@ -42,9 +40,9 @@ amp=resample(amp.*weights',1,1000);
 freq_axis_ghz=linspace(freq_axis_ghz(1),...
                        freq_axis_ghz(end),numel(amp))';
 plot(freq_axis_ghz,weights(1:1000:end),'r-');
-plot(freq_axis_ghz,amp,'k-'); 
+plot(freq_axis_ghz,amp,'k-');
 klegend({'spectrum raw','window function',...
-         'spectrum filtered'},'Location','Best');
+         'spectrum filtered'},'location','south');
 
 % Zero-fill the amplitude spectrum and put 94.0 GHz at zero frequency
 amp_spec=ifftshift([zeros(size(amp)); zeros(size(amp)); amp;
@@ -66,7 +64,6 @@ save('hiper_kernel_trans.mat','h');
 subplot(2,1,2); plot(t,[real(h) imag(h)]);
 kxlabel('time, ns'); kgrid; xlim tight; ylim padded;
 kylabel('filter ampl.'); klegend({'in-phase','quadrature'});
-ktitle('filter kernel at 94.0 GHz offset');
 
 end
 

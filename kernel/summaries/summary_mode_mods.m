@@ -32,32 +32,32 @@ report(spin_system,'Mode A  Mode B  Order  Modulation target    Norm, Hz        
 report(spin_system,'-------------------------------------------------------------');
 
 % Print coupling tensor derivatives
-[rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.coupling_mod));
-for n=1:numel(rows)
-    deriv_orders=spin_system.inter.modes.coupling_mod{rows(n),cols(n)};
+pairs=spin_system.inter.modes.coupling_mod;
+for n=1:size(pairs,1)
+    deriv_orders=pairs{n,3};
     for m=1:numel(deriv_orders)
         if ~isempty(deriv_orders{m})
-            [spr,spc]=find(~cellfun(@isempty,deriv_orders{m}));
-            for k=1:numel(spr)
-                target=['coupling {' num2str(spr(k)) ',' num2str(spc(k)) '}'];
-                report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
+            blocks=deriv_orders{m};
+            for k=1:size(blocks,1)
+                target=['coupling {' num2str(blocks{k,1}) ',' num2str(blocks{k,2}) '}'];
+                report(spin_system,[pad(num2str(pairs{n,1}),8) pad(num2str(pairs{n,2}),8)...
                                     pad(num2str(m),7) pad(target,21)...
-                                    num2str(norm(deriv_orders{m}{spr(k),spc(k)},'fro')/(2*pi),'%+10.4e')]);
+                                    num2str(norm(blocks{k,3},'fro')/(2*pi),'%+10.4e')]);
             end
         end
     end
 end
 
 % Print effective field derivatives
-[rows,cols]=find(~cellfun(@isempty,spin_system.inter.modes.zeeman_mod));
-for n=1:numel(rows)
-    deriv_orders=spin_system.inter.modes.zeeman_mod{rows(n),cols(n)};
+pairs=spin_system.inter.modes.zeeman_mod;
+for n=1:size(pairs,1)
+    deriv_orders=pairs{n,3};
     for m=1:numel(deriv_orders)
         if ~isempty(deriv_orders{m})
             spr=find(~cellfun(@isempty,deriv_orders{m}));
             for k=1:numel(spr)
                 target=['field, spin ' num2str(spr(k))];
-                report(spin_system,[pad(num2str(rows(n)),8) pad(num2str(cols(n)),8)...
+                report(spin_system,[pad(num2str(pairs{n,1}),8) pad(num2str(pairs{n,2}),8)...
                                     pad(num2str(m),7) pad(target,21)...
                                     num2str(norm(deriv_orders{m}{spr(k)},2)/(2*pi),'%+10.4e')]);
             end

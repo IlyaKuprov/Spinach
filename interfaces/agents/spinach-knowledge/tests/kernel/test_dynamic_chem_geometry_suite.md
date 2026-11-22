@@ -37,3 +37,5 @@ The function takes no inputs. It returns `result`, a regression test result obje
 ## References
 
 - Source file: [https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_chem_geometry_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_dynamic_chem_geometry_suite.m)
+
+The bidirectional coupling check uses two unequal directed tensors.

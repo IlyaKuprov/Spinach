@@ -51,19 +51,17 @@ grumble(model,parameters);
 [~,observed_pos]=ismember(model.observed_ids,model.physical_ids);
 ids=model.bath_ids;
 n=numel(ids);
-nc=numel(observed_pos);
 
 % Obtain physical two-spin operator norms before graph pruning
-pair_norm=zeros(n);
-attachments=false(n,nc);
+ends=reshape([model.pairs.ids],2,[]);
+[~,positions]=ismember(ends,model.physical_ids);
+weights=zeros(1,numel(model.pairs));
 for k=1:numel(model.pairs)
 
     % Resolve this unordered physical pair
     pair=model.pairs(k);
-    [~,a]=ismember(pair.ids(1),model.physical_ids);
-    [~,b]=ismember(pair.ids(2),model.physical_ids);
-    ma=model.multiplicities(a);
-    mb=model.multiplicities(b);
+    ma=model.multiplicities(positions(1,k));
+    mb=model.multiplicities(positions(2,k));
     spins=cell(2,3);
     for q=1:2
 
@@ -84,27 +82,22 @@ for k=1:numel(model.pairs)
             interaction=interaction+pair.tensor(u,v)*kron(spins{1,u},spins{2,v});
         end
     end
-    strength=norm(interaction,2);
-
-    % Accumulate bath edges and exact observed attachment topology
-    ia=find(ids==pair.ids(1));
-    ib=find(ids==pair.ids(2));
-    ca=find(model.observed_ids==pair.ids(1));
-    cb=find(model.observed_ids==pair.ids(2));
-    if ~isempty(ia)&&~isempty(ib)
-        pair_norm(ia,ib)=strength;
-        pair_norm(ib,ia)=strength;
-    elseif ~isempty(ia)&&~isempty(cb)
-        attachments(ia,cb)=strength>0;
-    elseif ~isempty(ib)&&~isempty(ca)
-        attachments(ib,ca)=strength>0;
-    end
+    weights(k)=norm(interaction,2);
 
 end
 
-% Keep the observed-spin system joint unless state/detection factorisation is proven
-attached=any(attachments,2);
-mediated=attached&attached.';
+% Accumulate the bath edges and exact observed attachment topology
+[~,bath]=ismember(ends,ids);
+internal=all(bath>0,1);
+a=bath(1,internal);
+b=bath(2,internal);
+pair_norm=sparse([a b],[b a],[weights(internal) weights(internal)],n,n);
+observed=any(ismember(ends,model.observed_ids),1);
+attachments=sum(bath(:,observed&(weights>0)),1);
+attached=sparse(attachments(attachments>0),1,true,n,1);
+
+% Keep the observed-spin system joint unless factorisation is proven
+mediated=logical(attached*attached.');
 mediated(1:n+1:end)=false;
 
 % Construct scores without modifying the Hamiltonian or edge norms
@@ -112,10 +105,12 @@ scores=pair_norm;
 if isfield(parameters.graph,'score')
     switch parameters.graph.score
         case 'resonance'
-            scores=pair_norm./hypot(1,parameters.graph.mismatch/...
-                                     parameters.graph.mismatch_scale);
+            [a,b,value]=find(pair_norm);
+            offsets=sub2ind([n n],a,b);
+            value=value./hypot(1,parameters.graph.mismatch(offsets)/parameters.graph.mismatch_scale);
+            scores=sparse(a,b,value,n,n);
         case 'supplied'
-            scores=parameters.graph.scores;
+            scores=sparse(parameters.graph.scores);
     end
 end
 scores(1:n+1:end)=0;
@@ -123,17 +118,28 @@ scores(1:n+1:end)=0;
 % Apply only the explicitly requested graph criterion
 switch parameters.graph.mode
     case 'complete'
-        adjacency=~eye(n);
+        adjacency=~speye(n);
     case 'distance'
         xyz=model.coordinates_A(bath_pos,:);
-        adjacency=false(n);
-        for k=1:n
-            adjacency(k,:)=vecnorm(xyz-xyz(k,:),2,2)<=parameters.graph.radius;
+        radius=parameters.graph.radius;
+        if radius==0
+
+            % Exact coordinate duplicates are connected even at zero radius
+            [~,~,group]=unique(xyz,'rows');
+            sites=sparse(1:n,group,1,n,n);
+            adjacency=logical(sites*sites.');
+        else
+
+            % Include all pairs on the cutoff shell
+            [origins,targets]=nearby_points(xyz,xyz,radius);
+            adjacency=sparse(origins,targets,true,n,n);
         end
     case 'coupling'
-        adjacency=(scores>0)&(scores>=parameters.graph.threshold);
+        [a,b,value]=find(scores);
+        keep=value>=parameters.graph.threshold;
+        adjacency=sparse(a(keep),b(keep),true,n,n);
     case 'explicit'
-        adjacency=full(parameters.graph.adjacency);
+        adjacency=parameters.graph.adjacency;
 end
 adjacency(1:n+1:end)=false;
 
@@ -284,12 +290,12 @@ if isfield(g,'score')
            ~isnumeric(g.mismatch_scale)||~isreal(g.mismatch_scale)||...
            ~isscalar(g.mismatch_scale)||~isfinite(g.mismatch_scale)||g.mismatch_scale<=0||...
            ~isnumeric(g.mismatch)||~isreal(g.mismatch)||~isequal(size(g.mismatch),[n n])||...
-           any(~isfinite(g.mismatch),'all')||~isequal(abs(g.mismatch),abs(g.mismatch.'))
+           any(~isfinite(nonzeros(g.mismatch)))||~isequal(abs(g.mismatch),abs(g.mismatch.'))
             error('cce_graph:score','resonance needs symmetric absolute mismatches and positive scale.');
         end
     elseif strcmp(g.score,'supplied')
         if ~isfield(g,'scores')||~isnumeric(g.scores)||~isreal(g.scores)||...
-           ~isequal(size(g.scores),[n n])||any(~isfinite(g.scores),'all')||...
+           ~isequal(size(g.scores),[n n])||any(~isfinite(nonzeros(g.scores)))||...
            any(g.scores<0,'all')||~isequal(g.scores,g.scores.')
             error('cce_graph:score','supplied scores must be finite symmetric nonnegative.');
         end

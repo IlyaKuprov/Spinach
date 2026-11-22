@@ -83,20 +83,23 @@ inter.flux_type='intermolecular';
 bas.formalism='sphten-liouv'; bas.approximation={'none'};
 s=test_spin_system(sys,inter,bas);
 
-% Spin removal retains the original flux matrix indexing contract
+% Spin removal drops records incident on the deleted spin
 reduced=kill_spin(s,3);
-result=test_close(result,'flux indices after spin removal',...
-                  reduced.rlx.flux_rate,inter.flux_rate(1:2,1:2),0,0,...
-                  'removed spins lose their incoming and outgoing flux entries');
+expected={1 1 11; 2 1 2000; 1 2 500; 2 2 13};
+result=test_true(result,'flux indices after spin removal',...
+                 isequal(reduced.rlx.flux_rate,expected),...
+                 'removed spins lose their incoming and outgoing flux entries');
 
+% Assert direction and order independently of the generator
+expected=[expected; {3 2 30; 2 3 70; 3 3 17}];
 result=test_true(result,'original flux inputs retained',...
-                 isequal(s.rlx.flux_rate,inter.flux_rate)&&...
+                 isequal(s.rlx.flux_rate,expected)&&...
                  strcmp(s.rlx.flux_type,inter.flux_type),...
-                 'point-to-point rates retain their original matrix orientation');
+                 'point-to-point records retain matrix orientation and column-major order');
 for type={'intermolecular','intramolecular'}
     s.rlx.flux_type=type{1};
     result=test_close(result,[type{1} ' full flux generator'],...
-                      relaxation(s),original_flux(s),0,0,...
+                      relaxation(s),original_flux(s,inter.flux_rate),0,0,...
                       'single-spin gains, losses, correlations, and diagonal rates match the original generator');
 end
 result=test_close(result,'flux not duplicated in kinetics',kinetics(s),...
@@ -108,7 +111,7 @@ multi=inter; multi.chem.parts={[1 3],2}; multi.chem.concs=[1 1];
 local=bas; local.approximation={'none','none'};
 m=test_spin_system(sys,multi,local);
 result=test_close(result,'flux across local descriptor blocks',...
-                  relaxation(m),original_flux(m),0,0,...
+                  relaxation(m),original_flux(m,inter.flux_rate),0,0,...
                   'global spin labels are translated to local descriptor columns and offsets');
 
 % Relaxation retention and thermalisation must not act on the flux generator
@@ -122,22 +125,22 @@ for keep={'diagonal','secular','labframe'}
         if strcmp(destination{1},'dibari')
             work.sys.disable=[work.sys.disable {'high_temp'}];
         end
-        bare=work; bare.rlx.flux_rate=[]; bare.rlx.flux_type='';
+        bare=work; bare.rlx.flux_rate=cell(0,3); bare.rlx.flux_type='';
         result=test_close(result,['flux after ' keep{1} ' ' destination{1}],...
-                          relaxation(work)-relaxation(bare),original_flux(work),1e-12,1e-12,...
+                          relaxation(work)-relaxation(bare),original_flux(work,inter.flux_rate),1e-12,1e-12,...
                           'flux is added after relaxation processing, as the old separate K was');
     end
 end
 work.tols.rlx_zero=1e5;
 result=test_close(result,'flux bypasses relaxation zero threshold',...
-                  relaxation(work),original_flux(work),0,0,...
+                  relaxation(work),original_flux(work,inter.flux_rate),0,0,...
                   'relaxation-specific numerical thresholds must not erase historical flux');
 
 % Original no-flux defaults and paired-field validation remain unchanged
 bare=rmfield(inter,{'flux_rate','flux_type'}); bare.relaxation={};
 bare=test_spin_system(sys,bare,bas);
 result=test_true(result,'original no-flux defaults',...
-                 isempty(bare.rlx.flux_rate)&&isempty(bare.rlx.flux_type),...
+                 isequal(bare.rlx.flux_rate,cell(0,3))&&isempty(bare.rlx.flux_type),...
                  'absent flux inputs produce the original empty defaults');
 invalid={struct('flux_rate',zeros(3)),struct('flux_type','intermolecular'),...
          struct('flux_rate',zeros(2),'flux_type','intermolecular'),...
@@ -171,7 +174,7 @@ result=test_true(result,'original tensor-label compatibility',rejected,...
 end
 
 % Historical row-mask definition, evaluated on the current direct-sum row labels
-function F=original_flux(s)
+function F=original_flux(s,flux_rate)
 
 % Embed local descriptors only in this small independent regression reference
 b=zeros(s.bas.offsets(end),s.comp.nspins);
@@ -180,7 +183,7 @@ for n=1:numel(s.chem.parts)
     b(rows,s.chem.parts{n})=s.bas.basis{n};
 end
 orders=sum(logical(b),2); F=sparse(size(b,1),size(b,1));
-[from,to,rates]=find(s.rlx.flux_rate);
+[from,to,rates]=find(flux_rate);
 for n=1:numel(rates)
     for order=1:2
         mask=(orders==1);
@@ -200,8 +203,6 @@ for n=1:numel(rates)
 end
 
 end
-
-
 
 % Flux must remain compatible with recursive relaxation, assembly, and propagation
 function result=flux_consumer_checks(result)
@@ -224,7 +225,7 @@ for destination={'zero','IME','dibari'}
     if strcmp(destination{1},'dibari')
         work.sys.disable=[work.sys.disable {'high_temp'}];
     end
-    bare=work; bare.rlx.flux_rate=[]; bare.rlx.flux_type='';
+    bare=work; bare.rlx.flux_rate=cell(0,3); bare.rlx.flux_type='';
     bath=relaxation(bare);
     result=test_close(result,['SRSK once-only flux ' destination{1}],...
                       relaxation(work)-bath,F,100*eps(norm(bath,'fro')),0,...
@@ -286,7 +287,7 @@ result=test_close(result,'reduced cross-substance flux propagation',current,...
                   'trajectory reduction retains source and destination in one coupled space');
 
 % The unrelated cross-substance prohibition remains when no coupling is specified
-bare=s; bare.rlx.flux_rate=[]; bare.rlx.flux_type=''; rejected=false;
+bare=s; bare.rlx.flux_rate=cell(0,3); bare.rlx.flux_type=''; rejected=false;
 try
     reduce(bare,1i*F,rho);
 catch err
@@ -334,7 +335,7 @@ end
 inter.chem.parts={1,2}; inter.chem.concs=[1 1]; inter.flux_rate=zeros(2);
 bas.approximation={'none','none'}; sys.disable={'pt'};
 s=test_spin_system(sys,inter,bas); bare=s;
-bare.rlx.flux_rate=[]; bare.rlx.flux_type='';
+bare.rlx.flux_rate=cell(0,3); bare.rlx.flux_type='';
 rho=state(s,'Lz','1H'); dim=s.bas.offsets(end);
 L=1i*spdiags((1:dim)',0,dim,dim);
 result=test_true(result,'inactive flux preserves symmetry projectors',...

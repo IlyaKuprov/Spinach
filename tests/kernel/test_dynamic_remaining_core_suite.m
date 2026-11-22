@@ -82,9 +82,9 @@ dip_pref=0.5*dip_system.inter.gammas(1)*dip_system.inter.gammas(2)*...
          dip_system.tols.hbar*dip_system.tols.mu0/(4*pi*(1e-10)^3);
 dip_ref=dip_pref*[-2 0 0;0 1 0;0 0 1];
 result=test_close(result,'dipolar coupling tensor',...
-                  dip_system.inter.coupling.matrix{1,2},dip_ref,1e-6,1e-12,...
+                  dip_system.inter.coupling.matrix{2,3},dip_ref,1e-6,1e-12,...
                   'a unit X-axis internuclear vector gives the traceless diag([-2 1 1]) dipolar tensor');
-result=test_true(result,'dipolar proximity matrix',nnz(dip_system.inter.proxmatrix)==2,...
+result=test_true(result,'dipolar proximity matrix',isequal(cell2mat(dip_system.inter.proximity(:,1:2)),[2 1;1 2]),...
                  'both directed spin-pair proximities must be detected below the distance cutoff');
 
 % Check isotope swapping rescales spin-pair couplings and wipes quadratic terms
@@ -265,7 +265,7 @@ spin_system.chem.parts={1:2};
 spin_system.inter.coordinates={[0 0 0],[1 0 0]};
 spin_system.inter.pbc={};
 spin_system.inter.gammas=[2 3];
-spin_system.inter.coupling.matrix=cell(2,2);
+spin_system.inter.coupling.matrix=cell(0,3);
 spin_system.tols.prox_cutoff=2;
 spin_system.tols.dd_ncells=0;
 spin_system.tols.hbar=1;

@@ -13,3 +13,5 @@ Each nonempty derivative entry is listed with its two mode indices, derivative o
 ## Output and inputs
 
 The routine has no returned output. It sends the supplied header, headings, rows, and final separator through `report` to the console or configured report destination. It checks that `spin_system` is a structure and `header` is a character array; the routine does not assign fields of the input structure.
+
+The outer records identify mode pairs. Within a coupling derivative order the spin targets are themselves ordered pair records; within a field derivative order the spin index is the position in the field row.

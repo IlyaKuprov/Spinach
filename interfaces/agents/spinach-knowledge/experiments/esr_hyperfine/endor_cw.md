@@ -28,3 +28,5 @@ This is an isotropic, approximate CW-ENDOR model, not a full field-dependent EPR
 Source: https://spindynamics.org/wiki/index.php?title=endor_cw.m
 
 Both the normalised hyperfine-weighted nuclear operator sum and the receiver use `coil_state`: their geometry is independent of substance concentrations, including zero populations. This approximate, normalised spectrum is not an absolute concentration-weighted signal.
+
+Nuclear initial-state weights use the absolute value of the sum of the two directed isotropic hyperfine contributions for each electron–nucleus pair.

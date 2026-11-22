@@ -77,6 +77,9 @@ parfor n=1:size(traj,3)
                                    double(traj_slice(:,8)')}; 
     spinsys_loc.inter.pbc={}; spinsys_loc=dipolar(spinsys_loc);
 
+    % Set laboratory frame assumptions
+    spinsys_loc=assume(spinsys_loc,'labframe');
+
     % Get the anisotropic part of the Hamiltonian
     [~,Q]=hamiltonian(spinsys_loc); H1{n}=orientation(Q,[0,0,0]);
     

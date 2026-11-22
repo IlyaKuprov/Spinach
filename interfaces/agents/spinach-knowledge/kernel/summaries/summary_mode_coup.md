@@ -13,3 +13,5 @@ For each nonempty coupling entry, the table gives the component indices, a coupl
 ## Output and inputs
 
 The routine has no returned output. It sends the supplied header, table headings, rows, and separators through `report` to the console or configured report destination. The input checks require `spin_system` to be a structure and `header` to be a character array; no input-structure fields are assigned by the routine.
+
+Rows within each channel follow the ordered records: second particle first in the sort, then first particle. Reversing the two longitudinal indices is not a change of display order.

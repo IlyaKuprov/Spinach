@@ -23,6 +23,7 @@ parameters.orientation=deg2rad([0 90 133.5]);
 parameters.times=(0:60)*1e-3;
 parameters.cce.approximation='projected';
 parameters.cce.order=2;
+parameters.cce.backend='analytical_hahn';
 parameters.cce.numerics=struct('atol',1e-4,'max_memory_bytes',2^27);
 n_configs=50;
 
@@ -41,7 +42,7 @@ lattice=lattice(vecnorm(lattice,2,2)<=radius,:);
 n_amorphous=10346;
 
 % Effective electron g factor is specified for each physical bath below
-sys.enable={'secular_pairs'};
+sys.tols.prox_cutoff=0;
 sys.magnet=0.067;
 sys.parallel={'processes',8};
 sys.output='hush';
@@ -106,7 +107,7 @@ kgrid();
 
 end
 
-% Create one compact physical bath with the central electron first
+% Create one physical bath with the central electron first
 function spin_system=bath_system(sys,coords)
 
 % Assign physical IDs with the central electron first

@@ -46,6 +46,7 @@ bool SpinachGUI::XYZ::LoadFile(void)
 		if((fileline=ReadLine())->Length==0) continue;
 		if (!Int32::TryParse(fileline, totalAtoms ) || totalAtoms<0) { OK=false; break; } 
 
+		AtomsDictionary::CheckAtomCount(totalAtoms);
 		// The second line is a comment, even when it resembles an atom.
         fileline=ReadLine();
         for(int i=0;i<totalAtoms;i++)

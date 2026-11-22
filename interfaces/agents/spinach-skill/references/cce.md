@@ -41,7 +41,7 @@ Use `cce_transition(spin_system,parameters,assumptions)` to resolve an ordered p
 | `cce.bath_state` | Mixed or sampled product bath states; supplied samples/probabilities/seeds define the sampling problem |
 | `cce.meanfield`, `cce.meanfield_radius` | Exterior product-state field policy and optional distance cutoff |
 | `cce.groups`, `cce.partition` | Physical bath grouping and bounded partition policy |
-| `cce.backend` | `auto`, `direct` or `stock` retained-Hamiltonian construction within validated support |
+| `cce.backend` | `auto`, `direct` or `stock` retained-Hamiltonian construction within validated support; `analytical_hahn` for the closed-form Hahn pair limit |
 | `cce.numerics` | Absolute/relative accuracy and memory budget, precision, and conditioning policy |
 | `cce.parallel`, `cce.checkpoint` | Scheduling and checkpoint controls |
 | `cce.convergence` | Independent refinement controls consumed by `cce_converge` |
@@ -188,8 +188,10 @@ CPMG and ESEEM retain a floating-point propagation estimate per time and receive
 
 ### Analytical Hahn pair limit
 
-For the analytical Hahn pair expansion, set `sys.enable={'secular_pairs'}`. Supply the bath through `sys.isotopes` and `inter.coordinates` (Å). A located electron uses its Zeeman g tensor for dipolar hyperfine interactions; leave its position empty for purely measured hyperfine tensors in `inter.coupling.matrix{1,k}` (Hz). Supply isotropic bath exchange in `inter.coupling.scalar{i,j}` (Hz, upper triangle). A methyl tunnel splitting t gives exchange J = −2t/3. Nuclear dipolar interactions are calculated from the isotope and coordinates as each pair is needed.
+For the analytical Hahn pair expansion, set `parameters.cce.backend='analytical_hahn'` and create the system with `sys.tols.prox_cutoff=0`, so that `create` builds no dipolar network. Supply the bath through `sys.isotopes` and `inter.coordinates` (Å). A located electron uses its Zeeman g tensor for dipolar hyperfine interactions; leave its position empty for purely measured hyperfine tensors in `inter.coupling.matrix{1,k}` (Hz). Supply isotropic bath exchange in `inter.coupling.scalar{i,j}` (Hz). A methyl tunnel splitting t gives exchange J = −2t/3. Nuclear dipolar interactions are calculated from the isotope and coordinates as each pair is needed.
 
 Use `clexpn(spin_system,@hahn_echo,parameters,'labframe')` with `observed=1`, `transition.spins=1`, `transition.ms=[1/2 -1/2]`, `cce.approximation='projected'`, and `cce.order=2`. Supply one orientation or the ordinary explicit weighted grid. The reference and singleton echoes are unity; the complete pair product is streamed independently at each orientation and only the finished products are averaged. No bath basis, explicit graph edges, or raw pair records are allocated. `cce.numerics.atol` is the screening-loss budget (zero disables approximate screening), not a geometrical cutoff. Diagnostics report the bound separately from roundoff. Use ordinary coupling declarations and the standard projected generator for nonsecular models, nonideal pulses, or when the raw cluster responses are needed.
 
 For a paper-scale benchmark, select the material example by figure rather than assuming a common output shape. The diamond NV and SiC clock examples return order-resolved echoes; the VO(TPP) example returns register energies and fields as well as the proton echo and times. The Finland and OX063 examples compute the published powder-averaged pair-approximation curves, not small-cluster orientation demonstrations. The corresponding knowledge entries distinguish archived input realisations from independently generated baths and document numerical discrepancies.
+
+Internal model inspection: each unordered pair has a bare Cartesian tensor for graph scoring and a retained tensor for Hamiltonians. Read the retained tensor in ascending physical-ID order, transposing it for reversed sites; missing pairs have no coupling.

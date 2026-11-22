@@ -8,7 +8,7 @@ Selects interaction-strength rules for a simulation context. Call it before requ
 
 ## Selector layout
 
-For N = spin_system.comp.nspins, the function replaces spin_system.inter.zeeman.strength and spin_system.inter.giant.strength with N×1 cell arrays, and spin_system.inter.coupling.strength with an N×N cell array. The cells contain rule strings such as secular, zz, full, strong, z*, *z, or ignore. These are selectors for later Hamiltonian generation, not operators. There are no state/operator dimensions or physical units defined by this function. It does not read or write a cache.
+For N = spin_system.comp.nspins, the function replaces spin_system.inter.zeeman.strength and spin_system.inter.giant.strength with N×1 cell arrays, and spin_system.inter.coupling.strength with a directed record list with the same keys and row order as the coupling tensors. The cells contain rule strings such as secular, zz, full, strong, z*, *z, or ignore. These are selectors for later Hamiltonian generation, not operators. There are no state/operator dimensions or physical units defined by this function. It does not read or write a cache.
 
 ## Assumption sets
 
@@ -26,3 +26,5 @@ The assumptions argument must be a character string, and the source accepts two 
 ## Reference
 
 [Spin Dynamics Wiki: assume.m](https://spindynamics.org/wiki/index.php?title=assume.m)
+
+The cavity exclusions test whether longitudinal or modulation records exist, not whether their payloads have nonzero norm.

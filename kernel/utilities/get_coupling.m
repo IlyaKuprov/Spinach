@@ -21,16 +21,14 @@ function A=get_coupling(spin_system,n,k)
 % Check consistency
 grumble(spin_system,n,k);
 
-% Pull forward and backward coupling
-A=spin_system.inter.coupling.matrix{n,k};
-B=spin_system.inter.coupling.matrix{k,n};
-
-% Fill in empties
-if isempty(A), A=zeros([3 3]); end
-if isempty(B), B=zeros([3 3]); end
-
-% Add up
-A=A+B;
+% Add the forward and backward entries independently
+pairs=spin_system.inter.coupling.matrix;
+keys=reshape(cell2mat(pairs(:,1:2)),[],2);
+[found,index]=ismember([n k;k n],keys,'rows');
+A=zeros(3);
+for q=index(found)'
+    A=A+pairs{q,3};
+end
 
 end
 
@@ -51,4 +49,5 @@ end
 % это прям однозначно плохой арбуз.
 %
 % Russian internet folklore
+
 

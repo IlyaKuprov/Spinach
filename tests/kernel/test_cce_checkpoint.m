@@ -166,8 +166,9 @@ catch exception
 end
 result=test_true(result,'time identity',refused,'Time meshes are part of the restart identity.');
 changed_model=spin_system;
-changed_model.inter.coupling.matrix{1,2}(3,3)=1.01*...
-    changed_model.inter.coupling.matrix{1,2}(3,3);
+tensor_value=cce_test_read(changed_model,[1 2]);
+tensor_value(3,3)=1.01*tensor_value(3,3);
+changed_model=cce_test_write(changed_model,[1 2],tensor_value);
 refused=false;
 try
     clexpn(changed_model,@free_evolution,p,'labframe');
@@ -462,7 +463,7 @@ for method={'cce','mecce','noise','controls'}
     end
     original=clexpn(spin_system,pulse_sequence,request,'labframe'); %#ok<NASGU>
     changed_system=spin_system;
-    changed_system.inter.coupling.matrix{1,2}=2*spin_system.inter.coupling.matrix{1,2};
+    changed_system=cce_test_write(changed_system,[1 2],2*cce_test_read(spin_system,[1 2]));
     warm=clexpn(changed_system,pulse_sequence,request,'labframe');
     clear cce_hamiltonian;
     cold=clexpn(changed_system,pulse_sequence,request,'labframe');

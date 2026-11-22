@@ -27,3 +27,7 @@ Each retained image contributes a dipolar tensor proportional to `gamma_n*gamma_
 ## References
 
 - Spinach Wiki page for `dipolar.m`: [https://spindynamics.org/wiki/index.php?title=dipolar.m](https://spindynamics.org/wiki/index.php?title=dipolar.m)
+
+The proximity records store every retained displacement vector per directed pair. Each periodic image is searched against cutoff-sized bins of atoms, without constructing a pair table.
+
+The function does not read or modify interaction strength assumptions. When it adds couplings to a system on which `assume` has already been called, call `assume` again before requesting a Hamiltonian.

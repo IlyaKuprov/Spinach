@@ -30,3 +30,5 @@ The function takes no inputs.
 - Source: [tests/kernel/test_tensor_vector_suite.m](https://github.com/IlyaKuprov/Spinach/blob/main/tests/kernel/test_tensor_vector_suite.m)
 
 The synthetic compiled fixtures use per-substance descriptor cells and offsets.
+
+The coupling extractor must add both unequal tensors from the two directed records.

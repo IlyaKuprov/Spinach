@@ -1,468 +1,350 @@
 #include "../StdAfx.h"
 #include "Orca.h"
 
-//Definitions
-#define InteractionCollection  SystemModel->InteractionCollection
-#define AtomCollection  SystemModel->AtomCollection
+using namespace System::Collections::Generic;
+using namespace System::Globalization;
+using namespace System::Text::RegularExpressions;
 
-//Definitions of keywords-phrases found in this format
-#define CMD_CARTCOORD             "CARTESIAN COORDINATES (A.U.)"
-#define CMD_GTENSOR               "The g-matrix:"
-#define CMD_ZERO_FIELD            "ZERO-FIELD-SPLITTING TENSOR"
-#define CMD_CHEMICAL_SHIFTS        "CHEMICAL SHIFTS"
-#define CMD_HFC_QUAD_COUPLINGS    "ELECTRIC AND MAGNETIC HYPERFINE STRUCTURE"
-//Definition of factor from convertion from atomic units to amstrong
-#define  AUtoAmstrong             0.529177249
-
-/**
-*\file Orca.cpp
-*/
-
-/**
-* @brief Constructor of Orca format
-* @param filename Name of the file to be read.
-* @param model The model where the imported data will be saved.
-*/
-Orca::Orca(System::String^ filename, Model^% model)
+namespace
 {
-	SystemModel=model;
-	FileName=filename;
-	ReadingFile = gcnew StreamReader(filename);
-	FormatName="Orca";
+    // Keep original ORCA atom indices, even when a dummy or capped site is
+    // omitted from the physical spin system. Assign GUI IDs only at the end.
+    ref class OrcaSite
+    {
+    public:
+        String^ symbol;
+        double x, y, z;
+        int mass;
+        Atom^ atom;
+    };
+
+    ref class NuclearProperties
+    {
+    public:
+        String^ symbol;
+        int mass, qMass;
+        double spin, quadrupoleMoment;
+        ::Matrix3x3^ hfc;
+        ::Matrix3x3^ efg;
+    };
+
+    bool IsPhysicalSite(OrcaSite^ site)
+    {
+        return Regex::IsMatch(site->symbol,"^[A-Za-z]{1,2}$") && site->symbol!="X" && site->symbol!="DA";
+    }
+
+    bool Number(String^ text, double% value)
+    {
+        return Double::TryParse(text->Replace(L'D',L'E')->Replace(L'd',L'e'),
+            NumberStyles::Float,CultureInfo::InvariantCulture,value) &&
+            !Double::IsNaN(value) && !Double::IsInfinity(value);
+    }
+
+    cli::array<String^>^ Fields(String^ line)
+    {
+        return line->Split((cli::array<Char>^)nullptr,StringSplitOptions::RemoveEmptyEntries);
+    }
+
+    bool IsSectionRule(String^ line)
+    {
+        return line->Length>0 && line->Trim(L'-',L'=')->Length==0;
+    }
+
+    OrcaSite^ ParseSite(String^ line, bool atomicUnits, double scale)
+    {
+        auto f=Fields(line);
+        int first=atomicUnits ? 5 : 1;
+        if(f->Length!=first+3) return nullptr;
+        OrcaSite^ site=gcnew OrcaSite();
+        if(!Number(f[first],site->x) || !Number(f[first+1],site->y) || !Number(f[first+2],site->z)) return nullptr;
+        site->symbol=f[atomicUnits ? 1 : 0];
+        site->x*=scale; site->y*=scale; site->z*=scale;
+        double mass;
+        if(atomicUnits && Number(f[4],mass)) site->mass=Convert::ToInt32(mass);
+        return site;
+    }
+
+    Isotope^ SiteIsotope(String^ symbol, int mass, bool exact)
+    {
+        // Atomic weights in the geometry table are not isotope declarations.
+        // Use an exact table match when available, otherwise the GUI default.
+        for each(Isotope^ candidate in Isotopes::getAllIsotopes())
+            if(candidate->Element==symbol && candidate->Mass==mass) return candidate;
+        if(exact) throw gcnew FormatException("ORCA requests "+mass+symbol+", absent from the GUI isotope table.");
+        try { return Isotopes::FindIsotope(symbol,0,0); }
+        catch(String^) { throw gcnew FormatException("ORCA element is not supported by the GUI: "+symbol); }
+    }
 }
 
-/**
-* @brief Main function for opening and reading file
-* @return Returns false if the format does not seem to be correct.
-*/
-bool Orca::LoadFile(void)
+Orca::Orca(String^ filename, Model^% model)
 {
- String^ Command;
- 
- bool  OK = true;
-
- //Initializing flags to false, meaning that no any frame was yet read
- read_onceOR=false;
- read_onceCS=false;
- read_onceHFC_QUAD=false;
- read_onceGT=false;
- pendingProperties=gcnew InteractionsDictionary();
- read_onceZF=false;
-
- //Turn off Refreshing for faster importing
- AtomCollection->Refreshing=false;
-
-
-
-
- //Read the file
- while (!ReadingFile->EndOfStream  && OK )
- {
-	 //if(Command==nullptr)		
-	 //  {
-	 Command=gcnew String("");
-	 Command= ReadLine() ;
-	 //  };
-
-
-	 if(OK)
-	 {
-		 if ( String::Compare(Command->Trim(), CMD_CARTCOORD  ) == 0)
-		 {  OK=read_CARTCOORD();read_onceOR=true; }	
-		 else if ( String::Compare(Command->Trim(), CMD_GTENSOR) == 0 ) 
-		 {OK=read_GTENSOR();read_onceGT=true; } 
-		 else if ( String::Compare(Command->Trim(), CMD_ZERO_FIELD ) == 0 ) 
-		 {OK=read_ZERO_FIELD();read_onceZF=true; } 
-		 else if (String::Compare(Command->Trim(), CMD_CHEMICAL_SHIFTS ) == 0 ) 
-		 {
-			 OK=read_CHEMICAL_SHIFTS();read_onceCS=true;
-		 } 
-		 else if (String::Compare(Command->Trim(), CMD_HFC_QUAD_COUPLINGS)== 0) 
-		 {OK=read_HFC_QUAD_COUPLINGS();read_onceHFC_QUAD=true;}
-	 };
-
-	 if(!OK) throw gcnew Exception("Problem in Reading File in Line "+LineCount+",");
-
-
- };
-
-  // Check if Orca format
- if(!(read_onceOR || read_onceGT || read_onceZF || read_onceCS || read_onceHFC_QUAD)) return false;
-
-//  sww->Close();
-  ReadingFile->Close();
-  if(read_onceHFC_QUAD)
-  {
-
-	int electronindex=0;
-
-	if(AtomCollection->get_electron_number()<1)
-	{
-
-	  //Create electron
-	  Atom^ nAtom=gcnew Atom();
-	  nAtom->isotope=Isotopes::FindIsotope("e",0, 0); 
-	  nAtom->X=0.0f;
-	  nAtom->Y=0.0f;
-	  nAtom->Z=0.0f;
-	  AtomCollection->Add(nAtom);
-	  electronindex=nAtom->getID();
-
-	  //Create gtensor
-	  ::Matrix3x3 ^g_tensor=gcnew ::Matrix3x3();
-	  g_tensor[0]=2.0023f; g_tensor[4]=2.0023f;g_tensor[8]=2.0023f;
-	  g_tensor[1]=0.0f; g_tensor[2]=0.0f; g_tensor[3]=0.0f; 
-	  g_tensor[5]=0.0f; g_tensor[6]=0.0f; g_tensor[7]=0.0f;
-	  Tensor^ nInteraction=gcnew Tensor(nAtom, nAtom,
-										  InteractionKind::GTensor, g_tensor);
-	 nInteraction->unit=Units::Mi_b;
-	 nInteraction->Frame=SystemModel->RefFrameCollection[1];
-	 InteractionCollection->Add(nInteraction);
-
-	}
-	else
-		for each(int i in AtomCollection->Keys) 
-			if(((Atom^)AtomCollection[i])->isotope->Element=="e") electronindex=i;
-
-	// Commit only the final property section. Hyperfine and quadrupolar rows
-	// may interleave, so neither kind has a contiguous range of model IDs.
-	for each(int id in pendingProperties->Keys)
-	{
-		Tensor^ tensor=(Tensor^)pendingProperties[id];
-		if(tensor->IntKind==InteractionKind::spinrotation)
-		{
-			tensor=gcnew Tensor(tensor->A,AtomCollection[electronindex],
-				InteractionKind::HFC,tensor->matrix3x3);
-			tensor->unit=Units::MHz;
-			tensor->Frame=SystemModel->RefFrameCollection[1];
-		}
-		InteractionCollection->Add(tensor);
-	}
-	pendingProperties->Clear();
-
-  };
-
-   AtomCollection->Refreshing=true; 
-  return true;
-	
+    SystemModel=model;
+    FileName=filename;
+    FormatName="Orca";
+    ReadingFile=gcnew StreamReader(filename);
 }
 
-/**
-* @brief Main function for reading coordinates from the file
-* @return Returns false if the format does not seem to be correct.
-*/
-bool Orca::read_CARTCOORD()
+::Matrix3x3^ Orca::ReadMatrix()
 {
-	String^ fileline=gcnew String("");  //line
-	int AtomID=1;						//Saving the atom ID
-
-	//dummy lines
-	//----------------------------
-	fileline=ReadLine() ; 
-	// NO LB      ZA    FRAG    MASS        X           Y           Z
-	fileline=ReadLine() ;
-
-	//Read the section until the end of it
-	while (!(fileline=ReadLine())->Contains("--------") &&
-		fileline!="")
-	{
-		//Number of Fields: 8, Isotope index: 1, AtomNumber Index: 2, Mass index: 4, XYZ index: 5,6,7
-		ExtractIsotopeAndCoordinates(fileline, FormatName, read_onceOR, AtomID,
-			8, 1, 2, 4, 5, 6, 7, AUtoAmstrong, AtomCollection);
-	};
-
-	return true;
+    ::Matrix3x3^ matrix=gcnew ::Matrix3x3();
+    for(int row=0; row<3; ++row)
+    {
+        String^ line;
+        do {
+            if(ReadingFile->EndOfStream) throw gcnew FormatException("Incomplete ORCA tensor at line "+LineCount);
+            line=ReadLine()->Trim();
+        } while(row==0 && (line=="" || IsSectionRule(line)));
+        auto fields=Fields(line);
+        if(fields->Length!=3) throw gcnew FormatException("Invalid ORCA tensor at line "+LineCount);
+        for(int col=0; col<3; ++col)
+        {
+            double value;
+            if(!Number(fields[col],value)) throw gcnew FormatException("Invalid ORCA tensor at line "+LineCount);
+            matrix[3*row+col]=value;
+        }
+    }
+    return matrix;
 }
 
-/**
-* @brief Main function for reading Chemical shifts from the file
-* @return Returns false if the format does not seem to be correct.
-*/
-bool Orca::read_CHEMICAL_SHIFTS()
+void Orca::AddTensor(Atom^ a, Atom^ b, InteractionKind kind, ::Matrix3x3^ matrix, Unit^ unit)
 {
-	int number;							//Number of fields in a line
-	cli::array<String^>^numbers = nullptr;   // Matrix of the fields after splitting of a line
-	String^ delimStr = " ,";            //seperator of fields
-	cli::array<Char>^delimiter = delimStr->ToCharArray(); //Conversion to char array	
-	String^ fileline=gcnew String("");  //line
-	int AtomID=1;						//Saving the atom ID
-
-	//Saving the starting index of this interaction for case of multiple frames
-	int j=1;
-	static int startIndexCS;
-	if(!read_onceCS) startIndexCS=InteractionCollection->Count;
-
-	//Dummy lines
-	//----------------
-	//
-	// ---------------
-	fileline=ReadLine() ;
-	fileline=ReadLine() ;
-	fileline=ReadLine() ;
-
-	fileline="";
-
-	//Read until end of senction or end of file
-	while (!(fileline=ReadLine())->Contains("-----------------------------------------") &&
-		   !fileline->Contains("****ORCA TERMINATED NORMALLY****"))
-	{
-		
-		//Nucleus   0C : A
-		if (fileline->Contains("Nucleus"))
-		{ 
-			//Split the line to a number of fields
-			number=2;
-			numbers = nullptr;
-			numbers=fileline->Split(delimiter,StringSplitOptions::RemoveEmptyEntries );
-			if(number>numbers->Length) throw gcnew Exception("Problem in Reading CHEMICAL SHIFTS");
-
-			//Clean string leaving only atom ID
-			for(int i=numbers[1]->Length-1;i>-1;i--) 
-				if(Char::IsLetter(numbers[1][i])) numbers[1]=numbers[1]->Remove(i);
-			AtomID=Convert::ToInt32(numbers[1]);
-
-			// ----------------------------------------------------------- 
-			fileline=ReadLine();
-
-			if((fileline=ReadLine())->Contains("Raw-matrix :"))
-			{
-				//Reading interaction matrix and creating interaction
-				fileline=ReadLine();
-				//Number of Fields: 3, XYZ index: 0,1,2
-				ExtractInteractionMatrix3x3(fileline, "Chemical Shielding", 
-					(Atom^)AtomCollection[AtomID+1], (Atom^)AtomCollection[AtomID+1], 1.0,
-					read_onceCS, startIndexCS, j, 3, 0, 1, 2, 
-					Units::MHz, InteractionKind::Shift, 
-					SystemModel->RefFrameCollection[1], 
-					InteractionCollection);
-			}
-		}; //Nucleus
-
-	}; //CHEMICAL SHIFTS
-
-	return true;
-
+    Tensor^ tensor=gcnew Tensor(a,b,kind,matrix);
+    tensor->unit=unit;
+    tensor->Frame=SystemModel->RefFrameCollection[1];
+    SystemModel->InteractionCollection->Add(tensor);
 }
 
-/**
-* @brief Main function for reading Hyperfine couplings and quadropolar couplings from the file
-* @return Returns false if the format does not seem to be correct.
-*/
-bool Orca::read_HFC_QUAD_COUPLINGS()
+bool Orca::LoadFile()
 {
+    auto sites=gcnew List<OrcaSite^>();
+    auto inputSites=gcnew List<OrcaSite^>();
+    auto nuclear=gcnew SortedDictionary<int,NuclearProperties^>();
+    auto shielding=gcnew SortedDictionary<int,::Matrix3x3^>();
+    auto pairs=gcnew Dictionary<Tuple<int,int>^,double>();
+    ::Matrix3x3^ g=nullptr;
+    ::Matrix3x3^ zfs=nullptr;
+    bool recognised=false, precedingAngstrom=false, inputBohr=false;
+    enum class Section { None, G, ZFS, NMR, Hyperfine, J };
+    Section section=Section::None;
+    Regex^ nucleus=gcnew Regex("^Nucleus\\s+(\\d+)\\s*([a-zA-Z]+)");
+    Regex^ massHeader=gcnew Regex("(?:ISTP|Isotope)\\s*=\\s*(\\d+)");
+    Regex^ quadHeader=gcnew Regex("I=\\s*(\\S+)\\s+Q=\\s*(\\S+)\\s+barn");
+    Regex^ pair=gcnew Regex("^NUCLEUS A\\s*=\\s*\\S+\\s+(\\d+)\\s+NUCLEUS B\\s*=\\s*\\S+\\s+(\\d+)");
+    int atom=-1, other=-1;
+    String^ pending=nullptr;
 
-	int number;							//Number of fields in a line
-	cli::array<String^>^numbers = nullptr;   // Matrix of the fields after splitting of a line
-	String^ delimStr = " ,";            //seperator of fields
-	cli::array<Char>^delimiter = delimStr->ToCharArray(); //Conversion to char array	
-	String^ fileline=gcnew String("");  //line
-	int AtomID=1;						//Saving the atom ID
-	double factor=2.3496e+02;           //(efg_atomic*e_charge*1e-28/h_planck)MHz
-	double Qbarn;						//Quadropolar factor
-	pendingProperties->Clear();
-	int j=1;
+    try
+    {
+        while(pending!=nullptr || !ReadingFile->EndOfStream)
+        {
+            String^ line=pending==nullptr ? ReadLine()->Trim() : pending;
+            pending=nullptr;
+            if(line->StartsWith("Program Version "))
+            {
+                // Concatenated outputs can describe unrelated molecules.
+                if(recognised)
+                {
+                    sites->Clear(); inputSites->Clear(); nuclear->Clear(); shielding->Clear(); pairs->Clear();
+                    g=nullptr; zfs=nullptr; section=Section::None;
+                    inputBohr=false; precedingAngstrom=false;
+                }
+                recognised=true;
+                continue;
+            }
+            if(line->StartsWith("|") && line->Contains(">"))
+            {
+                String^ input=line->Substring(line->IndexOf('>')+1)->Trim();
+                if(input->StartsWith("!") && Regex::IsMatch(input,"(?i)\\bbohrs?\\b")) inputBohr=true;
+                if(Regex::IsMatch(input,"(?i)^\\*\\s*xyz\\s+"))
+                {
+                    inputSites->Clear();
+                    while(!ReadingFile->EndOfStream)
+                    {
+                        line=ReadLine();
+                        if(!line->Contains(">")) break;
+                        input=line->Substring(line->IndexOf('>')+1)->Trim();
+                        if(input=="*") break;
+                        OrcaSite^ site=ParseSite(input,false,inputBohr ? 0.529177249 : 1.0);
+                        if(site==nullptr) { inputSites->Clear(); break; }
+                        inputSites->Add(site);
+                    }
+                }
+                continue;
+            }
+            if(line=="CARTESIAN COORDINATES (ANGSTROEM)" || line=="CARTESIAN COORDINATES (A.U.)")
+            {
+                bool au=line->Contains("A.U.");
+                auto frame=gcnew List<OrcaSite^>();
+                while(!ReadingFile->EndOfStream)
+                {
+                    line=ReadLine()->Trim();
+                    if(frame->Count==0 && (line=="" || IsSectionRule(line) || line->StartsWith("NO "))) continue;
+                    OrcaSite^ site=ParseSite(line,au,au ? 0.529177249 : 1.0);
+                    if(site==nullptr) { pending=line; break; }
+                    frame->Add(site);
+                }
+                if(frame->Count)
+                {
+                    if(au && precedingAngstrom && frame->Count==sites->Count)
+                    {
+                        for(int i=0;i<sites->Count;i++) sites[i]->mass=frame[i]->mass;
+                    }
+                    else sites=frame;
+                    precedingAngstrom=!au; // An A.U. table pairs with the preceding angstrom table.
+                }
+                section=Section::None;
+                continue;
+            }
 
-	//Dummy lines
-	//-----------------------------------------
-	//
-	//-----------------------------------------------------------
-	fileline=ReadLine() ;
-	fileline=ReadLine() ;
-	fileline=ReadLine() ;
+            if(line=="ELECTRONIC G-MATRIX" || line=="ELECTRONIC G-MATRIX FROM EFFECTIVE HAMILTONIAN")
+            { section=Section::G; g=nullptr; }
+            else if(line->StartsWith("ZERO-FIELD-SPLITTING TENSOR"))
+            { section=Section::ZFS; zfs=nullptr; }
+            else if(line=="CHEMICAL SHIFTS" || line->StartsWith("CHEMICAL SHIELDINGS"))
+            { section=Section::NMR; shielding->Clear(); atom=-1; }
+            else if(line->StartsWith("ELECTRIC AND MAGNETIC HYPERFINE STRUCTURE"))
+            { section=Section::Hyperfine; nuclear->Clear(); atom=-1; }
+            else if(line->StartsWith("NMR SPIN-SPIN COUPLING CONSTANTS"))
+            { section=Section::J; pairs->Clear(); atom=other=-1; }
+            else if(line->StartsWith("MULLIKEN ATOMIC CHARGES") || line->StartsWith("LOEWDIN ATOMIC CHARGES") ||
+                    line->StartsWith("ORCA TERMINATED") || line->Contains("****ORCA TERMINATED") ||
+                    line->StartsWith("ORCA PROPERTY CALCULATIONS") || line->StartsWith("ORCA EULER ANGLE PROGRAM"))
+                section=Section::None;
+            else if(section==Section::G && (line=="The g-matrix:" || line=="g-matrix:"))
+            { g=ReadMatrix(); section=Section::None; }
+            else if(section==Section::ZFS && line->StartsWith("raw-matrix"))
+            { zfs=ReadMatrix(); section=Section::None; }
+            else if((section==Section::NMR || section==Section::Hyperfine) && line->StartsWith("Nucleus"))
+            {
+                Match^ m=nucleus->Match(line);
+                atom=m->Success ? Int32::Parse(m->Groups[1]->Value) : -1;
+                if(atom>=0 && section==Section::Hyperfine)
+                {
+                    NuclearProperties^ prop=gcnew NuclearProperties();
+                    prop->symbol=m->Groups[2]->Value;
+                    m=massHeader->Match(line);
+                    if(m->Success) prop->mass=Int32::Parse(m->Groups[1]->Value);
+                    nuclear[atom]=prop;
+                }
+            }
+            else if(section==Section::NMR && atom>=0 &&
+                    (line->StartsWith("Total shielding tensor") || line->StartsWith("Raw-matrix")))
+            {
+                auto matrix=ReadMatrix();
+                // Early ORCA chemical-shift sections print dimensionless shielding.
+                if(line->StartsWith("Raw-matrix"))
+                    for(int i=0;i<9;i++) matrix[i]*=1e6;
+                shielding[atom]=matrix;
+            }
+            else if(section==Section::Hyperfine && atom>=0)
+            {
+                auto prop=nuclear[atom];
+                if(line->StartsWith("Q") && line->Contains("barn"))
+                {
+                    Match^ m=massHeader->Match(line);
+                    if(m->Success) prop->qMass=Int32::Parse(m->Groups[1]->Value);
+                    m=quadHeader->Match(line);
+                    if(!m->Success || !Number(m->Groups[1]->Value,prop->spin) ||
+                       !Number(m->Groups[2]->Value,prop->quadrupoleMoment))
+                        throw gcnew FormatException("Invalid ORCA quadrupole isotope at line "+LineCount);
+                }
+                else if(line->StartsWith("Total HFC matrix") || line->StartsWith("Raw HFC matrix"))
+                    prop->hfc=ReadMatrix();
+                else if(line->StartsWith("Total EFG matrix") || line->StartsWith("Raw EFG matrix"))
+                    prop->efg=ReadMatrix();
+            }
+            else if(section==Section::J && line->StartsWith("NUCLEUS A"))
+            {
+                Match^ m=pair->Match(line);
+                atom=m->Success ? Int32::Parse(m->Groups[1]->Value) : -1;
+                other=m->Success ? Int32::Parse(m->Groups[2]->Value) : -1;
+            }
+            else if(section==Section::J && atom>=0 && line->StartsWith("Total spin-spin coupling tensor"))
+            {
+                auto matrix=ReadMatrix();
+                pairs[Tuple::Create(Math::Min(atom,other),Math::Max(atom,other))]=(matrix[0]+matrix[4]+matrix[8])/3;
+            }
+        }
+    }
+    finally { ReadingFile->Close(); }
 
-	//Read until end of senction
-	while (!(fileline=ReadLine())->Contains("****ORCA TERMINATED NORMALLY****") )
-	{
-		
-		//Nucleus   0C : A:ISTP=   13 I=  0.5 P=134.1900 MHz/au**3
-		//fileline= ReadLine() ;
-		if (fileline->Contains("Nucleus"))
-		{ 
-			//Split the line to a number of fields
-			number=5;
-			numbers = nullptr;
-			numbers=fileline->Split(delimiter,StringSplitOptions::RemoveEmptyEntries );
-			if(number>numbers->Length) 
-				throw gcnew Exception("Problem in Reading ELECTRIC AND MAGNETIC HYPERFINE STRUCTURE");
-
-			//Clean string leaving only atom ID
-			for(int i=numbers[1]->Length-1;i>-1;i--) 
-				if(Char::IsLetter(numbers[1][i])) numbers[1]=numbers[1]->Remove(i);
-			AtomID=Convert::ToInt32(numbers[1]);
-
-			//Reading Qbarn factor
-			//                Q:ISTP=   13 I=  0.5 Q=  0.0000 barn  
-			fileline=ReadLine();
-			number=7;
-			numbers = nullptr;
-			numbers=fileline->Split(delimiter,StringSplitOptions::RemoveEmptyEntries );
-			if(number!=numbers->Length) 
-				throw gcnew Exception("Problem in Reading ELECTRIC AND MAGNETIC HYPERFINE STRUCTURE");
-			if(!TryParseNumber(numbers[5],Qbarn))
-				throw gcnew FormatException("Invalid quadrupole moment in ORCA output.");
-
-			// ----------------------------------------------------------- 
-			fileline=ReadLine();
-
-			//Read until end of senction of end of file
-			while (!(fileline=ReadLine())->
-				Contains(" -----------------------------------------------------------") &&
-				!fileline->Contains("****ORCA TERMINATED NORMALLY****"))
-			{
-				//Read Hyperfine interactions
-				if(fileline->Contains("Raw HFC matrix (all values in MHz):"))
-				{
-					//  ------------------------------
-					fileline=ReadLine();
-
-					//Reading interaction matrix and creating interaction
-					fileline=ReadLine();
-					//Number of Fields: 3, XYZ index: 0,1,2
-					ExtractInteractionMatrix3x3(fileline, "Hyeperfine Couplings", 
-						(Atom^)AtomCollection[AtomID+1], (Atom^)AtomCollection[AtomID+1], 1.0,
-						false, 0, j, 3, 0, 1, 2, 
-						Units::MHz, InteractionKind::spinrotation, 
-						SystemModel->RefFrameCollection[1], 
-						pendingProperties);
-
-				}//Read quadropolar interactions
-				else if(fileline->Contains("Raw EFG matrix (all values in a.u.**-3):"))
-				{
-					//Find nuclear spin quantum number and in case smaller 
-					//or equal than 0.5 find other isotope 
-					if (((Atom^)AtomCollection[AtomID+1])->isotope->Spin<=0.5)	
-						((Atom^)AtomCollection[AtomID+1])->isotope=
-						Isotopes::FindIsotopeWithHigherSpin(((Atom^)AtomCollection[AtomID+1])->isotope);
-					double NSQN=((Atom^)AtomCollection[AtomID+1])->isotope->Spin; //nuclear spin quantum number
-
-
-					// Keep any nonzero EFG, including a traceless diagonal tensor.
-					::Matrix3x3^ Quad_Coupling=gcnew ::Matrix3x3();
-					const double scale=NSQN>0.5 ? factor*Qbarn/(2*NSQN*(2*NSQN-1)) : 0.0;
-					bool nonzero=false;
-					for(int row=0; row<3; row++)
-					{
-						numbers=ReadLine()->Split(delimiter,StringSplitOptions::RemoveEmptyEntries);
-						if(numbers->Length!=3) throw gcnew FormatException("Invalid ORCA EFG row.");
-						for(int col=0; col<3; col++)
-						{
-							double value;
-							if(!TryParseNumber(numbers[col],value)) throw gcnew FormatException("Invalid ORCA EFG element.");
-							Quad_Coupling[3*row+col]=scale*value;
-							if(scale*value!=0.0) nonzero=true;
-						}
-					}
-					if(nonzero)
-					{
-						//If isotope with no 0.5>spin just ignore
-						try
-						{
-							Tensor^ nInteraction=gcnew Tensor((Atom^)AtomCollection[AtomID+1], 
-								(Atom^)AtomCollection[AtomID+1],
-								InteractionKind::Quadrupolar, Quad_Coupling);
-							nInteraction->unit=Units::MHz;
-							nInteraction->Frame=SystemModel->RefFrameCollection[1];
-							pendingProperties->Add(nInteraction);
-						}
-						catch (String^ e) {/*Continue*/};
-					};
-
-				};
-
-
-			};
-
-			//in order to stop while
-			if (fileline->Contains("****ORCA TERMINATED NORMALLY****")) return true;
-		}; //Nucleus
-
-	}; //ELECTRIC AND MAGNETIC HYPERFINE STRUCTURE
-
-	return true;
-
-}
-
-/**
-* @brief Main function for reading g-tensor couplins from the file
-* @return Returns false if the format does not seem to be correct.
-*/
-bool Orca::read_GTENSOR()
-{
-	String^ fileline=gcnew String(""); //line
-	int j=1;
-	//Saving the starting index of this interaction for case of multiple frames
-	static int startIndexGT;
-	if(!read_onceGT) startIndexGT=InteractionCollection->Count;
-
-	//Creating new atom for electron
-	Atom^ nAtom=gcnew Atom();
-	nAtom->X=0.0f;
-	nAtom->Y=0.0f;
-	nAtom->Z=0.0f;
-	nAtom->isotope=Isotopes::FindIsotope("e",0, 0); //Electron mass=0
-
-	//add it to the collection
-	if(read_onceGT) AtomCollection[AtomCollection->Count]=nAtom;
-	else AtomCollection->Add(nAtom);
-
-	//Reading interaction matrix and creating interaction
-	fileline=ReadLine();
-	//Number of Fields: 3, XYZ index: 0,1,2
-	ExtractInteractionMatrix3x3(fileline, "G-Tensor", 
-		nAtom, nAtom, 1.0,
-		read_onceGT, startIndexGT, j, 3, 0, 1, 2,
-		Units::Mi_b, InteractionKind::GTensor, 
-		SystemModel->RefFrameCollection[1], 
-		InteractionCollection);
-
-	return true;
-}
-
-/**
-* @brief Main function for reading zero-field couplings from the file
-* @return Returns false if the format does not seem to be correct.
-*/
-bool Orca::read_ZERO_FIELD()
-{
-	String^ fileline=gcnew String(""); //line
-	int j=1;
-	//Saving the starting index of this interaction for case of multiple frames
-	static int startIndexZF;
-	if(!read_onceZF) startIndexZF=InteractionCollection->Count;
-
-	//Dummy lines
-	//---------------------------
-	//
-	//raw-matrix : 
-	fileline=ReadLine() ;
-	fileline=ReadLine() ;
-	fileline=ReadLine() ;
-
-	//Check if electrons were created before
-	Atom^ nAtom=gcnew Atom();
-	if(AtomCollection->get_electron_number()>0 || read_onceGT || read_onceZF)
-	{
-		for each(int i in AtomCollection->Keys)
-			if(AtomCollection[i]->isotope->Element=="e") nAtom=AtomCollection[i];
-	}
-	else
-	{
-		nAtom->X=0.0f;
-		nAtom->Y=0.0f;
-		nAtom->Z=0.0f;
-		nAtom->isotope=Isotopes::FindIsotope("e",0, 0); //Electron mass=0
-		AtomCollection->Add(nAtom);
-	}
-
-	//Reading interaction matrix and creating interaction
-	fileline=ReadLine();
-	//Number of Fields: 3, XYZ index: 0,1,2
-	ExtractInteractionMatrix3x3(fileline, "Zero-Field coupling", 
-		nAtom, nAtom, 1.0,
-		read_onceZF, startIndexZF, j, 3, 0, 1, 2,
-		Units::rev_cm, InteractionKind::ZFS, 
-		SystemModel->RefFrameCollection[1], 
-		InteractionCollection);
-
-	return true;
+    if(!recognised) return false;
+    if(!sites->Count) sites=inputSites;
+    if(!sites->Count) throw gcnew FormatException("ORCA output contains no Cartesian geometry.");
+    int atomCount=0;
+    for each(OrcaSite^ site in sites) if(IsPhysicalSite(site)) ++atomCount;
+    AtomsDictionary::CheckAtomCount(atomCount);
+    bool hasHfc=false;
+    for(int i=0;i<sites->Count;i++)
+    {
+        OrcaSite^ site=sites[i];
+        if(!IsPhysicalSite(site)) continue;
+        NuclearProperties^ prop;
+        int mass=site->mass;
+        bool exact=false;
+        if(nuclear->TryGetValue(i,prop))
+        {
+            if(!String::Equals(site->symbol,prop->symbol,StringComparison::OrdinalIgnoreCase))
+                throw gcnew FormatException("ORCA nucleus disagrees with geometry at atom "+i);
+            if(prop->hfc!=nullptr)
+            {
+                hasHfc=true;
+                if(prop->mass) { mass=prop->mass; exact=true; }
+            }
+            else if(prop->efg!=nullptr && prop->qMass) { mass=prop->qMass; exact=true; }
+        }
+        auto a=gcnew Atom();
+        String^ symbol=site->symbol->Substring(0,1)->ToUpperInvariant()+site->symbol->Substring(1)->ToLowerInvariant();
+        a->isotope=SiteIsotope(symbol,mass,exact);
+        a->X=site->x; a->Y=site->y; a->Z=site->z;
+        SystemModel->AtomCollection->Add(a); site->atom=a;
+    }
+    Atom^ electron=nullptr;
+    if(g!=nullptr || zfs!=nullptr || hasHfc)
+    {
+        electron=gcnew Atom();
+        electron->isotope=Isotopes::FindIsotope("e",0,0);
+        SystemModel->AtomCollection->Add(electron);
+        if(g==nullptr && hasHfc)
+        {
+            g=gcnew ::Matrix3x3();
+            for(int i=0;i<9;i+=4) g[i]=2.0023;
+        }
+        if(g!=nullptr) AddTensor(electron,electron,InteractionKind::GTensor,g,Units::Mi_b);
+        if(zfs!=nullptr) AddTensor(electron,electron,InteractionKind::ZFS,zfs,Units::rev_cm);
+    }
+    for each(int i in shielding->Keys)
+    {
+        Atom^ a=sites[i]->atom;
+        if(a!=nullptr) { AddTensor(a,a,InteractionKind::CShielding,shielding[i],Units::ppm); ToShift=true; }
+    }
+    for each(int i in nuclear->Keys)
+    {
+        Atom^ a=sites[i]->atom;
+        if(a==nullptr) continue;
+        NuclearProperties^ prop=nuclear[i];
+        if(prop->hfc!=nullptr) AddTensor(a,electron,InteractionKind::HFC,prop->hfc,Units::MHz);
+        // ORCA may print HFC and EFG for different isotopes at the same site.
+        // A GUI atom describes one isotope. Never assign e.g. a 2H NQI to 1H.
+        if(prop->efg!=nullptr && prop->spin>0.5 && prop->quadrupoleMoment!=0 &&
+           a->isotope->Mass==prop->qMass)
+        {
+            const double efgToMHz=9.717362e21*1e-28*1.60217657e-19/6.62606957e-34/1e6;
+            double scale=efgToMHz*prop->quadrupoleMoment/(2*prop->spin*(2*prop->spin-1));
+            auto m=prop->efg;
+            double iso=(m[0]+m[4]+m[8])/3;
+            for(int k=0;k<9;k++) m[k]=scale*(m[k]-(k%4==0 ? iso : 0));
+            AddTensor(a,a,InteractionKind::Quadrupolar,m,Units::MHz);
+        }
+    }
+    for each(auto key in pairs->Keys)
+    {
+        Atom^ a=sites[key->Item1]->atom;
+        Atom^ b=sites[key->Item2]->atom;
+        if(a==nullptr || b==nullptr) continue;
+        auto m=gcnew ::Matrix3x3();
+        for(int i=0;i<9;i+=4) m[i]=pairs[key];
+        AddTensor(a,b,InteractionKind::Jcoupling,m,Units::Hz);
+    }
+    return SystemModel->AtomCollection->Count>0;
 }

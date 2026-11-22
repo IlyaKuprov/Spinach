@@ -47,10 +47,14 @@ Normalised SRSK vectors use the three-argument unweighted `coil_state` primitive
 
 `inter.nz_shift` must be an explicit finite scalar with non-negative real part. The former `'chem'` request is rejected by `create`: a general reaction network does not specify a unique scalar lifetime. For a legacy exponential radical-pair model use the summed channel rates; for the legacy Haberkorn/Jones–Hore scalar approximation use half their sum, stating that approximation explicitly in the example. `relaxation` uses the supplied scalar without reading retired radical-pair fields.
 
+Weizmann dipolar R1d (flip-flop) and R2d (ZZ) records contribute independently: a transverse-only pair still relaxes, and diagonal entries do not enter cross-relaxation. SRFK consumes every nonempty modulation-depth record when building the modulated coupling Hamiltonian.
+
 ## Explicit point-to-point flux relaxation
 
-Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. These user fields are stored as spin_system.rlx.flux_rate and spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
+Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply inter.flux_rate and inter.flux_type. Nonzero rate entries become directed records in spin_system.rlx.flux_rate, while the selector is stored as spin_system.rlx.flux_type; flux is not chemistry-owned. Rates alone do not activate flux: relaxation calls rlx_flux(spin_system) only when 'flux' is selected in spin_system.rlx.theories. With flux disabled, no point-to-point contribution is added. When enabled, it is appended exactly once after retention and thermalisation. Imaging does not inject flux; callers supply the complete relaxation operator R.
 
 Selecting flux does not waive the usual relaxation settings: supply valid inter.rlx_keep and inter.equilibrium as required by the relaxation path (for example 'labframe' and 'zero').
 
 When flux is the only selected mechanism and there is no dissipative mode contribution, `relaxation` returns `rlx_flux` directly without constructing ordinary relaxation or applying its retention and thermalisation. An all-zero flux therefore returns zero, including in Hilbert space with IME selected. The flux-only check reduces across all dimensions of the internal theory array.
+
+SRSK sums both directed isotropic couplings for each source and destination. SRFK instead builds a local coupling list from modulation depths before applying the laboratory-frame assumptions.

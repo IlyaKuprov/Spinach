@@ -37,3 +37,5 @@ For a master-equation representation, cce_aux.generator records the physical ord
 Caller-supplied parameters.sequence is rejected, including empty arrays. Use finite_drive, refocusing_train, or the appropriate named echo experiment; internal events are constructed from native physical declarations, never read from that removed field.
 
 Jump support, operator dimensions, rates, and representation compatibility are checked locally before cache lookup or retained-matrix allocation; this service does not rerun the complete experiment-options resolver. The conditional second-order correction uses the isolated observed eigensystem with unchanged signed energy denominators and overlap criteria.
+
+Direct generators and virtual corrections index directed retained tensors from the unordered model pair list. Reversing the site order transposes the Cartesian tensor.

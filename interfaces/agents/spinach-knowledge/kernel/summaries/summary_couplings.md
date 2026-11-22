@@ -13,3 +13,5 @@ A pair is included when the matrix spectral norm satisfies `norm(J,2) > 2*pi*spi
 ## Output and inputs
 
 The routine has no returned output. It sends the supplied header, table headings, rows, and separators to `report`, which routes text to the console or the configured report destination. Its input checks require `spin_system` to be a structure and `header` to be a character array; the routine does not update fields of the input structure.
+
+The summary reads directed tensor records in destination-major order; hushed systems skip the entire table.

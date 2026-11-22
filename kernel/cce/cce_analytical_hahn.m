@@ -7,7 +7,8 @@
 %
 % Parameters:
 %
-%   spin_system    - create output with compact dipolar geometry
+%   spin_system    - create output with sys.tols.prox_cutoff=0; point
+%                    dipoles are taken from inter.coordinates here
 %   parameters     - resolved clexpn request for one orientation
 %   pulse_sequence - registered @hahn_echo handle
 %   assumptions    - 'labframe'
@@ -53,28 +54,17 @@ if order==2
            3*((xyz*g.'*axis).*(xyz*axis))./dist.^2)./dist.^3;
     end
 
-    % Add measured electron-nuclear tensors in physical spin order
-    if isfield(spin_system.inter,'coupling')&&isfield(spin_system.inter.coupling,'matrix')
-        tensors=spin_system.inter.coupling.matrix;
-        if any(~cellfun(@isempty,tensors(2:end,:)),'all')||~isempty(tensors{1,1})
-            error('Secular pair hyperfine tensors must be supplied in the electron row.');
-        end
-        for k=find(~cellfun(@isempty,tensors(1,2:end)))
-            hf(k)=hf(k)+axis.'*tensors{1,k+1}*axis;
-        end
-    end
+    % Add the longitudinal part of user-supplied electron-nuclear tensors
+    pairs=spin_system.inter.coupling.matrix;
+    keys=sort(reshape(cell2mat(pairs(:,1:2)),[],2),2)-1;
+    zz=cellfun(@(tensor)axis.'*tensor*axis,pairs(:,3));
+    central=(keys(:,1)==0);
+    hf=hf+accumarray(keys(central,2),zz(central),size(hf));
 
-    % Isotropic bath exchange J adds J/2 to the flip-flop matrix element
-    exchange=sparse(size(xyz,1),size(xyz,1));
-    if isfield(spin_system.inter,'coupling')&&isfield(spin_system.inter.coupling,'scalar')
-        scalars=spin_system.inter.coupling.scalar;
-        [rows,cols]=find(~cellfun(@isempty,scalars));
-        if any(rows==1)||any(cols<=rows)
-            error('Supply bath exchange in the upper triangle in physical spin order.');
-        end
-        vals=cell2mat(scalars(~cellfun(@isempty,scalars)));
-        exchange=sparse(cols-1,rows-1,vals,size(xyz,1),size(xyz,1));
-    end
+    % A user-supplied bath tensor adds (Txx+Tyy)/2 to the flip-flop element, J for exchange
+    flipflop=(cellfun(@trace,pairs(:,3))-zz)/2;
+    exchange=sparse(keys(~central,2),keys(~central,1),flipflop(~central),...
+                    size(xyz,1),size(xyz,1));
 
     % Stream the complete pair family and retain only its product and screening bound
     numerics=parameters.cce.numerics;
@@ -103,25 +93,28 @@ shifts=spin_system.inter.zeeman.matrix(2:end);
 if ~all(cellfun(@(z)isequal(z,shifts{1}),shifts))
     error('clexpn:analyticalHahn','Secular pairs require a common nuclear Zeeman tensor.');
 end
-if ~ismember('secular_pairs',spin_system.sys.enable)||...
-   ~isequal(sequence,@hahn_echo)||~strcmp(assumptions,'labframe')||...
+keys=reshape(cell2mat(spin_system.inter.coupling.matrix(:,1:2)),[],2);
+if (spin_system.tols.prox_cutoff~=0)||any(keys(:,1)==keys(:,2))
+    error('clexpn:analyticalHahn','Analytical Hahn pairs take point dipoles from coordinates: set sys.tols.prox_cutoff=0 and supply no quadratic couplings.');
+end
+if ~isequal(sequence,@hahn_echo)||~strcmp(assumptions,'labframe')||...
    ~isequal(p.observed,1)||~isequal(c.bath_spins,2:spin_system.comp.nspins)||...
    ~isfield(p,'transition')||~isfield(p.transition,'ms')||...
    numel(fieldnames(p.transition))~=2||~isequal(p.transition.ms,[1/2 -1/2])||...
    ~strcmp(c.approximation,'projected')
-    error('clexpn:analyticalHahn','Compact dipolar geometry requires a projected electron Hahn echo with the full ordered bath.');
+    error('clexpn:analyticalHahn','Analytical Hahn pairs require a projected electron Hahn echo with the full ordered bath.');
 end
 if c.order>2||~strcmp(c.graph.mode,'complete')||numel(fieldnames(c.graph))~=1||...
    ~strcmp(c.expansion,'standard')||~strcmp(c.bath_state.mode,'mixed_product')||...
    ~strcmp(c.meanfield,'none')||~strcmp(c.averaging,'after_expansion')||...
-   c.second_order.enabled||c.retain_raw||~strcmp(c.backend,'auto')
-    error('clexpn:analyticalHahn','Compact Hahn supports only the complete mixed-state secular expansion through order two.');
+   c.second_order.enabled||c.retain_raw
+    error('clexpn:analyticalHahn','Analytical Hahn pairs support only the complete mixed-state secular expansion through order two.');
 end
 if any(~ismember(fieldnames(p),{'observed','times','orientation','transition','cce'}))||...
    any(isfield(c,{'basis','parallel','convergence','checkpoint','groups','partition',...
                   'bath_radius','interaction_cutoff','interlaced'}))||...
    isfield(c.numerics,'propagator')||~strcmp(c.reducer,'powers')
-    error('clexpn:analyticalHahn','The compact ideal Hahn evaluator does not support the requested experiment controls.');
+    error('clexpn:analyticalHahn','The analytical ideal Hahn evaluator does not support the requested experiment controls.');
 end
 end
 

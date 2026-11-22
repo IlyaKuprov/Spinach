@@ -41,11 +41,14 @@ Sp=operator(spin_system,'L+','nuclei'); Sy=(Sp-Sp')/2i;
 
 % The initial state is a sum of nuclear Lz states weighted by HFCs
 rho=zeros([size(L,1) 1],'like',1i);
-for n=find(cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes))
-    for k=find(~cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes))
-        amplitude=trace(spin_system.inter.coupling.matrix{n,k})/3+...
-                  trace(spin_system.inter.coupling.matrix{k,n})/3;
-        rho=rho+abs(amplitude)*coil_state(spin_system,{'Lz'},{k});
+pairs=spin_system.inter.coupling.matrix;
+amplitudes=sparse(cell2mat(pairs(:,1)),cell2mat(pairs(:,2)),...
+                  cellfun(@(x)trace(x)/3,pairs(:,3)),spin_system.comp.nspins,spin_system.comp.nspins);
+amplitudes=amplitudes+amplitudes.';
+electrons=cellfun(@(x)strncmp(x,'E',1),spin_system.comp.isotopes);
+for n=find(electrons)
+    for k=find((amplitudes(n,:)~=0)&(~electrons))
+        rho=rho+abs(amplitudes(n,k))*coil_state(spin_system,{'Lz'},{k});
     end
 end
 rho=rho/norm(rho,2);
@@ -94,4 +97,5 @@ end
 % not to trust, but to know.
 %
 % Ayn Rand, "Atlas Shrugged"
+
 

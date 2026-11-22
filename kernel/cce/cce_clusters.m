@@ -66,30 +66,20 @@ end
 prototype={[]};
 metadata=whos('prototype');
 family_bytes=metadata.bytes/numel(prototype)+8*(max_order+1);
+graph_bytes=16*(nnz(graph.adjacency)+nnz(graph.scores)+2*ng+2);
 check_storage(ng);
 
-% Collapse physical graph edges and scores onto group vertices
-if all(cellfun(@isscalar,groups))
-    [~,positions]=ismember([groups{:}],graph.bath_ids);
-    adjacency=graph.adjacency(positions,positions);
-    scores=graph.scores(positions,positions);
-else
-    [~,positions]=ismember([groups{:}],graph.bath_ids);
-    positions=mat2cell(positions,1,cellfun(@numel,groups));
-    adjacency=false(ng);
-    scores=zeros(ng);
-    for a=1:ng
-        for b=a+1:ng
-
-            % Preserve physical connections and sum scores between composite groups
-            adjacency(a,b)=any(graph.adjacency(positions{a},positions{b}),'all');
-            adjacency(b,a)=adjacency(a,b);
-            scores(a,b)=sum(graph.scores(positions{a},positions{b}),'all');
-            scores(b,a)=scores(a,b);
-
-        end
-    end
+% Map bath positions to group vertices and sum inter-group scores
+[~,sites]=ismember([groups{:}],graph.bath_ids);
+vertices=cell(size(groups));
+for k=1:ng
+    vertices{k}=repmat(k,size(groups{k}));
 end
+group=sparse(sites,[vertices{:}],1,numel(sites),ng);
+adjacency=logical(group.'*sparse(graph.adjacency)*group);
+scores=group.'*sparse(graph.scores)*group;
+adjacency(1:ng+1:end)=false;
+scores(1:ng+1:end)=0;
 
 % Enumerate unique connected candidates by one-vertex frontier growth
 explicit=isfield(parameters,'clusters')&&~isempty(parameters.clusters);
@@ -330,11 +320,11 @@ for k=numel(clusters):-1:1
 
 end
 
-% Bound three family/sorting copies and the dense group graph
+% Bound three family/sorting copies and the sparse group graph
 function check_storage(count)
 
     % Check the workspace size against the explicit budget
-    bytes=9*ng^2+3*count*family_bytes;
+    bytes=graph_bytes+3*count*family_bytes;
     if ~isfinite(bytes)||bytes>budget
         error('cce_clusters:memory',...
               'Cluster family workspace exceeds numerics.max_memory_bytes.');
@@ -364,7 +354,7 @@ if numel(unique(graph.bath_ids))~=n||~all(ismember(graph.bath_ids,model.bath_ids
    ~isequal(size(graph.adjacency),[n n])||~islogical(graph.adjacency)||...
    ~isequal(graph.adjacency,graph.adjacency.')||any(diag(graph.adjacency))||...
    ~isequal(size(graph.scores),[n n])||~isreal(graph.scores)||...
-   any(~isfinite(graph.scores),'all')||any(graph.scores<0,'all')||...
+   any(~isfinite(nonzeros(graph.scores)))||any(graph.scores<0,'all')||...
    ~isequal(graph.scores,graph.scores.')
     error('cce_clusters:graph','invalid physical graph ordering, adjacency, or scores.');
 end

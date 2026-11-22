@@ -51,7 +51,7 @@ pair.coupling.matrix=cell(4);
 pair.coupling.scalar{2,3}=4;
 pair.coupling.matrix{2,3}=-4*eye(3);
 uncoupled=test_spin_system(cutoff_sys,pair,bas);
-result=test_true(result,'zero at zero cutoff',isempty(uncoupled.inter.coupling.matrix{2,3}),...
+result=test_true(result,'zero at zero cutoff',~ismember([2 3],reshape(cell2mat(uncoupled.inter.coupling.matrix(:,1:2)),[],2),'rows'),...
                  'an exactly cancelled cross-substance tensor is absent');
 
 % Retain an assembled tensor exactly at a positive cutoff within a substance
@@ -62,7 +62,7 @@ pair.coupling.matrix=cell(4);
 pair.coupling.scalar{1,2}=3;
 pair.coupling.matrix{1,2}=-2*eye(3);
 coupled=test_spin_system(cutoff_sys,pair,bas);
-result=test_true(result,'positive cutoff equality',isequal(coupled.inter.coupling.matrix{1,2},2*pi*eye(3)),...
+result=test_true(result,'positive cutoff equality',isequal(get_coupling(coupled,1,2),2*pi*eye(3)),...
                  'a nonzero tensor at the final cutoff is retained');
 
 % Reject a scalar coupling between different substances even at zero cutoff

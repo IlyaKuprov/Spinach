@@ -51,3 +51,5 @@ This table describes the retained graph engine input, not an additional public c
 | `bath_radius` | Maximum distance in Angstrom from an observed spin for retaining a bath site; default Inf. This is separate from the graph edge radius. |
 
 Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.
+
+Bath pair norms and scores are sparse. Distance selection includes the cutoff shell; a shared observed subsystem can still induce a complete mediated subgraph.

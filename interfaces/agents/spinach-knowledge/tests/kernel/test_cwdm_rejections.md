@@ -27,3 +27,5 @@ Exactly zero spinful Hamiltonian blocks in both positions retain the local unit 
 Cross-substance Hamiltonian entries in either direction, supplied through `I` or the oriented `Q`, must raise `Spinach:equilibrium:crossSubstanceHamiltonian`.
 
 Cross-substance generator entries in either direction must raise `Spinach:reduce:crossSubstanceGenerator` through both `reduce` and `evolution`. With numerical clean-up disabled, supported block-diagonal evolution is compared with the full matrix exponential at absolute and relative whole-vector tolerances of `1e-12`.
+
+A cancelled cross-species tensor has no directed record, whereas an assembled tensor exactly at the positive final threshold survives.

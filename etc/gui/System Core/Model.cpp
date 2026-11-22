@@ -217,6 +217,7 @@ AtomsDictionary::AtomsDictionary(InteractionsDictionary ^%aInteractions)
 
 System::Void AtomsDictionary::Add(Atom^ atom)
 {
+	if(atom->isotope->Element!="e") CheckAtomCount(aDictionary->Count-electron_number+1);
 	//Add atom in the end of Dictionary
 	atom->ID=newID;
 	aDictionary->Add(newID,atom); 

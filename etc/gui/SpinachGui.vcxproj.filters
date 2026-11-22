@@ -82,16 +82,7 @@
     <ClCompile Include="ShieldingtoShift.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IO Formats\ADF.cpp">
-      <Filter>IO Formats</Filter>
-    </ClCompile>
-    <ClCompile Include="IO Formats\GAMESS.cpp">
-      <Filter>IO Formats</Filter>
-    </ClCompile>
     <ClCompile Include="IO Formats\SpinEvolution.cpp">
-      <Filter>IO Formats</Filter>
-    </ClCompile>
-    <ClCompile Include="IO Formats\COSMOS.cpp">
       <Filter>IO Formats</Filter>
     </ClCompile>
     <ClCompile Include="RefFrameOrientationDialog.cpp">
@@ -181,16 +172,7 @@
     <ClInclude Include="ShieldingtoShift.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IO Formats\ADF.h">
-      <Filter>IO Formats</Filter>
-    </ClInclude>
-    <ClInclude Include="IO Formats\GAMESS.h">
-      <Filter>IO Formats</Filter>
-    </ClInclude>
     <ClInclude Include="IO Formats\SpinEvolution.h">
-      <Filter>IO Formats</Filter>
-    </ClInclude>
-    <ClInclude Include="IO Formats\COSMOS.h">
       <Filter>IO Formats</Filter>
     </ClInclude>
     <ClInclude Include="IO Formats\spinxml_schema.h">

@@ -34,12 +34,12 @@ for j=1:nb
     % Set each bath field and observed-spin coupling
     spin_system.inter.zeeman.matrix{j+1}(3,3)=fields(j+1);
     tensor{1,j+1}=[0 0 0;0 0 0;31*j -17*j 19*j];
-    spin_system.inter.coupling.matrix{1,j+1}=tensor{1,j+1}.';
+    spin_system=cce_test_write(spin_system,[1 j+1],tensor{1,j+1}.');
     for k=j+1:nb
 
         % Set the bath-pair interaction tensor
         tensor{j+1,k+1}=diag([11 -7 13])/(j+k);
-        spin_system.inter.coupling.matrix{j+1,k+1}=tensor{j+1,k+1}.';
+        spin_system=cce_test_write(spin_system,[j+1 k+1],tensor{j+1,k+1}.');
 
     end
 

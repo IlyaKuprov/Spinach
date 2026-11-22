@@ -305,7 +305,7 @@ choice(c.approximation,{'projected','generalized'},'cce.approximation');
 choice(c.expansion,{'standard','partition','disjoint','disjoint_inter','periodic_segments'},'cce.expansion');
 choice(c.averaging,{'after_expansion','internal_then_expansion'},'cce.averaging');
 choice(c.reducer,{'powers','direct'},'cce.reducer');
-choice(c.backend,{'auto','direct','stock'},'cce.backend');
+choice(c.backend,{'auto','direct','stock','analytical_hahn'},'cce.backend');
 choice(c.meanfield,{'none','static'},'cce.meanfield');
 choice(c.numerics.zero_policy,{'mask','error'},'cce.numerics.zero_policy');
 choice(c.numerics.precision,{'double'},'cce.numerics.precision');

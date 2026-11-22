@@ -22,7 +22,7 @@ inter.coupling.scalar=cell(3);
 s=create(sys,inter);
 s.inter.zeeman.matrix{2}(3,3)=1.3;
 s.inter.zeeman.matrix{3}(3,3)=0.7;
-s.inter.coupling.matrix{2,3}=diag([0.4 0.5 0.9]);
+s=cce_test_write(s,[2 3],diag([0.4 0.5 0.9]));
 p=struct('observed',1,'output','correlation','times',linspace(0,2,31),...
          'orientation',[0 0 0]);
 p.cce=struct('bath_spins',[2 3],'expansion','standard','order',2,...
@@ -101,7 +101,7 @@ for ordering={'ordered','symmetrized'}
 end
 
 % Check factorisation into independent connected single-spin correlations
-s.inter.coupling.matrix{2,3}=zeros(3);
+s=cce_test_write(s,[2 3],zeros(3));
 p.cce.order=1;
 first=clexpn(s,@noise_correlation,p,'labframe');
 p.cce.order=2;

@@ -31,7 +31,7 @@ for j=1:nb+1
     spin_system.inter.zeeman.matrix{j}(3,3)=fields(j);
     for k=j+1:nb+1
         tensors{j,k}=[7 2 -3;-1 11 4;3 -2 13]/(j+k);
-        spin_system.inter.coupling.matrix{j,k}=tensors{j,k}.';
+        spin_system=cce_test_write(spin_system,[j k],tensors{j,k}.');
     end
 end
 

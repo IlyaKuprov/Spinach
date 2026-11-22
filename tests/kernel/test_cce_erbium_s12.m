@@ -75,17 +75,18 @@ for k=[1 size(xyz,1)]
 
 end
 
-% Create the same system from compact point-dipole inputs in Hz and Angstrom
+% Create the same system from coordinates with the dipolar network switched off
 sys.magnet=0.067;
 sys.output='hush';
 sys.parallel={'processes',1};
-sys.enable={'secular_pairs'};
+sys.tols.prox_cutoff=0;
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
 parameters.orientation=deg2rad([0 90 133.5]);
 parameters.times=times.';
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
+parameters.cce.backend='analytical_hahn';
 parameters.cce.numerics=struct('atol',0,'max_memory_bytes',32*(4+numel(times)));
 
 % Exercise both a single pair and the complete three-nucleus pair family
@@ -97,9 +98,9 @@ for n=2:3
     inter.coordinates=num2cell([zeros(1,3); 1e10*xyz(1:n,:)],2);
     spin_system=create(sys,inter);
     [answer,details]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
-    result=test_close(result,sprintf('Compact Hahn with %d nuclei',n),...
+    result=test_close(result,sprintf('Analytical Hahn with %d nuclei',n),...
                       answer,expected(:,n-1),1e-8,1e-8,...
-                      'Compact streamed factors must match full pair propagation.');
+                      'Streamed pair factors must match full pair propagation.');
     result=test_true(result,'Exact singleton and observed-only echoes',...
                      all(details.reduction.by_order(:,:,1:2)==1,'all'),...
                      'The reference and every singleton refocus exactly.');
@@ -145,7 +146,7 @@ answer=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 result=test_true(result,'Zero splitting',all(answer==1),...
                  'An exactly degenerate pair contributes unity without a division.');
 
-% Reject requests whose physics the compact approximation does not implement
+% Reject requests whose physics the analytical evaluator does not implement
 parameters.cce.graph=struct('mode','distance','radius',10);
 rejected=false;
 try
@@ -154,7 +155,7 @@ catch exception
     rejected=strcmp(exception.identifier,'clexpn:analyticalHahn');
 end
 result=test_true(result,'Unsupported graph rejected',rejected,...
-                 'Compact complete-family evaluation cannot silently change graph policy.');
+                 'Complete-family evaluation cannot silently change graph policy.');
 
 end
 

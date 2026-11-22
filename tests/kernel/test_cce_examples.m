@@ -1925,7 +1925,7 @@ for n=1:size(cases,1)
                     h=h+tensor(3,a)*operators{j,a};
                 end
                 for k=j:3
-                    tensor=spin_system.inter.coupling.matrix{j,k};
+                    tensor=cce_test_read(spin_system,[j k]);
                     if isempty(tensor)
                         continue;
                     end

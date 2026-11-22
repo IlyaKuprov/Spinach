@@ -89,87 +89,103 @@ end
 % Rotate canonical Cartesian tensors into the requested laboratory frame
 rotation=euler2dcm(parameters.orientation);
 model.zeeman=cell(1,nspins);
-model.quadratic=cell(1,nspins);
-model.pairs=struct('ids',{},'tensor',{});
-model.retained=cell(nspins);
+model.quadratic=repmat({zeros(3)},1,nspins);
+model.quadratic_strength=repmat({'ignore'},1,nspins);
+model.pairs=struct('ids',{},'tensor',{},'retained',{});
 model.omitted_pairs=zeros(0,2);
 for n=1:nspins
-
-    % Rotate the Zeeman and on-site quadratic tensors
     model.zeeman{n}=rotation*spin_system.inter.zeeman.matrix{n}*rotation.';
-    tensor=spin_system.inter.coupling.matrix{n,n};
-    if isempty(tensor)
-        tensor=zeros(3);
+end
+
+% Index the directed records and rotate the on-site terms
+list=spin_system.inter.coupling.matrix;
+from=cell2mat(list(:,1));
+to=cell2mat(list(:,2));
+index=sparse(from,to,1:size(list,1),nspins,nspins);
+omit=false(size(list,1),1);
+for r=find(from==to).'
+    n=from(r);
+    tensor=list{r,3};
+    if norm(tensor,2)>2*pi*spin_system.tols.inter_cutoff
+        model.quadratic{n}=rotation*tensor*rotation.';
     end
-    if norm(tensor,2)<=2*pi*spin_system.tols.inter_cutoff
-        tensor=zeros(3);
+    model.quadratic_strength{n}=spin_system.inter.coupling.strength{r,3};
+end
+
+% Combine opposite directions in ascending unordered physical pair order
+[k_ids,n_ids]=find(tril(index+index.',-1));
+for p=1:numel(n_ids)
+
+    % Accumulate both independently labelled directions
+    n=n_ids(p);
+    k=k_ids(p);
+    tensor=zeros(3);
+    retained=zeros(3);
+    for direction=1:2
+
+        % Retrieve the directed coupling and its aligned label
+        if direction==1
+            row=index(n,k);
+        else
+            row=index(k,n);
+        end
+        if row==0
+            continue
+        end
+        value=list{row,3};
+        if norm(value,2)<=2*pi*spin_system.tols.inter_cutoff
+            continue
+        end
+
+        % Separate the stock isotropic and anisotropic numerical cutoffs
+        isotropic=trace(value)/3;
+        anisotropic=value-isotropic*eye(3);
+        if abs(isotropic)<=2*pi*spin_system.tols.inter_cutoff
+            isotropic=0;
+        end
+        [~,rank_one,rank_two]=mat2sphten(anisotropic);
+        if norm(rank_one,2)<=spin_system.tols.liouv_zero&&...
+           norm(rank_two,2)<=spin_system.tols.liouv_zero
+            anisotropic=zeros(3);
+        end
+        value=isotropic*eye(3)+anisotropic;
+
+        % Stock spherical pair convention transposes each ordered cell
+        value=rotation*value.'*rotation.';
+        part=retain_pair(value,spin_system.inter.coupling.strength{row,3});
+        if direction==2
+            value=value.';
+            part=part.';
+        end
+        tensor=tensor+value;
+        retained=retained+part;
+
     end
-    model.quadratic{n}=rotation*tensor*rotation.';
 
-    % Combine ordered cells only after applying their retention masks
-    for k=n+1:nspins
-        tensor=zeros(3);
-        retained=zeros(3);
-        for direction=1:2
-
-            % Retrieve one ordered cell and its independently declared strength
-            ids=[n k];
-            if direction==2
-                ids=fliplr(ids);
-            end
-            value=spin_system.inter.coupling.matrix{ids(1),ids(2)};
-            if isempty(value)||norm(value,2)<=2*pi*spin_system.tols.inter_cutoff
-                continue
-            end
-
-            % Separate the stock isotropic and anisotropic numerical cutoffs
-            isotropic=trace(value)/3;
-            anisotropic=value-isotropic*eye(3);
-            if abs(isotropic)<=2*pi*spin_system.tols.inter_cutoff
-                isotropic=0;
-            end
-            [~,rank_one,rank_two]=mat2sphten(anisotropic);
-            if norm(rank_one,2)<=spin_system.tols.liouv_zero&&...
-               norm(rank_two,2)<=spin_system.tols.liouv_zero
-                anisotropic=zeros(3);
-            end
-            value=isotropic*eye(3)+anisotropic;
-
-            % Stock spherical pair convention transposes each ordered cell
-            value=rotation*value.'*rotation.';
-            part=retain_pair(value,spin_system.inter.coupling.strength{ids(1),ids(2)});
-            if direction==2
-                value=value.';
-                part=part.';
-            end
-            tensor=tensor+value;
-            retained=retained+part;
-
+    % Apply only the explicitly requested physical distance cutoff
+    if isfinite(model.interaction_cutoff)&&(norm(tensor,'fro')>0)
+        if any(~isfinite(model.coordinates_A([n k],:)),'all')
+            error('finite interaction_cutoff requires coordinates for every coupled pair.');
         end
-
-        % Apply only the explicitly requested physical distance cutoff
-        if isfinite(model.interaction_cutoff)&&(norm(tensor,'fro')>0)
-            if any(~isfinite(model.coordinates_A([n k],:)),'all')
-                error('finite interaction_cutoff requires coordinates for every coupled pair.');
-            end
-            if norm(model.coordinates_A(n,:)-model.coordinates_A(k,:))>model.interaction_cutoff
-                model.omitted_pairs(end+1,:)=[n k];
-                spin_system.inter.coupling.matrix{n,k}=zeros(3);
-                spin_system.inter.coupling.matrix{k,n}=zeros(3);
-                tensor=zeros(3);
-                retained=zeros(3);
-            end
+        if norm(model.coordinates_A(n,:)-model.coordinates_A(k,:))>model.interaction_cutoff
+            model.omitted_pairs(end+1,:)=[n k];
+            rows=[index(n,k) index(k,n)];
+            omit(rows(rows>0))=true;
+            tensor=zeros(3);
+            retained=zeros(3);
         end
+    end
 
-        % Keep a compact unordered pair list and a symmetric lookup
-        if norm(tensor,'fro')>0
-            model.pairs(end+1)=struct('ids',[n k],'tensor',tensor);
-        end
-        model.retained{n,k}=retained;
-        model.retained{k,n}=retained.';
+    % A cancelled bare tensor can still have a nonzero retained part
+    if any(tensor,'all')||any(retained,'all')
+        model.pairs(end+1)=struct('ids',[n k],'tensor',tensor,'retained',retained);
     end
 
 end
+
+% Remove pruned directions and their aligned strength records
+spin_system.inter.coupling.matrix(omit,:)=[];
+spin_system.inter.coupling.strength(omit,:)=[];
 
 % Bind the physically pruned stock fallback to the same model
 model.spin_system=spin_system;

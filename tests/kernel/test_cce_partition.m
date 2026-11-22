@@ -36,11 +36,11 @@ spin_system=create(sys,inter);
 spin_system.inter.magnet=0;
 spin_system.inter.coordinates=inter.coordinates;
 spin_system.inter.zeeman.matrix=cellfun(@(x)2*pi*x,inter.zeeman.matrix,'UniformOutput',false);
-spin_system.inter.coupling.matrix=cell(4);
+spin_system.inter.coupling.matrix=cell(0,3);
 for j=1:4
     for k=1:4
         if ~isempty(inter.coupling.matrix{j,k})
-            spin_system.inter.coupling.matrix{j,k}=2*pi*inter.coupling.matrix{j,k};
+            spin_system=cce_test_write(spin_system,[j k],2*pi*inter.coupling.matrix{j,k});
         end
     end
 end

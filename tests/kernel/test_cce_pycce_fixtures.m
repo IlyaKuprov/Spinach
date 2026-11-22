@@ -48,26 +48,28 @@ for f=1:numel(fixtures)
     spin_system.inter.zeeman.matrix{1}(3,:)=-fixture.central.gyro*field*1000;
     D=fixture.central.D;
     E=fixture.central.E;
-    spin_system.inter.coupling.matrix{1,1}=2*pi*1000*diag([-D/3+E -D/3-E 2*D/3]);
+    spin_system=cce_test_write(spin_system,[1 1],2*pi*1000*diag([-D/3+E -D/3-E 2*D/3]));
     gyros=zeros(1,nb);
     for j=1:nb
         type=fixture.bath.types.(matlab.lang.makeValidName(fixture.bath.N{j}));
         gyros(j)=type.gyro;
         spin_system.inter.zeeman.matrix{j+1}(3,:)=-type.gyro*field*1000;
-        spin_system.inter.coupling.matrix{1,j+1}=2*pi*1000*squeeze(fixture.bath.A(j,:,:)).';
+        spin_system=cce_test_write(spin_system,[1 j+1],2*pi*1000*squeeze(fixture.bath.A(j,:,:)).');
 
         % Conventional reference CCE explicitly retains only observed Sz coupling
         if strcmp(fixture.compute.method,'cce')
-            spin_system.inter.coupling.matrix{1,j+1}(:,1:2)=0;
+            tensor_value=cce_test_read(spin_system,[1 j+1]);
+            tensor_value(:,1:2)=0;
+            spin_system=cce_test_write(spin_system,[1 j+1],tensor_value);
         end
-        spin_system.inter.coupling.matrix{j+1,j+1}=2*pi*1000*squeeze(fixture.bath.Q(j,:,:)).';
+        spin_system=cce_test_write(spin_system,[j+1 j+1],2*pi*1000*squeeze(fixture.bath.Q(j,:,:)).');
     end
     for j=1:nb
         for k=j+1:nb
             r=fixture.bath.xyz(j,:)-fixture.bath.xyz(k,:);
             distance=norm(r);
             tensor=1000*1.05457172*gyros(j)*gyros(k)*(eye(3)-3*(r.'*r)/distance^2)/distance^3;
-            spin_system.inter.coupling.matrix{j+1,k+1}=tensor.';
+            spin_system=cce_test_write(spin_system,[j+1 k+1],tensor.');
         end
     end
 

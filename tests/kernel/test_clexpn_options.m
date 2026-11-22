@@ -169,8 +169,8 @@ sys.parallel={'local',1};
 rsys.parallel={'local',1};
 plain=create(sys,inter);
 rotated=create(rsys,rinter);
-T=plain.inter.coupling.matrix{1,2};
-Tr=rotated.inter.coupling.matrix{1,2};
+T=cce_test_read(plain,[1 2]);
+Tr=cce_test_read(rotated,[1 2]);
 result=test_close(result,'Native dipolar transform covariance',Tr,R*T*R.',...
                   100*eps*norm(T,'fro'),100*eps,'Rigid translations leave dipoles invariant.');
 

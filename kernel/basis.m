@@ -455,53 +455,34 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
                                               spin_system.comp.nspins,spin_system.comp.nspins);
             end
 
-            % Over coupling tensor derivatives with respect to mode coordinates
-            pairs=spin_system.inter.modes.coupling_mod;
-            for n=1:size(pairs,1)
+            % Link every modulated spin block to its pair of modes
+            mod_flds={'coupling_mod','zeeman_mod'};
+            for f=1:numel(mod_flds)
+                pairs=spin_system.inter.modes.(mod_flds{f});
+                for n=1:size(pairs,1)
+                    [m1,m2,derivs]=pairs{n,:};
+                    for m=1:numel(derivs)
+                        if isempty(derivs{m}), continue; end
 
-                % Over derivative orders
-                [m1,m2,derivs]=pairs{n,:};
-                for m=1:numel(derivs)
+                        % Select spin targets above the basis cut-off
+                        if f==1
+                            blocks=derivs{m};
+                            keep=cellfun(tensor_norm,blocks(:,3))>2*pi*spin_system.tols.inter_cutoff;
+                            targets=cell2mat(blocks(keep,1:2));
+                        else
+                            keep=cellfun(@(x)norm(x,2),derivs{m})>2*pi*spin_system.tols.inter_cutoff;
+                            targets=find(keep)';
+                        end
+                        if isempty(targets), continue; end
 
-                    % Skip empty derivative orders
-                    if isempty(derivs{m}), continue; end
+                        % A common derivative connects all incident particles
+                        particles=[repmat([m1 m2],size(targets,1),1) targets];
+                        labels=repmat((1:size(targets,1))',1,size(particles,2));
+                        incident=sparse(particles(:),labels(:),1,spin_system.comp.nspins,size(targets,1));
+                        mode_conmat=mode_conmat|(incident*incident');
 
-                    % Spin pairs whose coupling derivative is above the cut-off
-                    blocks=derivs{m};
-                    blocks=blocks(cellfun(tensor_norm,blocks(:,3))>2*pi*spin_system.tols.inter_cutoff,:);
-
-                    % Connect the modes and the spin pair
-                    for k=1:size(blocks,1)
-                        particles=[m1 m2 blocks{k,1:2}];
-                        mode_conmat(particles,particles)=true;
                     end
-
                 end
-
-            end
-
-            % Over effective field derivatives with respect to mode coordinates
-            pairs=spin_system.inter.modes.zeeman_mod;
-            for n=1:size(pairs,1)
-
-                % Over derivative orders
-                [m1,m2,derivs]=pairs{n,:};
-                for m=1:numel(derivs)
-
-                    % Skip empty derivative orders
-                    if isempty(derivs{m}), continue; end
-
-                    % Spins whose field derivative is above the cut-off
-                    p=find(cellfun(@(x)norm(x,2),derivs{m})>2*pi*spin_system.tols.inter_cutoff);
-
-                    % Connect the modes and the spin
-                    for k=1:numel(p)
-                        particles=[m1 m2 p(k)];
-                        mode_conmat(particles,particles)=true;
-                    end
-
-                end
-
             end
 
             % Merge spin and bosonic mode connectivity matrices

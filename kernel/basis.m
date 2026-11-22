@@ -80,25 +80,23 @@ for s=1:nsubst
     local_system.inter.zeeman.matrix=spin_system.inter.zeeman.matrix(spins);
     local_system.inter.giant.coeff=spin_system.inter.giant.coeff(spins);
     if isfield(spin_system.inter,'modes')
-        mode_fields=fieldnames(spin_system.inter.modes);
+        mode_fields={'exchange','kerr','longitudinal','dispersive','coupling_mod','zeeman_mod'};
         for n=1:numel(mode_fields)
-            values=spin_system.inter.modes.(mode_fields{n});
-            if iscell(values)&&isequal(size(values),[spin_system.comp.nspins spin_system.comp.nspins])
-                values=values(spins,spins);
-                if ismember(mode_fields{n},{'coupling_mod','zeeman_mod'})
-                    for k=1:numel(values)
-                        for m=1:numel(values{k})
-                            if isempty(values{k}{m}), continue; end
-                            if strcmp(mode_fields{n},'coupling_mod')
-                                values{k}{m}=values{k}{m}(spins,spins);
-                            else
-                                values{k}{m}=values{k}{m}(spins);
-                            end
+            pairs=spin_system.inter.modes.(mode_fields{n});
+            pairs=substance_pairs(pairs,spins);
+            if ismember(mode_fields{n},{'coupling_mod','zeeman_mod'})
+                for k=1:size(pairs,1)
+                    for m=1:numel(pairs{k,3})
+                        if isempty(pairs{k,3}{m}), continue; end
+                        if strcmp(mode_fields{n},'coupling_mod')
+                            pairs{k,3}{m}=substance_pairs(pairs{k,3}{m},spins);
+                        else
+                            pairs{k,3}{m}=pairs{k,3}{m}(spins);
                         end
                     end
                 end
-                local_system.inter.modes.(mode_fields{n})=values;
             end
+            local_system.inter.modes.(mode_fields{n})=pairs;
         end
     end
 
@@ -442,65 +440,47 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             % Pairwise bosonic interaction fields list
             chan_flds={'exchange','dispersive','kerr','longitudinal'};
 
-            % Largest pairwise coupling norm between modes and between modes and spins
-            mode_norm=zeros(spin_system.comp.nspins);
+            % Connect retained scalar interactions above the basis cut-off
+            mode_conmat=sparse(spin_system.comp.nspins,spin_system.comp.nspins);
             for n=1:numel(chan_flds)
-                mode_norm=max(mode_norm,cellfun(@(x)norm(x,2),spin_system.inter.modes.(chan_flds{n})));
+                pairs=spin_system.inter.modes.(chan_flds{n});
+                pairs=pairs(abs(cell2mat(pairs(:,3)))>2*pi*spin_system.tols.inter_cutoff,:);
+                mode_conmat=mode_conmat|sparse(cell2mat(pairs(:,1)),cell2mat(pairs(:,2)),true,...
+                                              spin_system.comp.nspins,spin_system.comp.nspins);
             end
 
-            % Build the mode connectivity matrix
-            mode_conmat=mode_norm>2*pi*spin_system.tols.inter_cutoff;
+            % Link every modulated spin block to its pair of modes
+            mod_flds={'coupling_mod','zeeman_mod'};
+            for f=1:numel(mod_flds)
+                pairs=spin_system.inter.modes.(mod_flds{f});
+                for n=1:size(pairs,1)
+                    [m1,m2,derivs]=pairs{n,:};
+                    for m=1:numel(derivs)
+                        if isempty(derivs{m}), continue; end
 
-            % Over coupling tensor derivatives with respect to mode coordinates
-            [m1,m2]=find(~cellfun(@isempty,spin_system.inter.modes.coupling_mod));
-            for n=1:numel(m1)
+                        % Select spin targets above the basis cut-off
+                        if f==1
+                            blocks=derivs{m};
+                            keep=cellfun(tensor_norm,blocks(:,3))>2*pi*spin_system.tols.inter_cutoff;
+                            targets=cell2mat(blocks(keep,1:2));
+                        else
+                            keep=cellfun(@(x)norm(x,2),derivs{m})>2*pi*spin_system.tols.inter_cutoff;
+                            targets=find(keep)';
+                        end
+                        if isempty(targets), continue; end
 
-                % Over derivative orders
-                derivs=spin_system.inter.modes.coupling_mod{m1(n),m2(n)};
-                for m=1:numel(derivs)
+                        % A common derivative connects all incident particles
+                        particles=[repmat([m1 m2],size(targets,1),1) targets];
+                        labels=repmat((1:size(targets,1))',1,size(particles,2));
+                        incident=sparse(particles(:),labels(:),1,spin_system.comp.nspins,size(targets,1));
+                        mode_conmat=mode_conmat|(incident*incident');
 
-                    % Skip empty derivative orders
-                    if isempty(derivs{m}), continue; end
-
-                    % Spin pairs whose coupling derivative is above the cut-off
-                    [p,q]=find(cellfun(tensor_norm,derivs{m})>2*pi*spin_system.tols.inter_cutoff);
-
-                    % Connect the modes and the spin pair
-                    for k=1:numel(p)
-                        particles=[m1(n) m2(n) p(k) q(k)];
-                        mode_conmat(particles,particles)=true;
                     end
-
                 end
-
-            end
-
-            % Over effective field derivatives with respect to mode coordinates
-            [m1,m2]=find(~cellfun(@isempty,spin_system.inter.modes.zeeman_mod));
-            for n=1:numel(m1)
-
-                % Over derivative orders
-                derivs=spin_system.inter.modes.zeeman_mod{m1(n),m2(n)};
-                for m=1:numel(derivs)
-
-                    % Skip empty derivative orders
-                    if isempty(derivs{m}), continue; end
-
-                    % Spins whose field derivative is above the cut-off
-                    p=find(cellfun(@(x)norm(x,2),derivs{m})>2*pi*spin_system.tols.inter_cutoff);
-
-                    % Connect the modes and the spin
-                    for k=1:numel(p)
-                        particles=[m1(n) m2(n) p(k)];
-                        mode_conmat(particles,particles)=true;
-                    end
-
-                end
-
             end
 
             % Merge spin and bosonic mode connectivity matrices
-            spin_system.inter.conmatrix=spin_system.inter.conmatrix|sparse(mode_conmat);
+            spin_system.inter.conmatrix=spin_system.inter.conmatrix|mode_conmat;
 
             % Update the user
             report(spin_system,'bosonic mode couplings above the cut-off added to the coupling graph.');

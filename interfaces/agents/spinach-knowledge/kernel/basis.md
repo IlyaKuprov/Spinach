@@ -56,3 +56,4 @@ Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this e
 Product records are sorted by operator index, then source and destination. `bas.lp_offsets{mult}` and `bas.rp_offsets{mult}` store cumulative row counts (starting at zero), locating each tensor slice. `bas.unit_norm{mult}` stores the `[n 1 n value]` coefficients for direct detection-state normalisation. Disk cache filenames and contents are unchanged.
 
 Each substance receives its own locally numbered coupling and proximity records. Connectivity tests operate on sparse graphs; the IK-DNP graphs distinguish electron–electron, electron–nuclear, and nuclear–nuclear pairs.
+Substance restriction renumbers both mode endpoints and the spin targets inside derivative orders. In IK-SBS each retained tensor derivative connects its spin pair and both modes in the sparse connectivity graph.

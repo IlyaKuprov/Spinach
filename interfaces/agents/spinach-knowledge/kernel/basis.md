@@ -54,3 +54,5 @@ Wavefunction direct-sum storage uses the local Hilbert dimensions, including sca
 Legacy global `bas.basis` matrices and `bas.irrep` fields are rejected at this entry point with named errors pointing to per-substance `bas.basis{n}`/`bas.offsets` and `bas.sym_fact(n)` symmetry data. Compiled structures remain ordinary MATLAB structs; arbitrary external dot reads are not intercepted.
 
 Product records are sorted by operator index, then source and destination. `bas.lp_offsets{mult}` and `bas.rp_offsets{mult}` store cumulative row counts (starting at zero), locating each tensor slice. `bas.unit_norm{mult}` stores the `[n 1 n value]` coefficients for direct detection-state normalisation. Disk cache filenames and contents are unchanged.
+
+Substance restriction renumbers both mode endpoints and the spin targets inside derivative orders. In IK-SBS each retained tensor derivative connects its spin pair and both modes in the sparse connectivity graph.

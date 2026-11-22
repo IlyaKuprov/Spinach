@@ -328,6 +328,8 @@ local descriptor and apply the resulting masks at its offset.
 electrons and nuclei and nothing else in the system. `IK-SBS` requires both
 spins and bosonic modes (`C`, `V`, or `T` particles).
 
+Supply mode pair channels as particle-indexed cell arrays. In the compiled system, the six pair channels instead contain `{from,to,value}` records; spin pairs within a coupling modulation derivative use the same layout.
+
 ## Unit conversions on the way in
 
 Spinach works in rad/s internally and converts on absorption, so every helper

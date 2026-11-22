@@ -85,7 +85,7 @@ if isfield(inter.chem,'parts')&&isscalar(inter.chem.parts)&&~isfield(inter.chem,
 end
 
 % Validate input
-grumble(sys,inter);
+inter=grumble(sys,inter);
 
 % Run existential checks
 if (~isfield(sys,'disable'))||...
@@ -473,14 +473,6 @@ if isfield(inter,'modes')
     spin_system.inter.modes.damp=zeros(1,spin_system.comp.nspins);
     spin_system.inter.modes.dephase=zeros(1,spin_system.comp.nspins);
 
-    % Preallocate pairwise coupling arrays
-    spin_system.inter.modes.exchange=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.kerr=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.longitudinal=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.dispersive=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.coupling_mod=cell(spin_system.comp.nspins);
-    spin_system.inter.modes.zeeman_mod=cell(spin_system.comp.nspins);
-
     % Absorb mode frequencies
     if isfield(inter.modes,'frqs')
         for n=find(mode_mask)
@@ -575,104 +567,60 @@ if isfield(inter,'modes')
         end
     end
 
-    % Absorb significant exchange couplings
-    if isfield(inter.modes,'exchange')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.exchange));
-        for n=1:numel(rows)
-            if abs(inter.modes.exchange{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.exchange{rows(n),cols(n)}=...
-                2*pi*inter.modes.exchange{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - exchange coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
+    % Compile the significant scalar couplings in column-major order
+    pair_flds={'exchange','kerr','longitudinal','dispersive'};
+    for f=1:numel(pair_flds)
+        name=pair_flds{f};
+        pairs=cell(0,3);
+        if isfield(inter.modes,name)
+            pairs=inter.modes.(name);
+            keep=cellfun(@(x)abs(x)>spin_system.tols.inter_cutoff,pairs(:,3));
+            for n=find(~keep)'
+                report(spin_system,['WARNING - ' name ' coupling ' int2str(pairs{n,1}) ',' ...
+                                    int2str(pairs{n,2}) ' is below the interaction cutoff, ignored.']);
             end
+            pairs=pairs(keep,:);
+            pairs(:,3)=cellfun(@(x)2*pi*x,pairs(:,3),'UniformOutput',false);
         end
+        spin_system.inter.modes.(name)=pairs;
     end
 
-    % Absorb significant cross-Kerr couplings
-    if isfield(inter.modes,'kerr')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.kerr));
-        for n=1:numel(rows)
-            if abs(inter.modes.kerr{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.kerr{rows(n),cols(n)}=...
-                2*pi*inter.modes.kerr{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - cross-Kerr coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
-            end
-        end
-    end
-
-    % Absorb significant longitudinal couplings
-    if isfield(inter.modes,'longitudinal')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.longitudinal));
-        for n=1:numel(rows)
-            if abs(inter.modes.longitudinal{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.longitudinal{rows(n),cols(n)}=...
-                2*pi*inter.modes.longitudinal{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - longitudinal coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
-            end
-        end
-    end
-
-    % Absorb significant dispersive couplings
-    if isfield(inter.modes,'dispersive')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.dispersive));
-        for n=1:numel(rows)
-            if abs(inter.modes.dispersive{rows(n),cols(n)})>spin_system.tols.inter_cutoff
-                spin_system.inter.modes.dispersive{rows(n),cols(n)}=...
-                2*pi*inter.modes.dispersive{rows(n),cols(n)};
-            else
-                report(spin_system,['WARNING - dispersive coupling ' int2str(rows(n)) ',' ...
-                                    int2str(cols(n)) ' is below the interaction cutoff, ignored.']);
-            end
-        end
-    end
-
-    % Absorb coupling tensor derivatives
-    if isfield(inter.modes,'coupling_mod')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.coupling_mod));
-        for n=1:numel(rows)
-            deriv_orders=inter.modes.coupling_mod{rows(n),cols(n)};
-            for m=1:numel(deriv_orders)
-                if ~isempty(deriv_orders{m})
-                    spin_system.inter.modes.coupling_mod{rows(n),cols(n)}{m}=...
-                    cellfun(@(x)2*pi*x,deriv_orders{m},'UniformOutput',false);
+    % Compile the tensor and field derivatives in angular frequency units
+    mod_flds={'coupling_mod','zeeman_mod'};
+    for f=1:numel(mod_flds)
+        name=mod_flds{f};
+        pairs=cell(0,3);
+        if isfield(inter.modes,name)
+            pairs=inter.modes.(name);
+            for n=1:size(pairs,1)
+                orders=pairs{n,3};
+                for m=1:numel(orders)
+                    if isempty(orders{m}), continue; end
+                    if f==1
+                        tensors=orders{m};
+                        tensors(:,3)=cellfun(@(x)2*pi*x,tensors(:,3),'UniformOutput',false);
+                        orders{m}=tensors;
+                    else
+                        orders{m}=cellfun(@(x)2*pi*x,orders{m},'UniformOutput',false);
+                    end
                 end
+                pairs{n,3}=orders;
             end
+            pairs=pairs(~cellfun(@isempty,pairs(:,3)),:);
         end
-    end
-
-    % Absorb effective field derivatives
-    if isfield(inter.modes,'zeeman_mod')
-        [rows,cols]=find(~cellfun(@isempty,inter.modes.zeeman_mod));
-        for n=1:numel(rows)
-            deriv_orders=inter.modes.zeeman_mod{rows(n),cols(n)};
-            for m=1:numel(deriv_orders)
-                if ~isempty(deriv_orders{m})
-                    spin_system.inter.modes.zeeman_mod{rows(n),cols(n)}{m}=...
-                    cellfun(@(x)2*pi*x,deriv_orders{m},'UniformOutput',false);
-                end
-            end
-        end
+        spin_system.inter.modes.(name)=pairs;
     end
 
     % Report mode parameters to the user
     summary_modes(spin_system,'bosonic mode summary');
 
     % Report mode couplings to the user
-    if ~all(cellfun(@isempty,[spin_system.inter.modes.exchange(:);
-                              spin_system.inter.modes.kerr(:);
-                              spin_system.inter.modes.longitudinal(:);
-                              spin_system.inter.modes.dispersive(:)]))
+    if any(cellfun(@(x)~isempty(spin_system.inter.modes.(x)),pair_flds))
         summary_mode_coup(spin_system,'summary of bosonic mode couplings (Hz)');
     end
 
     % Report modulation tensors to the user
-    if ~all(cellfun(@isempty,[spin_system.inter.modes.coupling_mod(:);
-                              spin_system.inter.modes.zeeman_mod(:)]))
+    if any(cellfun(@(x)~isempty(spin_system.inter.modes.(x)),mod_flds))
         summary_mode_mods(spin_system,'summary of spin Hamiltonian modulation by modes');
     end
 
@@ -1489,8 +1437,18 @@ end
 
 end
 
+% Extract occupied cells without materialising a square occupancy mask
+function pairs=mode_pairs(table)
+columns=cell(size(table,2),1);
+for k=1:size(table,2)
+    rows=find(~cellfun(@isempty,table(:,k)));
+    columns{k}=[num2cell(rows) repmat({k},numel(rows),1) table(rows,k)];
+end
+pairs=vertcat(columns{:});
+end
+
 % Input validation function
-function grumble(sys,inter)
+function inter=grumble(sys,inter)
 
 % Check the output switch
 if isfield(sys,'output')
@@ -3012,40 +2970,39 @@ if isfield(inter,'modes')
                (size(fld,2)~=numel(sys.isotopes))
                 error(['inter.modes.' pair_flds{m} ' must be a cell array with dimensions nspins x nspins.']);
             end
-            for n=1:numel(sys.isotopes)
-                for k=1:numel(sys.isotopes)
-                    if ~isempty(fld{n,k})
-                        if (~isnumeric(fld{n,k}))||(~isreal(fld{n,k}))||...
-                           (~isscalar(fld{n,k}))||(~isfinite(fld{n,k}))
-                            error(['non-empty elements of inter.modes.' pair_flds{m} ' must be real finite scalars.']);
-                        end
-                        if strcmp(pair_flds{m},'longitudinal')
-                            if n==k
-                                error('inter.modes.longitudinal must not have entries on the main diagonal.');
-                            end
-                            if ~isempty(fld{k,n})
-                                error(['inter.modes.longitudinal is declared for both {' int2str(n) ','...
-                                       int2str(k) '} and {' int2str(k) ',' int2str(n) '}, which is ambiguous.']);
-                            end
-                        elseif n>=k
-                            error(['inter.modes.' pair_flds{m} ' must only have entries above the main diagonal.']);
-                        end
-                        nbosons=nnz(boson_mask([n k]));
-                        if strcmp(pair_flds{m},'exchange')&&(nbosons==0)
-                            error(['inter.modes.exchange between particles ' int2str(n) ' and ' int2str(k) ': spin-spin couplings belong in inter.coupling.']);
-                        end
-                        if strcmp(pair_flds{m},'kerr')&&(nbosons~=2)
-                            error(['inter.modes.kerr between particles ' int2str(n) ' and ' int2str(k) ' requires two bosonic modes.']);
-                        end
-                        if strcmp(pair_flds{m},'longitudinal')&&(nbosons==0)
-                            error(['inter.modes.longitudinal between particles ' int2str(n) ' and ' int2str(k) ' requires at least one bosonic mode.']);
-                        end
-                        if strcmp(pair_flds{m},'dispersive')&&(nbosons~=1)
-                            error(['inter.modes.dispersive between particles ' int2str(n) ' and ' int2str(k) ' requires one spin and one bosonic mode; number-number couplings between modes belong in inter.modes.kerr.']);
-                        end
+            pairs=mode_pairs(fld);
+            for j=1:size(pairs,1)
+                [n,k,value]=pairs{j,:};
+                if (~isnumeric(value))||(~isreal(value))||...
+                   (~isscalar(value))||(~isfinite(value))
+                    error(['non-empty elements of inter.modes.' pair_flds{m} ' must be real finite scalars.']);
+                end
+                if strcmp(pair_flds{m},'longitudinal')
+                    if n==k
+                        error('inter.modes.longitudinal must not have entries on the main diagonal.');
                     end
+                    if ~isempty(fld{k,n})
+                        error(['inter.modes.longitudinal is declared for both {' int2str(n) ','...
+                               int2str(k) '} and {' int2str(k) ',' int2str(n) '}, which is ambiguous.']);
+                    end
+                elseif n>=k
+                    error(['inter.modes.' pair_flds{m} ' must only have entries above the main diagonal.']);
+                end
+                nbosons=nnz(boson_mask([n k]));
+                if strcmp(pair_flds{m},'exchange')&&(nbosons==0)
+                    error(['inter.modes.exchange between particles ' int2str(n) ' and ' int2str(k) ': spin-spin couplings belong in inter.coupling.']);
+                end
+                if strcmp(pair_flds{m},'kerr')&&(nbosons~=2)
+                    error(['inter.modes.kerr between particles ' int2str(n) ' and ' int2str(k) ' requires two bosonic modes.']);
+                end
+                if strcmp(pair_flds{m},'longitudinal')&&(nbosons==0)
+                    error(['inter.modes.longitudinal between particles ' int2str(n) ' and ' int2str(k) ' requires at least one bosonic mode.']);
+                end
+                if strcmp(pair_flds{m},'dispersive')&&(nbosons~=1)
+                    error(['inter.modes.dispersive between particles ' int2str(n) ' and ' int2str(k) ' requires one spin and one bosonic mode; number-number couplings between modes belong in inter.modes.kerr.']);
                 end
             end
+            inter.modes.(pair_flds{m})=pairs;
         end
     end
     deriv_flds={'coupling_mod','zeeman_mod'};
@@ -3056,64 +3013,64 @@ if isfield(inter,'modes')
                (size(fld,2)~=numel(sys.isotopes))
                 error(['inter.modes.' deriv_flds{m} ' must be a cell array with dimensions nspins x nspins.']);
             end
-            for n=1:numel(sys.isotopes)
-                for k=1:numel(sys.isotopes)
-                    if ~isempty(fld{n,k})
-                        if nnz(boson_mask([n k]))~=2
-                            error(['inter.modes.' deriv_flds{m} ' entry {' int2str(n) ',' int2str(k) '} requires two bosonic mode indices.']);
+            pairs=mode_pairs(fld);
+            for j=1:size(pairs,1)
+                [n,k,value]=pairs{j,:};
+                if nnz(boson_mask([n k]))~=2
+                    error(['inter.modes.' deriv_flds{m} ' entry {' int2str(n) ',' int2str(k) '} requires two bosonic mode indices.']);
+                end
+                if n>k
+                    error(['inter.modes.' deriv_flds{m} ' must only have entries on or above the main diagonal.']);
+                end
+                if (~iscell(value))||(numel(value)>2)
+                    error(['inter.modes.' deriv_flds{m} ' entries must be cell arrays with at most two derivative orders.']);
+                end
+                if (numel(value)>=1)&&(~isempty(value{1}))&&(n~=k)
+                    error(['first derivative in inter.modes.' deriv_flds{m} ' entry {' int2str(n) ',' int2str(k) '} requires a diagonal mode pair.']);
+                end
+                last=find(~cellfun(@isempty,value),1,'last');
+                if isempty(last), pairs{j,3}=[]; continue; end
+                pairs{j,3}=reshape(value(1:last),1,[]);
+                for m2=1:last
+                    block=value{m2};
+                    if isempty(block), continue; end
+                    if strcmp(deriv_flds{m},'coupling_mod')
+                        if (~iscell(block))||(size(block,1)~=numel(sys.isotopes))||...
+                           (size(block,2)~=numel(sys.isotopes))
+                            error('coupling derivative blocks must be cell arrays with dimensions nspins x nspins.');
                         end
-                        if n>k
-                            error(['inter.modes.' deriv_flds{m} ' must only have entries on or above the main diagonal.']);
+                        tensors=mode_pairs(block);
+                        for t=1:size(tensors,1)
+                            [p,q,tensor]=tensors{t,:};
+                            if boson_mask(p)||boson_mask(q)
+                                error('coupling derivative tensors may only connect spin index pairs.');
+                            end
+                            if (~isnumeric(tensor))||(~isreal(tensor))||...
+                               (~isequal(size(tensor),[3 3]))||(~all(isfinite(tensor(:))))
+                                error('coupling derivative tensors must be real finite 3x3 matrices.');
+                            end
                         end
-                        if (~iscell(fld{n,k}))||(numel(fld{n,k})>2)
-                            error(['inter.modes.' deriv_flds{m} ' entries must be cell arrays with at most two derivative orders.']);
+                        pairs{j,3}{m2}=tensors;
+                    else
+                        if (~iscell(block))||(~isrow(block))||(numel(block)~=numel(sys.isotopes))
+                            error('field derivative blocks must be row cell arrays with one element per particle.');
                         end
-                        if (numel(fld{n,k})>=1)&&(~isempty(fld{n,k}{1}))&&(n~=k)
-                            error(['first derivative in inter.modes.' deriv_flds{m} ' entry {' int2str(n) ',' int2str(k) '} requires a diagonal mode pair.']);
-                        end
-                        for m2=1:numel(fld{n,k})
-                            block=fld{n,k}{m2};
-                            if isempty(block), continue; end
-                            if strcmp(deriv_flds{m},'coupling_mod')
-                                if (~iscell(block))||(size(block,1)~=numel(sys.isotopes))||...
-                                   (size(block,2)~=numel(sys.isotopes))
-                                    error('coupling derivative blocks must be cell arrays with dimensions nspins x nspins.');
+                        for p=1:numel(sys.isotopes)
+                            if ~isempty(block{p})
+                                if boson_mask(p)
+                                    error('field derivative vectors may only be specified for spins.');
                                 end
-                                for p=1:numel(sys.isotopes)
-                                    for q=1:numel(sys.isotopes)
-                                        if ~isempty(block{p,q})
-                                            if boson_mask(p)||boson_mask(q)
-                                                error('coupling derivative tensors may only connect spin index pairs.');
-                                            end
-                                            if (~isnumeric(block{p,q}))||(~isreal(block{p,q}))||...
-                                               (~all(size(block{p,q})==[3 3]))||...
-                                               (~all(isfinite(block{p,q}(:))))
-                                                error('coupling derivative tensors must be real finite 3x3 matrices.');
-                                            end
-                                        end
-                                    end
-                                end
-                            else
-                                if (~iscell(block))||(~isrow(block))||(numel(block)~=numel(sys.isotopes))
-                                    error('field derivative blocks must be row cell arrays with one element per particle.');
-                                end
-                                for p=1:numel(sys.isotopes)
-                                    if ~isempty(block{p})
-                                        if boson_mask(p)
-                                            error('field derivative vectors may only be specified for spins.');
-                                        end
-                                        if (~isnumeric(block{p}))||(~isreal(block{p}))||...
-                                           (~all(size(block{p})==[1 3]))||...
-                                           (~all(isfinite(block{p})))
-                                            error('field derivative vectors must be real finite 1x3 vectors.');
-                                        end
-                                    end
+                                if (~isnumeric(block{p}))||(~isreal(block{p}))||...
+                                   (~all(size(block{p})==[1 3]))||...
+                                   (~all(isfinite(block{p})))
+                                    error('field derivative vectors must be real finite 1x3 vectors.');
                                 end
                             end
                         end
                     end
                 end
             end
+            inter.modes.(deriv_flds{m})=pairs;
         end
     end
 end

@@ -73,3 +73,5 @@ When reusing a parallel pool, `create` clears its ValueStore only if none of `op
 Use current patched R2026b or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.
 
 Point-to-point flux inputs are inter.flux_rate and inter.flux_type, stored under spin_system.rlx. Their presence does not automatically select flux relaxation: include 'flux' in inter.relaxation to activate the contribution.
+
+The six compiled mode pair channels are ordered cell records `{from,to,value}`, sorted by the second index and then the first. Coupling modulation stores spin-pair tensor records at each derivative order; field modulation retains a particle-indexed row of vectors.

@@ -26,3 +26,5 @@ The assumptions argument must be a character string, and the source accepts two 
 ## Reference
 
 [Spin Dynamics Wiki: assume.m](https://spindynamics.org/wiki/index.php?title=assume.m)
+
+The cavity exclusions test whether longitudinal or modulation records exist, not whether their payloads have nonzero norm.

@@ -622,13 +622,13 @@ switch assumptions
         if isfield(spin_system.inter,'modes')
 
             % Disallow longitudinal terms that average out under the RWA
-            if ~all(cellfun(@isempty,spin_system.inter.modes.longitudinal(:)))
+            if ~isempty(spin_system.inter.modes.longitudinal)
                 error('longitudinal couplings average to zero in this frame, use spin-phonon or labframe.');
             end
 
             % Disallow modulation terms that average out under the RWA
-            if (~all(cellfun(@isempty,spin_system.inter.modes.coupling_mod(:))))||...
-               (~all(cellfun(@isempty,spin_system.inter.modes.zeeman_mod(:))))
+            if (~isempty(spin_system.inter.modes.coupling_mod))||...
+               (~isempty(spin_system.inter.modes.zeeman_mod))
                 error('Hamiltonian modulation terms average to zero in this frame, use spin-phonon or labframe.');
             end
 

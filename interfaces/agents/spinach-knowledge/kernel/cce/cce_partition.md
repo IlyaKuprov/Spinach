@@ -54,3 +54,5 @@ Native adaptive patch selection removes the experiment-owned propagator preferen
 Only the native experiment parameter contract is accepted. Exact-patch evaluation always obtains its callback from the registered pulse sequence; no method-name dispatch or event-schedule compiler is used.
 
 Native partition bounds and group membership are checked before constructing the internal graph and cluster-selection request.
+
+Coupling merges consider only groups joined by a nonzero physical edge. Spatial swaps and adaptive pilot proposals may involve uncoupled groups.

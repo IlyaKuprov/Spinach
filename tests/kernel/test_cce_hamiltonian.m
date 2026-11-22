@@ -74,16 +74,16 @@ parameters.orientation=[0 0 0];
 model=cce_compile(system,parameters,assumptions);
 [reference,meta]=cce_hamiltonian(model,[3 1],struct('backend','stock'));
 mutant=system;
-mutant.inter.coupling.matrix{1,2}=mutant.inter.coupling.matrix{1,2}.';
+mutant=cce_test_write(mutant,[1 2],cce_test_read(mutant,[1 2]).');
 wrong=cce_hamiltonian(cce_compile(mutant,parameters,assumptions),[3 1],struct());
 result=test_true(result,'transpose mutation rejected',...
                  norm(wrong-reference,'fro')>100*meta.roundoff_bound,'Antisymmetric ordered-cell convention is observable.');
 
 % Check one-sided versus two-half-cell storage for a nonsymmetric tensor
 half=system;
-tensor=half.inter.coupling.matrix{1,2};
-half.inter.coupling.matrix{1,2}=tensor/2;
-half.inter.coupling.matrix{2,1}=tensor.'/2;
+tensor=cce_test_read(half,[1 2]);
+half=cce_test_write(half,[1 2],tensor/2);
+half=cce_test_write(half,[2 1],tensor.'/2);
 H=cce_hamiltonian(cce_compile(half,parameters,assumptions),[3 1],struct());
 result=test_close(result,'nonsymmetric half cells',...
                   H,reference,meta.roundoff_bound,0,'Reverse ordered cell requires tensor transpose.');

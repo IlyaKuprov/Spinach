@@ -64,6 +64,9 @@ if ~isfinite(dimension)||16*dimension^2*copies>model.numerics.max_memory_bytes
     error('cluster Hamiltonian exceeds numerics.max_memory_bytes.');
 end
 
+% Resolve both directions of each retained pair
+[pair_index,tensors]=cce_pair_index(model);
+
 % Construct angular momentum operators in canonical product ordering
 ops=cell(numel(ids),3);
 for n=1:numel(ids)
@@ -130,7 +133,7 @@ if strcmp(backend,'direct')
 
         % Apply the stock on-site quadratic retention convention
         tensor=model.quadratic{id};
-        strength=model.spin_system.inter.coupling.strength{id,id};
+        strength=model.quadratic_strength{id};
         switch strength
             case 'strong'
 
@@ -158,7 +161,7 @@ if strcmp(backend,'direct')
 
         % Sum each physical pair once, using combined ordered-cell tensors
         for k=n+1:numel(ids)
-            tensor=model.retained{id,ids(k)};
+            tensor=tensors{1+pair_index(id,ids(k))};
             for axis=1:3
                 for other=1:3
                     term=tensor(axis,other)*(ops{n,axis}*ops{k,other});
@@ -207,7 +210,7 @@ if isfield(spin_config,'exterior_ids')
     end
     for n=1:numel(ids)
         for k=1:numel(spin_config.exterior_ids)
-            field=model.retained{ids(n),spin_config.exterior_ids(k)}*...
+            field=tensors{1+pair_index(ids(n),spin_config.exterior_ids(k))}*...
                   spin_config.exterior_expectations(k,:).';
             for axis=1:3
                 term=field(axis)*ops{n,axis};
@@ -247,7 +250,7 @@ end
 % Validate structure, IDs, and explicitly supplied exterior expectations
 function grumble(model,sites,spin_config)
 if ~isstruct(model)||~all(isfield(model,{'source_hash','observed_ids',...
-   'bath_ids','multiplicities','retained','spin_system','numerics','backend'}))
+   'bath_ids','multiplicities','pairs','spin_system','numerics','backend'}))
     error('model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...

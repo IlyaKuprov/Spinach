@@ -22,3 +22,5 @@ Observed transitions are resolved once after native tensor compilation. Coherent
 The physical source fingerprint excludes native cce.parallel, cce.checkpoint, cce.retain_raw, and cce.convergence controls. These fields remain in the resolved parameters for their respective owners; excluding them from the physical hash lets resumed and newly evaluated raw generator records retain identical physical provenance when only scheduling or resume switches change. Tensors, Spinach tolerances, time meshes, preparations, bath states, and all other physical options remain part of the fingerprint.
 
 The compiler validates its consumed spin identifiers, orientation, assumptions, resolved numerical budgets, and representation locally before tensor compilation. cce_options supplies the shared native defaults and vocabulary; no compiler accuracy or memory policy is invented.
+
+Compilation visits occupied unordered pairs in ascending physical-ID order. Each pair stores its unprojected laboratory-frame tensor for graph scoring and its independently masked tensor for propagation; cancelling bare terms need not cancel after masking.

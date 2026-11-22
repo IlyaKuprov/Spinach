@@ -52,10 +52,10 @@ result=test_close(result,'dipole SI units',...
 
 % Check one full ordered cell versus two transposed half cells
 system=model.spin_system;
-tensor=system.inter.coupling.matrix{1,2}+...
-        system.inter.coupling.matrix{2,1}.';
-system.inter.coupling.matrix{1,2}=tensor;
-system.inter.coupling.matrix{2,1}=zeros(3);
+tensor=cce_test_read(system,[1 2])+...
+        cce_test_read(system,[2 1]).';
+system=cce_test_write(system,[1 2],tensor);
+system=cce_test_write(system,[2 1],zeros(3));
 one=cce_hamiltonian(cce_compile(system,parameters,'labframe'),2,struct());
 result=test_close(result,'ordered half cells',...
                   H,one,meta.roundoff_bound,0,'Coordinate tensors must not double-count.');

@@ -55,8 +55,8 @@ ids=graph.bath_ids;
 [~,positions]=ismember(ids,model.physical_ids);
 dims=model.multiplicities(positions);
 
-% Bound dense partition graph, edge candidates, and group copies before allocation
-bytes=3*(9*numel(ids)^2+32*numel(ids)*(numel(ids)-1)/2);
+% Bound the physical edge candidates and group copies before allocation
+bytes=3*(32*nnz(graph.pair_norm)+16*numel(ids));
 if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
     error('cce_partition:memory',...
           'Partition graph and candidate storage exceed numerics.max_memory_bytes.');
@@ -75,17 +75,22 @@ complete=true;
 if strcmp(p.mode,'coupling')
     while true
         edges=zeros(0,4);
-        for a=1:numel(groups)
-            for b=a+1:numel(groups)
-                if dimension([groups{a} groups{b}],ids,dims)>p.max_dimension
-                    continue;
-                end
+        [~,sites]=ismember([groups{:}],ids);
+        ng=numel(groups);
+        vertices=cell(size(groups));
+        for k=1:ng
+            vertices{k}=repmat(k,size(groups{k}));
+        end
+        group=sparse(sites,[vertices{:}],1,numel(ids),ng);
+        [left,right]=find(triu(group.'*spones(graph.pair_norm)*group,1));
+        for k=1:numel(left)
+            a=left(k);
+            b=right(k);
+            if dimension([groups{a} groups{b}],ids,dims)<=p.max_dimension
                 [~,ia]=ismember(groups{a},ids);
                 [~,ib]=ismember(groups{b},ids);
                 strength=norm(graph.pair_norm(ia,ib),'fro');
-                if strength>0
-                    edges(end+1,:)=[-strength min(groups{a}) a b]; %#ok<AGROW>
-                end
+                edges(end+1,:)=[-strength min(groups{a}) a b]; %#ok<AGROW>
             end
         end
         if isempty(edges)
@@ -450,7 +455,7 @@ if any(~found)||any(model.multiplicities(index)>p.max_dimension)
 end
 if ~isnumeric(graph.pair_norm)||~isreal(graph.pair_norm)||...
    ~isequal(size(graph.pair_norm),[numel(ids) numel(ids)])||...
-   any(~isfinite(graph.pair_norm)|graph.pair_norm<0,'all')
+   any(~isfinite(nonzeros(graph.pair_norm)))||any(graph.pair_norm<0,'all')
     error('Physical pair norms must be a finite nonnegative square array.');
 end
 if isfield(parameters,'groups')&&~isempty(parameters.groups)

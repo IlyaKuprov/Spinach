@@ -146,6 +146,28 @@ answer=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 result=test_true(result,'Zero splitting',all(answer==1),...
                  'An exactly degenerate pair contributes unity without a division.');
 
+% Bath species and couplings outside the spin-1/2 exchange model must be rejected
+deuterons=sys;
+deuterons.isotopes(2:end)={'2H'};
+skewed=inter;
+skewed.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
+skewed.coupling.matrix{2,3}=[0 1 0; -1 0 0; 0 0 0];
+cases={create(deuterons,inter),create(sys,skewed)};
+names={'Spin-1 bath rejected','Antisymmetric bath tensor rejected'};
+for k=1:2
+
+    % Require the evaluator's own error rather than a silent unit echo
+    rejected=false;
+    try
+        clexpn(cases{k},@hahn_echo,parameters,'labframe');
+    catch exception
+        rejected=strcmp(exception.identifier,'clexpn:analyticalHahn');
+    end
+    result=test_true(result,names{k},rejected,...
+                     'The pair formula covers spin-1/2 nuclei with isotropic exchange only.');
+
+end
+
 % Reject requests whose physics the analytical evaluator does not implement
 parameters.cce.graph=struct('mode','distance','radius',10);
 rejected=false;

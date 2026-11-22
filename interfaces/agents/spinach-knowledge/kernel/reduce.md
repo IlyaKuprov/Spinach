@@ -46,4 +46,4 @@ For `zeeman-liouv` and `sphten-liouv`, the code tries symmetry factorisation whe
 
 The reduction order is symmetry factorisation, zero-track elimination, then disconnected-subspace identification by path tracing. Further details are in [doi:10.1016/j.jmr.2008.08.008](https://doi.org/10.1016/j.jmr.2008.08.008), [doi:10.1063/1.3398146](https://doi.org/10.1063/1.3398146), and [doi:10.1016/j.jmr.2011.03.010](https://doi.org/10.1016/j.jmr.2011.03.010). See also [the function Wiki page](https://spindynamics.org/wiki/index.php?title=reduce.m).
 
-An unselected flux theory must not suppress symmetry reduction merely because flux-rate fields are present. Only enabled, nonzero flux relevant to the permutation can constrain reduction; rates alone do not activate flux relaxation.
+An unselected flux theory must not suppress symmetry reduction merely because flux-rate fields are present. Only enabled flux with a nonempty compiled rate list can constrain reduction; rates alone do not activate flux relaxation.

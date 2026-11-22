@@ -72,4 +72,4 @@ When reusing a parallel pool, `create` clears its ValueStore only if none of `op
 
 Use current patched R2026b or later. Pool startup uses MATLAB’s default port settings; no historical Windows port-range workaround is applied.
 
-Point-to-point flux inputs are inter.flux_rate and inter.flux_type, stored under spin_system.rlx. Their presence does not automatically select flux relaxation: include 'flux' in inter.relaxation to activate the contribution.
+The square flux and Weizmann dipolar-rate inputs compile to nonzero `{from,to,value}` rows in `spin_system.rlx`, sorted by destination then source. The SRFK input cell array compiles to the same layout, retaining every nonempty depth (including an explicitly specified zero). An absent or empty compiled table is `cell(0,3)`. Flux rates do not automatically select flux relaxation: include `'flux'` in `inter.relaxation` to activate the contribution.

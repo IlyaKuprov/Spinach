@@ -301,41 +301,36 @@ if ismember('weizmann',spin_system.rlx.theories)
         Rmp*(2*Nm_L*Np_R-Np_L*Nm_L-Nm_R*Np_R)+...
         Rzz*(2*Nz_L*Nz_R-Nz_L*Nz_L-Nz_R*Nz_R);
     
-    % Add dipolar cross-relaxation terms
-    for n=1:spin_system.comp.nspins
-        for k=1:spin_system.comp.nspins
-            if n~=k
-            
-                % Process longitudinal terms
-                if spin_system.rlx.weiz_r1d(n,k)~=0
-                
-                    % Generate flip-flop superoperator
-                    FF_L=operator(spin_system,{'L+','L-'},{n,k},'left')+...
-                         operator(spin_system,{'L-','L+'},{n,k},'left');
-                    FF_R=operator(spin_system,{'L+','L-'},{n,k},'right')+...
-                         operator(spin_system,{'L-','L+'},{n,k},'right');
-                
-                    % Add Lindblad type term
-                    R=R+spin_system.rlx.weiz_r1d(n,k)*(2*FF_L*FF_R-FF_L*FF_L-FF_R*FF_R)/2;
-                
-                end
-            
-                % Process transverse terms
-                if spin_system.rlx.weiz_r2d(n,k)~=0
-                
-                    % Generate ZZ superoperator
-                    ZZ_L=operator(spin_system,{'Lz','Lz'},{n,k},'left');
-                    ZZ_R=operator(spin_system,{'Lz','Lz'},{n,k},'right');
-                
-                    % Add Lindblad type term
-                    R=R+spin_system.rlx.weiz_r2d(n,k)*(2*ZZ_L*ZZ_R-ZZ_L*ZZ_L-ZZ_R*ZZ_R)/2;
-                
-                end
+    % Visit populated keys in the original from-then-to accumulation order
+    rates=[spin_system.rlx.weiz_r1d; spin_system.rlx.weiz_r2d];
+    [~,order]=sortrows(cell2mat(rates(:,1:2)));
+    for m=order.'
 
-            end
+        % Diagonal rates are reported but do not enter cross-relaxation
+        [n,k,rate]=deal(rates{m,:});
+        if n==k, continue; end
+
+        % Add independent longitudinal and transverse Lindblad terms
+        if m<=size(spin_system.rlx.weiz_r1d,1)
+
+            % Generate flip-flop superoperators
+            FF_L=operator(spin_system,{'L+','L-'},{n,k},'left')+...
+                 operator(spin_system,{'L-','L+'},{n,k},'left');
+            FF_R=operator(spin_system,{'L+','L-'},{n,k},'right')+...
+                 operator(spin_system,{'L-','L+'},{n,k},'right');
+            R=R+rate*(2*FF_L*FF_R-FF_L*FF_L-FF_R*FF_R)/2;
+
+        else
+
+            % Generate ZZ superoperators
+            ZZ_L=operator(spin_system,{'Lz','Lz'},{n,k},'left');
+            ZZ_R=operator(spin_system,{'Lz','Lz'},{n,k},'right');
+            R=R+rate*(2*ZZ_L*ZZ_R-ZZ_L*ZZ_L-ZZ_R*ZZ_R)/2;
+
         end
+
     end
-    
+
     % Inform the user
     report(spin_system,'Weizmann DNP relaxation theory terms have been incorporated.');
     
@@ -411,11 +406,11 @@ if ismember('SRFK',spin_system.rlx.theories)
     spin_system_local=assume(spin_system,'labframe','couplings');
     
     % Replace couplings with their modulation depths
-    [rows,cols]=find(~cellfun(@isempty,spin_system.rlx.srfk_mdepth));
+    mdepth=spin_system.rlx.srfk_mdepth;
     spin_system_local.inter.coupling.matrix=cell(size(spin_system.inter.coupling.matrix));
-    for n=1:numel(rows)
-        spin_system_local.inter.coupling.matrix{rows(n),cols(n)}=...
-             2*pi*eye(3)*spin_system.rlx.srfk_mdepth{rows(n),cols(n)};
+    for n=1:size(mdepth,1)
+        spin_system_local.inter.coupling.matrix{mdepth{n,1},mdepth{n,2}}=...
+            2*pi*eye(3)*mdepth{n,3};
     end
     
     % Get the modulated coupling Hamiltonian
@@ -925,7 +920,7 @@ if ( strcmp(spin_system.rlx.equilibrium,'IME'))&&...
    (~ismember(spin_system.bas.formalism,{'sphten-liouv','zeeman-liouv'}))&&...
    ~(ismember('flux',spin_system.rlx.theories)&&...
      all(strcmp(spin_system.rlx.theories,'flux'),'all')&&...
-     nnz(spin_system.rlx.flux_rate)==0)
+     isempty(spin_system.rlx.flux_rate))
     error('IME thermalisation is only available in Liouville space.');
 end
 if (strcmp(spin_system.rlx.equilibrium,'dibari'))&&...

@@ -5,7 +5,7 @@
 % Parameters:
 %
 %    spin_system - Spinach data structure with a compiled basis and
-%                  validated rlx.flux_rate and rlx.flux_type fields
+%                  compiled rlx.flux_rate records and rlx.flux_type selector
 %
 % Outputs:
 %
@@ -21,7 +21,7 @@ grumble(spin_system);
 % Allocate the generator and retain the no-flux default
 F=mprealloc(spin_system,0);
 if ~ismember('flux',spin_system.rlx.theories)||...
-   nnz(spin_system.rlx.flux_rate)==0, return; end
+   isempty(spin_system.rlx.flux_rate), return; end
 
 % The original flux model uses spherical tensor basis labels
 if ~strcmp(spin_system.bas.formalism,'sphten-liouv')
@@ -38,13 +38,13 @@ switch spin_system.rlx.flux_type
         error('unrecognized type of magnetisation flux.');
 end
 
-% Process every matrix entry, including diagonal bath rates
-[sources,destins,rates]=find(spin_system.rlx.flux_rate);
+% Process every rate record, including diagonal bath rates
+flux=spin_system.rlx.flux_rate;
 orders=cellfun(@(b)sum(logical(b),2),spin_system.bas.basis,'UniformOutput',false);
-for n=1:numel(rates)
+for n=1:size(flux,1)
 
     % Locate single- and multi-spin orders on either side
-    spins=[sources(n) destins(n)];
+    spins=[flux{n,1:2}];
     rows=cell(2,2); labels=cell(2,2);
     for side=1:2
         subst=which_subst(spin_system,spins(side));
@@ -77,12 +77,12 @@ for n=1:numel(rates)
             end
 
             % Gain terms retain their original ordered basis-state matching
-            F=F+rates(n)*sparse(rows{2,order},rows{1,order},...
+            F=F+flux{n,3}*sparse(rows{2,order},rows{1,order},...
                                ones(size(rows{1,order})),size(F,1),size(F,2));
         end
 
         % Intermolecular flux destroys every source correlation, even on the diagonal
-        F=F-rates(n)*sparse(rows{1,order},rows{1,order},...
+        F=F-flux{n,3}*sparse(rows{1,order},rows{1,order},...
                            ones(size(rows{1,order})),size(F,1),size(F,2));
     end
 end

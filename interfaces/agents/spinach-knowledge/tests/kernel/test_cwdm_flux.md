@@ -6,4 +6,4 @@ The test verifies zero concentration derivatives at independently sampled popula
 
 Detection and reference operator vectors use the three-argument unweighted `coil_state` primitive.
 
-Current interface note: flux rates/type live at inter.flux_rate and inter.flux_type, then spin_system.rlx.flux_rate and spin_system.rlx.flux_type. Selecting 'flux' in inter.relaxation activates the contribution; tests of prior automatic or chemistry-owned behavior are historical, not current API assertions.
+Current interface note: flux rates/type live at inter.flux_rate and inter.flux_type, then spin_system.rlx.flux_rate (column-major ordered source, destination, and rate records) and spin_system.rlx.flux_type. The independent generator reference still reads the input rate matrix. Selecting 'flux' in inter.relaxation activates the contribution; tests of prior automatic or chemistry-owned behavior are historical, not current API assertions.

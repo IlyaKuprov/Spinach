@@ -79,6 +79,11 @@ irr_comp{1}=zeros([spin_system.comp.nspins 8 3],'like',1i);  % Rank 1 [+1, 0, -1
 irr_comp{2}=zeros([spin_system.comp.nspins 8 5],'like',1i);  % Rank 2 [+2, +1, 0, -1, 2]
 
 % Process Zeeman interactions and NQI
+pairs=spin_system.inter.coupling.matrix;
+keys=reshape(cell2mat(pairs(:,1:2)),[],2);
+diagonal=find(keys(:,1)==keys(:,2));
+self=zeros(spin_system.comp.nspins,1);
+self(keys(diagonal,1))=diagonal;
 for n=1:spin_system.comp.nspins
     
     % Write the isotropic Zeeman part
@@ -193,10 +198,10 @@ for n=1:spin_system.comp.nspins
         end
         
         % Process quadrupolar interactions
-        if norm(spin_system.inter.coupling.matrix{n,n},2)>2*pi*spin_system.tols.inter_cutoff
+        if self(n)&&(norm(pairs{self(n),3},2)>2*pi*spin_system.tols.inter_cutoff)
             
             % Get spherical tensor components for NQIs
-            [iso_quad,lam_quad,phi_quad]=mat2sphten(spin_system.inter.coupling.matrix{n,n});
+            [iso_quad,lam_quad,phi_quad]=mat2sphten(pairs{self(n),3});
             
             % Catch disallowed components
             if (norm(iso_quad,2)>1e-6*norm(phi_quad,2))||...
@@ -211,7 +216,7 @@ for n=1:spin_system.comp.nspins
             end
             
             % Process the coupling
-            switch spin_system.inter.coupling.strength{n,n}
+            switch spin_system.inter.coupling.strength{self(n),3}
                 
                 case 'strong'
                     
@@ -281,10 +286,8 @@ clear('nL','nS','opL','opS','isotropic','ist_coeff','irr_comp',...
       'mask_a','mask_b','mask_c','zeeman_iso','n');
 
 % Discover significant coupling tensors and build interacting pair list
-[L,S]=find(cellfun(@(x)norm(x,2),spin_system.inter.coupling.matrix)>...
-                                 2*pi*spin_system.tols.inter_cutoff);
-quad_couplings=(L==S); L(quad_couplings)=[]; S(quad_couplings)=[];
-pair_list=[L S]; if isempty(pair_list), pair_list=[]; end
+active=find((keys(:,1)~=keys(:,2))&(cellfun(@(x)norm(x,2),pairs(:,3))>2*pi*spin_system.tols.inter_cutoff));
+pair_list=keys(active,:);
 
 % Preallocate spin indices
 nL=zeros(size(pair_list,1),3,3);
@@ -312,13 +315,13 @@ for n=1:size(pair_list,1)
     L=pair_list(n,1); S=pair_list(n,2);
     
     % Get the isotropic coupling constant
-    coupling_iso=trace(spin_system.inter.coupling.matrix{L,S})/3;
+    coupling_iso=trace(pairs{active(n),3})/3;
     
     % Filter out small isotropic parts
     if abs(coupling_iso)>2*pi*spin_system.tols.inter_cutoff
         
         % Process the coupling
-        switch spin_system.inter.coupling.strength{L,S}
+        switch spin_system.inter.coupling.strength{active(n),3}
             
             case {'strong','secular'}
                 
@@ -358,7 +361,7 @@ for n=1:size(pair_list,1)
     if build_aniso
         
         % Get spherical tensor components
-        [~,lam_coupling,phi_coupling]=mat2sphten(spin_system.inter.coupling.matrix{L,S});
+        [~,lam_coupling,phi_coupling]=mat2sphten(pairs{active(n),3});
         
         % Only process significant interaction anisotropies
         if (norm(lam_coupling,2)>spin_system.tols.liouv_zero)||...
@@ -373,7 +376,7 @@ for n=1:size(pair_list,1)
             end
             
             % Write irreducible spherical tensors
-            switch spin_system.inter.coupling.strength{L,S}
+            switch spin_system.inter.coupling.strength{active(n),3}
                 
                 case 'strong'
                     

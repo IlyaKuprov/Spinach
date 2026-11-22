@@ -64,8 +64,10 @@ LyC=operator(spin_system,'Ly','13C');
 
 % Generate a distribution in J-couplings
 J=linspace(13,16,11); D=cell(numel(J),1);
+keys=cell2mat(spin_system.inter.coupling.matrix(:,1:2));
+row=find((keys(:,1)==1)&(keys(:,2)==2));
 for m=1:numel(D) % Build drift Hamiltonians
-    spin_system.inter.coupling.matrix{1,2}=2*pi*J(m)*eye(3);
+    spin_system.inter.coupling.matrix{row,3}=2*pi*J(m)*eye(3);
     D{m}{1}=hamiltonian(assume(spin_system,'nmr'));
 end
 

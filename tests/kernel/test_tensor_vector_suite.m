@@ -89,9 +89,7 @@ result=test_close(result,'shift_iso anisotropy preservation',shift_aniso,orig_an
 
 % Check direct coupling tensor extraction from both storage directions
 spin_system=local_tensor_system();
-spin_system.inter.coupling.matrix=cell(2);
-spin_system.inter.coupling.matrix{1,2}=diag([1 2 3]);
-spin_system.inter.coupling.matrix{2,1}=diag([4 5 6]);
+spin_system.inter.coupling.matrix={2,1,diag([4 5 6]);1,2,diag([1 2 3])};
 result=test_close(result,'get_coupling bidirectional sum',...
                   get_coupling(spin_system,1,2),diag([5 7 9]),1e-15,1e-15,...
                   'coupling tensors stored in both spin orders are summed on extraction');

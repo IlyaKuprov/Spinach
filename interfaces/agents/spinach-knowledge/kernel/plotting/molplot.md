@@ -5,7 +5,7 @@
 
 ## Purpose and inputs
 
-Draws molecular sticks from Cartesian coordinates; it is a geometry renderer, not a molecular simulation. `xyz` is an N-by-3 numeric real matrix in Angstroms. `conmatrix` identifies atom pairs to draw; when it is empty, the function calls `conmat(xyz,1.6)`, using the 1.6 Angstrom cutoff documented by the source.
+Draws molecular sticks from Cartesian coordinates; it is a geometry renderer, not a molecular simulation. `xyz` is an N-by-3 numeric real matrix in Angstroms. `conmatrix` identifies atom pairs to draw; when it is empty, the function calls `conmat(xyz,xyz,1.6)`, using the 1.6 Angstrom cutoff documented by the source.
 
 ## Rendering and side effects
 

@@ -75,8 +75,8 @@ for s=1:nsubst
     local_system.comp.mults=spin_system.comp.mults(spins);
     local_system.comp.types=spin_system.comp.types(spins);
     local_system.chem.parts={1:numel(spins)};
-    local_system.inter.coupling.matrix=spin_system.inter.coupling.matrix(spins,spins);
-    local_system.inter.proxmatrix=spin_system.inter.proxmatrix(spins,spins);
+    local_system.inter.coupling.matrix=substance_pairs(spin_system.inter.coupling.matrix,spins);
+    local_system.inter.proximity=substance_pairs(spin_system.inter.proximity,spins);
     local_system.inter.zeeman.matrix=spin_system.inter.zeeman.matrix(spins);
     local_system.inter.giant.coeff=spin_system.inter.giant.coeff(spins);
     if isfield(spin_system.inter,'modes')
@@ -248,6 +248,16 @@ spin_system.bas.basis_hash=md5_hash({spin_system.bas.basis,...
 
 end
 
+% Restrict an ordered pair list to a locally numbered substance
+function pairs=substance_pairs(pairs,spins)
+[inside,keys]=ismember(reshape(cell2mat(pairs(:,1:2)),[],2),spins);
+keep=all(inside,2);
+pairs=pairs(keep,:);
+pairs(:,1:2)=num2cell(keys(keep,:));
+[~,order]=sortrows(keys(keep,:),[2 1]);
+pairs=pairs(order,:);
+end
+
 % Consistency enforcement
 function grumble(spin_system,bas)
 if ~isstruct(bas)||~isscalar(bas)
@@ -299,6 +309,12 @@ function descriptor=substance_basis(spin_system,bas)
 e_idx=cellfun(@iselectron,spin_system.comp.isotopes);
 n_idx=cellfun(@isnucleus,spin_system.comp.isotopes);
 
+% Get ordered coupling endpoints
+pairs=spin_system.inter.coupling.matrix;
+from=cell2mat(pairs(:,1));
+to=cell2mat(pairs(:,2));
+ns=spin_system.comp.nspins;
+
 % Find bosonic modes
 b_idx=ismember(spin_system.comp.types,{'C','V','T'});
 
@@ -332,30 +348,16 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             error('IK-DNP approximation can only handle electrons and nuclei.');
         end
 
-        % Isolate inter-electron interactions
-        ee_couplings=spin_system.inter.coupling.matrix;
-        ee_couplings(:,n_idx)={[]}; 
-        ee_couplings(n_idx,:)={[]};
-
-        % Isolate electron-nuclear interactions
-        en_couplings=spin_system.inter.coupling.matrix;
-        en_couplings(e_idx,e_idx)={[]}; 
-        en_couplings(n_idx,n_idx)={[]};
-        
-        % Isolate inter-nuclear interactions
-        nn_couplings=spin_system.inter.coupling.matrix;
-        nn_couplings(:,e_idx)={[]}; 
-        nn_couplings(e_idx,:)={[]};         
-
-        % Remind the user about the amplitude cut-off
-        report(spin_system,['coupling tensors with norm below ' ...
-                            num2str(spin_system.tols.inter_cutoff) ...
-                            ' Hz will be ignored.']);
-
-        % Generate three types of connectivity graphs (e-e, e-n, n-n)
-        ee_conmatrix=sparse(cellfun(@(x)norm(x,2),ee_couplings)>2*pi*spin_system.tols.inter_cutoff);
-        en_conmatrix=sparse(cellfun(@(x)norm(x,2),en_couplings)>2*pi*spin_system.tols.inter_cutoff);
-        nn_conmatrix=sparse(cellfun(@(x)norm(x,2),nn_couplings)>2*pi*spin_system.tols.inter_cutoff);
+        % Build separate electron-electron, electron-nuclear, and nuclear graphs
+        significant=cellfun(@(x)norm(x,2),pairs(:,3))>2*pi*spin_system.tols.inter_cutoff;
+        graph=sparse(from,to,significant,ns,ns);
+        ee_conmatrix=graph;
+        ee_conmatrix(n_idx,:)=0;
+        ee_conmatrix(:,n_idx)=0;
+        nn_conmatrix=graph;
+        nn_conmatrix(e_idx,:)=0;
+        nn_conmatrix(:,e_idx)=0;
+        en_conmatrix=graph-ee_conmatrix-nn_conmatrix;
 
         % Make sure each spin is connected to itself
         ee_conmatrix=ee_conmatrix|speye(size(ee_conmatrix));
@@ -396,23 +398,24 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
     if ismember(spin_system.bas.approximation,{'IK-1','IK-2'})
 
         % Build the spin-spin coupling graph connectivity matrix
-        inter_norm=cellfun(tensor_norm,spin_system.inter.coupling.matrix);
-        spin_system.inter.conmatrix=sparse(inter_norm>2*pi*spin_system.tols.inter_cutoff);
+        inter_norm=cellfun(tensor_norm,pairs(:,3));
+        spin_system.inter.conmatrix=sparse(from,to,inter_norm>2*pi*spin_system.tols.inter_cutoff,ns,ns);
 
         % Make sure each spin is connected and proximate to itself
         spin_system.inter.conmatrix=spin_system.inter.conmatrix|speye(size(spin_system.inter.conmatrix));
-        spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|speye(size(spin_system.inter.proxmatrix));
+        prox=spin_system.inter.proximity;
+        proxmatrix=sparse(cell2mat(prox(:,1)),cell2mat(prox(:,2)),true,ns,ns)|speye(ns);
 
         % Make sure connectivity and proximity are reciprocal
         spin_system.inter.conmatrix=spin_system.inter.conmatrix|transpose(spin_system.inter.conmatrix);
-        spin_system.inter.proxmatrix=spin_system.inter.proxmatrix|transpose(spin_system.inter.proxmatrix);
+        proxmatrix=proxmatrix|transpose(proxmatrix);
 
         % Issue a report to the user
         report(spin_system,['connectivity matrix density ' num2str(100*nnz(spin_system.inter.conmatrix)/numel(spin_system.inter.conmatrix)) '%']);
-        report(spin_system,['proximity matrix density ' num2str(100*nnz(spin_system.inter.proxmatrix)/numel(spin_system.inter.proxmatrix)) '%']);
+        report(spin_system,['proximity matrix density ' num2str(100*nnz(proxmatrix)/numel(proxmatrix)) '%']);
 
         % Determine the number of independent subsystems
-        n_subsystems=max(scomponents(spin_system.inter.conmatrix|spin_system.inter.proxmatrix));
+        n_subsystems=max(scomponents(spin_system.inter.conmatrix|proxmatrix));
 
         % Print a notice to the user
         if n_subsystems>1
@@ -430,8 +433,8 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
         end
 
         % Build the spin-spin coupling graph connectivity matrix
-        inter_norm=cellfun(tensor_norm,spin_system.inter.coupling.matrix);
-        spin_system.inter.conmatrix=sparse(inter_norm>2*pi*spin_system.tols.inter_cutoff);
+        inter_norm=cellfun(tensor_norm,pairs(:,3));
+        spin_system.inter.conmatrix=sparse(from,to,inter_norm>2*pi*spin_system.tols.inter_cutoff,ns,ns);
 
         % Bosonic mode connectivity
         if isfield(spin_system.inter,'modes')
@@ -623,7 +626,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             report(spin_system,['    ' num2str(size(coupling_subgraphs,1)) ' subgraphs generated from coupling data.']);
 
             % Run proximity analysis
-            proximity_subgraphs=dfpt(spin_system.inter.proxmatrix(spins_in_subst,spins_in_subst),prox_level);
+            proximity_subgraphs=dfpt(proxmatrix(spins_in_subst,spins_in_subst),prox_level);
             report(spin_system,['    ' num2str(size(proximity_subgraphs,1)) ' subgraphs generated from proximity data.']);
 
         case 'IK-2'
@@ -636,7 +639,7 @@ if strcmp(spin_system.bas.formalism,'sphten-liouv')
             report(spin_system,['    ' num2str(size(coupling_subgraphs,1)) ' subgraphs generated from coupling data.']);
 
             % Run proximity analysis
-            proximity_subgraphs=dfpt(spin_system.inter.proxmatrix(spins_in_subst,spins_in_subst),prox_level);
+            proximity_subgraphs=dfpt(proxmatrix(spins_in_subst,spins_in_subst),prox_level);
             report(spin_system,['    ' num2str(size(proximity_subgraphs,1)) ' subgraphs generated from proximity data.']);
 
         case 'IK-DNP'

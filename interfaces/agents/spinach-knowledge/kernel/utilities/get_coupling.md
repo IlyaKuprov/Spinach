@@ -10,7 +10,7 @@ Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/get_co
 
 - Syntax: `A=get_coupling(spin_system,n,k)`.
 - Runs a consistency check (`grumble`) that errors if `spin_system` lacks the `inter` or `inter.coupling` fields, or if `n` or `k` is not a positive real integer.
-- Retrieves the forward coupling `spin_system.inter.coupling.matrix{n,k}` and the backward coupling `spin_system.inter.coupling.matrix{k,n}`.
+- Retrieves the tensor records keyed by `(n,k)` and `(k,n)`.
 - Replaces empty entries with 3x3 zero matrices.
 - Returns the sum of the forward and backward coupling tensors.
 

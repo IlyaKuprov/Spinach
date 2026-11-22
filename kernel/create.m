@@ -929,8 +929,8 @@ end
     
 % Preallocate coupling tensor array
 report(spin_system,'initializing interaction arrays...');
-spin_system.inter.coupling.matrix=mat2cell(zeros(3*spin_system.comp.nspins),3*ones(spin_system.comp.nspins,1),...
-                                                                            3*ones(spin_system.comp.nspins,1));
+spin_system.inter.coupling.matrix=cell(0,3);
+
 % Process coordinates
 if isfield(inter,'coordinates')
 
@@ -971,7 +971,7 @@ else
     spin_system.inter.coordinates=cell(spin_system.comp.nspins,1);
     
     % Set proximity matrix to isolated spins
-    spin_system.inter.proxmatrix=speye(spin_system.comp.nspins,spin_system.comp.nspins);
+    spin_system.inter.proximity=cell(0,3);
     
 end
 
@@ -981,73 +981,48 @@ if isfield(inter,'coupling')
     % Inform the user
     report(spin_system,'processing coupling data...');
     
-    % Absorb eigenvalues and Euler angles
-    if isfield(inter.coupling,'eigs')
-        
-        % Get coupling norms
-        norms=cellfun(@(x)norm(diag(x),2),inter.coupling.eigs);
-        
-        % Find significant couplings (Hz at this point)
-        [rows,cols,~]=find(norms>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert Euler angles into DCM
-            if isempty(inter.coupling.euler{rows(n),cols(n)})
-                S=eye(3,3);
-            else
-                S=euler2dcm(inter.coupling.euler{rows(n),cols(n)});
+    % Convert occupied input cells one column at a time
+    formats={'eigs','matrix','scalar'};
+    blocks=cell(spin_system.comp.nspins,numel(formats));
+    for m=1:numel(formats)
+        if ~isfield(inter.coupling,formats{m}), continue; end
+        table=inter.coupling.(formats{m});
+        for k=1:size(table,2)
+
+            % Apply the input threshold in Hz
+            rows=find(~cellfun(@isempty,table(:,k)));
+            records=cell(numel(rows),3);
+            for q=1:numel(rows)
+                n=rows(q);
+                component=table{n,k};
+                if strcmp(formats{m},'eigs')
+                    component=diag(component);
+                end
+                if norm(component,2)<=spin_system.tols.inter_cutoff, continue; end
+
+                % Convert the specified representation to a Cartesian tensor in rad/s
+                switch formats{m}
+                    case 'eigs'
+                        S=eye(3);
+                        if ~isempty(inter.coupling.euler{n,k})
+                            S=euler2dcm(inter.coupling.euler{n,k});
+                        end
+                        component=2*pi*S*component*S';
+                        component=(component+component')/2;
+                    case 'matrix'
+                        component=2*pi*component;
+                    case 'scalar'
+                        component=2*pi*eye(3)*component;
+                end
+                records(q,:)={n,k,component};
+
             end
-            
-            % Rotate and convert to rad/s
-            component=2*pi*S*diag(inter.coupling.eigs{rows(n),cols(n)})*S';
-            
-            % Tidy up the numerics
-            component=(component+component')/2;
-            
-            % Add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+component;
-        
+            blocks{k,m}=records(~cellfun(@isempty,records(:,1)),:);
+
         end
-        
     end
- 
-    % Absorb coupling tensors
-    if isfield(inter.coupling,'matrix')
-        
-        % Find significant couplings using 2-norm criterion (Hz at this point)
-        [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.matrix)>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert to rad/s and add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*inter.coupling.matrix{rows(n),cols(n)};
-        
-        end
-        
-    end
-        
-    % Absorb scalar couplings
-    if isfield(inter.coupling,'scalar')
-        
-        % Find significant couplings using 2-norm criterion (Hz at this point)
-        [rows,cols,~]=find(cellfun(@(x)norm(x,2),inter.coupling.scalar)>spin_system.tols.inter_cutoff);
-        
-        % Loop over significant couplings
-        for n=1:numel(rows)
-            
-            % Convert to rad/s and add to the total
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}=...
-            spin_system.inter.coupling.matrix{rows(n),cols(n)}+2*pi*eye(3)*inter.coupling.scalar{rows(n),cols(n)};
-        
-        end
-        
-    end
-    
+    spin_system.inter.coupling.matrix=sum_couplings([spin_system.inter.coupling.matrix;vertcat(blocks{:})]);
+
 else
     
     % Warn the user that couplings have not been found
@@ -1055,35 +1030,27 @@ else
 
 end
 
-% Clean up the result
-for n=1:spin_system.comp.nspins
-    for k=1:spin_system.comp.nspins
-
-        % Re-check all coupling tensors for significance in 2-norm and relevance
-        coupling_norm=norm(spin_system.inter.coupling.matrix{n,k},2);
-        if (coupling_norm==0)||(coupling_norm<2*pi*spin_system.tols.inter_cutoff)||...
-           (spin_system.comp.mults(n)==1)||((spin_system.comp.mults(k)==1)) % Ignore ghost spins
-       
-            % Set irrelevant tensors to empty
-            spin_system.inter.coupling.matrix{n,k}=[];
-            
-        end
-        
-    end
-end
-
-% Check for inter-subsystem couplings
+% Assign species numbers for the cross-species check
+species=zeros(spin_system.comp.nspins,1);
 for n=1:numel(spin_system.chem.parts)
-    for k=1:numel(spin_system.chem.parts)
-        if (n~=k)
-            coupling_block=spin_system.inter.coupling.matrix(spin_system.chem.parts{n},spin_system.chem.parts{k});
-            if ~all(cellfun(@isempty,coupling_block(:)))
-                error('Spinach:create:crossSubstanceCoupling',...
-                      'couplings detected between spins in different chemical species.');
-            end
-        end
+    species(spin_system.chem.parts{n})=n;
+end
+
+% Discard insignificant tensors and ghost-spin interactions
+pairs=spin_system.inter.coupling.matrix;
+keep=true(size(pairs,1),1);
+for q=1:size(pairs,1)
+    n=pairs{q,1};
+    k=pairs{q,2};
+    magnitude=norm(pairs{q,3},2);
+    keep(q)=(magnitude>0)&&(magnitude>=2*pi*spin_system.tols.inter_cutoff)&&...
+            (spin_system.comp.mults(n)>1)&&(spin_system.comp.mults(k)>1);
+    if keep(q)&&(species(n)~=species(k))
+        error('Spinach:create:crossSubstanceCoupling',...
+              'couplings detected between spins in different chemical species.');
     end
 end
+spin_system.inter.coupling.matrix=pairs(keep,:);
 
 % Report back to the user
 summary_couplings(spin_system,'summary of coupling tensors and their anisotropies (Hz)');
@@ -1467,11 +1434,13 @@ end
 
 % Apply interaction drops
 if isfield(inter,'ignore')
+    keys=reshape(cell2mat(spin_system.inter.coupling.matrix(:,1:2)),[],2);
+    ignored=cellfun(@(x)x(:)',inter.ignore,'UniformOutput',false);
+    ignored=vertcat(ignored{:});
+    if ~isempty(ignored)
+        spin_system.inter.coupling.matrix(ismember(keys,[ignored;fliplr(ignored)],'rows'),:)=[];
+    end
     for n=1:numel(inter.ignore)
-        spin_system.inter.coupling.matrix{inter.ignore{n}(1),...
-                                          inter.ignore{n}(2)}=[];
-        spin_system.inter.coupling.matrix{inter.ignore{n}(2),...
-                                          inter.ignore{n}(1)}=[];
         report(spin_system,['Interactions between spins ' int2str(inter.ignore{n}(1)) ...
                                                   ' and ' int2str(inter.ignore{n}(2)) ...
                             ' ignored on user request.']);
@@ -1831,147 +1800,72 @@ if isfield(inter,'pbc')
     
 end
             
-% Check couplings
 if isfield(inter,'coupling')
-    
-    % Check eigenvalues / Euler angles specification
-    if isfield(inter.coupling,'eigs')
-        
-        % Check type
-        if (~iscell(inter.coupling.eigs))||any(any(~cellfun(@isnumeric,inter.coupling.eigs)))
-            error('inter.coupling.eigs must be a cell array of empty vectors or 1x3 vectors.');
+    formats={'eigs','matrix','scalar'};
+    count=numel(sys.isotopes);
+    for m=1:numel(formats)
+        name=formats{m};
+        if ~isfield(inter.coupling,name), continue; end
+        table=inter.coupling.(name);
+        if ~iscell(table)||~isequal(size(table),[count count])
+            error('inter.coupling.%s must be a square cell array with one row per spin.',name);
         end
-        
-        % Check dimensions
-        if ~all(size(inter.coupling.eigs)==[numel(sys.isotopes) numel(sys.isotopes)])
-            error('both dimensions of inter.coupling.eigs must match the number of spins.');
+        if strcmp(name,'eigs')&&(~isfield(inter.coupling,'euler')||...
+           ~iscell(inter.coupling.euler)||~isequal(size(inter.coupling.euler),[count count]))
+            error('inter.coupling.eigs requires a matching inter.coupling.euler array.');
         end
-        
-        % Check quadratic couplings
-        for n=1:numel(sys.isotopes)
-            [~,mult]=spin(sys.isotopes{n});
-            if (norm(inter.coupling.eigs{n,n},1)>0)&&(mult<3)
-                error('quadratic couplings cannot be specified for spin-1/2 particles.');
-            elseif abs(sum(inter.coupling.eigs{n,n}))>1e-6
-                error('quadratic couplings cannot have a non-zero trace.');
+        for k=1:count
+            column=table(:,k);
+            if ~all(cellfun(@isnumeric,column))
+                error('inter.coupling.%s must contain numeric values.',name);
             end
-        end
-        
-        % Make sure eulers exist
-        if ~isfield(inter.coupling,'euler')
-            error('inter.coupling.euler array must be set together with inter.coupling.eigs.');
-        end
-        
-        % Make sure eulers are cells
-        if ~iscell(inter.coupling.euler)||any(any(~cellfun(@isnumeric,inter.coupling.euler)))
-            error('inter.coupling.euler must be a cell array of empty vectors or 1x3 vectors.');
-        end
-        
-        % Make sure eulers have the correct length
-        if ~all(size(inter.coupling.eigs)==size(inter.coupling.euler))
-            error('inter.coupling.eigs and inter.coupling.euler arrays must have the same dimension.');
-        end
-        
-        % Make sure all non-empty elements are real 1x3 vectors
-        for n=1:numel(sys.isotopes)
-            for k=1:numel(sys.isotopes)
-            
-                % For eigenvalues
-                if ~isempty(inter.coupling.eigs{n,k})
-                    if (~all(size(inter.coupling.eigs{n,k})==[1 3]))||...
-                       (~isnumeric(inter.coupling.eigs{n,k}))||...
-                       (~isreal(inter.coupling.eigs{n,k}))
-                        error('non-empty elements of inter.coupling.eigs must be real 1x3 vectors.');
-                    end
-                end
-                
-                % For Euler angles
-                if ~isempty(inter.coupling.euler{n,k})
-                    if (~all(size(inter.coupling.euler{n,k})==[1 3]))||...
-                       (~isnumeric(inter.coupling.euler{n,k}))||...
-                       (~isreal(inter.coupling.euler{n,k}))
-                        error('non-empty elements of inter.coupling.euler must be real 1x3 vectors.');
-                    end
-                end
-                
-                % For simultaneity
-                if (isempty(inter.coupling.eigs{n,k})&&(~isempty(inter.coupling.euler{n,k})))||...
-                   (isempty(inter.coupling.euler{n,k})&&(~isempty(inter.coupling.eigs{n,k})))
+            present=~cellfun(@isempty,column);
+            if strcmp(name,'eigs')
+                angles=inter.coupling.euler(:,k);
+                if ~all(cellfun(@isnumeric,angles))||~isequal(present,~cellfun(@isempty,angles))
                     error('inter.coupling.eigs and inter.coupling.euler must have identical non-empty cell patterns.');
                 end
-                
             end
-        end
-        
-    end
-    
-    % Check matrix specification
-    if isfield(inter.coupling,'matrix')
-        
-        % Check type
-        if ~iscell(inter.coupling.matrix)||any(any(~cellfun(@isnumeric,inter.coupling.matrix)))
-            error('inter.coupling.matrix must be a cell array of empty matrices or 3x3 matrices.');
-        end
-        
-        % Check dimensions
-        if ~all(size(inter.coupling.matrix)==[numel(sys.isotopes) numel(sys.isotopes)])
-            error('both dimensions of inter.coupling.matrix cell array should match the number of spins.');
-        end
-        
-        % Check quadratic couplings
-        for n=1:numel(sys.isotopes)
-            [~,mult]=spin(sys.isotopes{n});
-            if (norm(inter.coupling.matrix{n,n},1)>0)&&(mult==2)
-                error('quadratic couplings cannot be specified for spin-1/2 particles.');
-            elseif abs(trace(inter.coupling.matrix{n,n}))>1e-6
-                error('quadratic couplings cannot have a non-zero trace.');
-            end
-        end
-        
-        % Make sure all non-empty elements are real 3x3 matrices
-        for n=1:numel(sys.isotopes)
-            for k=1:numel(sys.isotopes)
-                if ~isempty(inter.coupling.matrix{n,k})
-                    if (~all(size(inter.coupling.matrix{n,k})==[3 3]))||...
-                       (~isnumeric(inter.coupling.matrix{n,k}))||...
-                       (~isreal(inter.coupling.matrix{n,k}))
-                        error('non-empty elements of inter.coupling.matrix must be real 3x3 matrices.');
-                    end
+            for n=find(present)'
+                value=column{n};
+                switch name
+                    case 'eigs'
+                        if ~isreal(value)||~isequal(size(value),[1 3])||...
+                           ~isreal(angles{n})||~isequal(size(angles{n}),[1 3])
+                            error('coupling eigenvalues and Euler angles must be real row triples.');
+                        end
+                    case 'matrix'
+                        if ~isreal(value)||~isequal(size(value),[3 3])
+                            error('non-empty elements of inter.coupling.matrix must be real 3x3 matrices.');
+                        end
+                    case 'scalar'
+                        if ~isreal(value)||~isscalar(value)
+                            error('non-empty elements of inter.coupling.scalar must be real numbers.');
+                        end
+                end
+                if n~=k, continue; end
+                [~,mult]=spin(sys.isotopes{n});
+                switch name
+                    case 'eigs'
+                        if (norm(value,1)>0)&&(mult<3)
+                            error('quadratic couplings cannot be specified for spin-1/2 particles.');
+                        elseif abs(sum(value))>1e-6
+                            error('quadratic couplings cannot have a non-zero trace.');
+                        end
+                    case 'matrix'
+                        if (norm(value,1)>0)&&(mult==2)
+                            error('quadratic couplings cannot be specified for spin-1/2 particles.');
+                        elseif abs(trace(value))>1e-6
+                            error('quadratic couplings cannot have a non-zero trace.');
+                        end
+                    case 'scalar'
+                        if value~=0
+                            error('scalar couplings cannot be quadratic.');
+                        end
                 end
             end
         end
-        
     end
-    
-    % Check scalars
-    if isfield(inter.coupling,'scalar')
-        
-        % Check type
-        if ~iscell(inter.coupling.scalar)||any(any(~cellfun(@isnumeric,inter.coupling.scalar)))
-            error('inter.coupling.scalar must be a cell array of empty matrices or 1x1 matrices.');
-        end
-        
-        % Check dimensions
-        if ~all(size(inter.coupling.scalar)==[numel(sys.isotopes) numel(sys.isotopes)])
-            error('both dimensions of inter.coupling.scalar array must match the number of spins.');
-        end
-        
-        % Make sure all non-empty elements are real numbers
-        if any(nonzeros(cellfun(@numel,inter.coupling.scalar))~=1)||...
-           any(nonzeros(~cellfun(@isnumeric,inter.coupling.scalar)))||...
-           any(nonzeros(~cellfun(@isreal,inter.coupling.scalar)))
-            error('non-empty elements of inter.coupling.scalar must be real numbers.');
-        end
-        
-        % Disallow quadratic scalar couplings
-        for n=1:numel(sys.isotopes)
-            if norm(inter.coupling.scalar{n,n},1)~=0
-                error('scalar couplings cannot be quadratic.');
-            end
-        end
-         
-    end
-    
 end
 
 % Check temperature - negative and complex values allowed

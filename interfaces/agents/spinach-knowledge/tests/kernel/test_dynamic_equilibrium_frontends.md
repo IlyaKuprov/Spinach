@@ -39,3 +39,5 @@ result = test_dynamic_equilibrium_frontends()
 - `result` — regression test result structure with explanatory messages, accumulated through `test_close()` checks.
 
 ## References
+
+Residual averaging is checked on the forward coupling record independently of its reverse.

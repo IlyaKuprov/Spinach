@@ -21,6 +21,7 @@ function summary_couplings(spin_system,header)
 
 % Check consistency
 grumble(spin_system,header);
+if strcmp(spin_system.sys.output,'hush'), return; end
 
 % Print the summary table
 report(spin_system,header);
@@ -29,33 +30,34 @@ report(spin_system,'Spin A  Spin B                     Matrix                   
 report(spin_system,'------------------------------------------------------------------------------------------------------');
 
 % Detect significant couplings
-[rows,cols,~]=find(cellfun(@(x)norm(x,2),spin_system.inter.coupling.matrix)>2*pi*spin_system.tols.inter_cutoff);
+pairs=spin_system.inter.coupling.matrix;
+pairs=pairs(cellfun(@(x)norm(x,2),pairs(:,3))>2*pi*spin_system.tols.inter_cutoff,:);
 
 % Loop over significant couplings
-for n=1:numel(rows)
+for n=1:size(pairs,1)
     
     % Get the isotropic part
-    iso=trace(spin_system.inter.coupling.matrix{rows(n),cols(n)})/3;
+    iso=trace(pairs{n,3})/3;
     
     % Get the first and second rank parts
-    [~,rank1,rank2]=mat2sphten(spin_system.inter.coupling.matrix{rows(n),cols(n)});
+    [~,rank1,rank2]=mat2sphten(pairs{n,3});
     rank1=sphten2mat([],rank1,[]); rank2=sphten2mat([],[],rank2);
     
     % Do the printing in Hz
-    report(spin_system,[pad(num2str(rows(n)),8)...
-                        pad(num2str(cols(n)),8) ...
-                        num2str(spin_system.inter.coupling.matrix{rows(n),cols(n)}(1,:)/(2*pi),'%+10.6e  %+10.6e  %+10.6e')]);
+    report(spin_system,[pad(num2str(pairs{n,1}),8)...
+                        pad(num2str(pairs{n,2}),8) ...
+                        num2str(pairs{n,3}(1,:)/(2*pi),'%+10.6e  %+10.6e  %+10.6e')]);
     report(spin_system,['                '...
-                        num2str(spin_system.inter.coupling.matrix{rows(n),cols(n)}(2,:)/(2*pi),'%+10.6e  %+10.6e  %+10.6e')...
+                        num2str(pairs{n,3}(2,:)/(2*pi),'%+10.6e  %+10.6e  %+10.6e')...
                         '    ' ...
                         pad(num2str(iso/(2*pi),'%+10.4e'),13)...
                         pad(num2str(norm(rank1,2)/(2*pi),'%+10.4e'),13)...
                         pad(num2str(norm(rank2,2)/(2*pi),'%+10.4e'),13)]);
     report(spin_system,['                '...
-                        num2str(spin_system.inter.coupling.matrix{rows(n),cols(n)}(3,:)/(2*pi),'%+10.6e  %+10.6e  %+10.6e')]);
+                        num2str(pairs{n,3}(3,:)/(2*pi),'%+10.6e  %+10.6e  %+10.6e')]);
     
     % Print the break line
-    if n<numel(rows), report(spin_system,' '); end
+    if n<size(pairs,1), report(spin_system,' '); end
     
 end
 report(spin_system,'======================================================================================================');
@@ -79,4 +81,5 @@ end
 % with venom.
 %
 % Toby Young
+
 

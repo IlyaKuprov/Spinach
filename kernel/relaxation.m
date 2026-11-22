@@ -407,17 +407,15 @@ if ismember('SRFK',spin_system.rlx.theories)
     % Get the background Hamiltonian
     H0=hamiltonian(spin_system_local);
     
-    % Set local assumptions
-    spin_system_local=assume(spin_system,'labframe','couplings');
-    
     % Replace couplings with their modulation depths
     [rows,cols]=find(~cellfun(@isempty,spin_system.rlx.srfk_mdepth));
-    spin_system_local.inter.coupling.matrix=cell(size(spin_system.inter.coupling.matrix));
+    pairs=[num2cell(rows) num2cell(cols) cell(numel(rows),1)];
     for n=1:numel(rows)
-        spin_system_local.inter.coupling.matrix{rows(n),cols(n)}=...
-             2*pi*eye(3)*spin_system.rlx.srfk_mdepth{rows(n),cols(n)};
+        pairs{n,3}=2*pi*eye(3)*spin_system.rlx.srfk_mdepth{rows(n),cols(n)};
     end
-    
+    spin_system_local.inter.coupling.matrix=pairs;
+    spin_system_local=assume(spin_system_local,'labframe','couplings');
+
     % Get the modulated coupling Hamiltonian
     H1=hamiltonian(spin_system_local);
     
@@ -458,6 +456,12 @@ if ismember('SRSK',spin_system.rlx.theories)
     % Preallocate the answers
     R1=zeros(spin_system.comp.nspins,1); R2=zeros(spin_system.comp.nspins,1);
 
+    % Combine the forward and backward isotropic couplings
+    pairs=spin_system.inter.coupling.matrix;
+    amplitudes=sparse(cell2mat(pairs(:,1)),cell2mat(pairs(:,2)),...
+                      cellfun(@(x)trace(x)/3,pairs(:,3)),spin_system.comp.nspins,spin_system.comp.nspins);
+    amplitudes=amplitudes+amplitudes.';
+
     % Loop over sources
     for k=spin_system.rlx.srsk_sources
 
@@ -474,15 +478,14 @@ if ismember('SRSK',spin_system.rlx.theories)
                              ', T1=' num2str(T1k) ' s, T2=' num2str(T2k) ' s):']);
     
         % Loop over potential destinations
-        for n=setdiff(1:spin_system.comp.nspins,...
+        for n=setdiff(find(amplitudes(:,k)).',...
                       spin_system.rlx.srsk_sources)
 
             % Only process heteronuclear pairs
             if ~strcmp(spin_system.comp.isotopes{n},spin_system.comp.isotopes{k})
             
                 % Determine the coupling (rad/s)
-                A=trace(spin_system.inter.coupling.matrix{n,k})/3+...
-                  trace(spin_system.inter.coupling.matrix{k,n})/3;
+                A=amplitudes(n,k);
 
                 % Catch out-of-scope situations
                 if ((2*pi/T1k)<10*abs(A))||((2*pi/T2k)<10*abs(A))

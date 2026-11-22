@@ -207,7 +207,7 @@ assumed=local_assumed_spin_system();
 assumed=dictum(assumed,1,'strong');
 assumed=dictum(assumed,[1 2],'weak');
 result=test_true(result,'dictum numeric overrides',strcmp(assumed.inter.zeeman.strength{1},'strong')&&...
-                 strcmp(assumed.inter.coupling.strength{1,2},'weak'),...
+                 strcmp(assumed.inter.coupling.strength{1,3},'weak'),...
                  'numeric dictum calls must replace Zeeman and coupling strength assumptions in place');
 assumed=dictum(assumed,{'13C'},'secular');
 result=test_true(result,'dictum isotope override',strcmp(assumed.inter.zeeman.strength{2},'secular'),...
@@ -343,8 +343,7 @@ function spin_system=local_assumed_spin_system()
 % Start from the edit fixture and add assumption fields
 spin_system=local_edit_spin_system();
 spin_system.inter.zeeman.strength={'secular','secular','secular'};
-spin_system.inter.coupling.strength=cell(3,3);
-spin_system.inter.coupling.strength(:)={'secular'};
+spin_system.inter.coupling.strength={1,2,'secular'};
 
 end
 

@@ -54,3 +54,5 @@ Set inter.relaxation={'redfield','flux'} (or select 'flux' alone) and supply int
 Selecting flux does not waive the usual relaxation settings: supply valid inter.rlx_keep and inter.equilibrium as required by the relaxation path (for example 'labframe' and 'zero').
 
 When flux is the only selected mechanism and there is no dissipative mode contribution, `relaxation` returns `rlx_flux` directly without constructing ordinary relaxation or applying its retention and thermalisation. An all-zero flux therefore returns zero, including in Hilbert space with IME selected. The flux-only check reduces across all dimensions of the internal theory array.
+
+SRSK sums both directed isotropic couplings for each source and destination. SRFK instead builds a local coupling list from modulation depths before applying the laboratory-frame assumptions.

@@ -14,3 +14,5 @@ The TT/TS source and SS/ST target operators are built from singlet/triplet terms
 ## Output and limits
 
 The optimisation is configured with all 11 drift Hamiltonians, but the final `shaped_pulse_xy` check propagates at the nominal RF amplitude (500 Hz) and only with the sixth drift, corresponding to a 1-2 coupling of 14.5 Hz. It reports two real final overlaps, one for each target. Those two values are single-ensemble-member simulation outputs, not an aggregate robustness score. No hardware validation is performed.
+
+The coupling distribution changes only the directed (1,2) Cartesian tensor in the compiled list.

@@ -76,7 +76,9 @@ plot_1d(spin_system,real(spectrum),parameters);
 
 % Quadrupolar interaction measured by O'Dell PCCP 2009
 dell_nqi=2*pi*eeqq2nqi(1.18e6,0.53,1,[0 0 0]);
-spin_system.inter.coupling.matrix{1,1}=dell_nqi;
+keys=cell2mat(spin_system.inter.coupling.matrix(:,1:2));
+row=find((keys(:,1)==1)&(keys(:,2)==1));
+spin_system.inter.coupling.matrix{row,3}=dell_nqi;
 
 % Simulation
 fid=powder(spin_system,@acquire,parameters,'nmr');
@@ -92,4 +94,5 @@ plot_1d(spin_system,real(spectrum),parameters);
 klegend({'CASTEP','O''Dell PCCP 2009'});
 
 end
+
 

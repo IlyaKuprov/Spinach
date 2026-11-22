@@ -44,3 +44,5 @@ a separate substance must retain its descriptor and settings.
 ## Reaction-record fixtures
 
 Synthetic editing objects carry an explicit empty reaction list. Merge tests retain empty chemistry, spin offsets, column-oriented part lists, and all non-chemical assertions. An explicit selector-loss record tests simultaneous substance and selector-spin offsets; with declared parts, correlation times concatenate per substance rather than using the retired partless radical-pair fields.
+
+The numeric assumption override is exercised on an existing directed coupling.

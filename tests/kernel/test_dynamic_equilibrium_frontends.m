@@ -113,9 +113,9 @@ bas.approximation={'none'};
 spin_system=test_spin_system(sys,inter,bas);
 
 % Store the original coupling tensor and apply residual ordering
-J_before=spin_system.inter.coupling.matrix{1,2};
+J_before=spin_system.inter.coupling.matrix{2,3};
 spin_system=residual(spin_system);
-J_after=spin_system.inter.coupling.matrix{1,2};
+J_after=spin_system.inter.coupling.matrix{2,3};
 
 % Check isotropic trace preservation and axial residual tensor shape
 result=test_close(result,'residual coupling trace',trace(J_after),trace(J_before),1e-10,1e-12,...

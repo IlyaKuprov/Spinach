@@ -61,29 +61,21 @@ for s=1:numel(spin_system.chem.parts)
     end
 
     % Process spin-spin couplings
-    for n=spin_system.chem.parts{s}
-        for k=spin_system.chem.parts{s}
+    pairs=spin_system.inter.coupling.matrix;
+    indices=find(ismember(cell2mat(pairs(:,1)),spin_system.chem.parts{s}));
+    drop=false(size(pairs,1),1);
+    for q=indices'
 
-            % Process non-empty interaction tensors
-            if ~isempty(spin_system.inter.coupling.matrix{n,k})
+        % Average the anisotropy over the residual order tensor
+        iso=trace(pairs{q,3})*eye(3)/3;
+        extra_zz=trace(spin_system.inter.order_matrix{s}*(pairs{q,3}-iso));
+        pairs{q,3}=iso+diag([-extra_zz/3 -extra_zz/3 2*extra_zz/3]);
+        drop(q)=norm(pairs{q,3},2)<2*pi*spin_system.tols.inter_cutoff;
 
-                % Obtain isotropic part
-                iso=trace(spin_system.inter.coupling.matrix{n,k})*eye(3)/3;
-
-                % Calculate residual order
-                extra_zz=trace(spin_system.inter.order_matrix{s}*(spin_system.inter.coupling.matrix{n,k}-iso));
-
-                % Update coupling tensor
-                spin_system.inter.coupling.matrix{n,k}=iso+diag([-extra_zz/3 -extra_zz/3 2*extra_zz/3]);
-
-            end
-
-            % Drop the couplings that become insignificant after averaging
-            if norm(spin_system.inter.coupling.matrix{n,k},2)<2*pi*spin_system.tols.inter_cutoff
-                spin_system.inter.coupling.matrix{n,k}=[];
-            end
-
-        end
+    end
+    spin_system.inter.coupling.matrix=pairs(~drop,:);
+    if isfield(spin_system.inter.coupling,'strength')
+        spin_system.inter.coupling.strength(drop,:)=[];
     end
 
 end
@@ -103,4 +95,5 @@ end
 % If I'd observed all the rules, I'd never have got anywhere.
 %
 % Marilyn Monroe
+
 

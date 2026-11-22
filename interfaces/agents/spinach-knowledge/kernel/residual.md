@@ -26,3 +26,5 @@ The order matrix must be present and nonempty. Coupling tensors whose matrix 2-n
 
 - [MATLAB source](https://github.com/IlyaKuprov/Spinach/blob/main/kernel/residual.m)
 - [Spinach Wiki](https://spindynamics.org/wiki/index.php?title=residual.m)
+
+A coupling removed by residual averaging also loses its assumption record, leaving strengths aligned with surviving tensors.

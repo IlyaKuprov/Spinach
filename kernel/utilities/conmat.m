@@ -1,106 +1,86 @@
-% Molecular connectivity matrix calculator with N*log(N) 
-% asymptotic complexity scaling with respect to the num-
-% ber or atoms. Syntax:
+% Finds ordered pairs of distinct atoms strictly within a distance cutoff.
+% Syntax:
 %
-%                conmatrix=conmat(xyz,r0)
+%                 pairs=conmat(xyz,images,r0)
 %
 % Parameters:
 %
-%       xyz  - an array with N rows and three columns,
-%              giving the Cartesian coordinates of
-%              each particle
+%    xyz, images - N-by-3 coordinates of the atoms in the reference
+%                  cell and one translated cell, in the same order
 %
-%        r0  - the distance below which the particles 
-%              are to be considered "connected"
+%             r0 - non-negative cutoff, in coordinate units
 %
-% Output:
+% Outputs:
 %
-%  conmatrix - a sparse logical matrix containing 1
-%              at the positions corresponding to the 
-%              connected particles
+%          pairs - cell rows {from,to,displacement}, from the reference
+%                  atom to the image atom, ordered by to, then by from
 %
 % ilya.kuprov@weizmann.ac.il
 %
 % <https://spindynamics.org/wiki/index.php?title=conmat.m>
 
-function conmatrix=conmat(xyz,r0)
+function pairs=conmat(xyz,images,r0)
 
 % Check consistency
-grumble(xyz,r0);
+grumble(xyz,images,r0);
 
-% Sort X coordinates
-[x_sorted,x_index]=sort(xyz(:,1));
+% No points can be strictly within a zero cutoff
+pairs=cell(0,3);
+if isempty(xyz)||(r0==0), return; end
 
-% Scan X coordinates
-A=false(size(xyz,1),size(xyz,1));
-for n=1:size(xyz,1)
-    for k=(n+1):size(xyz,1)
-        if abs(x_sorted(n)-x_sorted(k))<r0
-            A(x_index(n),x_index(k))=1; 
-            A(x_index(k),x_index(n))=1;
-        else
-            break;
-        end
+% Group image atoms by occupied cutoff-sized cell
+[bins,~,group]=unique(floor(images/r0),'rows');
+members=accumarray(group,(1:size(images,1))',[],@(x){x});
+origins=floor(xyz/r0);
+
+% Search neighbouring cells for each atom
+[x,y,z]=ndgrid(-1:1);
+offsets=[x(:) y(:) z(:)];
+hits=cell(size(offsets,1),1);
+for m=1:size(offsets,1)
+
+    % Locate occupied image cells at this offset
+    [present,which_bin]=ismember(origins+offsets(m,:),bins,'rows');
+    atoms=find(present);
+    block=cell(numel(atoms),1);
+    for n=1:numel(atoms)
+
+        % Test Euclidean distances and exclude all self images
+        a=atoms(n);
+        b=members{which_bin(a)};
+        dv=images(b,:)-xyz(a,:);
+        keep=(a~=b)&(sqrt(sum(dv.^2,2))<r0);
+        block{n}=[repmat(a,nnz(keep),1) b(keep) dv(keep,:)];
+
     end
+    hits{m}=vertcat(block{:});
+
 end
 
-% Sort Y coordinates
-[y_sorted,y_index]=sort(xyz(:,2));
-
-% Scan Y coordinates
-B=false(size(xyz,1),size(xyz,1));
-for n=1:size(xyz,1)
-    for k=(n+1):size(xyz,1)
-        if abs(y_sorted(n)-y_sorted(k))<r0
-            B(y_index(n),y_index(k))=1; 
-            B(y_index(k),y_index(n))=1;
-        else
-            break;
-        end
-    end
+% Gather ordered pairs and their displacement vectors
+hits=vertcat(hits{:});
+if ~isempty(hits)
+    hits=sortrows(hits,[2 1]);
+    pairs=[num2cell(hits(:,1:2)) num2cell(hits(:,3:5),2)];
 end
 
-% Sort Z coordinates
-[z_sorted,z_index]=sort(xyz(:,3));
-
-% Scan Y coordinates
-C=false(size(xyz,1),size(xyz,1));
-for n=1:size(xyz,1)
-    for k=(n+1):size(xyz,1)
-        if abs(z_sorted(n)-z_sorted(k))<r0
-            C(z_index(n),z_index(k))=1; 
-            C(z_index(k),z_index(n))=1;
-        else
-            break;
-        end
-    end
-end
-
-% Compile the dirty matrix
-conmatrix=A&B&C;
-
-% Clean up the matrix
-[row,col]=find(conmatrix);
-for n=1:numel(row)
-    if norm(xyz(row(n),:)-xyz(col(n),:),2)>r0
-        conmatrix(row(n),col(n))=0;
-    end
-end
-conmatrix=sparse(conmatrix);
-        
 end
 
 % Consistency enforcement
-function grumble(xyz,r0)
-if (~isnumeric(xyz))||(size(xyz,2)~=3)||(~isreal(xyz))
-    error('xyz parameter should be a real matrix with three columns.');
+function grumble(xyz,images,r0)
+if (~isnumeric(xyz))||(~isreal(xyz))||(size(xyz,2)~=3)
+    error('xyz must be a real matrix with three columns.');
 end
-if (~isnumeric(r0))||(~isreal(r0))||(r0<=0)
-    error('r0 must be a positive real number.');
+if (~isnumeric(images))||(~isreal(images))||(~isequal(size(images),size(xyz)))
+    error('images must be a real matrix of the same size as xyz.');
+end
+if (~isnumeric(r0))||(~isreal(r0))||(~isscalar(r0))||(~(r0>=0))
+    error('r0 must be a non-negative real scalar.');
 end
 end
 
 % It's always good to be underestimated.
 %
 % Donald Trump
+
 

@@ -366,7 +366,7 @@ hertz, not rad/s, however large the numbers look.
 [sys,inter]=g2spinach(props,particles,references,options)
 ```
 
-- `props` — output of `gparse`, `oparse` or a compatible parser. EPR import requires explicit HFC source isotopes in `props.isotopes` (Gaussian mass numbers or ORCA isotope strings); missing or malformed provenance for selected, nonempty tensors is rejected before processing or warnings. Whole tensors are scaled by the target/source gyromagnetic-ratio ratio before thresholding and purging, while NMR import is unchanged. Empty tensors and electron-only selections need no provenance; zero-gamma sources are rejected, while direct zero-spin targets produce zero tensors.
+- `props` — output of `gparse`, `oparse` or a compatible parser. EPR import requires explicit HFC source isotopes in `props.isotopes` (Gaussian mass numbers or ORCA isotope strings); missing or malformed provenance for selected, nonempty tensors is rejected before processing or warnings. Whole tensors are scaled by the target/source gyromagnetic-ratio ratio before thresholding and purging, while NMR import is unchanged. Empty tensors and electron-only selections need no provenance; zero-gamma sources are rejected, while direct zero-spin targets produce zero tensors. In NMR import, quadrupolar couplings are built from `props.efg` and the tabulated quadrupole moment of the isotope named in `particles`, so they follow the requested isotope; a quadrupolar isotope requested for an atom without a field gradient is reported and gets no coupling.
 - When selecting nuclei from a parsed EPR log, apply the same atom indices
   to `props.symbols`, `props.hfc.full.matrix`, `props.isotopes`, and
   `props.std_geom` when coordinates are included. If `std_geom` is absent,
@@ -412,8 +412,10 @@ sys.magnet=3.5;
 
 `gparse(filename,options)` reads Gaussian 03/09/16 logs and returns geometries
 in angstrom, energies in hartree, hyperfine tensors in gauss, J- and
-K-couplings in Hz, plus `g`, `cst` (absolute shielding), `srt`, `nqi` and
-`chi`. Options `'g_nosymm'`, `'cst_nosymm'`, `'hfc_nosymm'` disable tensor
+K-couplings in Hz, plus `g`, `cst` (absolute shielding), `srt`, `nqi`, `efg`
+(atomic units, from `nqi` and the isotope Gaussian prints beside it) and
+`chi`. `mass_numbers` reports isotopes from `#p` tables, vibrational
+analyses and `Iso=` labels, with `NaN` where the log states nothing. Options `'g_nosymm'`, `'cst_nosymm'`, `'hfc_nosymm'` disable tensor
 symmetrisation.
 
 `oparse(file_name)` reads ORCA 2.6–6.1 text output: `std_geom` in angstrom,

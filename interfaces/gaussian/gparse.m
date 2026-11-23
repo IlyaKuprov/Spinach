@@ -35,6 +35,12 @@
 %   props.j_couplings      - isotropic J-couplings (Hz)
 %   props.srt              - spin-rotation tensors (Hz)
 %   props.nqi              - nuclear quadrupolar tensors (Hz)
+%   props.efg              - electric field gradient tensors
+%                            (a.u.) obtained from props.nqi
+%                            and the quadrupole moment of the
+%                            isotope that Gaussian prints next
+%                            to each tensor; empty for nuclei
+%                            without a quadrupole moment
 %   props.chi              - susceptibility tensor
 %   props.gibbs            - Gibbs free energy (Hartree)
 %   props.symbols          - atomic symbols; 'Bq' for ghost
@@ -44,7 +50,11 @@
 %                            which hyperfine couplings are
 %                            reported
 %   props.mass_numbers     - mass numbers of the isotopes used
-%                            by Gaussian for atomic masses
+%                            by Gaussian for atomic masses, from
+%                            the isotope table of #p output,
+%                            the vibrational analysis, or the
+%                            Iso= labels of the molecule speci-
+%                            fication; NaN when not stated
 %   props.atom_masses      - atomic masses used by Gaussian
 %                            (atomic mass units)
 %   props.nuc_spins        - spin quantum numbers of the mass
@@ -114,6 +124,11 @@ function props=gparse(filename,options)
 % Check consistency
 if ~exist('options','var'), options={}; end
 grumble(filename,options);
+
+% Fundamental constants
+efg_atomic=9.717362e+21;
+e_charge=1.60217657e-19;
+h_planck=6.62606957e-34;
 
 % Read the file
 file_id=fopen(filename,'r');
@@ -189,6 +204,28 @@ for n=1:length(g03_output)
                                        'Delimiter',' ','MultipleDelimsAsOne',1);
        props.spin=[scan_data{1} scan_data{2} scan_data{3}]; props.s_sq=scan_data{4};
        disp('Gaussian import: found total electron spin.');
+   end
+
+   % Read isotope labels of a molecule specification, which supersedes earlier isotope data
+   if strcmp(current_line,'Symbolic Z-matrix:')
+       [props.mass_numbers,props.atom_masses,props.nuc_spins,props.nuc_qmom,props.nuc_mmom]=deal(zeros(0,1));
+       k=n+1;
+       while k<=numel(g03_output)
+           atom_label=regexp(char(g03_output(k)),'^\S+','match','once');
+           k=k+1;
+           if strcmp(atom_label,'Charge'), continue; end
+           if isempty(regexp(atom_label,'^([A-Za-z]{1,2}|-?\d+)(?![A-Za-z:])','once')), break; end
+           if ~isempty(regexp(atom_label,'^([Xx]\d*|-1)(?![A-Za-z])','once')), continue; end
+           iso_label=regexp(atom_label,'(?i)[(,]iso[a-z]*=(\d+)','tokens','once');
+           props.mass_numbers(end+1,1)=str2double([iso_label{:}]);
+       end
+   end
+
+   % Read isotope masses of the vibrational analysis, which reflect Freq=ReadIsotopes
+   mass_data=str2double(regexp(current_line,'^Atom\s+(\d+) has atomic number\s+\d+ (?:and )?mass\s+([\d.]+)$','tokens','once'));
+   if ~isempty(mass_data)
+       props.mass_numbers(mass_data(1),1)=round(mass_data(2));
+       props.atom_masses(mass_data(1),1)=mass_data(2);
    end
 
    % Read the isotope table
@@ -357,9 +394,10 @@ for n=1:length(g03_output)
    % Read spin-rotation or quadrupole tensors and rotate them into the standard orientation
    if strcmp(current_line,'nuclear spin - molecular rotation tensor [C] (MHz):')||...
       strcmp(current_line,'Nuclear quadrupole coupling constants [Chi] (MHz):')
-       tensors=cell(natoms,1); k=n+1;
+       tensors=cell(natoms,1); labels=cell(natoms,1); k=n+1;
        while ~isempty(regexp(char(g03_output(k)),'^\d+\s+[A-Za-z]','once'))
            atom_num=sscanf(char(g03_output(k)),'%d'); T=zeros(3);
+           labels{atom_num}=regexp(char(g03_output(k)),'^\d+\s+([A-Za-z]+)\((\d+)','tokens','once');
            for m=1:3
                T(m,:)=sscanf(regexprep(char(g03_output(k+m)),'[a-c]{2}=',' '),'%f')';
            end
@@ -368,8 +406,15 @@ for n=1:length(g03_output)
        if contains(current_line,'[C]')
            props.srt=tensors; disp('Gaussian import: found nuclear spin-rotation tensors.');
        else
+           props.efg=cell(natoms,1);
            for k=1:natoms
-               if ~isempty(tensors{k}), tensors{k}=tensors{k}-eye(3)*trace(tensors{k})/3; end
+               if ~isempty(tensors{k})
+                   tensors{k}=tensors{k}-eye(3)*trace(tensors{k})/3;
+                   [~,~,spin_data]=spin([labels{k}{2} labels{k}{1}]);
+                   if abs(spin_data.quad_moment)>0
+                       props.efg{k}=tensors{k}*h_planck/(efg_atomic*spin_data.quad_moment*1e-28*e_charge);
+                   end
+               end
            end
            props.nqi=tensors; disp('Gaussian import: found nuclear quadrupole tensors.');
        end

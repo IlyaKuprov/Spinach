@@ -9,7 +9,10 @@
 %                 requires props.isotopes for each nonempty HFC:
 %                 Gaussian mass numbers or ORCA isotope strings.
 %                 HFCs are scaled by target/source gyromagnetic
-%                 ratio before thresholding and purging.
+%                 ratio before thresholding and purging. Quad-
+%                 rupolar couplings are built from props.efg
+%                 and the tabulated quadrupole moment of the
+%                 requested isotope.
 %
 %    particles  - a cell array of the following form:
 %
@@ -203,13 +206,20 @@ switch ismember('E',[particles{:}])
             end
         end
         
-        % Absorb quadrupolar couplings
-        if isfield(props,'nqi')
+        % Absorb quadrupolar couplings using the quadrupole moment of the requested isotope
+        if isfield(props,'efg')
             inter.coupling.matrix=cell(nspins,nspins);
             for n=1:nspins
-                [~,mult]=spin(sys.isotopes{n}); I=(mult-1)/2;
-                if mult>2
-                    inter.coupling.matrix{n,n}=props.nqi{index(n)}/(2*I*(2*I-1));
+                [~,mult,spin_data]=spin(sys.isotopes{n});
+                if (mult>2)&&isempty(props.efg{index(n)})
+                    disp(['g2spinach: WARNING - no electric field gradient for atom ' num2str(index(n))...
+                          ', quadrupolar coupling of ' sys.isotopes{n} ' is not imported.']);
+                elseif mult>2
+                    if isnan(spin_data.quad_moment)
+                        error(['quadrupole moment of ' sys.isotopes{n} ' is not tabulated.']);
+                    end
+                    nqi=castep2nqi(props.efg{index(n)},spin_data.quad_moment,(mult-1)/2);
+                    inter.coupling.matrix{n,n}=nqi-eye(3)*trace(nqi)/3;
                 end
             end
         end

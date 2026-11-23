@@ -1,0 +1,7 @@
+# Grouped distant-dipolar imaging
+
+Use `imaging(spin_system,@ddf_sequence,parameters)` when finite gradients, RF, diffusion, and feedback must act together. Each waveform row has one duration, one laboratory gradient vector and complex nutation frequencies for each group (real X, imaginary Y). Receiver samples follow selected rows; a zero-duration row can record the initial state. The numeric imaging gradient ramps are rescaled to the cell centres, spaced by `dims./npts`. Set the gradient vector directly, without `grad_angles`.
+
+Each spin site belongs to one group. Calibrate each group's Cartesian projection using its own signed `scale` in A/m per unit projection. Groups with a common frame share all three field components; separated frames share only longitudinal fields. A zero source scale leaves the spin's response and receiver intact. The receive phantom does not define the magnetisation density. The field callback must be linear in the magnetisation (for example, close over a prepared Cartesian Fourier symbol). The spatial boundary for that symbol is independent of the diffusion boundary.
+
+For different molecular mobilities, use separate substance blocks and add their spatial diffusion rates as `1i*kron(rate,projector)` in `parameters.transport`, with no duplicate context diffusion. The projector covers all local density coordinates of a substance, including multispin orders, not just its transverse moments. The original ideal one-axis CRAZED experiment remains `@crazed_ddf`.

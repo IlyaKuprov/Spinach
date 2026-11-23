@@ -37,26 +37,27 @@ for n=1:count
 
 end
 
-% Let create build the carbon-carbon dipoles within 6 Angstrom
+% Carbon-carbon dipoles within 6 Angstrom, which also define the clusters
 sys.tols.prox_cutoff=6;
 inter.coordinates=[{[]}; num2cell(xyz,2)];
 
-% Native projected CCE for the 0/-1 transition
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
+% Cluster expansion tolerances and memory budget
+sys.tols.cce_atol=1e-3;
+sys.tols.cce_rtol=1e-3;
+sys.tols.cce_mem=2^31;
+
+% Spinach housekeeping
+spin_system=create(sys,inter);
+
+% Second-order projected expansion for the 0/-1 transition
 parameters.observed=1;
-parameters.cce.bath_spins=2:(count+1);
 parameters.transition.spins=1;
 parameters.transition.ms=[0 -1];
 parameters.times=linspace(0,1e-4,501);
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','coupling','threshold',0);
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...
-                               'max_memory_bytes',2^31);
-spin_system=create(sys,inter);
+
+% Simulation
 [cce2,details]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 cce1=details.reduction.by_order(:,:,2);
 

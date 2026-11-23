@@ -17,6 +17,9 @@ sys.magnet=0;
 sys.isotopes={'E','13C'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix=repmat({zeros(3)},1,2);
 inter.coupling.matrix=cell(2);
 
@@ -25,9 +28,6 @@ inter.coupling.matrix{1,2}=diag([1100 900 2200]);
 
 % Compile metadata, without a full-bath basis
 spin_system=create(sys,inter);
-
-% Basis formalism for retained clusters
-bas.formalism='zeeman-hilb';
 
 % Experiment parameters
 parameters.observed=1;
@@ -40,9 +40,6 @@ parameters.drive=struct('spins',1,'axis','x','amplitude',4e4,...
 parameters.cce.bath_spins=2;
 parameters.cce.approximation='generalized';
 parameters.cce.order=1;
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
 
 % Run the named finite-drive experiment
 [answer,diagnostics]=clexpn(spin_system,@finite_drive,parameters,'labframe');

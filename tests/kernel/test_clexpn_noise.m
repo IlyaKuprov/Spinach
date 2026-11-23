@@ -19,6 +19,9 @@ sys.magnet=0;
 sys.isotopes={'E','1H'};
 sys.output='hush';
 sys.parallel={'local',2};
+sys.tols.cce_atol=1e-11;
+sys.tols.cce_rtol=1e-11;
+sys.tols.cce_mem=2^26;
 inter.zeeman.scalar={0,0};
 inter.coupling.matrix=cell(2);
 s=create(sys,inter);
@@ -26,9 +29,9 @@ p.observed=1;
 p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 p.times=[0 0.2 0.4];
 p.cce.order=1;
-p.cce.bath_state=struct('mode','sampled','basis','uniform',...
-                        'probabilities',{{[0.8 0.2]}},'samples',16,'seed',3);
-p.cce.numerics=struct('atol',1e-11,'rtol',1e-11,'max_memory_bytes',2^26);
+p.bath_probs={[0.8 0.2]};
+p.bath_samples=16;
+p.bath_seed=3;
 p.noise=struct('ordering','ordered','connected',true,'manifold','bath_only',...
                'terms',struct('support',2,'operator',diag([0.5 -0.5])));
 [a,d]=clexpn(s,@noise_correlation,p,'labframe');
@@ -50,7 +53,8 @@ result=test_close(result,'Connected covariance sampling uncertainty',...
 p.cce.averaging='internal_then_expansion';
 b=clexpn(s,@noise_correlation,p,'labframe');
 result=test_close(result,'Additive averaging order',a,b,1e-12,1e-12,'Connected ensemble reduction is linear.');
-p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])}});
+p=rmfield(p,{'bath_samples','bath_seed','bath_probs'});
+p.bath_state={diag([0.8 0.2])};
 p.noise.connected=false;
 p.noise.terms.operator=[0 1;1 0]/2;
 s.inter.zeeman.matrix{2}(3,3)=1.3;
@@ -86,9 +90,10 @@ result=test_close(result,'Deterministic full-bath noise estimate',...
 % Relaxation to the upper bath level fixes the populations and each coherence analytically
 open=p;
 open.cce.averaging='after_expansion';
-open.cce.bath_state.rho={diag([0.7 0.3])};
-open.cce.numerics.atol=1e-30;
-open.cce.numerics.rtol=0;
+open.bath_state={diag([0.7 0.3])};
+open_system=s;
+open_system.tols.cce_atol=1e-30;
+open_system.tols.cce_rtol=0;
 open.bath_jumps=struct('support',2,'operator',[0 1;0 0],'rate',0.9);
 open.noise.terms.operator=[1 0.4i;-0.4i -0.2];
 times=open.times(:);
@@ -100,9 +105,9 @@ moment=0.7*(1+0.16*phase)-0.06*(1-1.2*decay)+0.048*conj(phase);
 for ordering={'ordered','symmetrized'}
     open.noise.ordering=ordering{1};
     open.noise.connected=false;
-    [raw,unconnected]=clexpn(s,@noise_correlation,open,'labframe');
+    [raw,unconnected]=clexpn(open_system,@noise_correlation,open,'labframe');
     open.noise.connected=true;
-    [cov,connected]=clexpn(s,@noise_correlation,open,'labframe');
+    [cov,connected]=clexpn(open_system,@noise_correlation,open,'labframe');
     if strcmp(ordering{1},'symmetrized')
         moment=real(moment);
     end
@@ -124,8 +129,8 @@ for ordering={'ordered','symmetrized'}
                       'The nonunital map amplifies its source; the two orderings have distinct source norms.');
 
     % Raw and connected deterministic records separately retain their strict-budget decisions
-    model_p=cce_options(s,connected.parameters,@cce_compile,'labframe');
-    model=cce_compile(s,model_p,'labframe');
+    model_p=cce_options(open_system,connected.parameters,@cce_compile,'labframe');
+    model=cce_compile(open_system,model_p,'labframe');
     first=cce_diagnostics(model,unconnected.raw,unconnected.reduction,unconnected.parameters);
     second=cce_diagnostics(model,connected.raw,connected.reduction,connected.parameters);
     result=test_true(result,['Dissipative budgets ' ordering{1}],...
@@ -137,8 +142,9 @@ end
 
 % Rescaling the fluctuation operator scales its correlation uncertainty quadratically
 open.noise.terms.operator=-3*open.noise.terms.operator;
-open.cce.numerics.atol=1e-8;
-[~,scaled]=clexpn(s,@noise_correlation,open,'labframe');
+open_system.tols.cce_atol=1e-8;
+[~,scaled]=clexpn(open_system,@noise_correlation,open,'labframe');
+model.tols.cce_atol=open_system.tols.cce_atol;
 checks=cce_diagnostics(model,scaled.raw,scaled.reduction,scaled.parameters);
 result=test_close(result,'Dissipative squared fluctuation units',...
                   checks.numerical_error./second.numerical_error,9*ones(3,1),1e-13,0,...
@@ -207,8 +213,7 @@ inter.coupling.matrix=cell(3);
 three=create(sys,inter);
 sparse=p;
 sparse.cce.order=2;
-sparse.cce.graph=struct('mode','coupling','threshold',0);
-sparse.cce.bath_state=struct('mode','explicit_product','rho',{{diag([1 0]),diag([1 0])}});
+sparse.bath_state={diag([1 0]),diag([1 0])};
 sparse.noise.connected=false;
 sparse.noise.terms(1)=struct('support',2,'operator',diag([0.5 -0.5]));
 sparse.noise.terms(2)=struct('support',3,'operator',diag([0.5 -0.5]));
@@ -239,7 +244,7 @@ records=dc.raw;
 records{1}(1).value(:)=2;
 records{1}(2).value(:)=5;
 local=dc.parameters;
-reduced=cce_reduce(records,dc.clusters,local);
+reduced=cce_reduce(s,records,dc.clusters,local);
 result=test_close(result,'Empty reference inclusion-exclusion',reduced.value,5*ones(3,1),...
                   1e-12,1e-12,'The reference is neither omitted nor counted twice.');
 end

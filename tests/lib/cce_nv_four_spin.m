@@ -16,15 +16,14 @@ function [answer,diagnostics]=cce_nv_four_spin()
 [sys,inter,fixture]=cce_fixture('nv_four_c13','6f7282b6');
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-3;
+sys.tols.cce_rtol=1e-3;
+sys.tols.cce_mem=2^28;
 
 % Declare the reference's observed-Sz projected approximation before propagation
 for n=2:5
     inter.coupling.matrix{1,n}(:,1:2)=0;
 end
-
-% Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -37,11 +36,6 @@ parameters.transition.ms=[-1 1];
 parameters.times=fixture.times;
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...
-                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn experiment through the cluster context
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');

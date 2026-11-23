@@ -30,6 +30,9 @@ Sets the accuracy cut-offs, constants and tolerances used by the Spinach kernel.
 - Relative accuracy of the elements of the Redfield superoperator `rlx_integration`: `1e-6` when paranoid, `1e-2` when cowboy, `1e-4` safe default.
 - Algorithm selection for propagator derivatives `dP_method`: default string `'auxmat'`; no paranoid or cowboy branches.
 - Number of PBC images for dipolar couplings `dd_ncells`: `2` safe default; no paranoid or cowboy branches.
+- Absolute tolerance on cluster expansion signals `cce_atol`: `sqrt(eps)` safe default; no paranoid or cowboy branches; must be a non-negative real number.
+- Relative tolerance on cluster expansion signals `cce_rtol`: `sqrt(eps)` safe default; no paranoid or cowboy branches; must be a non-negative real number.
+- Memory budget for cluster expansions `cce_mem` (bytes): `inf()` safe default; no paranoid or cowboy branches; must be a positive real number.
 - Cache storage timeout `cache_mem` (days before a cache record is deleted): `365` safe default; no paranoid or cowboy branches.
 - Fundamental constants are then written unconditionally: `hbar = 6.62607015e-34/(2*pi)` (J*s, exact number), `kbol = 1.380649e-23` (J*K^-1, exact number), `freeg = 2.00231930436092` (CODATA 2022), `mu0 = 1.25663706127e-6` (N A^-2, CODATA 2022) and `muB = 9.2740100657e-24` (J T^-1, CODATA 2022).
 - If `paranoia` is enabled, the function removes `'zte'`, `'op_cache'`, `'prop_cache'`, and `'ham_cache'` from `spin_system.sys.enable` so zero track elimination and operator, Hamiltonian, and propagator caching are disabled.

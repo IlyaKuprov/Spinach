@@ -37,7 +37,7 @@ Report validity, conditioning, sampling, and observed-density diagnostics.
 
 - [cce_reduce.m](cce_reduce.md)
 
-Native requests pass the resolved `parameters` with `parameters.cce.numerics`. When `parameters.output` is `density`, the reduction’s time-by-vectorised-density values are inspected as square observed-spin density matrices using the compiled model dimensions. The routine never repairs these arrays; all coverage, error-budget, trace, Hermiticity, and minimum-eigenvalue decisions retain their original arithmetic.
+Requests pass the resolved `parameters`; tolerances are read from `spin_system.tols`. When `parameters.output` is `density`, the reduction’s time-by-vectorised-density values are inspected as square observed-spin density matrices using the compiled model dimensions. The routine never repairs these arrays; all coverage, error-budget, trace, Hermiticity, and minimum-eigenvalue decisions retain their original arithmetic.
 
 Validation is local to this service and its consumed numerical records. Public experiment and approximation options are validated by `cce_options` before native context dispatch.
 

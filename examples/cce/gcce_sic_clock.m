@@ -36,10 +36,18 @@ for n=1:height(sites)
 
 end
 
-% Nuclear dipolar interactions
+% Nuclear dipolar interactions within 8 Angstrom; these define the clusters
 for n=1:height(pairs)
     inter.coupling.matrix{pairs.spin_1(n),pairs.spin_2(n)}=dipolar(:,:,n);
 end
+
+% Absolute budget covers the measured worst-case order-two roundoff bound
+sys.tols.cce_atol=0.03;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^31;
+
+% Spinach housekeeping
+spin_system=create(sys,inter);
 
 % Prepare and detect the coherence between the mS=0 and even defect eigenstates
 ground=[0;1;0];
@@ -51,23 +59,12 @@ parameters.coil=ground*excited';
 parameters.normalized=true;
 parameters.times=linspace(0,1e-3,501);
 
-% Mixed-state generalised expansion with the 8 Angstrom pair graph
-adjacency=sparse(pairs.spin_1-1,pairs.spin_2-1,true,nsites-1,nsites-1);
-bas.formalism='zeeman-hilb';
+% Generalised expansion over the directly coupled nuclear pairs
 parameters.cce.approximation='generalized';
-parameters.cce.basis=bas;
 parameters.cce.order=2;
-parameters.cce.graph=struct('mode','explicit','adjacency',adjacency|adjacency.',...
-                            'approximate',true);
-parameters.cce.bath_state=struct('mode','mixed_product');
-parameters.cce.meanfield='none';
+parameters.cce.mediated=false;
 
-% Absolute budget covers the measured worst-case order-two roundoff bound
-parameters.cce.numerics=struct('atol',0.03,'rtol',1e-8,...
-                               'max_memory_bytes',2^31);
-
-% Calculate the signal without building the full bath basis
-spin_system=create(sys,inter);
+% Simulation
 [~,details]=clexpn(spin_system,@free_evolution,parameters,'labframe');
 
 % Compare the first two cluster orders

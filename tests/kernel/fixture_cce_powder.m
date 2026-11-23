@@ -10,6 +10,9 @@ sys.magnet=0.01;
 sys.isotopes={'E','2H','2H'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 
 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
 inter.coordinates={[0 0 0];[1.45 0 0];[-0.725 1.2557 0]};
@@ -29,9 +32,6 @@ inter=rmfield(inter,'coordinates');
 % Compile physical metadata without a full-bath basis
 spin_system=create(sys,inter);
 
-% Basis formalism for retained clusters
-bas.formalism='zeeman-hilb';
-
 % Experiment parameters
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
@@ -42,10 +42,6 @@ parameters.times=linspace(0,200e-6,41);
 parameters.cce.bath_spins=2:3;
 parameters.cce.order=2;
 parameters.cce.approximation='generalized';
-parameters.cce.basis=bas;
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
 
 % Average complete Hahn echo expansions over the quadrature
 parameters.grid=struct('alphas',[0 0 pi/2],'betas',[0 pi/2 pi/2],...

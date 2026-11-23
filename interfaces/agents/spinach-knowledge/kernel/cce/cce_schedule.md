@@ -6,7 +6,7 @@
 
 Each configuration contains its observed-only reference and retained cluster tasks. Task IDs are sorted by configuration, state, and cluster, while returned cells preserve input configuration/cluster order. Workers evaluate raw records only; reduction remains outside the worker loop. Noise moments, validity masks, and numerical bounds are retained.
 
-Execution controls live under `parameters.cce.parallel`. Serial is the default; `mode=clusters|states` uses a pool already created with explicit `sys.parallel`. `batch_size` caps batch size; `max_tasks` caps concurrent batch tasks, not total physical work. Both caps must be positive integers. The requested pool size must match the existing pool. No GPU or nested-pool path is created.
+Tasks run on the pool that `create` starts from `sys.parallel`, and in the client when that pool has one worker or the caller is itself a worker. The worker count is reduced until resident raw data plus per-worker dense storage fit `sys.tols.cce_mem`; `cce_schedule:memory` is raised only when a single task does not fit. With a checkpoint file, a checkpoint is written after every batch of one task per worker. No GPU or nested-pool path is created.
 
 ## Storage admission
 
@@ -24,6 +24,6 @@ Interlaced tasks use `cce_evaluate` in every conditional recursion. With a compl
 
 Native finite_drive and refocusing_train preflight counts every retained time-by-segment Hamiltonian, pulse, and exterior expectation before dispatch. This is added to the existing simultaneous-workspace requirement without changing physical task enumeration or batch semantics.
 
-Checkpoint identities omit `cce.numerics.max_memory_bytes` from the hashed parameter and spin-system copies; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, and experiment remain bound to the ledger.
+Checkpoint identities omit `tols.cce_mem` from the hashed spin-system copy; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, and experiment remain bound to the ledger.
 
 Caller-selected parallel mode, batch caps, and the interlaced enumeration declaration are checked before task bookkeeping. Existing-pool availability and calculated resident storage remain execution-time checks.

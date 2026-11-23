@@ -20,7 +20,7 @@ With `raw_only=true`, the service returns the conditional physical raw average i
 
 ## Native reference validation
 
-Before enumerating a native conditional ensemble, the reference bath IDs and assignments must match the spin system. Every index must select a local basis vector and bath_rho must equal its projector within dimension^2*eps in Frobenius norm. Shape or density inconsistencies raise cce:spin_config before evaluation. This check does not use the propagation error tolerance; mixed reference densities belong to explicit_product.
+Before enumerating a native conditional ensemble, the reference bath IDs and assignments must match the spin system. Every index must select a local basis vector and bath_rho must equal its projector within dimension^2*eps in Frobenius norm. Shape or density inconsistencies raise cce:spin_config before evaluation. This check does not use the propagation error tolerance; mixed reference densities belong to an explicit `bath_state`.
 
 The conditioning contract uses cce.interlaced.max_states. Returned assignments, weights, condition_mass, log_condition_mass, and distribution_signature describe the deduplicated physical distribution; weights use the same shifted logarithmic product calculation as the established conditional average. raw.value, raw.valid, and raw.abs_error_bound always remain conditional raw quantities. factor, factor_valid, and factor_abs_error_bound separately carry the irreducible quotient; raw_only suppresses that quotient. kind identifies irreducible or raw_full_bath records. Every subset reuses the parent's cylinders. The allocation preflight includes assignment sorting workspace, and residual metadata retains the worst constituent solve, not merely the first assignment.
 

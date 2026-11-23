@@ -19,6 +19,9 @@ sys.magnet=0;
 sys.isotopes={'E','1H','1H'};
 sys.output='hush';
 sys.parallel={'local',2};
+sys.tols.cce_atol=1e-10;
+sys.tols.cce_rtol=1e-10;
+sys.tols.cce_mem=2^26;
 inter.zeeman.scalar={0,0,0};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([0 0 2]);
@@ -28,9 +31,8 @@ p.observed=1;
 p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 p.times=[0 0.07 0.15];
 p.cce.order=1;
-p.cce.bath_state=struct('mode','sampled','basis','uniform','probabilities','uniform',...
-                        'samples',8,'seed',7);
-p.cce.numerics=struct('atol',1e-10,'rtol',1e-10,'max_memory_bytes',2^26);
+p.bath_samples=8;
+p.bath_seed=7;
 [a,da]=clexpn(s,@free_evolution,p,'labframe');
 p.cce.averaging='internal_then_expansion';
 [b,db]=clexpn(s,@free_evolution,p,'labframe');
@@ -43,7 +45,7 @@ end
 result=test_close(result,'After-expansion weighting',a,manual,1e-13,1e-13,'Complete estimates first.');
 result=test_true(result,'Internal-first one reduction',isscalar(db.reduction.samples),...
                  'Average reference and cluster records before nonlinear reduction.');
-p.cce.bath_state=struct('mode','mixed_product');
+p=rmfield(p,{'bath_samples','bath_seed'});
 p.cce.order=2;
 p.output='density';
 [density,dd]=clexpn(s,@free_evolution,p,'labframe');
@@ -77,9 +79,9 @@ for k=1:numel(records{1})
 end
 local=da.parameters;
 local.cce.averaging='after_expansion';
-after=cce_reduce(records,da.clusters,local);
+after=cce_reduce(s,records,da.clusters,local);
 local.cce.averaging='internal_then_expansion';
-inside=cce_reduce(records,da.clusters,local);
+inside=cce_reduce(s,records,da.clusters,local);
 result=test_true(result,'Unequal configuration weights',any(abs(after.value-inside.value)>0.1),...
                  'A nontrivial two-configuration ensemble distinguishes averaging order.');
 
@@ -93,7 +95,7 @@ p.cce.order=1;
 [~,truncated]=clexpn(s,@free_evolution,p,'labframe');
 result=test_true(result,'Truncated density masks',any(~truncated.reduction.valid,'all'),...
                  'Zero-reference elementwise ratios are reported, not repaired.');
-p.cce.numerics.zero_policy='error';
+p.cce.zero_policy='error';
 caught=false;
 try
     clexpn(s,@free_evolution,p,'labframe');
@@ -107,11 +109,11 @@ result=test_true(result,'Explicit unresolved error policy',caught,...
 raw=da.raw;
 raw{1}(2).valid(2)=false;
 local=da.parameters;
-masked=cce_reduce(raw,da.clusters,local);
+masked=cce_reduce(s,raw,da.clusters,local);
 result=test_true(result,'Mask propagation',~masked.valid(2),'An invalid weighted sample is not discarded.');
 raw=da.raw;
 raw{1}(2).abs_error_bound(:)=0.01;
-bounded=cce_reduce(raw,da.clusters,local);
+bounded=cce_reduce(s,raw,da.clusters,local);
 result=test_true(result,'Error propagation',any(~bounded.valid),'Reported uncertainty cannot be erased.');
 
 % Preserve the sampled full-bath standard error and unavailable estimates
@@ -131,18 +133,11 @@ request.cce.order=1;
 result=test_true(result,'Internal truncated uncertainty is unavailable',...
                  all(isnan(sampled.reduction.sampling_standard_error),'all'),...
                  'A nonlinear product of means has no per-sample estimator.');
-request.cce.bath_state.samples=1;
+request.bath_samples=1;
 [~,sampled]=clexpn(s,@free_evolution,request,'labframe');
 result=test_true(result,'Single draw uncertainty is unavailable',...
                  all(isnan(sampled.reduction.sampling_standard_error),'all'),...
                  'One random sample cannot estimate its variance.');
-
-% Limit each scheduled batch without changing the physical calculation
-request=da.parameters;
-request.cce.parallel=struct('mode','serial','batch_size',4,'max_tasks',1);
-limited=clexpn(s,@free_evolution,request,'labframe');
-result=test_close(result,'Parallel task ceiling preserves signals',limited,a,0,0,...
-                  'The task limit caps batches, not the cluster family.');
 
 % Reject an interlacing density inconsistent with its sampled basis state
 request=da.parameters;

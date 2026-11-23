@@ -96,8 +96,8 @@ if iscell(H)&&isempty(R)&&~strcmp(spin_system.bas.formalism,'zeeman-liouv')&&...
         answer(n)=trace(ua*rho*ub');
         operations=12*spin_system.cce.bath_dimension^3;
         gamma=operations*eps/(1-operations*eps);
-        bounds(n)=2*time*(residual+parameters.cce_aux.roundoff_bound)+4*orthogonality+...
-                  gamma*(1+time*parameters.cce_aux.hamiltonian_norm);
+        bounds(n)=2*time*(residual+spin_system.cce.roundoff_bound)+4*orthogonality+...
+                  gamma*(1+time*spin_system.cce.hamiltonian_norm);
     end
     if ~meta.normalized
         answer=answer*reference;
@@ -105,8 +105,8 @@ if iscell(H)&&isempty(R)&&~strcmp(spin_system.bas.formalism,'zeeman-liouv')&&...
     end
     aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
                'orthogonality_residual',orthogonality,...
-               'hamiltonian_bound',parameters.cce_aux.roundoff_bound,...
-               'backend',parameters.cce_aux.backend);
+               'hamiltonian_bound',spin_system.cce.roundoff_bound,...
+               'backend',spin_system.cce.backend);
     return
 
 end
@@ -259,8 +259,8 @@ if coherent
     [vectors,energies]=eig(full((generator+generator')/2),'vector');
     aux.eigen_residual=norm(H*vectors-vectors.*energies.','fro');
     aux.orthogonality_residual=norm(vectors'*vectors-eye(size(generator)),'fro');
-    aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
-    aux.backend=parameters.cce_aux.backend;
+    aux.hamiltonian_bound=spin_system.cce.roundoff_bound;
+    aux.backend=spin_system.cce.backend;
     operations=12*size(generator,1)^3;
     gamma=operations*eps/(1-operations*eps);
     bounds=2*parameters.times(:)*(aux.eigen_residual+aux.hamiltonian_bound)+...
@@ -289,8 +289,8 @@ for n=1:numel(parameters.times)
             rho=u*rho0*u';
         end
     elseif liouville
-        if isfield(parameters.cce.numerics,'propagator')&&...
-           strcmp(parameters.cce.numerics.propagator,'stock')
+        if isfield(parameters.cce,'propagator')&&...
+           strcmp(parameters.cce.propagator,'stock')
             rho=propagator(engine,generator,parameters.times(n))*rho0;
         else
             action=generator;

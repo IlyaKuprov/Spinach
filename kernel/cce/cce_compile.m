@@ -5,12 +5,13 @@
 %
 % spin_system is create output; parameters obeys cce_options. Tensors
 % remain in rad/s and coordinates in Angstrom. No full-bath basis is built.
-% The calling context resolves cce.numerics.atol, rtol, and max_memory_bytes.
+% Numerical tolerances are read from spin_system.tols.
 % Observed and bath IDs retain the caller's order; groups retain physical IDs.
-% A supplied basis selects zeeman-hilb or zeeman-liouv; absent basis selects
-% zeeman-hilb. Stale full-system basis arrays are removed. Local representations
-% are complete, not restricted bases. The compiled data is stored in the
-% cce subfield of the returned spin system.
+% Jump operators in parameters.bath_jumps select zeeman-liouv; otherwise the
+% formalism of an existing spin_system.bas is kept, and zeeman-hilb is used
+% when there is none. Stale full-system basis arrays are removed. Local
+% representations are complete, not restricted bases. The compiled data is
+% stored in the cce subfield of the returned spin system.
 %
 % Parameters:
 %
@@ -37,6 +38,11 @@ formalism='zeeman-hilb';
 if isfield(spin_system,'bas')
     formalism=spin_system.bas.formalism;
     spin_system=rmfield(spin_system,'bas');
+end
+
+% Relaxation needs Liouville space
+if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
+    formalism='zeeman-liouv';
 end
 
 % Apply the requested stock approximation without building a basis
@@ -170,7 +176,7 @@ end
 
 % Exclude execution-only options from the physical model fingerprint
 physical=parameters;
-for name={'parallel','checkpoint','retain_raw','convergence'}
+for name={'checkpoint','retain_raw','convergence'}
     if isfield(physical.cce,name{1})
         physical.cce=rmfield(physical.cce,name{1});
     end
@@ -200,8 +206,8 @@ end
 if isfield(parameters,'transition')
     [spin_system.cce.transition,spin_system.cce.transition_meta]=cce_transition(spin_system,parameters,assumptions);
     dimension=numel(spin_system.cce.transition.alpha);
-    if 32*dimension^2>parameters.cce.numerics.max_memory_bytes
-        error('observed projectors exceed numerics.max_memory_bytes.');
+    if 32*dimension^2>spin_system.tols.cce_mem
+        error('observed projectors exceed sys.tols.cce_mem.');
     end
     spin_system.cce.manifold_projectors.alpha=spin_system.cce.transition.alpha*spin_system.cce.transition.alpha';
     spin_system.cce.manifold_projectors.beta=spin_system.cce.transition.beta*spin_system.cce.transition.beta';
@@ -271,18 +277,6 @@ for ids={parameters.observed,parameters.cce.bath_spins}
 end
 if isempty(parameters.observed)||~isempty(intersect(parameters.observed,parameters.cce.bath_spins))
     error('cce_compile:spins','Observed spins must be nonempty and disjoint from the bath.');
-end
-if ~all(isfield(parameters.cce.numerics,{'atol','rtol','max_memory_bytes'}))
-    error('cce_compile:policy','Resolve atol, rtol and max_memory_bytes before compilation.');
-end
-for name={'atol','rtol','max_memory_bytes'}
-    value=parameters.cce.numerics.(name{1});
-    if ~isnumeric(value)||~isreal(value)||~isscalar(value)||~isfinite(value)||value<0
-        error('cce_compile:policy','Numerical budgets must be finite nonnegative scalars.');
-    end
-end
-if parameters.cce.numerics.max_memory_bytes==0
-    error('cce_compile:policy','The memory budget must be positive.');
 end
 if isfield(spin_system,'bas')&&...
    ~ismember(spin_system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})

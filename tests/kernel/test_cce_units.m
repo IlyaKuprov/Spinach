@@ -21,10 +21,12 @@ parameters.cce.bath_spins=2;
 parameters.times=0;
 parameters.orientation=[0 0 0];
 parameters.cce.interaction_cutoff=Inf;
-parameters.cce.numerics=struct('atol',1e-7,'rtol',1e-12,'max_memory_bytes',1e8);
 sys.isotopes={'1H','13C'};
 sys.magnet=0;
 sys.output='hush';
+sys.tols.cce_atol=1e-7;
+sys.tols.cce_rtol=1e-12;
+sys.tols.cce_mem=1e8;
 inter.zeeman.scalar={0,0};
 inter.coupling.scalar={0,137;0,0};
 

@@ -17,12 +17,13 @@ result=new_test_result('kernel/cce_clusters','CCE graphs and subsets',...
 
 % Check count-scaled cluster metadata before constructing the family
 budget_model.cce=struct();
+budget_model.tols.cce_mem=1024;
 budget_model.comp.mults=2*ones(1,7);
 budget_model.comp.nspins=numel(budget_model.comp.mults);
 budget_graph=struct('bath_ids',2:7,'adjacency',logical(ones(6)-eye(6)),...
                     'scores',ones(6));
 budget_parameters=struct('observed',1,...
-                         'cce',struct('bath_spins',2:7,'order',6,'expansion','standard','numerics',struct('max_memory_bytes',1024)));
+                         'cce',struct('bath_spins',2:7,'order',6,'expansion','standard'));
 refused=false;
 try
     cce_clusters(budget_model,budget_graph,budget_parameters);
@@ -44,7 +45,7 @@ radius_model.inter.coordinates=num2cell([0 0 0;1 0 0;3 0 0],2);
 radius_model.comp.mults=[2 2 2];
 radius_model.comp.nspins=numel(radius_model.comp.mults);
 radius_parameters=struct('observed',1,...
-                         'cce',struct('bath_spins',[2 3],'approximation','projected','second_order',struct('enabled',false),'order',1,'expansion','standard','bath_radius',2,'graph',struct('mode','complete','score','coupling_norm')));
+                         'cce',struct('bath_spins',[2 3],'approximation','projected','second_order',struct('enabled',false),'order',1,'expansion','standard','bath_radius',2,'mediated',true));
 radius_graph=cce_graph(radius_model,radius_parameters);
 result=test_true(result,'Root bath radius selects sites',isequal(radius_graph.bath_ids,2),...
                  'A radius of two Angstrom must exclude the site three Angstrom from the centre.');
@@ -65,13 +66,13 @@ for n=0:7
                 adjacency(b,a)=edge;
             end
         end
-        model.cce=struct('pairs',struct('ids',{},'tensor',{}));
-        model.inter.coordinates=num2cell([(0:n).' zeros(n+1,2)],2);
+        model.cce=struct();
+        model.tols.cce_mem=Inf;
         model.comp.mults=2*ones(1,n+1);
         model.comp.nspins=numel(model.comp.mults);
         parameters=struct('observed',1,...
-                          'cce',struct('bath_spins',2:n+1,'approximation','projected','second_order',struct('enabled',false),'order',0,'expansion','standard','graph',struct('mode','explicit','adjacency',sparse(adjacency))));
-        graph=cce_graph(model,parameters);
+                          'cce',struct('bath_spins',2:n+1,'approximation','projected','second_order',struct('enabled',false),'order',0,'expansion','standard'));
+        graph=struct('bath_ids',2:n+1,'adjacency',sparse(adjacency),'scores',double(adjacency));
         for order=0:n
 
             % Exhaust all subsets independently, then close connected seeds
@@ -206,7 +207,7 @@ model.comp.mults=2*ones(1,50);
 model.comp.mults([10 30])=3;
 model.comp.nspins=50;
 parameters=struct('observed',10,...
-                  'cce',struct('bath_spins',[20 30 40 50],'approximation','projected','second_order',struct('enabled',false),'order',3,'expansion','partition','groups',{{[20 30],40,50}},'clusters',{{[1 2 3]}},'cluster_cap',[0 0 1],'graph',struct('mode','complete')));
+                  'cce',struct('bath_spins',[20 30 40 50],'approximation','projected','second_order',struct('enabled',false),'order',3,'expansion','partition','groups',{{[20 30],40,50}},'clusters',{{[1 2 3]}},'cluster_cap',[0 0 1],'mediated',true));
 graph=cce_graph(model,parameters);
 clusters=cce_clusters(model,graph,parameters);
 result=test_true(result,'Explicit closure and cap overrun',numel(clusters)==7&&...
@@ -219,14 +220,14 @@ result=test_close(result,'Composite physical Hilbert dimension',clusters(end).di
 % Measure observed-mediated edges without bath-bath interactions
 model.cce.pairs=struct('ids',{[10 20],[10 40]},'tensor',{eye(3),2*eye(3)});
 parameters=struct('observed',10,...
-                  'cce',struct('bath_spins',[20 30 40 50],'approximation','generalized','order',2,'expansion','standard','graph',struct('mode','coupling','threshold',Inf)));
+                  'cce',struct('bath_spins',[20 30 40 50],'approximation','generalized','order',2,'expansion','standard','mediated',true));
 graph=cce_graph(model,parameters);
 result=test_true(result,'Conservative observed-mediated edge',graph.adjacency(1,3)&&...
                  nnz(graph.adjacency)==2&&nnz(graph.pair_norm)==0,...
                  'gCCE retains bath correlation paths through the observed-spin system at J12=0');
-parameters.cce.graph.approximate=true;
+parameters.cce.mediated=false;
 approximate=cce_graph(model,parameters);
-result=test_true(result,'Explicit approximate graph',nnz(approximate.adjacency)==0&&approximate.approximate,...
+result=test_true(result,'Explicit approximate graph',nnz(approximate.adjacency)==0&&isequal(approximate.observed_mediated,graph.observed_mediated),...
                  'dropping observed-mediated correlations requires an explicit approximation');
 
 % Independent full-Hilbert counterexample to bath-only gCCE connectivity
@@ -248,11 +249,10 @@ result=test_close(result,'Observed-spin-mediated full-Hilbert reference',exact,c
 result=test_true(result,'Observed-spin mediation is not disconnected factorisation',abs(exact-pairwise)>0.04,...
                  sprintf('exact %.12f versus disconnected-singleton %.12f',exact,pairwise));
 
-% Independently check the actual two-spin interaction norm and distance cutoffs
+% Independently check the two-spin interaction norm and bath radius
 model.cce.pairs=struct('ids',[20 40],'tensor',4*diag([0 0 1]));
 parameters.cce.approximation='projected';
 parameters.cce.second_order=struct('enabled',false);
-parameters.cce.graph=struct('mode','coupling','threshold',1);
 graph=cce_graph(model,parameters);
 result=test_close(result,'Physical operator norm',graph.pair_norm(1,3),1,8*eps,0,...
                   '4*Iz*Iz has spectral norm one for two physical spin halves');
@@ -260,35 +260,30 @@ parameters.cce.interaction_cutoff=0;
 other=cce_graph(model,parameters);
 result=test_true(result,'Hamiltonian cutoff independence',isequal(graph,other),...
                  'graph selection never reads the physical Hamiltonian cutoff');
-parameters.cce.graph.score='resonance';
-parameters.cce.graph.mismatch=3*ones(4);
-parameters.cce.graph.mismatch_scale=4;
-graph=cce_graph(model,parameters);
-result=test_close(result,'Explicit resonance score',graph.scores(1,3),0.8,8*eps,0,...
-                  'operator norm divided by hypot(1,mismatch/scale)');
-parameters.cce.graph=struct('mode','distance','radius',1);
 xyz=zeros(50,3);
 xyz([10 20 30 40 50],1)=0:4;
 model.inter.coordinates=num2cell(xyz,2);
 parameters.cce.bath_radius=2;
 graph=cce_graph(model,parameters);
 result=test_true(result,'Union-of-centres bath radius',isequal(graph.bath_ids,[20 30])&&...
-                 isequal(graph.omitted_bath_ids,[40 50])&&nnz(graph.adjacency)==2,...
-                 'bath filtering and the separate physical graph radius preserve ID ordering');
+                 isequal(graph.omitted_bath_ids,[40 50])&&nnz(graph.adjacency)==0,...
+                 'bath filtering preserves ID ordering but cannot create edges without a coupling');
 
-% Supplied scores set deterministic cap selection before closure
-model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+% Physical coupling scores set deterministic cap selection before closure
+pairs=nchoosek(2:5,2);
+model.cce.pairs=struct('ids',num2cell(pairs,2),'tensor',4*diag([0 0 1]));
+model.cce.pairs(4).tensor=7*model.cce.pairs(4).tensor;
 model.inter.coordinates=num2cell(zeros(5,3),2);
 model.comp.mults=2*ones(1,5);
 model.comp.nspins=numel(model.comp.mults);
 parameters=struct('observed',1,...
-                  'cce',struct('bath_spins',2:5,'approximation','projected','second_order',struct('enabled',false),'order',2,'expansion','standard','cluster_cap',[0 1],'graph',struct('mode','complete','score','supplied','scores',[0 1 1 1;1 0 7 1;1 7 0 1;1 1 1 0])));
+                  'cce',struct('bath_spins',2:5,'approximation','projected','second_order',struct('enabled',false),'order',2,'expansion','standard','cluster_cap',[0 1],'mediated',true));
 graph=cce_graph(model,parameters);
 capped=cce_clusters(model,graph,parameters);
 result=test_true(result,'Deterministic score cap',isequal(capped(end).groups,[2 3])&&...
                  isequal(capped(1).cap_overrun,[2 0]),...
-                 'highest supplied edge wins and its two singleton closure additions are reported');
-parameters.cce.graph.scores=ones(4)-eye(4);
+                 'highest coupling score wins and its two singleton closure additions are reported');
+model.cce.pairs(4).tensor=model.cce.pairs(1).tensor;
 graph=cce_graph(model,parameters);
 capped=cce_clusters(model,graph,parameters);
 result=test_true(result,'Lexicographic score ties',isequal(capped(end).groups,[1 2]),...
@@ -296,7 +291,7 @@ result=test_true(result,'Lexicographic score ties',isequal(capped(end).groups,[1
 
 % A single composite group remains exact without replacing it by a pseudo-spin
 parameters=struct('observed',1,...
-                  'cce',struct('bath_spins',2:5,'approximation','projected','second_order',struct('enabled',false),'order',1,'expansion','disjoint','groups',{{2:5}},'graph',struct('mode','complete')));
+                  'cce',struct('bath_spins',2:5,'approximation','projected','second_order',struct('enabled',false),'order',1,'expansion','disjoint','groups',{{2:5}},'mediated',true));
 graph=cce_graph(model,parameters);
 grouped=cce_clusters(model,graph,parameters);
 result=test_true(result,'One-group exact physical cost',isscalar(grouped)&&...

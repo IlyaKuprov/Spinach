@@ -87,7 +87,7 @@ if count>spec.max_states
     error('cce_interlace:budget','Cylinder enumeration exceeds interlaced.max_states.');
 end
 bytes=8*count*(4*nb+5);
-if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
+if ~isfinite(bytes)||bytes>spin_system.tols.cce_mem
     error('cce_interlace:memory','Conditioning assignments and sorting workspace exceed the memory budget.');
 end
 
@@ -201,8 +201,8 @@ if ~isempty(cluster.sites)&&~raw.full_bath
             denominator=denominator.*factor.value;
             valid=valid&factor.valid;
         end
-        resolved=valid&abs(denominator)>denominator_error+parameters.cce.numerics.atol+...
-                 parameters.cce.numerics.rtol*abs(denominator);
+        resolved=valid&abs(denominator)>denominator_error+spin_system.tols.cce_atol+...
+                 spin_system.tols.cce_rtol*abs(denominator);
         value=NaN(size(item.value));
         uncertainty=Inf(size(item.value));
         value(resolved)=item.value(resolved)./denominator(resolved);

@@ -12,6 +12,9 @@ sys.magnet=0.01;
 sys.isotopes={'E','E','14N'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-3;
+sys.tols.cce_rtol=1e-3;
+sys.tols.cce_mem=2^28;
 
 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
 inter.coordinates={[0 0 0];[35 0 0];[35 0 1]};
@@ -36,10 +39,6 @@ end
 % Coordinates define the toy geometry; all couplings above are explicit
 inter=rmfield(inter,'coordinates');
 
-% Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 
@@ -51,11 +50,6 @@ parameters.transition.ms=[1/2 -1/2];
 parameters.times=linspace(0,200e-6,41);
 parameters.cce.order=1;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,...
-                               'max_memory_bytes',2^28);
 
 % Keep the electron and its nitrogen in the same physical group
 parameters.cce.expansion='partition';

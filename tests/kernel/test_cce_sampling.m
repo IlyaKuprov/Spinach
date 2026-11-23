@@ -19,6 +19,9 @@ sys.isotopes={'1H','1H','1H'};
 sys.magnet=0;
 sys.disable={'hygiene'};
 sys.parallel={'processes',1};
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
+sys.tols.cce_mem=2^26;
 sys.output='hush';
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([0 0 3])/(2*pi);
@@ -34,11 +37,10 @@ p.cce.order=2;
 p.rho0=diag([1 0]);
 p.orientation=[0 0 0];
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
 p.cce.meanfield='none';
-p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
-p.cce.bath_state=struct('mode','sampled','samples',1,'seed',17,'basis','uniform',...
-                        'probabilities',{{[0.7 0.3],[0.2 0.8]}});
+p.bath_samples=1;
+p.bath_seed=17;
+p.bath_probs={[0.7 0.3],[0.2 0.8]};
 [~,diagnostics]=clexpn(spin_system,@free_evolution,p,'labframe');
 p=diagnostics.parameters;
 model_p=cce_options(spin_system,p,@cce_compile,'labframe');
@@ -62,7 +64,8 @@ for a=1:2
         sampled=sampled+weights(k)*reshape(raw.value.',2,2,[]);
     end
 end
-p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.7 0.3]),diag([0.2 0.8])}});
+p=rmfield(p,{'bath_samples','bath_seed','bath_probs'});
+p.bath_state={diag([0.7 0.3]),diag([0.2 0.8])};
 [exact,diagnostics]=clexpn(spin_system,@free_evolution,p,'labframe');
 ensemble=diagnostics.ensemble;
 exact=reshape(exact.',2,2,[]);
@@ -71,8 +74,9 @@ result=test_close(result,'Exhaustive weighted samples equal exact product mixtur
                   'Exhaustive weighted samples equal exact product mixture');
 
 % Estimate the sampled full-bath mean uncertainty under internal averaging
-sampled=p;
-sampled.cce.bath_state=struct('mode','sampled','samples',16,'seed',17,'basis','uniform','probabilities','uniform');
+sampled=rmfield(p,'bath_state');
+sampled.bath_samples=16;
+sampled.bath_seed=17;
 sampled.cce.averaging='internal_then_expansion';
 [~,averaged]=clexpn(spin_system,@free_evolution,sampled,'labframe');
 values=cellfun(@(raw)raw(end).value,averaged.raw,'UniformOutput',false);
@@ -91,7 +95,7 @@ result=test_true(result,'Internal truncated uncertainty unavailable',...
                  all(isnan(truncated.reduction.sampling_standard_error),'all'),...
                  'A nonlinear product-of-means estimate must not claim zero Monte Carlo uncertainty.');
 sampled.cce.order=2;
-sampled.cce.bath_state.samples=1;
+sampled.bath_samples=1;
 [~,single]=clexpn(spin_system,@free_evolution,sampled,'labframe');
 result=test_true(result,'Single sample uncertainty unavailable',...
                  all(isnan(single.reduction.sampling_standard_error),'all'),...

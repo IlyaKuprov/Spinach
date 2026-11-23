@@ -8,7 +8,7 @@ Expert tensor-product density preparation utility for an already constructed ret
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `rho=cce_state(spin_system,parameters,states,spins)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `rho=cce_state(spin_system,states,spins)`. Engine records are not public experiment parameter structures.
 
 Keywords: cce_state clexpn density populations trace positivity vectorisation Hilbert Liouville physical IDs
 

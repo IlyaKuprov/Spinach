@@ -3,9 +3,9 @@
 % [answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)
 %
 % parameters.cce.convergence.ladders has field and values (cell row).
-% Supported fields: cce.order, cce.bath_spins, cce.graph.threshold,
-% cce.graph.radius, cce.bath_state.samples, times. Each ladder refines the
-% baseline independently; no simultaneous ladder changes are allowed.
+% Supported fields: cce.order, cce.bath_spins, bath_samples, times. Each
+% ladder refines the baseline independently; no simultaneous ladder changes
+% are allowed.
 % parameters.cce.convergence.atol/rtol are required scalar observable tolerances;
 % max_work is a positive integer cap on complete clexpn evaluations. A time
 % ladder must contain every preceding time exactly (no interpolation).
@@ -208,7 +208,7 @@ end
 if numel(unique({control.ladders.field}))~=numel(control.ladders)
     error('cce_converge:input','Each approximation may have only one independent ladder.');
 end
-allowed={'cce.order','cce.bath_spins','cce.graph.threshold','cce.graph.radius','cce.bath_state.samples','times'};
+allowed={'cce.order','cce.bath_spins','bath_samples','times'};
 for k=1:numel(control.ladders)
     ladder=control.ladders(k);
     if ~ischar(ladder.field)||~ismember(ladder.field,allowed)||...
@@ -243,13 +243,13 @@ if isfield(control,'checks')&&(~iscell(control.checks)||...
    ~all(cellfun(@(x) isstruct(x)&&isscalar(x),control.checks)))
     error('cce_converge:input','Independent checks must be a cell of parameter override structures.');
 end
-if any(strcmp({control.ladders.field},'cce.bath_state.samples'))
+if any(strcmp({control.ladders.field},'bath_samples'))
     held_out=false;
     if isfield(control,'checks')
         for k=1:numel(control.checks)
             check=control.checks{k};
-            held_out=held_out||(isfield(check,'cce')&&isfield(check.cce,'bath_state')&&isfield(check.cce.bath_state,'seed')&&...
-                check.cce.bath_state.seed~=parameters.cce.bath_state.seed);
+            held_out=held_out||(isfield(check,'bath_seed')&&...
+                                check.bath_seed~=parameters.bath_seed);
         end
     end
     if ~held_out

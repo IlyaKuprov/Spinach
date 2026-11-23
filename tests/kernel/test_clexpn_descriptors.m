@@ -18,12 +18,14 @@ result=new_test_result('kernel/clexpn_descriptors','Native cluster descriptors',
 sys.isotopes={'1H','14N','13C','1H'};
 sys.magnet=0;
 sys.output='hush';
+sys.tols.cce_atol=1e-12;
+sys.tols.cce_rtol=1e-12;
+sys.tols.cce_mem=2e8;
 inter.zeeman.scalar={0,0,0,0};
 system=create(sys,inter);
 parameters.observed=[3 1];
 parameters.times=0;
 parameters.cce.bath_spins=[4 2];
-parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
 model_p=cce_options(system,parameters,@cce_compile,'labframe');
 model=cce_compile(system,model_p,'labframe');
 [cluster,cache]=cce_subsystem(model,model_p,[4 2],struct(),[]);
@@ -62,7 +64,7 @@ for n=1:numel(labels)
     result=test_close(result,['Stock descriptor ' labels{n}],A,reference,1e-14,1e-14,...
                   'The canonical physical representation must agree with the independent reference.');
 end
-rho=cce_state(cluster,model_p,{'Lx','Lz'},{3,2});
+rho=cce_state(cluster,{'Lx','Lz'},{3,2});
 reference=state(stock,{'Lx','Lz'},{3,2});
 reference=reference(indices,indices);
 result=test_close(result,'Stock product state',rho,reference,1e-14,1e-14,...
@@ -70,7 +72,7 @@ result=test_close(result,'Stock product state',rho,reference,1e-14,1e-14,...
 
 % Fully specified nonuniform populations are not normalised a second time
 states={diag([0.7 0.3]),[0.2 0.3 0.5],[0.9 0.1],[0.4 0.6]};
-rho=cce_state(cluster,model_p,states,[1 2 3 4]);
+rho=cce_state(cluster,states,[1 2 3 4]);
 expected=kron(kron(kron(diag(states{3}),states{1}),diag(states{4})),diag(states{2}));
 result=test_close(result,'Explicit physical state order',rho,expected,0,0,...
                   'The canonical physical representation must agree with the independent reference.');
@@ -88,10 +90,10 @@ H=kron(speye(8),operators.y);
 expected=kron(speye(24),H)-kron(H.',speye(24));
 result=test_close(result,'Liouville commutator',A,expected,0,0,...
                   'The canonical physical representation must agree with the independent reference.');
-vector=cce_state(cluster,model_p,states,[1 2 3 4]);
+vector=cce_state(cluster,states,[1 2 3 4]);
 result=test_close(result,'Column-major physical density',vector,rho(:),0,0,...
                   'The canonical physical representation must agree with the independent reference.');
-vector=cce_state(cluster,model_p,'Ly',2);
+vector=cce_state(cluster,'Ly',2);
 result=test_close(result,'Column-major operator state',vector,H(:),0,0,...
                   'The canonical physical representation must agree with the independent reference.');
 
@@ -106,7 +108,7 @@ result=test_close(result,'Empty-bath observed commutator',A,...
 % Physical states cannot omit populations or refer to discarded spins
 rejected=false;
 try
-    cce_state(cluster,model_p,{[0.4 0.6]},3);
+    cce_state(cluster,{[0.4 0.6]},3);
 catch
     rejected=true;
 end

@@ -292,18 +292,21 @@ p=struct('observed',1,'transition',struct('spins',1,'ms',[0.5 -0.5]),...
 resolved=cce_options(system,p,@sin,'labframe');
 result=test_true(result,'Declared physical defaults',...
                  strcmp(resolved.cce.approximation,'generalized')&&...
-                 strcmp(resolved.cce.bath_state.mode,'mixed_product')&&...
+                 ~isfield(resolved,'bath_state')&&~isfield(resolved,'bath_samples')&&...
                  strcmp(resolved.cce.meanfield,'none')&&isequal(resolved.cce.bath_spins,2),...
                  'Default resolution records assumptions and does not claim convergence.');
 explicit=resolved;
 explicit.cce.order=1;
-explicit.cce.numerics=struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e7);
 explicit.cce.approximation='projected';
-explicit.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])}});
+explicit.bath_state={diag([0.8 0.2])};
 explicit.bath_jumps=struct('support',2,'operator','L+','rate',3000);
-checked=cce_options(system,explicit,@sin,'labframe');
+explicit_system=system;
+explicit_system.tols.cce_atol=1e-12;
+explicit_system.tols.cce_rtol=1e-10;
+explicit_system.tols.cce_mem=1e7;
+checked=cce_options(explicit_system,explicit,@sin,'labframe');
 result=test_true(result,'Explicit physical input retained',...
-                 isequal(checked.cce.bath_state.rho,explicit.cce.bath_state.rho)&&...
+                 isequal(checked.bath_state,explicit.bath_state)&&...
                  isequal(checked.bath_jumps,explicit.bath_jumps)&&...
                  isequal(checked.times,p.times),...
                  'Populations and inverse-second jump rates are neither normalized nor converted.');
@@ -319,7 +322,7 @@ invalid{3}.cce=struct('aproximation','projected');
 invalid{4}=explicit;
 invalid{4}.cce.bath_spins=1;
 invalid{5}=explicit;
-invalid{5}.cce.bath_state.rho={diag([1.2 -0.2])};
+invalid{5}.bath_state={diag([1.2 -0.2])};
 invalid{6}=explicit;
 invalid{6}.bath_jumps.rate=-1;
 invalid{7}=explicit;
@@ -331,7 +334,8 @@ invalid{9}.spins=1;
 invalid{10}=p;
 invalid{10}.times=[0 0];
 invalid{11}=p;
-invalid{11}.cce.bath_state=struct('mode','sampled','seed',NaN);
+invalid{11}.bath_samples=1;
+invalid{11}.bath_seed=NaN;
 invalid{12}=p;
 invalid{12}.transition.spins=2;
 for k=1:numel(invalid)
@@ -368,14 +372,18 @@ result=test_true(result,'Angular-frequency and species filters retained',...
                  isequal(checked.pump,pump.pump),...
                  'Explicit units and optional intersecting site/species filters belong to the experiment.');
 sampled=p;
-sampled.cce.bath_state=struct('mode','sampled','basis',{{eye(2)}},...
-                              'probabilities',{{[0.8 0.2]}},'samples',7,'seed',19);
+sampled.bath_basis={eye(2)};
+sampled.bath_probs={[0.8 0.2]};
+sampled.bath_samples=7;
+sampled.bath_seed=19;
 state_before=rng;
 checked=cce_options(system,sampled,@sin,'labframe');
 result=test_true(result,'Seed and probabilities retained',...
-                 isequal(state_before,rng)&&isequal(checked.cce.bath_state,sampled.cce.bath_state),...
+                 isequal(state_before,rng)&&isequal(checked.bath_basis,sampled.bath_basis)&&...
+                 isequal(checked.bath_probs,sampled.bath_probs)&&...
+                 checked.bath_samples==sampled.bath_samples&&checked.bath_seed==sampled.bath_seed,...
                  'Option validation does not sample or alter the global random stream.');
-sampled.cce.bath_state.seed=2^32;
+sampled.bath_seed=2^32;
 rejected=false;
 try
     cce_options(system,sampled,@sin,'labframe');
@@ -427,10 +435,10 @@ result=test_true(result,'Projected manifolds must be specified',rejected,...
 % Preserve deterministic product-state mean fields as well as sampled ones
 physical.cce.approximation='generalized';
 physical.cce.meanfield='static';
-physical.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])}});
+physical.bath_state={diag([0.8 0.2])};
 checked=cce_options(system,physical,@sin,'labframe');
 result=test_true(result,'Static mean field with explicit product density',...
-                 strcmp(checked.cce.meanfield,'static')&&isequal(checked.cce.bath_state,physical.cce.bath_state),...
+                 strcmp(checked.cce.meanfield,'static')&&isequal(checked.bath_state,physical.bath_state),...
                  'Static expectations need not be obtained by stochastic sampling.');
 physical.cce.meanfield='none';
 physical.cce.meanfield_radius=10;

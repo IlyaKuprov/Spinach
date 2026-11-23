@@ -16,7 +16,7 @@ The optional second output carries spectral residuals, orthogonality residuals, 
 
 Projected zero-duration Hahn propagation evaluates the retained bath density trace, preserving floating-point identity for mixed baths whose dimension is not a power of two. The six-state electron/nitrogen regression checks this exactly.
 
-The polarised two-proton example supplies sampled Zeeman-basis populations through parameters.cce.bath_state and averages after expansion. The returned signal remains separate from estimator standard error and deterministic summation bounds in diagnostics.reduction.
+The polarised two-proton example supplies sampled Zeeman-basis populations through parameters.bath_probs with parameters.bath_samples and averages after expansion. The returned signal remains separate from estimator standard error and deterministic summation bounds in diagnostics.reduction.
 
 ## Generalised unitary Hahn propagation
 
@@ -24,7 +24,7 @@ By default, for generalised Zeeman-Hilbert dynamics with zero R and K and no bat
 
 For default selected-transition detection in the generalised coherent path, the response is evaluated as `alpha'*rho_observed*beta`, with the receiver phase and the detected preparation reference applied once. Its detector norm is one for the normalised transition states. Explicit coils and detection descriptors retain the Hilbert–Schmidt trace evaluation and their own operator norms.
 
-For generalised Hilbert evolution, parameters.cce.numerics.propagator='expm' selects direct segment exponentials with the same physical midpoint pi pulse. The initial zero-duration interval is retained in the arithmetic bound 16*d^3*eps*sum(1+abs(dt)*norm(H,2)). The default spectral route and its residual-derived bounds are unchanged; direct-segment output does not invent spectral residuals.
+For generalised Hilbert evolution, parameters.cce.propagator='expm' selects direct segment exponentials with the same physical midpoint pi pulse. The initial zero-duration interval is retained in the arithmetic bound 16*d^3*eps*sum(1+abs(dt)*norm(H,2)). The default spectral route and its residual-derived bounds are unchanged; direct-segment output does not invent spectral residuals.
 
 The direct-segment selection rejects projected, dissipative, non-Hilbert, and pump-bearing requests rather than ignoring that numerical preference.
 

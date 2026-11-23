@@ -18,7 +18,14 @@ result=new_test_result('kernel/clexpn_master','Native master equation CCE',...
 sys.magnet=0;
 sys.isotopes={'E','1H','1H'};
 sys.output='hush';
-sys.parallel={'local',2};
+sys.parallel={'processes',1};
+sys.tols.cce_atol=1e-10;
+sys.tols.cce_rtol=1e-10;
+sys.tols.cce_mem=2^26;
+pool=gcp('nocreate');
+if ~isempty(pool)
+    delete(pool);
+end
 inter.zeeman.scalar={0,0,0};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([0 0 0.7]);
@@ -29,8 +36,6 @@ p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 p.times=[0 0.1 0.2];
 p.bath_jumps=struct('support',2,'operator','L-','rate',0.4);
 p.cce.order=2;
-p.cce.basis=struct('formalism','zeeman-liouv');
-p.cce.numerics=struct('atol',1e-10,'rtol',1e-10,'max_memory_bytes',2^26);
 [a,da]=clexpn(s,@free_evolution,p,'labframe');
 result=test_close(result,'Complete dissipative bath',a,da.raw{1}(end).value,1e-12,1e-12,...
                   'Full-order reduction agrees with direct raw GKSL propagation.');
@@ -50,8 +55,8 @@ result=test_close(result,'Hahn density full bath',echo_density,echo_details.raw{
                   1e-12,1e-12,'Generalized echo supports direct observed-density output.');
 p.cce.expansion='standard';
 p.cce.order=1;
-p.cce.bath_state=struct('mode','interlaced','basis','uniform','probabilities','uniform',...
-                        'samples',2,'seed',7);
+p.bath_samples=2;
+p.bath_seed=7;
 p.cce.interlaced=struct('max_states',4);
 [conditional,di]=clexpn(s,@free_evolution,p,'labframe');
 result=test_true(result,'Conditioned factors finite',all(isfinite(conditional)),...
@@ -61,7 +66,7 @@ result=test_true(result,'Irreducible metadata',strcmp(di.raw{1}(2).kind,'irreduc
 p.cce.order=2;
 [complete,df]=clexpn(s,@free_evolution,p,'labframe');
 p.cce.expansion='standard';
-p.cce.bath_state=struct('mode','mixed_product');
+p=rmfield(p,{'bath_samples','bath_seed'});
 p.cce=rmfield(p.cce,'interlaced');
 exact=clexpn(s,@free_evolution,p,'labframe');
 result=test_close(result,'Complete conditioned bath',complete,exact,1e-12,1e-12,...
@@ -77,10 +82,6 @@ relax=p;
 relax.cce.bath_spins=[];
 relax.cce.order=0;
 relax.cce.expansion='standard';
-relax.cce.bath_state=struct('mode','mixed_product');
-if isfield(relax.cce,'interlaced')
-    relax.cce=rmfield(relax.cce,'interlaced');
-end
 relax.cce.approximation='generalized';
 relax.output='density';
 relax.bath_jumps=struct('support',1,'operator','L+','rate',0.4);
@@ -149,15 +150,19 @@ p.cce.checkpoint.resume=true;
 delete(file);
 result=test_close(result,'Native checkpoint resume',first,resumed,0,0,'Exact task records survive restart.');
 p.cce=rmfield(p.cce,'checkpoint');
-p.cce.parallel=struct('mode','clusters','batch_size',2);
-parallel=clexpn(s,@free_evolution,p,'labframe');
+delete(gcp('nocreate'));
+sys.parallel={'processes',2};
+parallel_system=create(sys,inter);
+parallel=clexpn(parallel_system,@free_evolution,p,'labframe');
 result=test_close(result,'Native parallel determinism',parallel,first,0,0,'Workers return raw indexed records only.');
 
 % Finite Liouville drives retain uncertainty under strict numerical budgets
 request=p;
-request.cce.parallel.mode='serial';
-request.cce.numerics.atol=1e-30;
-request.cce.numerics.rtol=0;
+delete(gcp('nocreate'));
+sys.parallel={'processes',1};
+strict=create(sys,inter);
+strict.tols.cce_atol=1e-30;
+strict.tols.cce_rtol=0;
 request.times=[0 0.05 0.1 0.2];
 request.drive=struct('spins',1,'axis','x','time',0.02,...
                      'duration',0.1,'amplitude',7,'detuning',2);
@@ -165,10 +170,10 @@ request.drive(2)=request.drive;
 request.drive(2).time=0.06;
 request.drive(2).axis='y';
 request.drive(2).amplitude=3;
-[~,driven]=clexpn(s,@finite_drive,request,'labframe');
+[~,driven]=clexpn(strict,@finite_drive,request,'labframe');
 request=driven.parameters;
-drive_model_p=cce_options(s,request,@cce_compile,'labframe');
-drive_model=cce_compile(s,drive_model_p,'labframe');
+drive_model_p=cce_options(strict,request,@cce_compile,'labframe');
+drive_model=cce_compile(strict,drive_model_p,'labframe');
 drive_model.bas.formalism='zeeman-liouv';
 checks=cce_diagnostics(drive_model,driven.raw,driven.reduction,request);
 result=test_true(result,'Driven Liouville numerical budget is not exact',...
@@ -178,7 +183,8 @@ result=test_true(result,'Driven Liouville numerical budget is not exact',...
 
 % Independently sum the declared arithmetic estimate over all finite intervals
 [retained,~]=cce_subsystem(drive_model,drive_model_p,drive_model_p.cce.bath_spins,struct(),[]);
-[H,R,K,local]=cce_generators(retained,request,[]);
+[H,R,K,retained]=cce_generators(retained,request,[]);
+local=request;
 L=H+1i*R+1i*K;
 [~,aux]=finite_drive(retained,local,H,R,K);
 hilbert=retained;

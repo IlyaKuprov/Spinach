@@ -24,6 +24,9 @@ sys.magnet=0;
 sys.output='hush';
 sys.disable={'hygiene'};
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^29;
 inter.zeeman.matrix=repmat({zeros(3)},1,nb+1);
 inter.coupling.matrix=cell(nb+1);
 spin_system=create(sys,inter);
@@ -52,10 +55,8 @@ p.transition.alpha=[1;0];
 p.transition.beta=[0;1];
 p.orientation=[0 0 0];
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
 p.cce.meanfield='none';
 p.times=linspace(0,0.018,13);
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^29);
 maximum=0;
 max_bound=0;
 for pure=[false true]
@@ -71,7 +72,7 @@ for pure=[false true]
 
         end
     end
-    p.cce.bath_state=struct('mode','explicit_product','rho',{states});
+    p.bath_state=states;
     for hahn=[false true]
 
         % Select free evolution or the Hahn experiment

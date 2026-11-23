@@ -25,13 +25,15 @@ inter.coupling.matrix{1,2}=[11 3 -2;4 17 8;6 -5 23]*100;
 inter.coupling.matrix{2,3}=[8 -5 4;3 -7 9;1 6 13]*31;
 inter.coupling.matrix{1,3}=diag([7 9 13])*17;
 inter.coupling.matrix{2,2}=[2 1 0;1 -3 2;0 2 1]*41;
+sys.tols.cce_atol=1e-5;
+sys.tols.cce_rtol=1e-12;
+sys.tols.cce_mem=1e8;
 system=create(sys,inter);
 parameters.times=0;
 parameters.observed=2;
 parameters.cce.bath_spins=[3 1];
 parameters.orientation=[0 0 0];
 parameters.cce.interaction_cutoff=Inf;
-parameters.cce.numerics=struct('atol',1e-5,'rtol',1e-12,'max_memory_bytes',1e8);
 
 % Exercise every validated assumption, Euler choice, and retention selection
 max_error=0;
@@ -58,7 +60,7 @@ for angles={[0 0 0],[0.3 0.7 -0.2]}
                                   expm(full(-1i*reference*1e-7)),'fro');
             max_propagator=max(max_propagator,propagator_error);
             result=test_true(result,'dense propagator parity',...
-                             propagator_error<=parameters.cce.numerics.atol,...
+                             propagator_error<=system.tols.cce_atol,...
                              'Independent dense exponentials obey the requested observable budget.');
             result=test_true(result,[assumption{1} '/' retention{1} ' parity'],...
                              error_norm<=meta.roundoff_bound&&error_norm<=meta.observable_budget,'Stock/direct error must satisfy roundoff and requested budgets.');
@@ -151,13 +153,14 @@ result=test_true(result,'cutoff omission count',...
 % Reject a declared memory budget before allocating cluster-sized matrices
 small=parameters;
 small.cce.interaction_cutoff=Inf;
-small.cce.numerics.max_memory_bytes=1;
+tight=system;
+tight.tols.cce_mem=1;
 rejected=false;
 try
-    small_p=cce_options(system,small,@cce_compile,assumptions);
-    cce_hamiltonian(cce_compile(system,small_p,assumptions),small_p,[2 3],struct());
+    small_p=cce_options(tight,small,@cce_compile,assumptions);
+    cce_hamiltonian(cce_compile(tight,small_p,assumptions),small_p,[2 3],struct());
 catch exception
-    rejected=contains(exception.message,'max_memory_bytes');
+    rejected=contains(exception.message,'sys.tols.cce_mem');
 end
 result=test_true(result,'memory ceiling rejected',...
                  rejected,'Insufficient explicit memory must stop before operator allocation.');

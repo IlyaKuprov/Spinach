@@ -24,14 +24,17 @@ inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([1e5 1e5 4e5]);
 inter.coupling.matrix{1,3}=diag([2e4 2e4 8e4]);
 inter.coupling.matrix{2,2}=diag([-1 -1 2])*2e5;
+sys.tols.cce_atol=1e-6;
+sys.tols.cce_rtol=1e-6;
+if poolsize()>1
+    delete(gcp('nocreate'));
+end
 spin_system=create(sys,inter);
 p.observed=1;
 p.transition=struct('spins',1,'ms',[0.5 -0.5]);
 p.preparation='transverse';
 p.times=[0 13e-6 41e-6];
 p.cce=struct('bath_spins',2:3,'order',1,'approximation','generalized');
-p.cce.graph.mode='complete';
-p.cce.numerics=struct('atol',1e-6,'rtol',1e-6);
 grid=struct('alphas',[0 0],'betas',[0 pi/2],'gammas',[0 0],'weights',[1 3]);
 p.grid=grid;
 [after,diagnostics]=clexpn(spin_system,@hahn_echo,p,'labframe');
@@ -83,10 +86,10 @@ for mode={'after_expansion','internal_then_expansion'}
 end
 
 % A failing orientation invalidates only its affected times and expansion orders
-limited=p;
-limited.cce.numerics.atol=2.55e-8;
-limited.cce.numerics.rtol=0;
-[~,masked]=clexpn(spin_system,@hahn_echo,limited,'labframe');
+limited=spin_system;
+limited.tols.cce_atol=2.55e-8;
+limited.tols.cce_rtol=0;
+[~,masked]=clexpn(limited,@hahn_echo,p,'labframe');
 a=masked.orientations{1}.reduction;
 b=masked.orientations{2}.reduction;
 result=test_true(result,'Mixed orientation validity',~a.valid(end)&&b.valid(end)&&...
@@ -100,9 +103,11 @@ result=test_close(result,'Weighted orientation bounds',diagnostics.reduction.by_
                   'Absolute uncertainty is averaged conservatively at each expansion order.');
 
 % Cluster parallelism preserves each complete orientation and uses the existing pool
-parallel_request=p;
-parallel_request.cce.parallel.mode='clusters';
-[parallel_answer,parallel_data]=clexpn(spin_system,@hahn_echo,parallel_request,'labframe');
+delete(gcp('nocreate'));
+parallel_sys=sys;
+parallel_sys.parallel={'processes',2};
+parallel_system=create(parallel_sys,inter);
+[parallel_answer,parallel_data]=clexpn(parallel_system,@hahn_echo,p,'labframe');
 result=test_close(result,'Parallel orientation signal',parallel_answer,after,0,0,...
                   'Serial and cluster-parallel composition have identical gather order.');
 result=test_close(result,'Parallel orientation error',parallel_data.reduction.abs_error_bound,...
@@ -115,13 +120,13 @@ result=test_true(result,'Parallel orientation masks',...
 
 % Calling the composition on a worker must not request another pool
 pool=gcp('nocreate');
-future=parfeval(pool,@clexpn,2,spin_system,@hahn_echo,parallel_request,'labframe');
+future=parfeval(pool,@clexpn,2,parallel_system,@hahn_echo,p,'labframe');
 [worker_answer,worker_data]=fetchOutputs(future);
 result=test_close(result,'Outer-worker orientation signal',worker_answer,after,0,0,...
                   'An outer worker executes nested cluster calculations serially.');
 result=test_true(result,'Nested-worker suppression',...
-                 strcmp(worker_data.parameters.cce.parallel.mode,'serial')&&...
-                 gcp('nocreate').NumWorkers==pool.NumWorkers,...
+                 isequal(worker_data.reduction.valid,diagnostics.reduction.valid)&&...
+                 gcp('nocreate').NumWorkers==2,...
                  'Only the already existing outer pool owns workers.');
 
 % Rotating an anisotropic Zeeman tensor changes the physical pump selection
@@ -193,8 +198,8 @@ result=test_true(result,'No averaging of incompatible families',refused,...
 
 % Common sampled spin states are averaged across orientations before their error estimate
 p.cce.averaging='after_expansion';
-p.cce.bath_state=struct('mode','sampled','samples',4,'seed',19,...
-                        'basis','uniform','probabilities','uniform');
+p.bath_samples=4;
+p.bath_seed=19;
 [~,sampled]=clexpn(spin_system,@hahn_echo,p,'labframe');
 state_values=zeros(numel(p.times),4);
 for n=1:2
@@ -231,7 +236,7 @@ result=test_close(result,'Integer quadrature weights',integer_answer,internal_sa
 % Named grids use the same kernel/grids lookup and field names as powder
 named=p;
 named.times=0;
-named.cce=rmfield(named.cce,'bath_state');
+named=rmfield(named,{'bath_samples','bath_seed'});
 named.grid='icos_2ang_12pts.mat';
 [named_answer,named_diagnostics]=clexpn(spin_system,@hahn_echo,named,'labframe');
 result=test_close(result,'Named powder quadrature',named_answer,1,2e-14,0,...
@@ -248,12 +253,14 @@ result=test_close(result,'Zero quadrature weight',single,one.orientations{1}.red
 % Single stochastic draws remain unavailable through both averaging orders
 request=p;
 request.cce.order=1;
-request.cce.interlaced=struct('reference_state',1,'max_states',9);
+interlaced=struct('reference_state',1,'max_states',9);
+request.bath_samples=1;
 probe_grid=grid;
 probe_grid.betas=[0 0];
 for mode={'sampled','interlaced'}
-    request.cce.bath_state=struct('mode',mode{1},'samples',1,'seed',19,...
-                                  'basis','uniform','probabilities','uniform');
+    if strcmp(mode{1},'interlaced')
+        request.cce.interlaced=interlaced;
+    end
     for averaging={'after_expansion','internal_then_expansion'}
         if strcmp(mode{1},'interlaced')&&strcmp(averaging{1},'internal_then_expansion')
             continue;
@@ -274,11 +281,11 @@ for mode={'sampled','interlaced'}
 end
 
 % A complete bath still counts independent spin draws rather than quadrature nodes
+request.cce=rmfield(request.cce,'interlaced');
 request.cce.order=2;
 request.cce.averaging='internal_then_expansion';
 for count=[1 4]
-    request.cce.bath_state=struct('mode','sampled','samples',count,'seed',19,...
-                                  'basis','uniform','probabilities','uniform');
+    request.bath_samples=count;
     request.grid=probe_grid;
     [~,complete]=clexpn(spin_system,@hahn_echo,request,'labframe');
     if count==1
@@ -303,8 +310,8 @@ end
 
 % Complete interlacing preserves per-order reason shapes during diagnostic merging
 request.cce.averaging='after_expansion';
-request.cce.bath_state.mode='interlaced';
-request.cce.bath_state.samples=1;
+request.cce.interlaced=interlaced;
+request.bath_samples=1;
 [~,complete]=clexpn(spin_system,@hahn_echo,request,'labframe');
 result=test_true(result,'Complete interlaced orientation diagnostics',...
                  all(complete.reduction.sampling_standard_error==0,'all')&&...
@@ -313,7 +320,8 @@ result=test_true(result,'Complete interlaced orientation diagnostics',...
                  'Exact full-bath interlacing has zero sampling error and aligned diagnostic arrays.');
 
 % A shared ledger is rejected before any nested calculation writes a checkpoint
-request.cce=rmfield(request.cce,'bath_state');
+request=rmfield(request,{'bath_samples','bath_seed'});
+request.cce=rmfield(request.cce,'interlaced');
 request.cce.order=1;
 checkpoint=[tempname '.mat'];
 request.cce.checkpoint=struct('file',checkpoint,'resume',false);

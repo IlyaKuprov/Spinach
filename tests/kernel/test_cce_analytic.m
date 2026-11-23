@@ -21,6 +21,9 @@ sys.magnet=0;
 sys.output='hush';
 sys.disable={'hygiene'};
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=zeros(3);
@@ -48,10 +51,7 @@ p.cce.order=1;
 p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 p.orientation=[0 0 0];
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
-p.cce.bath_state=struct('mode','mixed_product');
 p.cce.meanfield='none';
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 p.times=linspace(0,0.012,81);
 
 % Compare the complex projected FID against independent two-by-two expm
@@ -74,8 +74,9 @@ q.times=p.times(samples);
 q.rho0=[0.5 -0.5i;0.5i 0.5];
 q.coil=(2-3i)*[0 1;0 0];
 initial=trace(q.coil'*q.rho0);
-q.cce.numerics.atol=1e-30;
-q.cce.numerics.rtol=1e-30;
+strict_system=spin_system;
+strict_system.tols.cce_atol=1e-30;
+strict_system.tols.cce_rtol=1e-30;
 frequency=norm(ha+(phase/2)*eye(2),1)+norm(hb-(phase/2)*eye(2),1);
 for normalised=[false true]
 
@@ -85,9 +86,9 @@ for normalised=[false true]
     if normalised
         factor=1;
     end
-    [signal,d]=clexpn(spin_system,@free_evolution,q,'labframe');
-    model_p=cce_options(spin_system,d.parameters,@cce_compile,'labframe');
-    model=cce_compile(spin_system,model_p,'labframe');
+    [signal,d]=clexpn(strict_system,@free_evolution,q,'labframe');
+    model_p=cce_options(strict_system,d.parameters,@cce_compile,'labframe');
+    model=cce_compile(strict_system,model_p,'labframe');
     check=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
     expected=16*2^3*abs(factor)*((q.times(:)>0)+q.times(:)*frequency);
     result=test_close(result,'Projected explicit receiver FID',signal,...
@@ -171,7 +172,6 @@ probe=q;
 probe.output='density';
 probe.rho0=ones(2)/2;
 probe.cce.approximation='generalized';
-probe.cce.basis.formalism='zeeman-hilb';
 full_hamiltonian=phase*kron(z,eye(2))+kron(eye(2),omega*z)+...
                  kron(z,longitudinal*z+transverse*x);
 initial=kron(probe.rho0,eye(2)/2);
@@ -195,7 +195,7 @@ for index=1:numel(probe.times)
     expected_density(index,:)=observed(:).';
 end
 for propagation={'eig','expm'}
-    probe.cce.numerics.propagator=propagation{1};
+    probe.cce.propagator=propagation{1};
     observed_density=clexpn(probe_system,@hahn_echo,probe,'labframe');
     result=test_close(result,['Absolute generalized ' propagation{1}],observed_density,...
                       expected_density,2e-12,2e-12,...

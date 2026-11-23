@@ -1,6 +1,6 @@
 % Deterministic multiplicative or additive cluster reduction. Syntax:
 %
-%                 reduced=cce_reduce(raw,clusters,parameters)
+%                 reduced=cce_reduce(spin_system,raw,clusters,parameters)
 %
 % raw is a vector of records with cluster_id (0 for observed-spin-only), value
 % (ntime by nout), abs_error_bound and valid of matching size. Every
@@ -10,9 +10,9 @@
 % Invalid input masks propagate as raw_invalid in the reduced result.
 %
 % parameters.method selects additive noise or multiplicative dynamics;
-% reducer is powers (default) or direct. numerics.atol and rtol specify
-% nonnegative output budgets (not both zero); zero_policy is mask or
-% error (default mask). No epsilon replacement or magnitude clipping.
+% reducer is powers (default) or direct. sys.tols.cce_atol and cce_rtol
+% specify nonnegative output budgets; zero_policy is mask or error
+% (default mask). No epsilon replacement or magnitude clipping.
 %
 % Output value/valid/reason/abs_error_bound correspond to maximum order;
 % by_order and matching diagnostics have an extra final dimension for
@@ -30,8 +30,8 @@
 %   raw - records with cluster_id, time-by-observable value, logical valid,
 %   and nonnegative abs_error_bound.
 %   clusters - ordered subset-closed records from cce_clusters.
-%   parameters - method, numerical tolerances; optional reducer=powers|direct
-%   (default powers), numerics.zero_policy=mask|error (default mask).
+%   parameters - method; optional reducer=powers|direct (default powers),
+%   zero_policy=mask|error (default mask).
 %
 % Outputs:
 %
@@ -54,10 +54,10 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function reduced=cce_reduce(raw,clusters,parameters)
+function reduced=cce_reduce(spin_system,raw,clusters,parameters)
 
 % Validate indexed raw records and their cluster family
-grumble(raw,clusters,parameters);
+grumble(spin_system,raw,clusters,parameters);
 
 % Native ensemble reduction retains experiment-owned output axes
 if isfield(parameters,'cce')
@@ -69,11 +69,7 @@ if isfield(parameters,'cce')
         weights(n)=raw{n}(1).weight;
     end
     selection=struct('method','gcce','order',options.order,...
-                     'reducer',options.reducer,'numerics',options.numerics,'expansion',options.expansion);
-    selection.numerics.zero_policy='mask';
-    if isfield(selection.numerics,'propagator')
-        selection.numerics=rmfield(selection.numerics,'propagator');
-    end
+                     'reducer',options.reducer,'expansion',options.expansion);
     additive=isfield(parameters,'noise');
     if additive
         selection.method='noise';
@@ -100,7 +96,8 @@ if isfield(parameters,'cce')
     bath=sort(options.bath_spins(:));
     sites=[{[]} {clusters.sites}];
     complete=find(cellfun(@(ids)isequal(sort(ids(:)),bath),sites),1);
-    interlaced=strcmp(options.bath_state.mode,'interlaced');
+    interlaced=isfield(options,'interlaced');
+    sampled=isfield(parameters,'bath_samples')&&~interlaced;
     if interlaced&&any([raw{1}.full_bath])
         complete=find([raw{1}.full_bath],1);
     end
@@ -140,9 +137,9 @@ if isfield(parameters,'cce')
     parts=cell(1,count);
     for n=1:count
         if interlaced
-            parts{n}=interlaced_product(raw{n},clusters,selection);
+            parts{n}=interlaced_product(spin_system,raw{n},clusters,selection);
         else
-            parts{n}=cce_reduce(raw{n},clusters,selection);
+            parts{n}=cce_reduce(spin_system,raw{n},clusters,selection);
         end
         if ~isempty(complete)
             exact=raw{n}(complete);
@@ -190,32 +187,32 @@ if isfield(parameters,'cce')
     % A finite exact reference remains valid even above the requested error budget
     reduced.valid=reduced.valid&isfinite(reduced.value);
     if isempty(complete)
-        reduced.valid=reduced.valid&reduced.abs_error_bound<=options.numerics.atol+...
-                                  options.numerics.rtol*abs(reduced.value);
+        reduced.valid=reduced.valid&reduced.abs_error_bound<=spin_system.tols.cce_atol+...
+                                  spin_system.tols.cce_rtol*abs(reduced.value);
     end
     reduced.reason=repmat({'ok'},size(reduced.value));
     reduced.reason(~reduced.valid)={'ensemble_invalid'};
     reduced.by_order_reason=repmat({'ok'},size(reduced.by_order));
     reduced.by_order_reason(~reduced.by_order_valid)={'ensemble_invalid'};
-    if strcmp(options.bath_state.mode,'interlaced')&&any([raw{1}.full_bath])
+    if interlaced&&any([raw{1}.full_bath])
         reduced.by_order_reason(:,:,1:end-1)={'not_evaluated'};
     end
-    if strcmp(options.numerics.zero_policy,'error')&&any(~reduced.valid,'all')
+    if strcmp(options.zero_policy,'error')&&any(~reduced.valid,'all')
         error('cce_reduce:unresolved','The native expansion contains unresolved output elements.');
     end
     reduced.samples=parts;
     reduced.weights=weights;
     reduced.complete_record=complete;
     reduced.sampling_standard_error=zeros(size(reduced.value));
-    if strcmp(options.bath_state.mode,'sampled')
+    if sampled
         reduced.sampling_standard_error(:)=NaN;
     end
-    if strcmp(options.bath_state.mode,'sampled')&&count>1&&all(abs(weights-1/count)<=eps)
+    if sampled&&count>1&&all(abs(weights-1/count)<=eps)
         values=cellfun(@(part)part.value,parts,'UniformOutput',false);
         values=cat(3,values{:});
         reduced.sampling_standard_error=sqrt(sum(abs(values-mean(values,3)).^2,3)/(count*(count-1)));
     end
-    if strcmp(options.bath_state.mode,'interlaced')
+    if interlaced
         reduced.sampling_standard_error(:)=NaN;
         if count>1
             values=cellfun(@(part)part.value,parts,'UniformOutput',false);
@@ -299,8 +296,8 @@ for o=0:max_order
             masks(q)=usable(1);
             if ~usable(1)
                 why{q}='raw_invalid';
-            elseif bounds(q)>parameters.numerics.atol+...
-                             parameters.numerics.rtol*abs(values(q))
+            elseif bounds(q)>spin_system.tols.cce_atol+...
+                             spin_system.tols.cce_rtol*abs(values(q))
                 masks(q)=false;
                 why{q}='error_budget';
             end
@@ -428,8 +425,8 @@ for o=0:max_order
         end
 
         % Reject estimates exceeding the caller's absolute/relative budget
-        if masks(q)&&bounds(q)>parameters.numerics.atol+...
-                               parameters.numerics.rtol*abs(values(q))
+        if masks(q)&&bounds(q)>spin_system.tols.cce_atol+...
+                               spin_system.tols.cce_rtol*abs(values(q))
             masks(q)=false;
             why{q}='error_budget';
         end
@@ -451,8 +448,8 @@ reduced=struct('value',by_order(:,:,end),'abs_error_bound',errors(:,:,end),...
                'by_order',by_order,'by_order_error',errors,...
                'by_order_valid',valid,'by_order_reason',{reasons},...
                'orders',0:max_order,'reducer',reducer);
-if isfield(parameters.numerics,'zero_policy')&&...
-   strcmp(parameters.numerics.zero_policy,'error')&&any(~reduced.valid,'all')
+if isfield(parameters,'zero_policy')&&...
+   strcmp(parameters.zero_policy,'error')&&any(~reduced.valid,'all')
     first=find(~reduced.valid,1);
     error('cce_reduce:invalid','unresolved reduction: %s.',reduced.reason{first});
 end
@@ -554,7 +551,7 @@ end
 end
 
 % Multiply each irreducible factor once, without feeding it into a raw reducer
-function reduced=interlaced_product(raw,clusters,selection)
+function reduced=interlaced_product(spin_system,raw,clusters,selection)
 empty=selection;
 empty.order=0;
 baseline=raw(1);
@@ -563,7 +560,7 @@ if ~isempty(complete)
     baseline=raw(complete);
     baseline.cluster_id=0;
 end
-reduced=cce_reduce(baseline,clusters([]),empty);
+reduced=cce_reduce(spin_system,baseline,clusters([]),empty);
 orders=0:selection.order;
 shape=[size(raw(1).value) numel(orders)];
 reduced.by_order=complex(NaN(shape));
@@ -602,7 +599,7 @@ reduced.valid=valid;
 end
 
 % Validate raw gather indexing, scalar budgets and the subset order
-function grumble(raw,clusters,parameters)
+function grumble(spin_system,raw,clusters,parameters)
 if ~isstruct(parameters)||~isscalar(parameters)
     error('cce_reduce:parameters','method and numerical budgets required.');
 end
@@ -610,7 +607,7 @@ if isfield(parameters,'cce')
     options=parameters.cce;
     if ~iscell(raw)||isempty(raw)||~isvector(raw)||~isstruct(clusters)||...
        ~isstruct(options)||~isscalar(options)||...
-       ~all(isfield(options,{'order','reducer','numerics','expansion','averaging','bath_spins','bath_state'}))
+       ~all(isfield(options,{'order','reducer','expansion','averaging','bath_spins'}))
         error('cce_reduce:inputs','native raw cells and resolved cluster controls required.');
     end
     count=numel(raw);
@@ -625,7 +622,7 @@ if isfield(parameters,'cce')
     if any(~isfinite(weights))||any(weights<0)||abs(sum(weights)-1)>count*eps
         error('cce_reduce:weights','Configuration weights must be normalized and nonnegative.');
     end
-    if strcmp(options.bath_state.mode,'interlaced')
+    if isfield(options,'interlaced')
         if isfield(parameters,'noise')
             error('cce_reduce:interlaced','Interlacing requires multiplicative signals.');
         end
@@ -633,16 +630,16 @@ if isfield(parameters,'cce')
             error('cce_reduce:interlaced','Interlaced factors require after_expansion averaging.');
         end
     end
-    selection=struct('method','gcce','reducer',options.reducer,'numerics',options.numerics);
+    selection=struct('method','gcce','reducer',options.reducer);
     for n=1:count
         records=raw{n};
         family=clusters;
-        if strcmp(options.bath_state.mode,'interlaced')&&any([records.full_bath])
+        if isfield(options,'interlaced')&&any([records.full_bath])
             records=records(find([records.full_bath],1));
             records.cluster_id=0;
             family=clusters([]);
         end
-        grumble(records,family,selection);
+        grumble(spin_system,records,family,selection);
     end
     return
 end
@@ -686,27 +683,14 @@ for k=1:numel(clusters)
         error('cce_reduce:subsets','proper subsets must precede their parent.');
     end
 end
-if ~isstruct(parameters)||~isscalar(parameters)||...
-   ~all(isfield(parameters,{'method','numerics'}))||...
-   ~ismember(parameters.method,{'cce','gcce','mecce','megcce','noise'})||...
-   ~isstruct(parameters.numerics)||~isscalar(parameters.numerics)||...
-   ~all(isfield(parameters.numerics,{'atol','rtol'}))
+if ~isfield(parameters,'method')||...
+   ~ismember(parameters.method,{'cce','gcce','mecce','megcce','noise'})
     error('cce_reduce:parameters','method and numerical budgets required.');
-end
-for field={'atol','rtol'}
-    value=parameters.numerics.(field{1});
-    if ~isnumeric(value)||~isreal(value)||~isscalar(value)||~isfinite(value)||value<0
-        error('cce_reduce:budget','absolute and relative budgets must be finite nonnegative scalars.');
-    end
-end
-if parameters.numerics.atol+parameters.numerics.rtol==0
-    error('cce_reduce:budget','absolute and relative budgets cannot both be zero.');
 end
 if isfield(parameters,'reducer')&&~ismember(parameters.reducer,{'powers','direct'})
     error('cce_reduce:reducer','reducer must be powers or direct.');
 end
-if isfield(parameters.numerics,'zero_policy')&&...
-   ~ismember(parameters.numerics.zero_policy,{'mask','error'})
+if isfield(parameters,'zero_policy')&&~ismember(parameters.zero_policy,{'mask','error'})
     error('cce_reduce:policy','zero_policy must be mask or error.');
 end
 end

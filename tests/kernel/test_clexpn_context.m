@@ -22,13 +22,15 @@ sys.disable={'hygiene'};
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=diag([0 0 7]);
+sys.tols.cce_atol=1e-12;
+sys.tols.cce_rtol=1e-10;
+sys.tols.cce_mem=1e8;
 spin_system=create(sys,inter);
 p.observed=1;
 p.times=[0 0.01 0.03];
 p.transition.spins=1;
 p.transition.alpha=[1;0];
 p.transition.beta=[0;1];
-p.cce.numerics=struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e8);
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,p,'labframe');
 result=test_close(result,'Natural echo output',answer,ones(3,1),1e-13,1e-13,...
                   'Ideal midpoint refocusing cancels the static conditional field.');
@@ -61,8 +63,8 @@ result=test_true(result,'Native bath-radius truncation',isempty(outside.graph.ba
 model_p=cce_options(spin_system,diagnostics.parameters,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
 [cluster,~]=cce_subsystem(model,model_p,2,struct(),[]);
-[H,R,K,parameters]=cce_generators(cluster,diagnostics.parameters,[]);
-reference=hahn_echo(cluster,parameters,H,R,K);
+[H,R,K,cluster]=cce_generators(cluster,diagnostics.parameters,[]);
+reference=hahn_echo(cluster,diagnostics.parameters,H,R,K);
 result=test_close(result,'Standard five-argument dispatch',...
                   diagnostics.raw{1}(end).value,reference,0,0,...
                   'The scheduler invokes the registered experiment without a result adapter.');
@@ -96,8 +98,8 @@ end
 
 % A sampled no-field ensemble also allows selected exterior spin rotations
 sampled=p;
-sampled.cce.bath_state=struct('mode','sampled','basis','uniform',...
-                              'probabilities','uniform','samples',4,'seed',19);
+sampled.bath_samples=4;
+sampled.bath_seed=19;
 [sampled_signal,sampled_diagnostics]=clexpn(spin_system,@bath_pumped_hahn,sampled,'labframe');
 assignment=[sampled_diagnostics.ensemble.spin_config.assignment];
 expected=mean(exp(-1i*2*pi*7*p.times(:)*(1.5-assignment)/2),2);
@@ -153,6 +155,9 @@ interlace_inter.coupling.matrix=cell(4);
 interlace_inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
 interlace_inter.coupling.matrix{1,3}=diag([0 0 4])/(2*pi);
 interlace_inter.coupling.matrix{1,4}=diag([0 0 7])/(2*pi);
+interlace_sys.tols.cce_atol=1e-9;
+interlace_sys.tols.cce_rtol=1e-9;
+interlace_sys.tols.cce_mem=2^26;
 interlace_system=create(interlace_sys,interlace_inter);
 q.observed=1;
 q.cce.bath_spins=2:4;
@@ -165,13 +170,12 @@ q.transition.alpha=[1;0];
 q.transition.beta=[0;1];
 q.orientation=[0 0 0];
 q.cce.interaction_cutoff=Inf;
-q.cce.graph=struct('mode','complete','score','coupling_norm');
-q.cce.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...
-                        'probabilities',{{[0.7 0.3],[0.2 0.8],[0.6 0.4]}});
+q.bath_samples=1;
+q.bath_seed=31;
+q.bath_probs={[0.7 0.3],[0.2 0.8],[0.6 0.4]};
 q.cce.meanfield='static';
 q.transition.spins=q.observed;
 q.cce.interlaced=struct('max_states',16);
-q.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 [~,interlace_details]=clexpn(interlace_system,@free_evolution,q,'labframe');
 q=interlace_details.parameters;
 model_p=cce_options(interlace_system,q,@cce_compile,'labframe');

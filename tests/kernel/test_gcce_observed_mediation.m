@@ -19,6 +19,9 @@ sys.magnet=0;
 sys.output='hush';
 sys.disable={'hygiene'};
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3);
 spin_system=create(sys,inter);
@@ -36,11 +39,8 @@ p.transition.beta=[0;1];
 p.rho0=ones(2)/2;
 p.orientation=[0 0 0];
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','coupling','threshold',0,'score','coupling_norm');
 p.cce.meanfield='none';
 p.times=linspace(0,0.08,41);
-p.cce.bath_state=struct('mode','mixed_product');
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
 % Compare singletons with the retained exact observed-mediated pair
 p.cce.order=1;
@@ -90,28 +90,22 @@ p.cce.averaging='internal_then_expansion';
 
 % Check unitary and master-equation paths against the exact signal
 for method={'gcce','megcce'}
-    p.cce.approximation='generalized';
-    p.cce.basis=struct('formalism','zeeman-hilb','approximation','none');
+    local_system=spin_system;
     if strcmp(method{1},'megcce')
-        p.bath_jumps=struct([]);
-        p.cce.basis.formalism='zeeman-liouv';
+        local_system.bas.formalism='zeeman-liouv';
     end
     for mode={'mixed_product','sampled'}
-        p.cce.bath_state=struct('mode',mode{1});
+        q=p;
         if strcmp(mode{1},'sampled')
-            p.cce.bath_state.samples=4;
-            p.cce.bath_state.seed=11;
-            p.cce.bath_state.basis='uniform';
-            p.cce.bath_state.probabilities={ones(1,2)/2,ones(1,2)/2};
+            q.bath_samples=4;
+            q.bath_seed=11;
+            q.bath_probs={ones(1,2)/2,ones(1,2)/2};
         end
-        actual=clexpn(spin_system,@free_evolution,p,'labframe');
+        actual=clexpn(local_system,@free_evolution,q,'labframe');
         name=['joint detection ' method{1} ' ' mode{1}];
         result=test_close(result,name,actual,reference,1e-8,1e-8,...
                           'Disconnected Hamiltonian components need not factorize a sum detection operator.');
         metrics.([method{1} '_' mode{1} '_joint_error'])=max(abs(actual-reference));
-    end
-    if isfield(p,'bath_jumps')
-        p=rmfield(p,'bath_jumps');
     end
 end
 

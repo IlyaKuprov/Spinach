@@ -24,11 +24,15 @@ sys.isotopes={'13C','13C','13C'};
 sys.magnet=0;
 sys.output='hush';
 sys.disable={'hygiene'};
-sys.parallel={'local',1};
+sys.parallel={'processes',1};
 inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([0 0 17]);
 inter.coupling.matrix{1,3}=diag([0 0 29]);
+delete(gcp('nocreate'));
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^26;
 spin_system=create(sys,inter);
 p.observed=1;
 p.times=[0 0.001 0.004];
@@ -36,19 +40,17 @@ p.orientation=[0 0 0];
 p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 p.cce=struct('approximation','projected','bath_spins',[2 3],...
              'expansion','standard','order',2,'interaction_cutoff',Inf,...
-             'graph',struct('mode','complete','score','coupling_norm'),...
-             'meanfield','none','averaging','after_expansion',...
-             'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
-                                 'samples',4,'seed',193),...
-             'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^26));
+             'meanfield','none','averaging','after_expansion');
+p.bath_samples=4;
+p.bath_seed=193;
 p=cce_options(spin_system,p,@free_evolution,'labframe');
 
 % Measure serial and one-worker execution on the identical sample list
-p.cce.parallel=struct('mode','serial','batch_size',3,'max_tasks',16);
+delete(gcp('nocreate'));
 started=tic;
 [serial,serial_data]=clexpn(spin_system,@free_evolution,p,'labframe');
 serial_time=toc(started);
-p.cce.parallel.mode='clusters';
+create(sys,inter);
 started=tic;
 [one,one_data]=clexpn(spin_system,@free_evolution,p,'labframe');
 one_time=toc(started);
@@ -59,7 +61,7 @@ result=test_close(result,'one-worker reduction',one,serial,0,0,...
 
 % Close this test's pool before create because create reuses an existing pool
 delete(gcp('nocreate'));
-sys.parallel={'local',2};
+sys.parallel={'processes',2};
 spin_system=create(sys,inter);
 pool=gcp('nocreate');
 result=test_true(result,'Requested two-worker pool',pool.NumWorkers==2,...
@@ -73,10 +75,6 @@ result=test_true(result,'two-worker raw identity',isequaln(serial_data.raw,two_d
                  'Cluster records have a deterministic gather order.');
 result=test_close(result,'two-worker reduction',two,serial,0,0,...
                   'The complex result is bitwise identical across worker counts.');
-p.cce.parallel.mode='states';
-[states,~]=clexpn(spin_system,@free_evolution,p,'labframe');
-result=test_close(result,'state scheduling',states,serial,0,0,...
-                  'There is one outer parallel layer for either scheduling mode.');
 
 % Compare against independent analytic projected Ising phases
 assignments=vertcat(serial_data.ensemble.spin_config.assignment);
@@ -85,16 +83,12 @@ reference=mean(exp(-1i*(magnetic*[17;29])*2*pi.*p.times),1).';
 result=test_close(result,'analytic sampled signal',serial,reference,1e-12,1e-12,...
                   'Projected phases follow the exact diagonal Ising Hamiltonian.');
 
-% Refuse oversized task ledgers and per-worker storage before propagation
-p.cce.parallel.max_tasks=1;
-[capped,capped_data]=clexpn(spin_system,@free_evolution,p,'labframe');
-result=test_true(result,'task cap',isequaln(capped_data.raw,serial_data.raw)&&isequaln(capped,serial),...
-                 'The native batch cap limits concurrent work without dropping any physical task.');
-p.cce.parallel.max_tasks=16;
-p.cce.numerics.max_memory_bytes=2000;
+% Refuse a cap smaller than the ledger and a single task workspace
+tight=spin_system;
+tight.tols.cce_mem=2000;
 refused=false;
 try
-    clexpn(spin_system,@free_evolution,p,'labframe');
+    clexpn(tight,@free_evolution,p,'labframe');
 catch exception
     refused=ismember(exception.identifier,{'cce_clusters:memory',...
                                            'cce_schedule:memory','clexpn:memory'});
@@ -102,81 +96,50 @@ end
 result=test_true(result,'memory cap',refused,...
                  'Configuration and cluster metadata are bounded before scheduler working matrices.');
 
-% Bound all concurrently active cluster workspaces in the selected batch
-p.cce.numerics.max_memory_bytes=2^26;
-model_p=cce_options(spin_system,p,@cce_compile,'labframe');
-model=cce_compile(spin_system,model_p,'labframe');
+% Fit only one workspace on a two-worker pool, in each formalism
 clusters=serial_data.clusters;
 ensemble=serial_data.ensemble;
 schedule=@free_evolution;
-p.cce.parallel.mode='clusters';
-p.cce.parallel.batch_size=2;
 count=numel(ensemble.spin_config)*(numel(clusters)+1);
 nt=numel(p.times);
-dc=prod(model.comp.mults(model_p.observed));
-metadata=whos('model','clusters','ensemble','p');
-resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
-dimension=max([clusters.dimension])/dc;
-construction=16*(12+3*model.comp.nspins)*(dc*dimension)^2;
-workspace=construction+16*24*dimension^2;
-p.cce.numerics.max_memory_bytes=resident+1.5*workspace;
-refused=false;
-try
-    cce_schedule(model,clusters,ensemble,schedule,p);
-catch exception
-    if ~strcmp(exception.identifier,'cce_schedule:memory')
-        rethrow(exception);
+dc=prod(spin_system.comp.mults(p.observed));
+for formalism={'zeeman-hilb','zeeman-liouv'}
+    source=spin_system;
+    source.bas.formalism=formalism{1};
+    model_p=cce_options(source,p,@cce_compile,'labframe');
+    model=cce_compile(source,model_p,'labframe');
+    high=cce_schedule(model,clusters,ensemble,schedule,p);
+    metadata=whos('model','clusters','ensemble','p');
+    resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
+    bath_dim=max([clusters.dimension])/dc;
+    nspins=numel(p.observed)+max(arrayfun(@(c)numel(c.sites),clusters));
+    workspace=16*(12+3*nspins)*(dc*bath_dim)^2+16*24*bath_dim^2;
+    if strcmp(formalism{1},'zeeman-liouv')
+        empty_cache=16*(3*dc^2+2)+16;
+        full_cache=16*(3*nspins*(dc*bath_dim)^2+2*bath_dim^2)+16*nspins;
+        resident=resident+3*numel(ensemble.spin_config)*(empty_cache+numel(clusters)*full_cache);
+        workspace=workspace+full_cache+16*24*(bath_dim^4-bath_dim^2);
     end
-    refused=true;
+    model.tols.cce_mem=resident+1.5*workspace;
+    accepted=cce_schedule(model,clusters,ensemble,schedule,p);
+    result=test_true(result,['Single-workspace parity ' formalism{1}],...
+                     isequaln(accepted,high),...
+                     'The cap admits one workspace without changing the raw records.');
 end
-result=test_true(result,'Concurrent worker memory preflight',refused,...
-                 'A cap fitting one workspace but not two must reject a two-worker batch before evaluation.');
-p.cce.parallel.mode='serial';
-accepted=cce_schedule(model,clusters,ensemble,schedule,p);
-result=test_true(result,'Single-worker memory preflight',numel(accepted)==numel(ensemble.spin_config),...
-                 'The same cap must still admit one serial workspace.');
-fprintf('Memory cap %.0f bytes; one workspace %.0f; two-worker refusal %d.\n',...
-        p.cce.numerics.max_memory_bytes,workspace,refused);
-
-% Include concurrent Liouville workspaces in the master-equation bound
-p.cce.basis.formalism='zeeman-liouv';
-p.bath_jumps=struct([]);
-p.cce.parallel.mode='clusters';
-model_p=cce_options(spin_system,p,@cce_compile,'labframe');
-model=cce_compile(spin_system,model_p,'labframe');
-model.bas.formalism='zeeman-liouv';
-metadata=whos('model','clusters','ensemble','p');
-resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
-workspace=construction+16*24*dimension^4;
-p.cce.numerics.max_memory_bytes=resident+1.5*workspace;
-refused=false;
-try
-    cce_schedule(model,clusters,ensemble,schedule,p);
-catch exception
-    if ~strcmp(exception.identifier,'cce_schedule:memory')
-        rethrow(exception);
-    end
-    refused=true;
-end
-result=test_true(result,'Concurrent ME worker memory preflight',refused,...
-                 'Each active ME task needs its own squared-Hilbert-space dense workspace.');
 
 % Bound full observed-observed-spin system construction separately from projected propagation
 large_sys=struct('isotopes',{repmat({'1H'},1,7)},'magnet',0,'output','hush',...
                  'disable',{{'hygiene'}},'parallel',{{'processes',2}});
+large_sys.tols=sys.tols;
+large_sys.tols.cce_mem=2^28;
 large_spin=create(large_sys,struct());
-large=p;
+large=rmfield(p,{'bath_samples','bath_seed'});
 large.observed=1:6;
 large.cce.bath_spins=7;
 large.cce.order=1;
 large.times=[0 0.01];
-large.cce.basis.formalism='zeeman-hilb';
-large=rmfield(large,'bath_jumps');
 large.transition=struct('spins',1:6,'alpha',[1;zeros(63,1)],...
                         'beta',[zeros(63,1);1]);
-large.cce.bath_state=struct('mode','mixed_product');
-large.cce.parallel.batch_size=2;
-large.cce.numerics.max_memory_bytes=2^28;
 large=cce_options(large_spin,large,@free_evolution,'labframe');
 [~,large_data]=clexpn(large_spin,@free_evolution,large,'labframe');
 large_model_p=cce_options(large_spin,large,@cce_compile,'labframe');
@@ -201,25 +164,24 @@ for method={'cce','mecce','noise'}
                            'ordering','ordered','connected',false,'manifold','bath_only');
     end
     large_schedule=pulse_sequence;
-    large_model_p=large;
-    large.cce.numerics.max_memory_bytes=2^28;
+    large_model.tols.cce_mem=2^28;
     high=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large);
     metadata=whos('large_model','large_clusters','large_ensemble','large');
     resident=3*2*(2*(25+16*64^2)+1024)+sum([metadata.bytes]);
     if strcmp(method{1},'noise')
         resident=resident+3*2*(32*2+16);
     end
-    full_workspace=16*(64*2)^2*(12+3*7);
+    full_workspace=16*(64*2)^2*(12+3*7)+16*24*2^2;
     if strcmp(method{1},'mecce')
 
         % Include both retained manifold/spin caches and the active task cache
-        empty_cache=16*(3*6*64^2+2);
-        full_cache=16*(3*7*128^2+2*2^2);
+        empty_cache=16*(3*6*64^2+2)+16*6;
+        full_cache=16*(3*7*128^2+2*2^2)+16*7;
         resident=resident+3*(empty_cache+full_cache);
-        full_workspace=full_workspace+full_cache;
+        full_workspace=full_workspace+full_cache+16*24*(2^4-2^2);
 
     end
-    large.cce.numerics.max_memory_bytes=resident+1.5*full_workspace;
+    large_model.tols.cce_mem=resident+0.5*full_workspace;
     refused=false;
     try
         cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large);
@@ -229,28 +191,23 @@ for method={'cce','mecce','noise'}
         end
         refused=true;
     end
-    result=test_true(result,['Full-observed-spin system concurrent workspace ' method{1}],refused,...
-                     'Two workers must reserve unprojected observed-observed-spin system storage as well as bath propagation.');
+    result=test_true(result,['Full-observed-spin system workspace ' method{1}],refused,...
+                     'Even one task must reserve full physical construction as well as bath propagation.');
 
-    % The same ceiling must still permit one worker and preserve its numerical result
-    large.cce.parallel.mode='serial';
+    % A ceiling admitting one but not two workspaces must retain the high-budget result
+    large_model.tols.cce_mem=resident+1.5*full_workspace;
     low=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large);
     result=test_close(result,['Full-observed-spin system serial parity ' method{1}],...
                       low{1}(end).value,high{1}(end).value,0,0,...
-                      'The memory guard must reject concurrency, not an individually fitting task.');
-    large.cce.parallel.mode='clusters';
-    fprintf('CCE full-observed-spin system %s budget %.0f one workspace %.0f refused %d.\n',...
-            method{1},large.cce.numerics.max_memory_bytes,full_workspace,refused);
+                      'The memory ceiling reduces concurrency without changing the result.');
 
 end
 
 % Noise still constructs a full retained Liouville generator before bath restriction
 noise_request=large;
-noise_request.cce.numerics.max_memory_bytes=2^28;
-noise_request.cce.basis.formalism='zeeman-liouv';
 noise_request.bath_jumps=struct('support',7,'operator',diag([1 -1])/2,'rate',1);
 noise_model=large_model;
-noise_model_p=large_model_p;
+noise_model.tols.cce_mem=2^28;
 noise_model.bas.formalism='zeeman-liouv';
 refused=false;
 try
@@ -267,13 +224,12 @@ liouville=large;
 liouville.cce.approximation='projected';
 liouville=rmfield(liouville,'noise');
 liouville.bath_jumps=struct('support',1,'operator',diag([1 -1])/2,'rate',1);
-liouville.cce.numerics.max_memory_bytes=2^28;
 large_model.bas.formalism='zeeman-liouv';
-large_model_p=liouville;
-[subsystem,~]=cce_subsystem(large_model,large_model_p,7,struct(),[]);
+large_model.tols.cce_mem=2^28;
+[subsystem,~]=cce_subsystem(large_model,liouville,7,struct(),[]);
 [H,R,~]=cce_generators(subsystem,liouville,[]);
 reference=-1i*(kron(eye(2),H{1})-kron(H{2}.',eye(2)))+R;
-liouville.cce.numerics.max_memory_bytes=10000;
+subsystem.tols.cce_mem=10000;
 refused=false;
 try
     cce_generators(subsystem,liouville,[]);
@@ -289,31 +245,30 @@ result=test_close(result,'Projected jump independent dephasing',reference,-eye(4
                   'Opposite observed Iz eigenvalues give a bath-independent signal decay rate of one half.');
 
 % Count every observable column in closed and open-system resident records
-q=p;
-q.cce.bath_state=struct('mode','mixed_product');
+q=rmfield(p,{'bath_samples','bath_seed'});
+observable_sys=spin_system;
+observable_sys.tols.cce_mem=5000000;
 q.rho0=eye(2)/2;
 q.output='observable';
 q.coil=repmat({eye(2)},1,200);
 q.times=linspace(0,1,301);
-q.cce.parallel.mode='serial';
-q.cce.numerics.max_memory_bytes=5000000;
 q.bath_jumps=struct([]);
 for method={'gcce','megcce'}
     q.cce.approximation='generalized';
-    q.cce.basis.formalism='zeeman-hilb';
+    observable_sys.bas.formalism='zeeman-hilb';
     if strcmp(method{1},'megcce')
-        q.cce.basis.formalism='zeeman-liouv';
+        observable_sys.bas.formalism='zeeman-liouv';
     end
     refused=false;
     try
-        clexpn(spin_system,@free_evolution,q,'labframe');
+        clexpn(observable_sys,@free_evolution,q,'labframe');
     catch exception
         refused=strcmp(exception.identifier,'cce_schedule:memory');
     end
     result=test_true(result,['observable column memory ' method{1}],refused,...
-                     'The four time-by-operator records alone exceed five million bytes.');
+                     'The resident budget for four time-by-operator records exceeds five million bytes.');
     fprintf('R7 observable memory %s rejection %d raw minimum %d budget %d\n',...
-            method{1},refused,4*25*numel(q.times)*numel(q.coil),q.cce.numerics.max_memory_bytes);
+            method{1},refused,4*25*numel(q.times)*numel(q.coil),observable_sys.tols.cce_mem);
 end
 
 % Retained ME manifold, spin, and jump operators accumulate across sampled tasks
@@ -324,25 +279,24 @@ for method={'mecce','megcce'}
     retained.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
     retained.cce=struct('bath_spins',2,'order',1,'approximation','projected',...
                         'expansion','standard','interaction_cutoff',Inf,...
-                        'graph',struct('mode','complete','score','coupling_norm'),...
                         'meanfield','none','averaging','after_expansion',...
-                        'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
-                                            'samples',40,'seed',31),...
-                        'numerics',struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e8,...
-                                          'zero_policy','mask'),...
-                        'parallel',struct('mode','serial','max_tasks',80),...
-                        'basis',struct('formalism','zeeman-liouv'));
+                        'zero_policy','mask');
+    retained.bath_samples=40;
+    retained.bath_seed=31;
+    retained_sys=spin_system;
+    retained_sys.tols.cce_atol=1e-12;
+    retained_sys.tols.cce_rtol=1e-10;
+    retained_sys.tols.cce_mem=1e8;
     retained.bath_jumps=repmat(struct('support',2,'operator',[0 1;0 0],'rate',2),1,8);
     if strcmp(method{1},'megcce')
         retained.cce.approximation='generalized';
         retained.output='density';
         retained.rho0=ones(2)/2;
     end
-    retained=cce_options(spin_system,retained,@free_evolution,'labframe');
-    [~,retained_data]=clexpn(spin_system,@free_evolution,retained,'labframe');
-    retained_model_p=cce_options(spin_system,retained,@cce_compile,'labframe');
-    retained_model=cce_compile(spin_system,retained_model_p,'labframe');
-    retained_model.bas.formalism='zeeman-liouv';
+    retained=cce_options(retained_sys,retained,@free_evolution,'labframe');
+    [~,retained_data]=clexpn(retained_sys,@free_evolution,retained,'labframe');
+    retained_model_p=cce_options(retained_sys,retained,@cce_compile,'labframe');
+    retained_model=cce_compile(retained_sys,retained_model_p,'labframe');
     retained_clusters=retained_data.clusters;
     retained_states=retained_data.ensemble;
     retained_schedule=schedule;
@@ -373,7 +327,7 @@ for method={'mecce','megcce'}
         dimension=2;
     end
     workspace=16*4^2*18+16*dimension^4*24;
-    retained.cce.numerics.max_memory_bytes=resident+workspace+payload/2;
+    retained_model.tols.cce_mem=resident+workspace+payload/2;
     refused=false;
     try
         cce_schedule(retained_model,retained_clusters,retained_states,...
@@ -384,13 +338,14 @@ for method={'mecce','megcce'}
     result=test_true(result,[method{1} ' retained metadata memory'],refused,...
                      'Every completed task retains its manifold, spin and jump operator arrays.');
     fprintf('%s retained operator payload %.0f bytes; cap %.0f; refused %d.\n',...
-            method{1},payload,retained.cce.numerics.max_memory_bytes,refused);
+            method{1},payload,retained_model.tols.cce_mem,refused);
 end
 
 % Print the pilot timings without imposing an unjustified speedup target
 fprintf('CCE pilot serial %.6g s; one worker %.6g s; two workers %.6g s; discrepancy %.3g.\n',...
         serial_time,one_time,two_time,max(abs(serial-two),[],'all'));
-sys.parallel={'local',1};
+delete(gcp('nocreate'));
+sys.parallel={'processes',1};
 create(sys,inter);
 
 end

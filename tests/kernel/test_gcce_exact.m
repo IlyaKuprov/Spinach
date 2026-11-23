@@ -24,6 +24,9 @@ sys.disable={'hygiene'};
 sys.parallel={'local',1};
 inter.zeeman.matrix=repmat({zeros(3)},1,nb+1);
 inter.coupling.matrix=cell(nb+1);
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^29;
 spin_system=create(sys,inter);
 fields=[31 17 23 29 37];
 tensors=cell(nb+1);
@@ -40,8 +43,7 @@ rho0=diag([1 0]);
 q=struct('observed',1,'times',0,'output','observable',...
          'rho0',rho0,'normalized',true,...
          'coil',{{diag([1 0]),1e-20*diag([1 0]),1e20*diag([1 0])}});
-q.cce=struct('bath_spins',[],'order',0,'approximation','generalized',...
-             'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^29));
+q.cce=struct('bath_spins',[],'order',0,'approximation','generalized');
 model_p=cce_options(spin_system,q,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
 observed_system=cce_subsystem(model,model_p,[],struct(),[]);
@@ -80,10 +82,8 @@ v=[sqrt(0.3);1i*sqrt(0.7)];
 p.rho0=v*v';
 p.orientation=[0 0 0];
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
 p.cce.meanfield='none';
 p.times=linspace(0,0.07,8);
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^29);
 maximum=0;
 trace_error=0;
 hermiticity=0;
@@ -96,7 +96,7 @@ for pure=[false true]
             states{j}=v*v';
         end
     end
-    p.cce.bath_state=struct('mode','explicit_product','rho',{states});
+    p.bath_state=states;
     for hahn=[false true]
 
         pulse_sequence=@free_evolution;
@@ -166,8 +166,7 @@ for pure=[false true]
         end
         reduced=diagnostics.reduction;
         reduced.density=reshape(reduced.value.',2,2,[]);
-        physical=cce_diagnostics(struct('observed_dimension',2),diagnostics.raw,reduced,...
-                                 struct('times',p.times,'numerics',p.cce.numerics));
+        physical=cce_diagnostics(spin_system,diagnostics.raw,reduced,p);
         trace_error=max(trace_error,max(physical.trace_error));
         hermiticity=max(hermiticity,max(physical.hermiticity_error));
         mineig=min(mineig,min(physical.minimum_eigenvalue));
@@ -199,7 +198,7 @@ q.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 q.output='observable';
 q.rho0=diag([1 0]);
 q.coil={eye(2),2*eye(2)};
-q.cce.bath_state=struct('mode','mixed_product');
+q=rmfield(q,'bath_state');
 q.bath_jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7);
 accepted=true;
 value_error=0;
@@ -208,39 +207,35 @@ cases=0;
 finite=struct('spins',1,'time',0.05,'duration',0.05,...
               'axis','x','amplitude',2,'detuning',0);
 for method={'gcce','megcce'}
-    q.cce.basis=struct('formalism','zeeman-hilb');
     if strcmp(method{1},'gcce')
         q.bath_jumps=struct([]);
     else
         q.bath_jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7);
-        q.cce.basis.formalism='zeeman-liouv';
     end
     for sequence={@free_evolution,@hahn_echo,@finite_drive}
         pulse_sequence=sequence{1};
         if strcmp(method{1},'megcce')&&~isequal(pulse_sequence,@free_evolution)
             continue;
         end
-        if isfield(q.cce.numerics,'propagator')
-            q.cce.numerics=rmfield(q.cce.numerics,'propagator');
+        if isfield(q.cce,'propagator')
+            q.cce=rmfield(q.cce,'propagator');
         end
         if isfield(q,'drive')
             q=rmfield(q,'drive');
         end
         if isequal(pulse_sequence,@hahn_echo)
-            q.cce.numerics.propagator='expm';
+            q.cce.propagator='expm';
         elseif isequal(pulse_sequence,@finite_drive)
             q.drive=finite;
         end
         for mode={'mixed_product','interlaced'}
-            q.cce.bath_state=struct('mode',mode{1});
             if isfield(q.cce,'interlaced')
                 q.cce=rmfield(q.cce,'interlaced');
+                q=rmfield(q,{'bath_samples','bath_seed'});
             end
             if strcmp(mode{1},'interlaced')
-                q.cce.bath_state.samples=1;
-                q.cce.bath_state.seed=31;
-                q.cce.bath_state.probabilities='uniform';
-                q.cce.bath_state.basis='uniform';
+                q.bath_samples=1;
+                q.bath_seed=31;
                 q.cce.interlaced.max_states=4;
             end
             for order=1:2
@@ -311,7 +306,7 @@ fprintf('R6 column-cell cases %d; accepted %d; value error %.3g; relative bound 
 % Unknown and representation-incompatible propagation preferences remain errors
 for preference={'unknown','eig'}
     request=q;
-    request.cce.numerics.propagator=preference{1};
+    request.cce.propagator=preference{1};
     unsupported=false;
     try
         clexpn(small,@free_evolution,request,'labframe');
@@ -324,7 +319,7 @@ end
 
 % A requested direct-segment method must not be ignored in another representation
 request=observe;
-request.cce.numerics.propagator='expm';
+request.cce.propagator='expm';
 for projected=[true false]
     restricted=observed_system;
     generator={0,0};
@@ -349,12 +344,12 @@ function [value,bound]=column_evaluate(spin_system,pulse_sequence,parameters)
 
 % The context owns configuration draws and the ordinary observable reduction
 request=parameters;
-if strcmp(parameters.cce.bath_state.mode,'interlaced')
+if isfield(parameters.cce,'interlaced')
     request.cce.order=0;
 end
 [value,diagnostics]=clexpn(spin_system,pulse_sequence,request,'labframe');
 bound=diagnostics.reduction.abs_error_bound;
-if ~strcmp(parameters.cce.bath_state.mode,'interlaced')
+if ~isfield(parameters.cce,'interlaced')
     return;
 end
 
@@ -362,7 +357,6 @@ end
 parameters=cce_options(spin_system,parameters,pulse_sequence,'labframe');
 model_p=cce_options(spin_system,parameters,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
-model.bas.formalism=parameters.cce.basis.formalism;
 model_clusters=diagnostics.clusters;
 parameters.cce.interlaced.raw_only=true;
 parameters.cce.interlaced.reference_state=1;

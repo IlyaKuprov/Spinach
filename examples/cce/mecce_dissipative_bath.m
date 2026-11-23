@@ -33,6 +33,14 @@ for n=1:nbath
 
 end
 
+% Allow for accumulated error in the order-five product and its denominator
+sys.tols.cce_atol=1e-7;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^29;
+
+% Spinach housekeeping
+spin_system=create(sys,inter);
+
 % Néel product state and equal raising and lowering jump rates
 bath_rho=repmat({diag([1 0]),diag([0 1])},1,nbath/2);
 jumps=repmat(struct('support',0,'operator','L+','rate',0.01),1,2*nbath);
@@ -45,27 +53,22 @@ for n=1:nbath
 
 end
 
-% Specify the periodic cluster graph and frozen exterior Néel state
-adjacency=sparse(1:nbath,[2:nbath 1],true,nbath,nbath);
-parameters.cce.graph=struct('mode','explicit','adjacency',adjacency|adjacency.');
-parameters.cce.expansion='periodic_segments';
-parameters.cce.order=5;
-parameters.cce.bath_spins=sites;
-parameters.cce.bath_state=struct('mode','explicit_product','rho',{bath_rho});
-parameters.cce.meanfield='static';
-parameters.cce.approximation='projected';
-
-% Simulate the projected free induction with native retained-cluster jumps
+% Projected free induction of the central spin in the relaxing bath
 times=0:0.1:20;
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
 parameters.times=times;
 parameters.output='signal';
+parameters.bath_state=bath_rho;
 parameters.bath_jumps=jumps;
 
-% Allow for accumulated error in the order-five product and its denominator
-parameters.cce.numerics=struct('atol',1e-7,'rtol',1e-8,'max_memory_bytes',2^29);
-spin_system=create(sys,inter);
+% Periodic segments of the ring in a frozen exterior Néel state
+parameters.cce.expansion='periodic_segments';
+parameters.cce.order=5;
+parameters.cce.meanfield='static';
+parameters.cce.approximation='projected';
+
+% Simulation
 [~,details]=clexpn(spin_system,@free_evolution,parameters,'labframe');
 coherence=abs(reshape(details.reduction.by_order(:,1,2:end),numel(times),[]));
 

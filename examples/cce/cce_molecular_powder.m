@@ -17,13 +17,18 @@ sys.magnet=1.2414;
 sys.isotopes=[{'E'} repmat({'1H'},1,size(protons,1))];
 sys.output='hush';
 sys.tols.prox_cutoff=0;
+sys.tols.cce_atol=0;
+sys.tols.cce_mem=2^27;
 inter.coordinates=[{[]}; num2cell(protons(:,1:3),2)];
 inter.coupling.matrix=cell(numel(sys.isotopes),numel(sys.isotopes));
 for k=1:size(protons,1)
     inter.coupling.matrix{1,k+1}=reshape(protons(k,4:12),3,3)/(2*pi);
 end
 
-% Evaluate the complete secular pair expansion at every powder node before averaging
+% Spinach housekeeping
+spin_system=create(sys,inter);
+
+% Complete secular pair expansion at every powder node
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
 parameters.times=linspace(0,40e-6,2048);
@@ -31,8 +36,8 @@ parameters.grid='icos_2ang_642pts';
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
 parameters.cce.backend='analytical_hahn';
-parameters.cce.numerics=struct('atol',0,'max_memory_bytes',2^27);
-spin_system=create(sys,inter);
+
+% Simulation
 echo=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Compare with the measured trace in deuterated water/glycerol

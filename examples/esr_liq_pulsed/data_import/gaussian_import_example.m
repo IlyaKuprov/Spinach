@@ -8,7 +8,7 @@ function gaussian_import_example()
 % System properties (vacuum DFT calculation)
 options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('gaussian_methyl_radical.out'),...
-                     {{'E','E'},{'H','1H'}},[0 0],options);
+                      {'E','H'},[0 0],options);
 
 % Magnet induction
 sys.magnet=0.339;

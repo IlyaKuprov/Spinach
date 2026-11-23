@@ -30,9 +30,10 @@
 %
 %   props.k_couplings      - isotropic reduced spin-spin couplings,
 %                            natoms x natoms, in the units used by
-%                            gparse.m (magres K times mu_N^2/h, Hz);
-%                            g2spinach.m converts them into J-coup-
-%                            lings for the isotopes it is given
+%                            gparse.m (magres K times mu_N^2/h, Hz).
+%                            For conversion to J by g2spinach.m,
+%                            supply props.isotopes in atom order;
+%                            this parser does not assign isotopes.
 %
 % Only the tensors that the file contains are returned; the caller
 % should test for their presence with isfield. An atom for which a

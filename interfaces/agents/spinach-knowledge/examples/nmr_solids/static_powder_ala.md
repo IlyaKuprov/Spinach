@@ -9,7 +9,7 @@ A static-powder 13C NMR calculation for alanine using magnetic parameters read f
 
 ## Spin model and powder average
 
-The parsed alanine model includes 13C and 15N spins; protons are not included, so their decoupling is an assumption rather than an explicitly simulated channel. The field parameter is 14.1 (no unit is stated in the source). The basis retains 15N longitudinal terms with projection +1, and the source sets interaction and proximity cutoffs to 5.0 and 4.0. `powder` performs the static orientation average on `rep_2ang_6400pts_sph`; no rotor or gradient sequence is specified.
+The alanine model retains the imported 13C spins and replaces the imported 14N with 15N using `isoswap`; protons are not included, so their decoupling is an assumption rather than an explicitly simulated channel. The field parameter is 14.1 (no unit is stated in the source). The basis retains 15N longitudinal terms with projection +1, and the source sets interaction and proximity cutoffs to 5.0 and 4.0. `powder` performs the static orientation average on `rep_2ang_6400pts_sph`; no rotor or gradient sequence is specified.
 
 ## Acquisition and processing
 

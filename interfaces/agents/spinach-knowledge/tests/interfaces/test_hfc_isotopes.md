@@ -4,13 +4,13 @@
 
 ## Purpose
 
-Regression test for isotope-resolved hyperfine coupling imports from Gaussian and ORCA electronic structure logs. It verifies that hyperfine tensors follow the requested nuclear gyromagnetic ratio during `g2spinach` conversion, including anisotropic and off-diagonal components, and that source isotopes are taken from the shipped logs rather than assumed from natural abundance.
+Regression test for isotope-resolved hyperfine coupling imports from Gaussian and ORCA electronic structure logs. `g2spinach` selects elements and keeps the source isotopes and full tensors. A subsequent `isoswap` changes the selected isotope and rescales the tensor.
 
 ## What the suite checks
 
-- Gaussian nitrogen hyperfine tensors must retain their source value for the printed isotope and rescale, including anisotropic components and the negative gyromagnetic-ratio sign, when a different target isotope is requested. Importing the same isotope must not alter the tensor. Hyperfine thresholding and purging must apply to the isotope-adjusted strength rather than silently changing the surviving interaction.
-- Nonempty imported hyperfine tensors require identifiable source-isotope provenance: missing, malformed or unprinted isotope metadata cannot be replaced by a natural-abundance guess. Ordinary NMR-only conversion must remain usable without hyperfine isotope provenance.
-- ORCA proton hyperfine tensors must use isotope metadata from the hyperfine records and rescale consistently for deuterium, including asymmetric components; invalid provenance is rejected without corrupting independent valid imports. The suite checks these import invariants, not a newly computed electronic-structure result.
+- In Gaussian nitroxide, the imported nitrogen-14 tensor agrees with the parsed tensor in Spinach units. Replacing nitrogen-14 by nitrogen-15 changes the sign and scales both stored pair directions. The threshold uses the imported norm: equality retains the tensor, a larger threshold removes it, and purging then removes the uncoupled nucleus.
+- A missing label on a selected atom is an error. An electron-only selection still returns the electron g-tensor.
+- In ORCA porphyrine, all imported nuclei have isotope labels, but only the protons have printed hyperfine tensors. Their hyperfine records identify them as hydrogen-1, not the isotope specified for the quadrupole calculation. Replacing the protons by deuterons scales every tensor component by the positive magnetogyric ratio.
 
 ## Inputs and outputs
 
@@ -24,7 +24,7 @@ The function takes no arguments.
 
 **Outputs**
 
-- `result` — regression check accumulator returned by `new_test_result` and progressively updated by `test_true` and `test_close`, covering tensor scaling, provenance, thresholding, purging, and unchanged NMR imports.
+- `result` — regression check accumulator covering isotope labels, hyperfine tensors, thresholding, purging, and isotope substitution.
 
 ## References
 

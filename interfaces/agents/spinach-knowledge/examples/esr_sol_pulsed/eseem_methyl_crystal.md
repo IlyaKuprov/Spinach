@@ -2,7 +2,7 @@
 
 ## Experiment and spin system
 
-This example computes a two-pulse X-band electron-spin-echo envelope modulation (ESEEM) response for a methyl radical at one fixed crystal orientation. The example imports vacuum-DFT magnetic parameters from `examples/standard_systems/methyl.log` with `g2spinach`; the Gaussian log contains four atoms (the carbon framework and three hydrogens), and the import maps the electron to `E` and the proton nuclei to `1H`. The imported model therefore carries the electron Zeeman and electron–proton hyperfine interactions from that calculation; their tensors are not literal assignments in this script. The field is 0.33 T. No powder average is performed. Ideal hard pulses are assumed.
+This example computes a two-pulse X-band electron-spin-echo envelope modulation (ESEEM) response for a methyl radical at one fixed crystal orientation. The example imports vacuum-DFT magnetic parameters from `examples/standard_systems/methyl.log` with `g2spinach`; the Gaussian log contains four atoms (the carbon framework and three hydrogens), and the importer selects the electron and all three hydrogens (`1H` in the log). The imported model therefore carries the electron Zeeman and electron–proton hyperfine interactions from that calculation; their tensors are not literal assignments in this script. The field is 0.33 T. No powder average is performed. Ideal hard pulses are assumed.
 
 ## Sequence and sampling
 

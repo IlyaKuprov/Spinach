@@ -11,7 +11,7 @@ function noesy_methanol()
 
 % Spin system properties (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/methanol.log'),...
-                     {{'H','1H'},{'C','13C'}},[31.8 182.4],[]);
+                      {'H','C'},[31.8 182.4],[]);
 
 % Remove the OH proton
 sys.isotopes(end)=[];

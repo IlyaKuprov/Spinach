@@ -12,7 +12,10 @@ function pansy_triple_ch()
 % Read the spin system properties (vacuum DFT calculation)        
 options.min_j=3.0; options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/glycine.log'),...
-            {{'H','1H'},{'C','13C'},{'N','15N'}},[31.5 189.2 400.3],options); 
+                      {'H','C','N'},[31.5 189.2 400.3],options);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
 
 % Magnet field
 sys.magnet=5.9;

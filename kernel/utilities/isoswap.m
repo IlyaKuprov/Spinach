@@ -72,15 +72,21 @@ for n=spins(:)'
     for k=setdiff(1:numel(sys.isotopes),n)
 
         % Scale eigensystem representation
-        if isfield(inter.coupling,'eigs')
+        if isfield(inter,'coupling')&&isfield(inter.coupling,'eigs')
             inter.coupling.eigs{n,k}=gamma_ratio*inter.coupling.eigs{n,k};
             inter.coupling.eigs{k,n}=gamma_ratio*inter.coupling.eigs{k,n};
         end
 
         % Scale matrix representation
-        if isfield(inter.coupling,'matrix')
+        if isfield(inter,'coupling')&&isfield(inter.coupling,'matrix')
             inter.coupling.matrix{n,k}=gamma_ratio*inter.coupling.matrix{n,k};
             inter.coupling.matrix{k,n}=gamma_ratio*inter.coupling.matrix{k,n};
+        end
+
+        % Scale scalar couplings
+        if isfield(inter,'coupling')&&isfield(inter.coupling,'scalar')
+            inter.coupling.scalar{n,k}=gamma_ratio*inter.coupling.scalar{n,k};
+            inter.coupling.scalar{k,n}=gamma_ratio*inter.coupling.scalar{k,n};
         end
 
     end
@@ -106,6 +112,9 @@ function grumble(sys,inter,spins,new_iso)
     end
     if ~ischar(new_iso)
         error('new_iso must be a character string.');
+    end
+    if any(cellfun(@spin,sys.isotopes(spins))==0)
+        error('interactions of zero-gamma particles cannot be rescaled.');
     end
 end
 

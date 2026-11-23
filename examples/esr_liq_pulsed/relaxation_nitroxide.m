@@ -13,7 +13,7 @@ options.no_xyz=1;
 
 % Spin system properties (imported from a DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/nitroxide.log'),...
-                           {{'E','E'},{'N','14N'}},[0 0],options);
+                      {'E','N'},[0 0],options);
 % Magnet induction
 sys.magnet=3.5;
 

@@ -6,7 +6,7 @@
 
 ## Purpose and spin system
 
-Liquid-state HMBC for camphor at natural 13C abundance; the source comment estimates seconds of calculation time. The wrapper parses `../standard_systems/camphor.log` and maps H/C to `1H`/`13C` through `g2spinach`; its comment identifies the coordinates, shielding anisotropies, and J-couplings as vacuum-DFT-derived. It sets `options.min_j=3.0` and `options.no_xyz=0`, and passes the source range expression `[31.8-0.35 182.1+7.14]` to the importer.
+Liquid-state HMBC for camphor at natural 13C abundance; the source comment estimates seconds of calculation time. The wrapper parses `../standard_systems/camphor.log` and uses `g2spinach` to select H and C (`1H` and `13C` in this log); its comment identifies the coordinates, shielding anisotropies, and J-couplings as vacuum-DFT-derived. It sets `options.min_j=3.0` and `options.no_xyz=0`, and passes the source range expression `[31.8-0.35 182.1+7.14]` to the importer.
 
 ## Acquisition and simulation
 

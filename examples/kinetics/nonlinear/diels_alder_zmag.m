@@ -17,7 +17,7 @@ options.style='harmonics'; % Plotting style
 
 % Load and display acetylene      (substance A)
 props_a=gparse('acetylene.out');
-[sys_a,inter_a]=g2spinach(props_a,{{'H','1H'}},31.8,options);
+[sys_a,inter_a]=g2spinach(props_a,{'H'},31.8,options);
 kfigure(); scale_figure([1.0 1.0]); 
 subplot(1,2,1); cst_display(props_a,{'C'},0.005,[],options); 
                 camorbit(+45,-45); ktitle('$^{13}$C CST');
@@ -26,7 +26,7 @@ subplot(1,2,2); cst_display(props_a,{'H'},0.05,[],options);
 
 % Load and display butadiene      (substance B)
 props_b=gparse('butadiene.out');
-[sys_b,inter_b]=g2spinach(props_b,{{'H','1H'}},31.8,options);
+[sys_b,inter_b]=g2spinach(props_b,{'H'},31.8,options);
 kfigure(); scale_figure([1.5 1.0]);
 subplot(1,2,1); cst_display(props_b,{'C'},0.01,[],options); 
                 camorbit(+45,-45); ktitle('$^{13}$C CST');
@@ -35,7 +35,7 @@ subplot(1,2,2); cst_display(props_b,{'H'},0.1,[],options);
 
 % Load and display cyclohexadiene (substance C)
 props_c=gparse('cyclohexadiene.out');
-[sys_c,inter_c]=g2spinach(props_c,{{'H','1H'}},31.8,options);
+[sys_c,inter_c]=g2spinach(props_c,{'H'},31.8,options);
 kfigure(); scale_figure([1.5 1.0]); 
 subplot(1,2,1); cst_display(props_c,{'C'},0.01,[],options); 
                 camorbit(+45,-45); ktitle('$^{13}$C CST');

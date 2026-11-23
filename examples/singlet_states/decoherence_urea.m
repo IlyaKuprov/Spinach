@@ -11,7 +11,10 @@ function decoherence_urea()
 % Read the spin system (coordinates, chemical shifts,
 % J-couplings and CSAs) from a vacuum DFT calculation
 [sys,inter]=g2spinach(gparse('../standard_systems/urea.log'),...
-                   {{'H','1H'},{'N','15N'}},[30.0 166.0],[]);
+                      {'H','N'},[30.0 166.0],[]);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
 
 % Set magnet field to 1.0 Tesla
 sys.magnet=1.0;

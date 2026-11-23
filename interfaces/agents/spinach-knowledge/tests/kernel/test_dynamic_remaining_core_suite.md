@@ -5,6 +5,10 @@ for deterministic utility contracts that are not covered by more specialised
 suites. Failed assertions are retained in the result rather than silently
 accepted.
 
+The isotope substitution checks cover matrix and scalar pair couplings, removal
+of quadratic self-couplings, substitution without coupling data, and rejection
+of a zero-gamma source isotope.
+
 The physical checks cover adiabatic elimination and its induced relaxation,
 interaction-frame transformations, dipolar geometry and units, isotope
 rescaling, and magnetic pumping. The Clebsch–Gordan check uses the shared

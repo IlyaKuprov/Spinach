@@ -19,9 +19,10 @@ The parser keeps the last Cartesian coordinate table and the last occurrence of 
 - `g_tensor.raw`, `g_tensor.matrix`, `g_tensor.eigvals`, `g_tensor.eigvecs`: the printed g matrix, its symmetrised matrix, and that matrix's eigenvalues/eigenvectors.
 - `zfs.matrix`, `zfs.eigvals`, `zfs.eigvecs`: zero-field-splitting tensor data; matrix/eigenvalues are in cm^-1.
 - `hfc.full.matrix`, `hfc.full.eigvals`, `hfc.full.eigvecs`: per-atom hyperfine tensors and decompositions in Gauss, stored in natoms-length cell arrays. `hfc.iso` contains isotropic hyperfine couplings in Gauss and uses NaN where not printed.
-- `efg`, `nqi`, `isotopes`: per-atom cell arrays for electric-field-gradient tensors (a.u.^-3), quadrupolar tensors (Hz), and ORCA's isotope assignments.
+- `efg`, `nqi`: per-atom cell arrays for electric-field-gradient tensors (a.u.^-3) and quadrupolar tensors (Hz).
+- `isotopes`: always present, a natoms x 1 cell of magnetic isotope labels. The EPR/NMR settings and hyperfine results identify the magnetic isotope; ORCA can print a different isotope for the quadrupole moment. Where no magnetic isotope is printed, the parser uses the element default measured in ORCA 6.1.1. An unknown assignment is an empty character vector.
 - `cst`: per-atom shielding tensors in ppm.
 - `j_couplings`: isotropic J-couplings in Hz (natoms x natoms).
 - `chi_temps`, `chi_tensors`: susceptibility temperatures in K and one molar-susceptibility tensor per temperature (cm^3*K/mol).
 
-Fields are added only when the corresponding section/data are found; the geometry and version are required. Tensor outputs follow the parser's 3 x 3 matrix decomposition, and per-nucleus tensor properties are held in atom-indexed cells.
+Optional fields are added only when the corresponding section/data are found; the geometry and version are required. Tensor outputs follow the parser's 3 x 3 matrix decomposition, and per-nucleus tensor properties are held in atom-indexed cells.

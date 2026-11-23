@@ -99,6 +99,23 @@ result=test_close(result,'isoswap coupling scaling',...
 result=test_true(result,'isoswap quadratic wipe',...
                  isempty(inter_out.coupling.matrix{1,1}),...
                  'quadratic self-couplings are not transferable and must be wiped');
+result=test_close(result,'isoswap scalar scaling',[inter_out.coupling.scalar{1,2} inter_out.coupling.scalar{2,1}],...
+                  gamma_ratio*[3 5],0,1e-14,'both directed scalar couplings scale by the gamma ratio');
+
+% Substitution needs no coupling specification when the system has none
+[sys_out,inter_out]=isoswap(sys,struct(),1,'2H');
+result=test_true(result,'isoswap without couplings',isequal(sys_out.isotopes,{'2H','13C'})&&isequal(inter_out,struct()),...
+                 'replacing an isotope does not create interactions');
+
+% A spinless source has no gamma ratio for transferring its interactions
+sys.isotopes{2}='12C';
+caught=false;
+try
+    isoswap(sys,inter,2,'13C');
+catch exception
+    caught=contains(exception.message,'zero-gamma');
+end
+result=test_true(result,'isoswap zero-gamma source',caught,'a zero denominator is rejected');
 
 % Check interaction-representation order zero against the perturbation block
 spin_system=local_liouvillian_system(2);
@@ -283,6 +300,7 @@ inter.coupling.matrix{1,1}=eye(3);
 inter.coupling.matrix{1,2}=eye(3);
 inter.coupling.matrix{2,1}=2*eye(3);
 inter.coupling.matrix{2,2}=[];
+inter.coupling.scalar={[] 3;5 []};
 
 end
 

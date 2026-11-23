@@ -10,7 +10,7 @@ function trosy_selenium()
 
 % Read 3-fluorotyrosine DFT calculation
 [~,inter_dft]=g2spinach(gparse('../standard_systems/ethylselenol.out'),...
-                            {{'C','13C'},{'Se','77Se'}},[186.38 0.0]);
+                        {'C','Se'},[186.38 0.0]);
                                  
 % Extract coordinates and CSAs
 sys.isotopes={'77Se','13C'};

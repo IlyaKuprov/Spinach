@@ -100,8 +100,10 @@ one second, unknown lifetimes, unresolved lower limits, and magnetic particles
 are retained. Alternative environmental lifetimes do not override this cutoff.
 
 `iselectron` and `isnucleus` test a specification string. `isoswap(sys,inter,
-spins,new_iso)` performs isotope replacement and rescales all interactions
-accordingly, wiping quadratic and higher-order couplings with a warning.
+spins,new_iso)` replaces the selected isotopes. It scales bilinear matrix,
+eigensystem, and scalar couplings by the new-to-old magnetogyric ratio, wipes
+the selected spins' quadratic and higher-order couplings with a warning, and
+refuses a source isotope with zero magnetogyric ratio.
 
 `isot2elem({'1H','13C','35Cl'})` returns `{'H','C','Cl'}`, retaining the input
 cell-array shape and order. It strips digits only, without an isotope lookup;
@@ -363,28 +365,26 @@ hertz, not rad/s, however large the numbers look.
 `sys`/`inter`:
 
 ```matlab
-[sys,inter]=g2spinach(props,particles,references,options)
+[sys,inter]=g2spinach(props,elements,references,options)
 ```
 
-- `props` — output of `gparse`, `oparse` or a compatible parser. EPR import requires explicit HFC source isotopes in `props.isotopes` (Gaussian mass numbers or ORCA isotope strings); missing or malformed provenance for selected, nonempty tensors is rejected before processing or warnings. Whole tensors are scaled by the target/source gyromagnetic-ratio ratio before thresholding and purging, while NMR import is unchanged. Empty tensors and electron-only selections need no provenance; zero-gamma sources are rejected, while direct zero-spin targets produce zero tensors. In NMR import, quadrupolar couplings are built from `props.efg` and the tabulated quadrupole moment of the isotope named in `particles`, so they follow the requested isotope; a quadrupolar isotope requested for an atom without a field gradient is reported and gets no coupling.
+- `props` — output of `gparse`, `oparse`, or a compatible parser. Supply
+  `props.isotopes` as a cell array in atom order; every selected atom needs an
+  isotope string. Hyperfine and quadrupolar tensors are imported for those
+  isotopes, not rescaled to another isotope. In NMR mode the converter divides
+  `props.nqi` by `2I(2I-1)` for nuclei with spin `I>1/2`; it does not use `props.efg`.
 - When selecting nuclei from a parsed EPR log, apply the same atom indices
   to `props.symbols`, `props.hfc.full.matrix`, `props.isotopes`, and
-  `props.std_geom` when coordinates are included. If `std_geom` is absent,
-  select from `props.inp_geom`; alternatively set `options.no_xyz=1` to omit
-  coordinates. For a selected nonempty HFC, an isotope-array length mismatch
-  now gives an alignment diagnostic; an unsupported source isotope identifies
-  the atom and asks you to check isotope/symbol order. A known isotope
-  without tabulated spin data gets a distinct atom-specific diagnostic. Empty
-  or unselected tensors and electron-only or NMR imports need no source-isotope
-  alignment.
-
-- `particles` — cell array of element/isotope pairs, e.g.
-  `{{'C','13C'},{'N','15N'}}`. Including an electron, as in
-  `{{'E','E'},{'H','1H'}}`, switches the function into **EPR mode**: chemical
+  `props.std_geom` when coordinates are included. `gparse` uses the input
+  geometry if no standard geometry was printed; alternatively set
+  `options.no_xyz=1` to omit coordinates.
+- `elements` — cell array of element symbols, e.g. `{'C','N'}`. Including an
+  electron, as in `{'E','H'}`, switches the function into **EPR mode**: chemical
   shielding and scalar couplings are ignored, g-tensor and hyperfine couplings
-  are imported, and coordinates are not returned.
+  are imported, and the electron is appended with an empty coordinate cell
+  when coordinates are returned.
 - `references` — absolute isotropic shieldings of the reference substances, one
-  per entry in `particles`, computed at the same level of theory. The header of
+  per entry in `elements`, computed at the same level of theory. The header of
   `g2spinach.m` tabulates TMS absolute shieldings for GIAO and CSGT with B3LYP
   and HF at 6-31G* and 6-311+G(2d,p). Ignored in EPR mode.
 - `options.min_j` — J-coupling threshold in Hz; `options.min_hfc` — hyperfine
@@ -400,23 +400,31 @@ Outputs are `sys.isotopes`, `inter.coordinates` (cell array, angstrom),
 ```matlab
 % NMR mode
 [sys,inter]=g2spinach(gparse('../standard_systems/glycine.log'),...
-                    {{'C','13C'},{'N','15N'}},[182.1 264.5],[]);
+                      {'C','N'},[182.1 264.5],[]);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
 sys.magnet=14.1;
 
 % EPR mode
 options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/chrysene_cation.log'),...
-                            {{'E','E'},{'H','1H'}},[0 0],options);
+                      {'E','H'},[0 0],options);
 sys.magnet=3.5;
 ```
 
 `gparse(filename,options)` reads Gaussian 03/09/16 logs and returns geometries
 in angstrom, energies in hartree, hyperfine tensors in gauss, J- and
-K-couplings in Hz, plus `g`, `cst` (absolute shielding), `srt`, `nqi`, `efg`
-(atomic units, from `nqi` and the isotope Gaussian prints beside it) and
-`chi`. `mass_numbers` reports isotopes from `#p` tables, vibrational
-analyses and `Iso=` labels, with `NaN` where the log states nothing. Options `'g_nosymm'`, `'cst_nosymm'`, `'hfc_nosymm'` disable tensor
-symmetrisation.
+K-couplings in Hz, plus `g_tensor`, `cst` (absolute shielding), `srt`, `nqi`,
+and `chi`, but not `efg`. `mass_numbers` reports mass information from `#p`
+tables, vibrational analyses, and `Iso=` labels. An unlabelled atom in the
+molecule specification has mass number `NaN`. For `props.isotopes`, a printed
+hyperfine isotope label takes precedence, followed by a stated mass isotope
+(mass tables or a quadrupole table label) with nonzero spin, then Gaussian's
+default for the element's magnetic properties. Examples are `1H`, `13C`, `14N`, `17O`, `19F`, `29Si`,
+`31P`, `33S`, and `35Cl`; selenium falls back to spin-zero `80Se`. Inspect
+`sys.isotopes` after import before deciding whether a substitution is needed.
+Options `'g_nosymm'`, `'cst_nosymm'`, and `'hfc_nosymm'` disable tensor symmetrisation.
 
 `oparse(file_name)` reads ORCA 2.6–6.1 text output: `std_geom` in angstrom,
 energy in hartree, ZFS in cm⁻¹, `hfc` in gauss, `efg` in a.u.⁻³, `nqi` in Hz,
@@ -431,8 +439,9 @@ magres v1.0 file (CASTEP, Quantum ESPRESSO GIPAW) and returns `std_geom`
 (angstrom), `symbols`, `natoms`, and, when the file has them, `cst` (shielding
 relative to the bare nucleus in vacuum, ppm, in the printed component order),
 `efg` (a.u.), and `k_couplings` (isotropic reduced couplings from the `isc`
-records, in the same units as `gparse`, so that `g2spinach` converts them into
-J-couplings for the isotopes it is given). Tensors are matched to atoms by
+records, in the same units as `gparse`). To convert them into J-couplings with
+`g2spinach`, first supply `props.isotopes` in atom order: `c2spinach` does not
+assign isotopes. Tensors are matched to atoms by
 label and index, so a file whose `ms` records are reordered or partial still
 lands on the right atoms; atoms without a tensor get an empty cell. Test for
 optional fields with `isfield`. CASTEP shieldings must be referenced by hand,

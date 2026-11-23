@@ -19,7 +19,7 @@ function sle2rlx_vs_redfield()
 % Nitroxide radical
 options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/nitroxide.log'),...
-                           {{'E','E'},{'N','14N'}},[0 0],options);
+                      {'E','N'},[0 0],options);
 sys.magnet=3.5;
 sys.tols.prox_cutoff=4.0;
 

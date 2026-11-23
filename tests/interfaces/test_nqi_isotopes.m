@@ -1,13 +1,12 @@
 % Test: interfaces/nqi_isotopes | Quadrupolar and isotope label import
+% Tests Gaussian isotope labels and quadrupolar tensor import. Syntax:
 %
-% The electric field gradient at a nucleus belongs to the molecule; the
-% quadrupolar coupling is its product with the quadrupole moment of the
-% isotope. A coupling imported for one isotope from a calculation that
-% used another must therefore scale by the ratio of their moments. The
-% chlorine ratio is checked against two Gaussian 16 calculations of LiCl
-% (B3LYP/6-31G(d), output=pickett), which print -2.7154 MHz for Cl(35)
-% and -2.1401 MHz for Cl(37). Isotopes named in a molecule specification
-% must be reported by the parser without #p output.
+%                       result=test_nqi_isotopes()
+%
+% Outputs:
+%
+%     result - regression checks for default and explicit isotope labels,
+%              the spin-1 tensor convention, and isotope substitution
 %
 % talos@spindynamics.org
 
@@ -16,59 +15,55 @@ function result=test_nqi_isotopes()
 % Start the test record
 result=new_test_result('interfaces/nqi_isotopes',...
                        'Quadrupolar and isotope label import',...
-                       'quadrupolar couplings follow the requested isotope');
+                       'import uses the stated isotope or the magnetic isotope assumed by Gaussian');
 
-% Parse a Gaussian log that carries a nitrogen-14 quadrupole tensor
+% Unlabelled benzoquinone and ammonium carry the Gaussian magnetic isotopes
 root_dir=fileparts(fileparts(fileparts(mfilename('fullpath'))));
 log_dir=fullfile(root_dir,'examples','standard_systems');
-props=gparse(fullfile(log_dir,'methylaziridine_a.log'));
-nitrogen=find(strcmp(props.symbols,'N'));
-proton=find(strcmp(props.symbols,'H'),1);
-options.no_xyz=1;
+log_path=fullfile(log_dir,'benzoquinone.log');
+props=gparse(log_path);
+expected={'13C','13C','13C','1H','1H','17O','13C','13C','13C','1H','17O','1H'};
+[sys,~]=g2spinach(props,{'C','H','O'},[0 0 0]);
+result=test_true(result,'unlabelled benzoquinone',isequal(props.isotopes(:)',expected)&&isequal(sys.isotopes,expected),...
+                 'Gaussian assumes 13C, 1H, and 17O for these atoms in coordinate order');
+props=gparse(fullfile(log_dir,'shielding_reference','ammonium.log'));
+[sys,~]=g2spinach(props,{'N'},0);
+result=test_true(result,'unlabelled ammonium',isequal(sys.isotopes,{'14N'}),...
+                 'Gaussian assumes 14N for nitrogen');
 
-% Gradients exist only where the calculation isotope has a quadrupole moment
-result=test_true(result,'gradient provenance',...
-                 (~isempty(props.efg{nitrogen}))&&isempty(props.efg{proton}),...
-                 'nitrogen-14 has a quadrupole moment, the proton has none');
-
-% Same-isotope import returns the tensor that Gaussian prints
-[~,inter]=g2spinach(props,{{'N','14N'}},0,options);
-result=test_close(result,'same isotope',inter.coupling.matrix{1,1},...
-                  props.nqi{nitrogen}/2,0,1e-12,...
-                  'spin 1: the coupling matrix is the printed tensor over 2I(2I-1)');
-
-% A quadrupolar isotope without a gradient is reported and not imported
-[report,~,inter]=evalc('g2spinach(props,{{''H'',''2H''}},0,options);');
-result=test_true(result,'missing gradient',...
-                 contains(report,'no electric field gradient')&&...
-                 all(cellfun(@isempty,inter.coupling.matrix),'all'),...
-                 'the calculation used protons, so deuterium has no data');
-
-% One chlorine gradient imported as both stable isotopes
-chloride.symbols={'Cl'};
-chloride.efg={diag([1 1 -2])};
-[~,light]=g2spinach(chloride,{{'Cl','35Cl'}},0,options);
-[~,heavy]=g2spinach(chloride,{{'Cl','37Cl'}},0,options);
-result=test_close(result,'chlorine isotope ratio',...
-                  light.coupling.matrix{1,1}(3,3)/heavy.coupling.matrix{1,1}(3,3),...
-                  2.7154/2.1401,0,1e-4,...
-                  'both isotopes have spin 3/2; Gaussian prints five significant digits');
-
-% Label one hydrogen of a shipped log as deuterium and parse the copy
-log_text=fileread(fullfile(log_dir,'benzoquinone.log'));
-log_text=regexprep(log_text,'H {21}0\.8484','H(Iso=2)              0.8484','once');
+% Label only the fourth atom in a temporary copy of the benzoquinone input specification
+log_text=regexprep(fileread(log_path),'H {21}0\.8484','H(Iso=2)              0.8484','once');
 log_copy=[tempname '.log'];
 file_id=fopen(log_copy,'w');
 fwrite(file_id,log_text);
 fclose(file_id);
+cleaner=onCleanup(@()delete(log_copy));
 props=gparse(log_copy);
-delete(log_copy);
-stated=find(~isnan(props.mass_numbers));
-result=test_true(result,'isotope label',...
-                 (numel(props.mass_numbers)==numel(props.symbols))&&...
-                 isscalar(stated)&&strcmp(props.symbols{stated},'H')&&...
-                 (props.mass_numbers(stated)==2),...
-                 'one labelled hydrogen, no statement about the other atoms');
+expected{4}='2H';
+[sys,~]=g2spinach(props,{'C','H','O'},[0 0 0]);
+result=test_true(result,'single stated isotope',isequal(find(~isnan(props.mass_numbers)),4)&&...
+                 (props.mass_numbers(4)==2)&&isequal(props.isotopes(:)',expected)&&isequal(sys.isotopes,expected),...
+                 'only the labelled hydrogen changes from 1H to 2H');
+
+% Gaussian prints this 14N quadrupole tensor in MHz in the principal axis frame
+props=gparse(fullfile(log_dir,'methylaziridine_a.log'));
+nitrogen=strcmp(props.symbols,'N');
+printed=[-1.2932  0.6251  1.8700;...
+          0.6251  1.7170 -2.3127;...
+          1.8700 -2.3127 -0.4238];
+[sys,inter]=g2spinach(props,{'N'},0);
+result=test_true(result,'quadrupole table isotopes',isequal(sys.isotopes,{'14N'})&&...
+                 all(strcmp(props.isotopes(strcmp(props.symbols,'C')),'13C')),...
+                 'the table names N(14) and C(12); spin-zero carbon-12 leaves the magnetic carbon-13');
+result=test_close(result,'standard frame tensor',inter.coupling.matrix{1,1},props.nqi{nitrogen}/2,0,0,...
+                  '2I(2I-1) is two for nitrogen-14');
+result=test_close(result,'printed principal values',sort(eig(inter.coupling.matrix{1,1})),...
+                  1e6*sort(eig(printed))/2,0,1e-12,'rotation to standard orientation preserves the three principal values');
+
+% Nitrogen-15 has no quadrupolar interaction
+[sys,inter]=isoswap(sys,inter,1,'15N');
+result=test_true(result,'quadrupole removal',isequal(sys.isotopes,{'15N'})&&isempty(inter.coupling.matrix{1,1}),...
+                 'substituting spin-half nitrogen removes the quadratic self-coupling');
 
 end
 

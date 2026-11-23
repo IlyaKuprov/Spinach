@@ -8,7 +8,7 @@ Call **pulse_acquire_methyl()** with no arguments. It has no output arguments: i
 
 ## Spin system and relaxation
 
-The source describes an X-band pulse-acquire FFT ESR spectrum of methyl radical. It reads **../standard_systems/methyl.log** using **gparse** and **g2spinach**, maps **E** to **E** and **H** to **1H**, and passes **[0 0]**. With **options.no_xyz=1**, coordinate information is ignored; the source comment says hyperfine couplings are provided. It sets **sys.magnet=0.33**.
+The source describes an X-band pulse-acquire FFT ESR spectrum of methyl radical. It reads **../standard_systems/methyl.log** using **gparse** and **g2spinach**, selects the electron and hydrogen (`1H` in the log), and passes **[0 0]**. With **options.no_xyz=1**, coordinate information is ignored; the source comment says hyperfine couplings are provided. It sets **sys.magnet=0.33**.
 
 The simple common-linewidth model uses relaxation **'damp'**, diagonal retention, zero equilibrium, and **inter.damp_rate=2.5e7**. The **sphten-liouv** basis has no approximation, projection **+1**, and longitudinal **1H**; no symmetry group is specified.
 

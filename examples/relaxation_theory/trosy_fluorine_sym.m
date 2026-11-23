@@ -11,7 +11,7 @@ function trosy_fluorine_sym()
 
 % Read 3-fluorotyrosine DFT calculation
 [~,inter_dft]=g2spinach(gparse('../standard_systems/3_fluoro_tyr.log'),...
-                            {{'C','13C'},{'F','19F'}},[186.38 192.97]);
+                        {'C','F'},[186.38 192.97]);
                                  
 % Extract coordinates and CSAs
 ZF=inter_dft.zeeman.matrix{8};

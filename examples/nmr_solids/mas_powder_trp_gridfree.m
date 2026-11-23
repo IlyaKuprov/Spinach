@@ -19,7 +19,11 @@ function mas_powder_trp_gridfree()
 
 % Spin system properties (DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/trp_xray.out'),...
-                         {{'C','13C'},{'N','15N'}},[174.0 0],[]);
+                      {'C','N'},[174.0 0],[]);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
+
 % Magnet field
 sys.magnet=9.4;
 
@@ -75,7 +79,11 @@ fid=gridfree(spin_system,@acquire,parameters,'nmr');
 
 % Spin system properties (DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/trp_xray.out'),...
-                         {{'C','13C'},{'N','15N'}},[174.0 0],[]);
+                      {'C','N'},[174.0 0],[]);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
+
 % Magnet field
 sys.magnet=9.4;
 

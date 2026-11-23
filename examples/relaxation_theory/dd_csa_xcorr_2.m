@@ -9,7 +9,7 @@ function dd_csa_xcorr_2()
 
 % Read the spin system parameters (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/fdnb.log'),...
-                   {{'H','1H'},{'F','19F'}},[32.0 270.0],[]);
+                      {'H','F'},[32.0 270.0],[]);
 
 % Set up the calculation
 sys.magnet=9.4;                  % Magnet induction

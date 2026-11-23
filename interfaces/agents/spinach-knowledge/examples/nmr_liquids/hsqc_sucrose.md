@@ -10,7 +10,7 @@ Build a natural-abundance 13C HSQC spectrum for sucrose from the supplied vacuum
 
 ## Spin system and method
 
-The wrapper parses `examples/standard_systems/sucrose.log` and calls `g2spinach` with H mapped to `1H` and C to `13C`; the input contains 22 proton and 12 carbon sites, while oxygen is not imported as a spin. The DFT-derived couplings are filtered with `options.min_j=3.0 Hz`, and `options.no_xyz=1`. The script replaces isotropic shifts at spin indices [1:19, 24:30] with its 26-entry experimental-shift array, then generates the 13C isotopomer contributions. The DFT reference arguments are [31.8, 182.1]; the wrapper does not annotate their units. The basis is sparse Liouville space (`sphten-liouv`, IK-2), scalar-coupling connectivity and proximity level 1. Greedy setup uses proximity cutoff 4.0; the field is 5.9 T.
+The wrapper parses `examples/standard_systems/sucrose.log` and calls `g2spinach` to select H and C (`1H` and `13C` in this log); the input contains 22 proton and 12 carbon sites, while oxygen is not imported as a spin. The DFT-derived couplings are filtered with `options.min_j=3.0 Hz`, and `options.no_xyz=1`. The script replaces isotropic shifts at spin indices [1:19, 24:30] with its 26-entry experimental-shift array, then generates the 13C isotopomer contributions. The DFT reference arguments are [31.8, 182.1]; the wrapper does not annotate their units. The basis is sparse Liouville space (`sphten-liouv`, IK-2), scalar-coupling connectivity and proximity level 1. Greedy setup uses proximity cutoff 4.0; the field is 5.9 T.
 
 ## HSQC acquisition
 

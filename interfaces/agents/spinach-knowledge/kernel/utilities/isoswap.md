@@ -2,19 +2,18 @@
 
 ## Purpose
 
-Makes isotope replacements in the input structures. All interactions are automatically scaled as necessary.
+Replaces selected isotopes in Spinach input structures. Use it after importing a calculation to obtain the bilinear couplings for a different isotope without changing the interpretation of the source data.
 
 Source: <https://github.com/IlyaKuprov/Spinach/blob/main/kernel/utilities/isoswap.m>
 
 ## Behaviour
 
 - Syntax: `[sys,inter]=isoswap(sys,inter,spins,new_iso)`.
-- Enforces input consistency via an internal `grumble` subfunction, which errors if isotope information is missing from `sys`, if `inter` is not a structure, if `spins` is not a real numeric vector of integer indices not exceeding the number of isotopes, or if `new_iso` is not a character string.
+- A selected source isotope must have nonzero magnetogyric ratio: its couplings cannot otherwise be rescaled by a ratio of magnetogyric ratios. A system without `inter.coupling` can still have its isotope labels replaced.
 - Wipes quadratic couplings before replacement, in both eigensystem representation (`inter.coupling.eigs`, together with `inter.coupling.euler`) and matrix representation (`inter.coupling.matrix`), printing a warning per affected spin that the coupling is not transferable.
 - Wipes high-rank couplings stored in `inter.giant.coeff` and `inter.giant.euler`, printing a warning per affected spin.
-- For each specified spin, computes `gamma_ratio = spin(new_iso)/spin(sys.isotopes{n})` and scales all couplings to every other spin `k` (both `{n,k}` and `{k,n}` entries) in the eigensystem and matrix representations by this ratio.
+- For each selected spin, multiplies its bilinear couplings to every other spin by `spin(new_iso)/spin(old_iso)` in both pair directions. This applies to scalar couplings (`inter.coupling.scalar`), tensor matrices, and tensor eigenvalues. A pair with both isotopes replaced acquires one ratio from each partner.
 - Replaces the isotope string `sys.isotopes{n}` with `new_iso` for each specified spin.
-- Quadratic and higher order couplings are wiped with a warning because they are not transferable.
 
 ## Inputs and outputs
 

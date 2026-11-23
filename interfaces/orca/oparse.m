@@ -35,7 +35,9 @@
 %   props.hfc.iso           - isotropic hyperfine couplings, Gauss, NaN if not printed
 %   props.efg               - EFG tensors, a.u.^-3, natoms cell
 %   props.nqi               - quadrupolar tensors, Hz, natoms cell
-%   props.isotopes          - isotopes used by ORCA, natoms cell
+%   props.isotopes          - magnetic isotope labels, natoms x 1 cell; printed
+%                              labels take precedence over measured ORCA 6.1.1
+%                              defaults, and unknown labels are empty
 %   props.cst               - shielding tensors, ppm, natoms cell
 %   props.j_couplings       - isotropic J-couplings, Hz, natoms x natoms
 %   props.chi_temps         - susceptibility temperatures, K
@@ -153,6 +155,39 @@ for n=1:natoms
     if ~isempty(element), props.atomic_numbers(n)=element; end
 end
 
+% Magnetic isotope mass numbers measured in ORCA 6.1.1, in atomic number order
+default_mass=[1 3 7 9 11 13 14 17 19 21 23 25 27 29 31 33 35 39 ...
+              39 43 45 47 51 53 55 57 59 61 63 67 69 73 75 77 79 83 ...
+              85 87 89 91 93 95 99 101 103 105 107 111 115 119 121 125 127 129 ...
+              133 137 139 0 141 143 147 147 153 157 159 161 165 167 169 171 175 177 ...
+              181 183 187 187 193 195 197 199 205 207 209 209 0 0 0 0 227 0 ...
+              0 235];
+mass=zeros(natoms,1);
+known=(props.atomic_numbers>0)&(props.atomic_numbers<=numel(default_mass));
+mass(known)=default_mass(props.atomic_numbers(known));
+
+% Read the magnetic (not quadrupolar) isotope from the last EPR/NMR settings
+settings=find(startsWith(log_lines,'Number of nuclei for epr/nmr'),1,'last');
+if ~isempty(settings)
+
+    % Each nucleus label precedes its hyperfine isotope
+    last=sect_end(banner_idx,nlines,settings);
+    nuclei=find_lines(log_lines,'^Nucleus:',settings,last-1);
+    for n=1:numel(nuclei)
+
+        % Match the zero-based index and element to the coordinate table
+        header=regexp(log_lines{nuclei(n)},'^Nucleus:\s*(\d+)\s*([A-Za-z]+)$','tokens','once');
+        istp=regexp(log_lines{nuclei(n)+1},'^Hyperfine\s*:\s*Isotope=\s*(\d+)','tokens','once');
+        if isempty(header)||isempty(istp), continue; end
+        atom=str2double(header{1})+1;
+        if (atom<=natoms)&&strcmpi(header{2},bare_symbols{atom})
+            mass(atom)=str2double(istp{1});
+        end
+
+    end
+
+end
+
 % Read the charge and the spin multiplicity from the calculation
 % settings block; later parts of the log reprint both quantities in
 % formats that do not always refer to the system as a whole
@@ -249,7 +284,6 @@ if ~isempty(sect)
     hfc_matrix=cell(1,natoms); hfc_eigvals=cell(1,natoms);
     hfc_eigvecs=cell(1,natoms); hfc_iso=NaN(natoms,1);
     efg_matrix=cell(1,natoms); nqi_matrix=cell(1,natoms);
-    isotopes=cell(1,natoms);
     for n=1:numel(nucleus_idx)
 
         % Each nucleus owns the lines up to the next nucleus header
@@ -268,10 +302,9 @@ if ~isempty(sect)
             error(['ORCA import: element mismatch for atom ' num2str(atom) '.']);
         end
 
-        % The isotope, the spin, and the quadrupole moment are printed
-        % in the two header lines of the nucleus block
+        % Read the magnetic isotope, spin, and quadrupole moment from the nucleus header
         istp=regexp(log_lines{block_top},'(ISTP|Isotope)=\s*(\d+)','tokens','once');
-        if ~isempty(istp), isotopes{atom}=[istp{2} symbols{atom}]; end
+        if ~isempty(istp), mass(atom)=str2double(istp{2}); end
         spin_qm=NaN; quad_mom=NaN;
         if block_top<block_bot
             quad_line=regexp(log_lines{block_top+1},...
@@ -329,7 +362,12 @@ if ~isempty(sect)
             disp('ORCA import: found nuclear quadrupole tensors.');
         end
     end
-    if any(~cellfun(@isempty,isotopes)), props.isotopes=isotopes; end
+end
+
+% Form per-atom isotope labels, leaving unknown assignments empty
+props.isotopes=repmat({''},natoms,1);
+for n=find(mass>0).'
+    props.isotopes{n}=[int2str(mass(n)) bare_symbols{n}];
 end
 
 % Read the last nuclear shielding section
@@ -476,4 +514,5 @@ end
 % is occasionally true - that I need physics more than friends.
 %
 % J. Robert Oppenheimer
+
 

@@ -4,7 +4,7 @@
 
 ## Model and sequence
 
-This wrapper builds the sucrose spin system from the vacuum-DFT file `../standard_systems/sucrose.log` using `gparse` and `g2spinach`, mapping hydrogen atoms to `1H`. The log identifies sucrose as C12H22O11, so the selected network is its 22 proton spins; carbon and oxygen are not selected as spins. The parser options are `min_j=2.0` and `no_xyz=1` (the wrapper does not annotate units for these values). It sets `sys.magnet=5.9` (field value; no unit is stated here) and calls `liquid(...,@dqf_cosy,parameters,'nmr')`. The DQF-COSY pulse program is implemented outside the wrapper in `experiments/nmr_liquids/dqf_cosy.m`, which cites https://doi.org/10.1016/0006-291X(83)91225-1 and https://doi.org/10.1021/ja00388a062. The observed channel is `1H`.
+This wrapper builds the sucrose spin system from the vacuum-DFT file `../standard_systems/sucrose.log` using `gparse` and `g2spinach`, selecting hydrogen (`1H` in this log). The log identifies sucrose as C12H22O11, so the selected network is its 22 proton spins; carbon and oxygen are not selected as spins. The parser options are `min_j=2.0` and `no_xyz=1` (the wrapper does not annotate units for these values). It sets `sys.magnet=5.9` (field value; no unit is stated here) and calls `liquid(...,@dqf_cosy,parameters,'nmr')`. The DQF-COSY pulse program is implemented outside the wrapper in `experiments/nmr_liquids/dqf_cosy.m`, which cites https://doi.org/10.1016/0006-291X(83)91225-1 and https://doi.org/10.1021/ja00388a062. The observed channel is `1H`.
 
 ## Basis and acquisition
 

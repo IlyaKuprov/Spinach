@@ -24,9 +24,10 @@
 %   parameters - resolved values, never translated old fields. A missing
 %                order is returned as [] for the context to resolve.
 %
-% Defaults: generalised evolution, the complete supplied finite bath graph,
-% mixed product bath density, no mean field, power-counting reduction, and
-% averaging completed expansions. Explicit physical populations, quadrupoles,
+% Defaults: generalised evolution, clusters joined by retained couplings and
+% observed-spin mediation, mixed product bath density, no mean field,
+% power-counting reduction, and averaging completed expansions.
+% Explicit physical populations, quadrupoles,
 % polarisation, jump directions/rates, and second-order projection are never
 % invented. For closed-system Hilbert Hahn echoes with an energy-level
 % transition and ideal midpoint pi pulse, cce.projection='conditional' explicitly drops register-changing

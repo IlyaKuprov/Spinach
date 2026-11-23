@@ -6,7 +6,7 @@ Internal multiplicative, additive, and observed-density reduction service. clexp
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `reduced=cce_reduce(raw,clusters,parameters)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `reduced=cce_reduce(spin_system,raw,clusters,parameters)`; the spin system supplies `tols.cce_atol` and `tols.cce_rtol`. Engine records are not public experiment parameter structures.
 
 [MATLAB source](../../../../../kernel/cce/cce_reduce.m)
 
@@ -27,7 +27,7 @@ Reduce raw cluster observables with conditioned multiplicative or additive recur
 
 - `raw` — records with `cluster_id`, time-by-observable `value`, logical `valid`, and nonnegative `abs_error_bound`.
 - `clusters` — ordered subset-closed records from `cce_clusters`.
-- `parameters` — method, numerical tolerances; optional `reducer=powers|direct` (default powers), `numerics.zero_policy=mask|error` (default mask).
+- `parameters` — method; optional `reducer=powers|direct` (default powers), `zero_policy=mask|error` (default mask).
 
 **Outputs**
 
@@ -53,7 +53,7 @@ For one deterministic bath state, a complete connected-noise cluster is a direct
 
 For sampled product states, uncertainty is separate from deterministic propagation error. After-expansion averaging uses sqrt(sum(abs(x_s-mean(x_s)).^2)/(N*(N-1))). Internal-first averaging uses the individual raw complete-bath responses in that same expression, not the already averaged response. A truncated internal-first estimator, a single sample, and internally averaged connected noise report NaN. Deterministic ensembles retain zero sampling uncertainty; interlaced uncertainty follows the conditional-ensemble rules below.
 
-Native reduction does not forward the experiment-owned cce.numerics.propagator into the internal scalar-reduction validator. Propagation preferences cannot change the reduction algebra or its numerical budget.
+Native reduction does not forward the experiment-owned cce.propagator into the internal scalar-reduction validator. Propagation preferences cannot change the reduction algebra or its numerical budget.
 
 Native interlacing consumes factor, factor_valid, and factor_abs_error_bound once, leaving the conditional raw response intact. With a full-bath raw record, it returns that exact average directly and marks all unavailable lower prefixes NaN/Inf/false. A single truncated interlaced reference has unavailable sampling uncertainty (NaN), not zero; multiple references use their sample standard error, and an exact full-bath average has zero sampling uncertainty.
 

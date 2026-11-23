@@ -16,7 +16,7 @@ Enumerate a deterministic subset-closed CCE cluster family.
 
 ## Behaviour
 
-- When `numerics.max_memory_bytes` is supplied, graph/frontier growth, closure/sorting copies, decimal family signatures, and final cluster/subset metadata are checked before allocation (`cce_clusters:memory`). A cluster-count cap does not substitute for a byte budget; standalone combinatorial calls without `numerics` retain their existing unbudgeted contract.
+- When `sys.tols.cce_mem` is finite, graph/frontier growth, closure/sorting copies, decimal family signatures, and final cluster/subset metadata are checked before allocation (`cce_clusters:memory`). A cluster-count cap does not substitute for a byte budget; standalone combinatorial calls without `numerics` retain their existing unbudgeted contract.
 - Enumerates connected candidate clusters through the requested order; disconnected subsets required by retained clusters are restored for recursive reduction.
 - `periodic_segments` requires a single cycle and a truncated order and keeps only contiguous segments; disconnected subsets are not restored.
 - Applies optional per-order cluster caps and explicit group-cluster selection deterministically, preserving physical-ID and subset bookkeeping.

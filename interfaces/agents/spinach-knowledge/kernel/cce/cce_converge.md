@@ -4,7 +4,7 @@
 
 Use `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)`. The experiment and assumptions are explicit, exactly as in clexpn; the primary result is the unchanged numeric baseline, never a wrapper or a silently substituted refined result.
 
-Declare independent ladders in parameters.cce.convergence using native paths cce.order, cce.bath_spins, cce.graph.threshold, cce.graph.radius, cce.bath_state.samples, or times. Every ladder starts at the supplied baseline. Every refinement is compared with that baseline, including its numerical masks and error bounds. Orders above the finite bath size evaluate the same full-bath family. Time ladders retain every preceding time exactly; interpolation is not used.
+Declare independent ladders in parameters.cce.convergence using the paths cce.order, cce.bath_spins, bath_samples, or times. Every ladder starts at the supplied baseline. Every refinement is compared with that baseline, including its numerical masks and error bounds. Orders above the finite bath size evaluate the same full-bath family. Time ladders retain every preceding time exactly; interpolation is not used.
 
 Supply atol, rtol, and max_work. Sampling ladders require a held-out bath-state seed in checks; nested cce overrides replace only the specified algorithm controls. Shared checkpoints are rejected before any evaluation. The second output contains convergence (converged, limit_reached, or not_converged), the original input_parameters, and convergence_report with comparisons, work, coverage, and budgets. The diagnostic reduction and ensemble remain those of the unchanged baseline.
 

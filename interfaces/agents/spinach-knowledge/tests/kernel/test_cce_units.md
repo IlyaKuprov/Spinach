@@ -38,4 +38,4 @@ result=test_cce_units()
 
 ## Native interface
 
-Uses `cce_options` and `cce_compile` with `parameters.observed`, `parameters.cce.bath_spins` and `parameters.cce.numerics`. The explicit labframe assumption is a separate argument. Canonical scalar, dipolar, signed-Zeeman and ordered-cell assertions are unchanged.
+Uses `cce_options` and `cce_compile` with `parameters.observed`, `parameters.cce.bath_spins`, with tolerances in `sys.tols`. The explicit labframe assumption is a separate argument. Canonical scalar, dipolar, signed-Zeeman and ordered-cell assertions are unchanged.

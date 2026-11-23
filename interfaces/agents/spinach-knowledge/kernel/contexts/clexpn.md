@@ -25,11 +25,11 @@ Bath-pumped Hahn evaluation uses `clexpn(spin_system,@bath_pumped_hahn,parameter
 
 ## Native adaptive groups and ensemble contracts
 
-parameters.cce.partition.mode=adaptive is executed through the experiment, using explicitly supplied pilot_configs and heldout_configs. The frozen production partition and convergence diagnostics are returned in diagnostics.partition. parameters.cce.parallel.max_tasks caps each scheduler batch. diagnostics.reduction.sampling_standard_error preserves raw full-bath Monte Carlo uncertainty under internal-first averaging; truncated internal-first and single-draw uncertainty are NaN.
+parameters.cce.partition.mode=adaptive is executed through the experiment, using explicitly supplied pilot_configs and heldout_configs. The frozen production partition and convergence diagnostics are returned in diagnostics.partition. diagnostics.reduction.sampling_standard_error preserves raw full-bath Monte Carlo uncertainty under internal-first averaging; truncated internal-first and single-draw uncertainty are NaN.
 
-For projected evolution, `parameters.cce.second_order` is included in graph construction. Enabled virtual-level corrections therefore retain observed-mediated bath pairs unless `parameters.cce.graph.approximate` is explicitly true.
+For projected evolution, `parameters.cce.second_order` is included in graph construction. Enabled virtual-level corrections therefore retain observed-mediated bath pairs unless `parameters.cce.mediated` is false.
 
-The experiment owns cce.numerics.propagator; graph and cluster-selection calls receive the same resolved parameters as the experiment.
+The experiment owns cce.propagator; graph and cluster-selection calls receive the same resolved parameters as the experiment.
 
 Before propagation, the resolved representation validates the numerical preference: eig for Hilbert dynamics, stock for Liouville dynamics, with expm additionally available for generalised Hahn echo. Unknown or incompatible preferences are rejected rather than discarded.
 

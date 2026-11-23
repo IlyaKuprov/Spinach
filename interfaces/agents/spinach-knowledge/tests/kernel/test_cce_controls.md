@@ -55,7 +55,7 @@ clexpn, finite_drive, hahn_echo, refocusing_train, or native compiled subsystem
 services. Former omitted/empty operator-angle spellings are tested as equivalent
 integrated-generator and Cartesian declarations; a physical angle is never
 implicitly applied twice. Raw signal checks explicitly request normalized=false.
-Named Hahn direct-segment arithmetic is selected with cce.numerics.propagator=expm.
+Named Hahn direct-segment arithmetic is selected with cce.propagator=expm.
 The test retains dense detuned-drive, ideal-width, midpoint-waveform, tensor-order,
 spin-one/selective-pulse, exterior-field, memory, and scale-invariant Hermiticity
 assertions, without calling the retired public control/evaluator interface.

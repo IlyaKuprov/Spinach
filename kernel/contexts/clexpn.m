@@ -10,16 +10,27 @@
 % observed transition or observable. Algorithm controls belong to cce.
 % assumptions is the Spinach interaction assumption string.
 %
-% answer is the experiment's natural numeric output, without a legacy result
-% wrapper. diagnostics includes raw cluster responses, reduction, resolved
-% parameters, physical ordering, and elapsed time. Echo experiments use
-% multiplicative reduction; noise_correlation uses additive reduction.
+% The spin system carries the system-level settings: bath spins are joined
+% into clusters when create kept a coupling between them, so the cluster
+% graph follows sys.tols.prox_cutoff, sys.tols.inter_cutoff and the supplied
+% couplings; sys.tols.cce_atol and cce_rtol are the accuracy budgets and
+% sys.tols.cce_mem is the memory budget in bytes; cluster tasks run on the
+% pool that create starts from sys.parallel. parameters.bath_state is a cell
+% row of bath spin density matrices (maximally mixed when absent), and
+% parameters.bath_samples with bath_seed requests sampled pure bath states.
+% Jump operators in parameters.bath_jumps select Liouville space; Hilbert
+% space is used otherwise.
+%
+% answer is the experiment's natural numeric output. diagnostics includes
+% raw cluster responses, reduction, resolved parameters, physical ordering,
+% and elapsed time. Echo experiments use multiplicative reduction, and
+% noise_correlation uses additive reduction.
 % For noise_correlation, parameters.spectrum requests cce_spectrum after the
 % completed ensemble reduction; the result is diagnostics.spectrum.
 %
 % Parameters:
 %
-%   spin_system    - native Spinach system returned by create
+%   spin_system    - Spinach system returned by create
 %   pulse_sequence - five-argument experiment function handle
 %   parameters     - experiment parameters and nested cce algorithm controls
 %   assumptions    - explicit Spinach Hamiltonian assumption string
@@ -32,9 +43,9 @@
 % cce.backend='analytical_hahn' evaluates the ideal-pulse, projected Hahn
 % CCE-2 limit in closed form. It takes point dipoles from inter.coordinates
 % of a system created with sys.tols.prox_cutoff=0 and adds user-supplied
-% couplings. Its complete pair family is implicit, so raw clusters,
-% checkpoints, and nonstandard graph policies are unavailable. In this
-% path sys.tols.cce_atol budgets screening loss.
+% couplings. Its complete pair family is implicit, so raw clusters and
+% checkpoints are unavailable. In this path sys.tols.cce_atol budgets
+% screening loss.
 % A checkpoint requires exactly one retained node. Grid nodes run serially;
 % cluster/state parallelism stays with the scheduler, or with an outer worker.
 %

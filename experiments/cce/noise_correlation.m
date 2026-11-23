@@ -41,17 +41,12 @@ function [A,aux]=noise_correlation(spin_system,parameters,H,R,K)
 % Require explicit ordering and physical fluctuation operator semantics
 grumble(spin_system,parameters,H,R,K);
 
-% Check the dense operator and time-series memory budget
+% Get the retained dimensions and physical spin identifiers
 noise=parameters.noise;
 obs_dim=spin_system.observed_dimension;
 bath_dim=spin_system.bath_dimension;
 dimension=obs_dim*bath_dim;
 ids=spin_system.physical_ids;
-bytes=16*(8*dimension^2+8*bath_dim^4+4*numel(parameters.times));
-if bytes>parameters.cce.numerics.max_memory_bytes
-    error('noise_correlation:memory',...
-          'Noise propagation exceeds the declared memory budget.');
-end
 
 % Form the product bath density and the retained fluctuation operator
 B=zeros(dimension);
@@ -63,15 +58,9 @@ if isfield(noise,'terms')
     for term=reshape(noise.terms,1,[])
 
         % Embed each supported physical fluctuation term
-        overlap=ismember(term.support,ids);
-        if ~any(overlap)
-            continue;
+        if all(ismember(term.support,ids))
+            B=B+embed(term.operator,term.support,ids,spin_system.multiplicities);
         end
-        if ~all(overlap)
-            error('noise_correlation:support',...
-                  'A fluctuation support is split by this cluster.');
-        end
-        B=B+embed(term.operator,term.support,ids,spin_system.multiplicities);
 
     end
 else
@@ -106,10 +95,6 @@ if strcmp(noise.manifold,'bath_only')
         bath_ham=bath_ham+reshape(ham(:,n,:,n),bath_dim,bath_dim)/obs_dim;
     end
 else
-    if ~isfield(system.model,'transition')
-        error('noise_correlation:transition',...
-              'A selected noise manifold requires an observed transition.');
-    end
     transition=system.model.transition;
     if strcmp(noise.manifold,'alpha')
         vector=transition.alpha;
@@ -254,6 +239,12 @@ if ~isfield(parameters,'times')||any(~isfinite(parameters.times))||...
     error('noise_correlation:times',...
           'Elapsed times must be finite, nonnegative and increasing.');
 end
+dimension=system.observed_dimension*system.bath_dimension;
+if 16*(8*dimension^2+8*system.bath_dimension^4+4*numel(parameters.times))>...
+   parameters.cce.numerics.max_memory_bytes
+    error('noise_correlation:memory',...
+          'Noise propagation exceeds the declared memory budget.');
+end
 if isfield(noise,'terms')
     for term=noise.terms
         dimension=prod(system.model.multiplicities(term.support));
@@ -263,6 +254,11 @@ if isfield(noise,'terms')
            norm(term.operator-term.operator','fro')>100*eps*norm(term.operator,'fro')
             error('noise_correlation:operator',...
                   'Fluctuation operators must be Hermitian and supported on bath spins.');
+        end
+        overlap=ismember(term.support,system.physical_ids);
+        if any(overlap)&&~all(overlap)
+            error('noise_correlation:support',...
+                  'A fluctuation support is split by this cluster.');
         end
     end
 else
@@ -293,6 +289,10 @@ if isfield(parameters,'bath_jumps')
                   'Noise propagation requires bath-only jumps.');
         end
     end
+end
+if ~strcmp(noise.manifold,'bath_only')&&~isfield(system.model,'transition')
+    error('noise_correlation:transition',...
+          'A selected noise manifold requires an observed transition.');
 end
 end
 

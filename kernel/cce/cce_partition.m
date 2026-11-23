@@ -54,13 +54,6 @@ p=parameters.partition;
 ids=graph.bath_ids;
 [~,positions]=ismember(ids,model.physical_ids);
 dims=model.multiplicities(positions);
-
-% Bound the physical edge candidates and group copies before allocation
-bytes=3*(32*nnz(graph.pair_norm)+16*numel(ids));
-if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
-    error('cce_partition:memory',...
-          'Partition graph and candidate storage exceed numerics.max_memory_bytes.');
-end
 groups=num2cell(ids);
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
     groups=cellfun(@sort,parameters.groups,'UniformOutput',false);
@@ -457,6 +450,10 @@ if ~isnumeric(graph.pair_norm)||~isreal(graph.pair_norm)||...
    ~isequal(size(graph.pair_norm),[numel(ids) numel(ids)])||...
    any(~isfinite(nonzeros(graph.pair_norm)))||any(graph.pair_norm<0,'all')
     error('Physical pair norms must be a finite nonnegative square array.');
+end
+if 3*(32*nnz(graph.pair_norm)+16*numel(ids))>parameters.numerics.max_memory_bytes
+    error('cce_partition:memory',...
+          'Partition graph and candidate storage exceed numerics.max_memory_bytes.');
 end
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
     groups=parameters.groups;

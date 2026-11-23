@@ -124,9 +124,6 @@ else
 end
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
 if density
-    if isstruct(H)
-        error('cce_acquire:density','Projected branches do not return a density matrix.');
-    end
     answer=complex(zeros(numel(parameters.times),spin_system.observed_dimension^2));
 else
     answer=complex(zeros(numel(parameters.times),numel(reference)));
@@ -136,9 +133,6 @@ end
 segments=struct();
 segmented=false;
 if ~isempty(events)
-    if isstruct(H)
-        error('cce_acquire:projection','Finite controls require generalized dynamics.');
-    end
     segmented=strcmp(spin_system.formalism,'zeeman-hilb')&&...
               (any(strcmp({events.type},'ideal'))||strcmp(parameters.cce.meanfield,'static')||...
                any(~ismember([events.target],spin_system.physical_ids)));
@@ -155,9 +149,6 @@ if ~isempty(events)
 
             % Build each retained target drive in its declared Cartesian direction
             e=events(k);
-            if any(~ismember(e.target,spin_system.physical_ids))
-                error('cce_acquire:exterior','Finite drives require retained target spins.');
-            end
             axis=e.axis;
             if ischar(axis)
                 axis=double('xyz'==axis);
@@ -440,6 +431,17 @@ if any(isfield(parameters,{'refocusing','train'}))&&~strcmp(spin_system.formalis
 end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('cce_acquire:generators','Supply conventional or tagged projected generators.');
+end
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&isstruct(H)
+    error('cce_acquire:density','Projected branches do not return a density matrix.');
+end
+events=cce_pulse_events(parameters);
+if ~isempty(events)&&isstruct(H)
+    error('cce_acquire:projection','Finite controls require generalized dynamics.');
+end
+if ~strcmp(spin_system.formalism,'zeeman-hilb')&&...
+   any(~ismember([events.target],spin_system.physical_ids))
+    error('cce_acquire:exterior','Finite drives require retained target spins.');
 end
 end
 

@@ -78,10 +78,8 @@ if isfield(configuration,'bath_rho')
 elseif strcmp(state.mode,'mixed_product')
     densities=arrayfun(@(id)speye(model.multiplicities(id))/model.multiplicities(id),...
                        bath_ids,'UniformOutput',false);
-elseif strcmp(state.mode,'explicit_product')
-    densities=state.rho;
 else
-    error('cce_subsystem:configuration','Sampling requires explicit bath density matrices.');
+    densities=state.rho;
 end
 expectations=zeros(numel(bath_ids),3);
 for n=1:numel(bath_ids)
@@ -123,10 +121,6 @@ cluster_system.configuration.exterior_expectations=zeros(0,3);
 if strcmp(model.parameters.cce.meanfield,'static')
     if isfield(model.parameters.cce,'meanfield_radius')&&...
        isfinite(model.parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
-        coordinates=model.coordinates_A([model.observed_ids exterior_ids],:);
-        if any(~isfinite(coordinates),'all')
-            error('cce:coordinates','cce.meanfield_radius requires finite observed and exterior coordinates.');
-        end
         distance=inf(1,numel(exterior_ids));
         for id=model.observed_ids
             delta=model.coordinates_A(exterior_ids,:)-model.coordinates_A(id,:);
@@ -223,6 +217,15 @@ if isfield(configuration,'exterior_ids')
     if ~isnumeric(supplied)||~isreal(supplied)||...
        (~isempty(supplied)&&~isrow(supplied))||numel(unique(supplied))~=numel(supplied)
         error('cce_subsystem:exterior','Exterior IDs must be a distinct physical-ID row.');
+    end
+end
+if strcmp(model.parameters.cce.meanfield,'static')&&...
+   isfield(model.parameters.cce,'meanfield_radius')&&...
+   isfinite(model.parameters.cce.meanfield_radius)
+    exterior=setdiff(model.bath_ids,sites);
+    if ~isempty(exterior)&&...
+       any(~isfinite(model.coordinates_A([model.observed_ids exterior],:)),'all')
+        error('cce:coordinates','cce.meanfield_radius requires finite observed and exterior coordinates.');
     end
 end
 end

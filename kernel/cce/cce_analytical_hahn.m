@@ -48,7 +48,6 @@ if order==2
     if ~isempty(spin_system.inter.coordinates{1})
         xyz=xyz-spin_system.inter.coordinates{1};
         dist=vecnorm(xyz,2,2);
-        if any(dist==0), error('A bath nucleus coincides with the electron.'); end
         g=spin_system.tols.freeg*spin_system.inter.zeeman.ddscal{1};
         hf=-scale*spin_system.tols.muB*gamma*((axis.'*g*axis)-...
            3*((xyz*g.'*axis).*(xyz*axis))./dist.^2)./dist.^3;
@@ -93,6 +92,10 @@ if (comp.nspins<2)||~strcmp(comp.isotopes{1},'E')||~isnucleus(comp.isotopes{2})|
    ~all(strcmp(comp.isotopes(2:end),comp.isotopes{2}))||(comp.mults(2)~=2)||...
    any(cellfun(@isempty,spin_system.inter.coordinates(2:end)))
     error('clexpn:analyticalHahn','Analytical Hahn pairs require one electron followed by a located bath of identical spin-1/2 nuclei.');
+end
+if ~isempty(spin_system.inter.coordinates{1})&&...
+   any(all(vertcat(spin_system.inter.coordinates{2:end})==spin_system.inter.coordinates{1},2))
+    error('clexpn:analyticalHahn','Analytical Hahn pairs require every bath nucleus to be away from the electron.');
 end
 if ~isfinite(spin_system.inter.magnet)||(spin_system.inter.magnet<=0)||...
    ~isempty(spin_system.rlx.theories)||~isscalar(spin_system.chem.parts)

@@ -95,9 +95,6 @@ parameters.cce_aux.jump_rate_units='s^-1';
 if projected
 
     % Conditional branches use the declared observed transition, never a guess
-    if ~isfield(model,'transition')
-        error('cce_generators:transition','Projected evolution needs a transition.');
-    end
     transition=model.transition;
     va=kron(transition.alpha,eye(db));
     vb=kron(transition.beta,eye(db));
@@ -110,9 +107,6 @@ if projected
     end
     second=parameters.cce.second_order.enabled;
     if second
-        if ~isempty(jumps)
-            error('cce:capability','Dissipative virtual-state corrections are unsupported.');
-        end
 
         % Resolve isolated observed eigenvectors against the compiled transition
         configuration=rmfield(cluster_system.configuration,{'exterior_ids','exterior_expectations'});
@@ -196,7 +190,7 @@ if projected
     H.hamiltonian_abs_error_bound=meta.roundoff_bound;
     H.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)||strcmp(cluster_system.formalism,'zeeman-liouv')
-        [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb,periodic);
+        [H.dissipator,jump_records]=dissipator(cluster_system,jumps,va,vb);
         if periodic
             H.left=sparse(H.left);
             H.right=sparse(H.right);
@@ -215,7 +209,7 @@ elseif strcmp(cluster_system.formalism,'zeeman-liouv')
     % Column-major vectorisation fixes the transposes and the relaxation sign
     memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*d^4));
     H=kron(eye(d),ham)-kron(ham.',eye(d));
-    [R,jump_records]=dissipator(cluster_system,jumps,[],[],false);
+    [R,jump_records]=dissipator(cluster_system,jumps,[],[]);
     K=zeros(size(H));
 else
     H=ham;
@@ -265,9 +259,6 @@ if strcmp(backend,'auto')
     else
         backend='stock';
     end
-end
-if strcmp(backend,'direct')&&~model.direct_supported
-    error('cce_generators:backend','The requested direct approximation is unsupported.');
 end
 ids=system.physical_ids;
 conditional=isfield(parameters.cce,'projection')&&strcmp(parameters.cce.projection,'conditional');
@@ -437,9 +428,6 @@ end
 
 % Add static exterior mean fields after the common ordering is established
 if isfield(spin_config,'exterior_ids')
-    if ~model.direct_supported&&~isempty(spin_config.exterior_ids)
-        error('exterior mean fields require validated pair-retention semantics.');
-    end
     for n=1:numel(ids)
         for k=1:numel(spin_config.exterior_ids)
             field=tensors{1+pair_index(ids(n),spin_config.exterior_ids(k))}*...
@@ -491,7 +479,7 @@ meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
 end
 
 % Assemble loss and jump terms for conventional or conditional density blocks
-function [R,records]=dissipator(system,jumps,va,vb,omit_exterior)
+function [R,records]=dissipator(system,jumps,va,vb)
 
 % Select the density dimension after the caller's allocation preflight
 ids=system.physical_ids;
@@ -511,15 +499,8 @@ for k=1:numel(jumps)
     if jump.rate==0
         continue;
     end
-    included=ismember(jump.support,ids);
-    if ~any(included)
-        if ~omit_exterior&&any(ismember(jump.support,system.configuration.exterior_ids))
-            error('cce:exteriorJump','An active exterior jump cannot drive a frozen mean field.');
-        end
+    if ~all(ismember(jump.support,ids))
         continue
-    end
-    if ~all(included)
-        error('cce:jumpSupport','A correlated jump crosses this cluster; group its support.');
     end
     if ischar(jump.operator)
         labels={'L+','L-','Lx','Ly','Lz'};
@@ -672,11 +653,35 @@ if isfield(parameters,'bath_jumps')
                ~isequal(size(jump.operator),[prod(model.multiplicities(ids)) prod(model.multiplicities(ids))])
             error('cce_options:jumps','A jump matrix must match its ordered support.');
         end
+        included=ismember(ids,system.physical_ids);
+        if jump.rate~=0&&~any(included)&&...
+           any(ismember(ids,system.configuration.exterior_ids))&&...
+           ~(strcmp(parameters.cce.approximation,'projected')&&...
+             strcmp(model.parameters.cce.expansion,'periodic_segments'))
+            error('cce:exteriorJump','An active exterior jump cannot drive a frozen mean field.');
+        end
+        if jump.rate~=0&&any(included)&&~all(included)
+            error('cce:jumpSupport','A correlated jump crosses this cluster; group its support.');
+        end
+    end
+    if ~isempty(jumps)&&strcmp(parameters.cce.approximation,'projected')&&...
+       parameters.cce.second_order.enabled
+        error('cce:capability','Dissipative virtual-state corrections are unsupported.');
     end
     if ~isempty(jumps)&&~strcmp(parameters.cce.approximation,'projected')&&...
        ~strcmp(system.formalism,'zeeman-liouv')
         error('cce_generators:formalism','Dissipation requires zeeman-liouv.');
     end
+end
+if strcmp(parameters.cce.approximation,'projected')&&~isfield(system.model,'transition')
+    error('cce_generators:transition','Projected evolution needs a transition.');
+end
+if strcmp(parameters.cce.backend,'direct')&&~system.model.direct_supported
+    error('cce_generators:backend','The requested direct approximation is unsupported.');
+end
+if ~system.model.direct_supported&&isfield(system.configuration,'exterior_ids')&&...
+   ~isempty(system.configuration.exterior_ids)
+    error('exterior mean fields require validated pair-retention semantics.');
 end
 end
 

@@ -133,13 +133,6 @@ for t=1:numel(schedule.times)
                 continue;
             end
             event=events(j);
-            outside=setdiff(event.target,ids);
-            if ~isempty(outside)&&strcmp(parameters.cce.meanfield,'static')
-                error('cce_segments:exterior_finite','Finite exterior pulses require dynamical exterior spins.');
-            end
-            if strcmp(parameters.cce.approximation,'projected')&&any(ismember(event.target,model.observed_ids))
-                error('cce_segments:manifold_drive','Finite observed drives require gCCE.');
-            end
             axis=axis_vector(event.axis);
             for id=reshape(intersect(event.target,ids,'stable'),1,[])
                 pos=ids==id;
@@ -168,14 +161,8 @@ for t=1:numel(schedule.times)
                        strcmp(parameters.cce.meanfield,'none')
                         continue;
                     end
-                    if ~isempty(exterior)
-                        error('cce_segments:exterior_correlations','Exterior operator pulses require explicit dynamical sites.');
-                    end
 
                     % Embed the selective operator in the retained tensor order
-                    if any(~ismember(event.target,ids))
-                        error('Selective operator targets must be retained.');
-                    end
                     slots=arrayfun(@(id) find(ids==id),event.target);
                     rest=setdiff(1:numel(ids),slots,'stable');
                     order=[slots rest];
@@ -287,12 +274,27 @@ for event=events
            any(~isfinite([event.duration event.amplitude event.detuning]))||event.duration<=0
             error('cce_segments:finite','Finite pulses require positive duration and finite rad/s amplitudes.');
         end
+        if strcmp(parameters.cce.meanfield,'static')&&...
+           any(~ismember(event.target,system.physical_ids))
+            error('cce_segments:exterior_finite','Finite exterior pulses require dynamical exterior spins.');
+        end
+        if strcmp(parameters.cce.approximation,'projected')&&...
+           any(ismember(event.target,system.model.observed_ids))
+            error('cce_segments:manifold_drive','Finite observed drives require gCCE.');
+        end
     elseif isfield(event,'operator')&&~isempty(event.operator)
         d=prod(system.model.multiplicities(event.target));
         if ~isnumeric(event.operator)||~isequal(size(event.operator),[d d])||...
            any(~isfinite(event.operator),'all')||...
            norm(event.operator-event.operator','fro')>d*eps*norm(event.operator,'fro')
             error('cce_segments:operator','Pulse generators must be finite and Hermitian.');
+        end
+        outside=~ismember(event.target,system.physical_ids);
+        if any(outside)&&~(isscalar(event.target)&&strcmp(parameters.cce.meanfield,'none'))
+            if any(ismember(event.target(outside),system.configuration.bath_ids))
+                error('cce_segments:exterior_correlations','Exterior operator pulses require explicit dynamical sites.');
+            end
+            error('Selective operator targets must be retained.');
         end
     end
     if ~isfield(event,'operator')||isempty(event.operator)

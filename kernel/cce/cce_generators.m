@@ -1,7 +1,7 @@
 % Construct retained-cluster generators in Spinach angular-frequency units.
 % Syntax:
 %
-%   [H,R,K,parameters,cache]=cce_generators(spin_system,parameters,cache)
+%   [H,R,K,spin_system,cache]=cce_generators(spin_system,parameters,cache)
 %
 % spin_system is cce_subsystem output; parameters is a resolved native
 % experiment structure. Conventional generators obey L=H+1i*R+1i*K and
@@ -20,10 +20,12 @@
 % the two branches and reverses the projected dissipator.
 % Conditional midpoint Hahn projection omits the isolated register terms:
 % their two scalar phases cancel exactly between equal swapped intervals.
-% parameters.cce.backend selects auto/direct/stock. The returned
-% parameters.cce_aux contains ordering, Hamiltonian, and rounding metadata.
-% Master-equation cce_aux.generator retains the physical Hamiltonians,
-% spin operators, and included jump pairs for completed raw-task evidence.
+% parameters.cce.backend selects auto/direct/stock. The returned spin
+% system carries the generator data in its cce subfield: roundoff_bound,
+% backend, and operators, with projection_leakage and hamiltonian_norm for
+% projected generators. Master-equation cce.generator retains the physical
+% Hamiltonians, spin operators, and included jump pairs for completed
+% raw-task evidence.
 % cache is [] or the separate exact generator cache returned here.
 %
 % Parameters:
@@ -34,13 +36,13 @@
 %
 % Outputs:
 %
-%   H,R,K      - retained generators, or the projected branch pair in H
-%   parameters - input options with generator diagnostics in cce_aux
-%   cache      - exact-input generator cache with hit and miss counts
+%   H,R,K       - retained generators, or the projected branch pair in H
+%   spin_system - retained subsystem with the generator data in cce
+%   cache       - exact-input generator cache with hit and miss counts
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [H,R,K,parameters,cache]=cce_generators(spin_system,parameters,cache)
+function [H,R,K,spin_system,cache]=cce_generators(spin_system,parameters,cache)
 
 % Validate ownership before allocating retained-space matrices
 grumble(spin_system,parameters,cache);
@@ -55,15 +57,15 @@ if isfield(parameters,'bath_jumps')
 end
 
 % Exact input comparison prevents stale orientation or configuration reuse
-if isfield(parameters,'cce_aux')
-    parameters=rmfield(parameters,'cce_aux');
-end
+stale=intersect(fieldnames(spin_system.cce),{'roundoff_bound','backend','operators',...
+                'projection_leakage','hamiltonian_norm','generator'});
+spin_system.cce=rmfield(spin_system.cce,stale);
 signature=struct('spin_system',spin_system,'parameters',parameters);
 if ~isempty(cache)&&isequaln(cache.signature,signature)
     H=cache.H;
     R=cache.R;
     K=cache.K;
-    parameters=cache.parameters;
+    spin_system=cache.spin_system;
     cache.hits=cache.hits+1;
     return
 end
@@ -86,10 +88,6 @@ end
 
 % Preserve the canonical direct and independent stock construction paths
 [ham,meta]=matrix(spin_system,parameters);
-parameters.cce_aux=meta;
-parameters.cce_aux.generator_convention='H+iR+iK';
-parameters.cce_aux.hamiltonian_units='rad/s';
-parameters.cce_aux.jump_rate_units='s^-1';
 if projected
 
     % Conditional branches use the declared observed transition, never a guess
@@ -99,7 +97,6 @@ if projected
     left=va'*ham*va;
     right=vb'*ham*vb;
     leakage=max(norm(ham*va-va*left,'fro'),norm(ham*vb-vb*right,'fro'));
-    parameters.cce_aux.projection_leakage=leakage;
     if ~isempty(jumps)&&leakage>d*eps*norm(ham,'fro')
         error('cce:population_transfer','Projected master dynamics requires invariant observed manifolds.');
     end
@@ -185,7 +182,6 @@ if projected
     H={left,right};
     R=[];
     K=[];
-    parameters.cce_aux.hamiltonian_norm=norm(ham,'fro');
     if ~isempty(jumps)||strcmp(spin_system.bas.formalism,'zeeman-liouv')
         [R,jump_records]=dissipator(spin_system,jumps,va,vb);
         if periodic
@@ -207,6 +203,15 @@ else
 
 end
 
+% Store the generator data in the spin system for the pulse sequence
+spin_system.cce.roundoff_bound=meta.roundoff_bound;
+spin_system.cce.backend=meta.backend;
+spin_system.cce.operators=meta.operators;
+if projected
+    spin_system.cce.projection_leakage=leakage;
+    spin_system.cce.hamiltonian_norm=norm(ham,'fro');
+end
+
 % Retain the physical master-generator evidence with its completed raw task
 if exist('jump_records','var')
     ha=ham;
@@ -215,7 +220,7 @@ if exist('jump_records','var')
         ha=H{1};
         hb=H{2};
     end
-    parameters.cce_aux.generator=struct('physical_ids',ids,'dimension',d,...
+    spin_system.cce.generator=struct('physical_ids',ids,'dimension',d,...
         'bath_dimension',db,'observed_dimension',spin_system.cce.observed_dimension,...
         'projected',projected,'h_alpha',ha,'h_beta',hb,'jumps',jump_records,...
         'vectorization','column','evolution','exp(-1i*L*t)',...
@@ -230,7 +235,7 @@ if ~isempty(cache)
     misses=cache.misses;
 end
 cache=struct('signature',signature,'H',H,'R',R,'K',K,...
-             'parameters',parameters,'hits',hits,'misses',misses+1);
+             'spin_system',spin_system,'hits',hits,'misses',misses+1);
 
 end
 
@@ -593,7 +598,7 @@ if ~ismember(system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
     error('cce_generators:formalism','Only complete Zeeman representations are supported.');
 end
 if ~isempty(cache)&&(~isstruct(cache)||~isscalar(cache)||...
-   ~all(isfield(cache,{'signature','H','R','K','parameters','hits','misses'})))
+   ~all(isfield(cache,{'signature','H','R','K','spin_system','hits','misses'})))
     error('cce_generators:cache','Use [] or this generator service cache.');
 end
 if ~ischar(parameters.cce.backend)||~isrow(parameters.cce.backend)||...

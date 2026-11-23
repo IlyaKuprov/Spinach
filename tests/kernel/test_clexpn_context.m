@@ -63,8 +63,8 @@ result=test_true(result,'Native bath-radius truncation',isempty(outside.graph.ba
 model_p=cce_options(spin_system,diagnostics.parameters,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
 [cluster,~]=cce_subsystem(model,model_p,2,struct(),[]);
-[H,R,K,parameters]=cce_generators(cluster,diagnostics.parameters,[]);
-reference=hahn_echo(cluster,parameters,H,R,K);
+[H,R,K,cluster]=cce_generators(cluster,diagnostics.parameters,[]);
+reference=hahn_echo(cluster,diagnostics.parameters,H,R,K);
 result=test_close(result,'Standard five-argument dispatch',...
                   diagnostics.raw{1}(end).value,reference,0,0,...
                   'The scheduler invokes the registered experiment without a result adapter.');

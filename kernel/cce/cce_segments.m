@@ -13,9 +13,9 @@
 %
 % Parameters:
 %
-%   system     - retained subsystem returned by cce_subsystem
-%   parameters - experiment parameters with a seconds-valued times row,
-%                cce controls, and cce_aux.operators
+%   system     - retained subsystem returned by cce_generators
+%   parameters - experiment parameters with a seconds-valued times row
+%                and cce controls
 %   drift      - retained drift Hamiltonian in rad/s
 %   events     - internal finite/ideal event structure row
 %
@@ -81,7 +81,7 @@ if retained+sum([metadata.bytes])+16*24*dimension^2>system.tols.cce_mem
 end
 
 % Build the Hamiltonian metadata only after the retained-storage check
-operators=parameters.cce_aux.operators;
+operators=system.cce.operators;
 segments.durations=cell(size(schedule.times));
 segments.hamiltonians=cell(size(schedule.times));
 segments.pulses=cell(size(schedule.times));

@@ -36,13 +36,13 @@ if isfield(configuration,'assignment')
     configuration=rmfield(configuration,'assignment');
 end
 [spin_system,~]=cce_subsystem(spin_system,parameters,cluster.sites,configuration,[]);
-[H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
+[H,R,K,spin_system]=cce_generators(spin_system,parameters,[]);
 
 % Test invariance unless the user declares the diagonal register approximation
 if iscell(H)&&(~isfield(parameters.cce,'projection')||...
                  strcmp(parameters.cce.projection,'invariant'))&&...
    ~parameters.cce.second_order.enabled&&...
-   parameters.cce_aux.projection_leakage>spin_system.cce.dimension*eps*parameters.cce_aux.hamiltonian_norm
+   spin_system.cce.projection_leakage>spin_system.cce.dimension*eps*spin_system.cce.hamiltonian_norm
     error('cce:population_transfer','Projected states must be invariant under the cluster Hamiltonian.');
 end
 
@@ -55,8 +55,8 @@ raw.value=answer;
 raw.abs_error_bound=aux.abs_error_bound;
 raw.valid=isfinite(answer);
 raw.weight=configuration.weight;
-if isfield(parameters.cce_aux,'generator')
-    raw.generator=parameters.cce_aux.generator;
+if isfield(spin_system.cce,'generator')
+    raw.generator=spin_system.cce.generator;
 end
 if isfield(aux,'eigen_residual')
     raw.eigen_residual=aux.eigen_residual;

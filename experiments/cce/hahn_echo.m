@@ -177,7 +177,7 @@ end
 % Retain spectral manifold propagation for a supported ideal pulse
 if projected&&~density&&isempty(R)&&...
    ~strcmp(spin_system.bas.formalism,'zeeman-liouv')&&~isfield(parameters,'pump')&&...
-   isfield(parameters,'cce_aux')&&isfield(parameters.cce_aux,'hamiltonian_norm')
+   isfield(spin_system,'cce')&&isfield(spin_system.cce,'hamiltonian_norm')
 
     % Resolve the branch spectra once, not once per observation time
     [va,ea]=eig(full((H{1}+H{1}')/2),'vector');
@@ -265,8 +265,8 @@ if projected&&~density&&isempty(R)&&...
         E(n)=value;
         operations=20*db^3;
         gamma=operations*eps/(1-operations*eps);
-        bounds(n)=2*time*(residual+parameters.cce_aux.roundoff_bound)+8*orthogonality+...
-                  gamma*(1+time*parameters.cce_aux.hamiltonian_norm);
+        bounds(n)=2*time*(residual+spin_system.cce.roundoff_bound)+8*orthogonality+...
+                  gamma*(1+time*spin_system.cce.hamiltonian_norm);
 
     end
 
@@ -278,8 +278,8 @@ if projected&&~density&&isempty(R)&&...
     % Retain numerical propagation diagnostics
     aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
                'orthogonality_residual',orthogonality,...
-               'hamiltonian_bound',parameters.cce_aux.roundoff_bound,...
-               'backend',parameters.cce_aux.backend);
+               'hamiltonian_bound',spin_system.cce.roundoff_bound,...
+               'backend',spin_system.cce.backend);
 
     aux.pulse_time=positions;
     aux.pulse_applied=parameters.times>0&positions<=parameters.times;
@@ -448,7 +448,7 @@ fractions=0.5;
 % Reuse one Hermitian spectrum and retain its forward-error diagnostics
 if ~projected&&strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
    ~any(R(:))&&~any(K(:))&&~isfield(parameters,'pump')&&...
-   isfield(parameters,'cce_aux')
+   isfield(spin_system,'cce')&&isfield(spin_system.cce,'roundoff_bound')
 
     % Select direct segments or reuse one Hermitian eigensystem
     direct=isfield(parameters.cce,'propagator')&&...
@@ -475,7 +475,7 @@ if ~projected&&strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
     operations=20*size(H,1)^3;
     gamma=operations*eps/(1-operations*eps);
     hnorm=norm(H,'fro');
-    hbound=parameters.cce_aux.roundoff_bound;
+    hbound=spin_system.cce.roundoff_bound;
     detector_norms=cellfun(@(x)norm(x,2),detectors);
     if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
         detector_norms=1;
@@ -574,8 +574,8 @@ if ~projected&&strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
     if ~direct
         aux.eigen_residual=residual;
         aux.orthogonality_residual=orthogonality;
-        aux.hamiltonian_bound=parameters.cce_aux.roundoff_bound;
-        aux.backend=parameters.cce_aux.backend;
+        aux.hamiltonian_bound=spin_system.cce.roundoff_bound;
+        aux.backend=spin_system.cce.backend;
     end
 
     aux.pulse_time=positions;

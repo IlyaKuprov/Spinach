@@ -539,7 +539,7 @@ p=cce_options(model,p,experiment,'labframe');
 model_p=cce_options(model,p,@cce_compile,'labframe');
 model=cce_compile(model,model_p,'labframe');
 local=cce_subsystem(model,model_p,sites,configuration,[]);
-[H,R,K,p]=cce_generators(local,p,[]);
+[H,R,K,local]=cce_generators(local,p,[]);
 [answer,aux]=experiment(local,p,H,R,K);
 
 end

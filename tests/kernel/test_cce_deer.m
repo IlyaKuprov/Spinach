@@ -579,12 +579,13 @@ field_model_p.cce.meanfield_radius=2;
 [h_near,~,~]=cce_generators(near,field_model_p,[]);
 field_model_p.cce.meanfield_radius=4;
 [far,~]=cce_subsystem(field_model,field_model_p,2,struct(),[]);
-[h_far,R,K,field_par]=cce_generators(far,field_model_p,[]);
+[h_far,R,K,far]=cce_generators(far,field_model_p,[]);
 result=test_close(result,'Finite radius retains the physical exterior field',...
                   full(h_far-h_near),kron(diag([1 -1]),eye(2)),0,0,...
                   'Only the exterior spin inside the declared radius contributes its measured moment.');
 
 % A Cartesian exterior inversion reverses the subsequent physical mean field
+field_par=field_model_p;
 field_par.refocusing=struct('spins',3,'axis','x','angle',pi,'fraction',0.5);
 field_par.cce.propagator='expm';
 [echo,~]=hahn_echo(far,field_par,h_far,R,K);

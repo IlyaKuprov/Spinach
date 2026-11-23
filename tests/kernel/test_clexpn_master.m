@@ -183,7 +183,8 @@ result=test_true(result,'Driven Liouville numerical budget is not exact',...
 
 % Independently sum the declared arithmetic estimate over all finite intervals
 [retained,~]=cce_subsystem(drive_model,drive_model_p,drive_model_p.cce.bath_spins,struct(),[]);
-[H,R,K,local]=cce_generators(retained,request,[]);
+[H,R,K,retained]=cce_generators(retained,request,[]);
+local=request;
 L=H+1i*R+1i*K;
 [~,aux]=finite_drive(retained,local,H,R,K);
 hilbert=retained;

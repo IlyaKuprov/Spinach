@@ -38,7 +38,7 @@ p=cce_options(spin_system,p,@free_evolution,'labframe');
 model_p=cce_options(spin_system,p,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
 [cluster,~]=cce_subsystem(model,model_p,2,struct(),[]);
-[H,R,K,p]=cce_generators(cluster,p,[]);
+[H,R,K,cluster]=cce_generators(cluster,p,[]);
 [rho0,coil,reference]=cce_observation(cluster,p);
 pulse=kron([0 -1i;-1i 0],eye(2));
 sequences={@free_evolution,@hahn_echo,@cpmg_echo,@cce_eseem};
@@ -81,7 +81,7 @@ invariant=spin_system;
 invariant=cce_test_write(invariant,[1 2],[0 0 5;0 0 0;0 0 7]);
 invariant=cce_test_write(invariant,[2 1],zeros(3));
 invariant.inter.zeeman.matrix{2}=diag([0 0 11]);
-phase_model_p=cce_options(invariant,rmfield(phased,'cce_aux'),@cce_compile,'labframe');
+phase_model_p=cce_options(invariant,phased,@cce_compile,'labframe');
 phase_model=cce_compile(invariant,phase_model_p,'labframe');
 [phase_cluster,~]=cce_subsystem(phase_model,phase_model_p,2,struct(),[]);
 for sequence={@cpmg_echo,@cce_eseem}
@@ -97,13 +97,13 @@ for sequence={@cpmg_echo,@cce_eseem}
             full_cluster=phase_cluster;
             full_cluster.bas.formalism=formalism{1};
             phased.cce.approximation='generalized';
-            [hf,rf,kf,full_p]=cce_generators(full_cluster,phased,[]);
-            expected=sequence{1}(full_cluster,full_p,hf,rf,kf);
+            [hf,rf,kf,full_sys]=cce_generators(full_cluster,phased,[]);
+            expected=sequence{1}(full_sys,phased,hf,rf,kf);
             phased.cce.approximation='projected';
-            [hp,rp,kp,proj_p]=cce_generators(full_cluster,phased,[]);
-            actual=sequence{1}(full_cluster,proj_p,hp,rp,kp);
+            [hp,rp,kp,proj_sys]=cce_generators(full_cluster,phased,[]);
+            actual=sequence{1}(proj_sys,phased,hp,rp,kp);
             result=test_close(result,'Projected fixture manifold invariance',...
-                              proj_p.cce_aux.projection_leakage,0,0,0,...
+                              proj_sys.cce.projection_leakage,0,0,0,...
                               'The comparison fixture has no observed-spin population transfer.');
             result=test_close(result,sprintf('Projected phase %s %d %s',...
                               func2str(sequence{1}),count,formalism{1}),...
@@ -138,17 +138,17 @@ for sites={[],2}
                                   'fraction',0.25,'allow_empty',true);
                 end
                 q.cce.approximation='generalized';
-                [hf,rf,kf,full_p]=cce_generators(retained,q,[]);
-                expected=sequence{1}(retained,full_p,hf,rf,kf);
+                [hf,rf,kf,full_sys]=cce_generators(retained,q,[]);
+                expected=sequence{1}(full_sys,q,hf,rf,kf);
                 q.cce.approximation='projected';
-                [hp,rp,kp,proj_p]=cce_generators(retained,q,[]);
-                actual=sequence{1}(retained,proj_p,hp,rp,kp);
+                [hp,rp,kp,proj_sys]=cce_generators(retained,q,[]);
+                actual=sequence{1}(proj_sys,q,hp,rp,kp);
                 result=test_close(result,'Hahn physical fixed receiver',actual,expected,...
                                   3e-13,3e-13,'Complex preparation and detector match full-space evolution.');
                 if isequal(sequence{1},@hahn_echo)&&strcmp(formalism{1},'zeeman-hilb')
-                    plain=proj_p;
-                    plain.cce_aux=rmfield(plain.cce_aux,'hamiltonian_norm');
-                    fallback=hahn_echo(retained,plain,hp,rp,kp);
+                    plain=proj_sys;
+                    plain.cce=rmfield(plain.cce,'hamiltonian_norm');
+                    fallback=hahn_echo(plain,q,hp,rp,kp);
                     result=test_close(result,'Hahn non-spectral fixed receiver',fallback,expected,...
                                       3e-13,3e-13,'The interval fallback detects the same physical coherence.');
                 end
@@ -171,11 +171,11 @@ for angle=[pi 2*pi]
     % Set an interchanging or preserving rotation
     q.refocusing=struct('spins',1,'operator',angle*[0 1;1 0]/2,'time',0.007);
     q.cce.approximation='generalized';
-    [hf,rf,kf,full_p]=cce_generators(retained,q,[]);
-    expected=hahn_echo(retained,full_p,hf,rf,kf);
+    [hf,rf,kf,full_sys]=cce_generators(retained,q,[]);
+    expected=hahn_echo(full_sys,q,hf,rf,kf);
     q.cce.approximation='projected';
-    [hp,rp,kp,proj_p]=cce_generators(retained,q,[]);
-    actual=hahn_echo(retained,proj_p,hp,rp,kp);
+    [hp,rp,kp,proj_sys]=cce_generators(retained,q,[]);
+    actual=hahn_echo(proj_sys,q,hp,rp,kp);
     result=test_close(result,'Dissipative Hahn fixed receiver',actual,expected,...
                       3e-13,3e-13,'Applied and absent swaps use the original receiver and reference.');
 
@@ -188,11 +188,11 @@ q.pump=struct('center',11,'halfwidth',0,'units','rad/s',...
               'fraction',0.25,'allow_empty',false);
 retained.bas.formalism='zeeman-hilb';
 q.cce.approximation='generalized';
-[hf,rf,kf,full_p]=cce_generators(retained,q,[]);
-expected=bath_pumped_hahn(retained,full_p,hf,rf,kf);
+[hf,rf,kf,full_sys]=cce_generators(retained,q,[]);
+expected=bath_pumped_hahn(full_sys,q,hf,rf,kf);
 q.cce.approximation='projected';
-[hp,rp,kp,proj_p]=cce_generators(retained,q,[]);
-actual=bath_pumped_hahn(retained,proj_p,hp,rp,kp);
+[hp,rp,kp,proj_sys]=cce_generators(retained,q,[]);
+actual=bath_pumped_hahn(proj_sys,q,hp,rp,kp);
 result=test_close(result,'Bath-pumped spectral fixed receiver',actual,expected,...
                   3e-13,3e-13,'Spectral propagation retains the full-space physical receiver.');
 
@@ -550,14 +550,14 @@ result=test_close(result,'Compiled observed energies match stock',...
 configuration=d.ensemble.spin_config;
 configuration=rmfield(configuration,'assignment');
 [retained,~]=cce_subsystem(model,model_p,2,configuration,[]);
-[H,R,K,pseq]=cce_generators(retained,d.parameters,[]);
-[~,aux]=free_evolution(retained,pseq,H,R,K);
+[H,R,K,retained]=cce_generators(retained,d.parameters,[]);
+[~,aux]=free_evolution(retained,d.parameters,H,R,K);
 [v,e]=eig(full((H+H')/2),'vector');
 residual=norm(H*v-v.*e.','fro');
 orthogonality=norm(v'*v-eye(size(H)),'fro');
 operations=12*size(H,1)^3;
 gamma=operations*eps/(1-operations*eps);
-bound=2*p.times(:)*(residual+pseq.cce_aux.roundoff_bound)+...
+bound=2*p.times(:)*(residual+retained.cce.roundoff_bound)+...
       4*orthogonality+gamma*(1+p.times(:)*norm(H,'fro'));
 result=test_close(result,'Native coherent error bounds',aux.abs_error_bound,...
                   repmat(bound,1,4),0,0,'The original propagation-error estimate is retained bitwise.');
@@ -590,11 +590,12 @@ model_p=cce_options(system,diagnostics.parameters,@cce_compile,'labframe');
 model=cce_compile(system,model_p,'labframe');
 config=rmfield(diagnostics.ensemble.spin_config,'assignment');
 [cluster,~]=cce_subsystem(model,model_p,2,config,[]);
-[H,R,K,p]=cce_generators(cluster,diagnostics.parameters,[]);
+p=diagnostics.parameters;
+[H,R,K,cluster]=cce_generators(cluster,p,[]);
 [actual,aux]=hahn_echo(cluster,p,H,R,K);
-plain=p;
-plain.cce_aux=rmfield(plain.cce_aux,'hamiltonian_norm');
-expected=hahn_echo(cluster,plain,H,R,K);
+plain=cluster;
+plain.cce=rmfield(plain.cce,'hamiltonian_norm');
+expected=hahn_echo(plain,p,H,R,K);
 result=test_close(result,'Projected unnormalised spectral pulse products',...
                   actual,expected,2e-14,2e-14,...
                   'Arbitrary coherent preparation and receiver phase retain their scale.');
@@ -603,8 +604,7 @@ result=test_true(result,'Projected spectral diagnostics',...
                  'Numerical bounds and backward residuals remain attached to the signal.');
 p.normalized=true;
 actual=hahn_echo(cluster,p,H,R,K);
-plain.normalized=true;
-expected=hahn_echo(cluster,plain,H,R,K);
+expected=hahn_echo(plain,p,H,R,K);
 result=test_close(result,'Projected normalized spectral pulse products',...
                   actual,expected,2e-14,2e-14,...
                   'Normalization uses the detected initial amplitude, including its phase.');
@@ -677,8 +677,8 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 model=cce_compile(strict_system,model_p,'labframe');
                 checks=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
                 [retained,~]=cce_subsystem(model,model_p,2,struct(),[]);
-                [H,R,K,local]=cce_generators(retained,d.parameters,[]);
-                [rho,coils,reference]=cce_observation(retained,local);
+                [H,R,K,retained]=cce_generators(retained,d.parameters,[]);
+                [rho,coils,reference]=cce_observation(retained,d.parameters);
                 if ~iscell(coils)
                     coils={coils};
                 end
@@ -748,9 +748,8 @@ for approximation={'projected','generalized'}
     model_p=cce_options(system,q,@cce_compile,'labframe');
     model=cce_compile(system,model_p,'labframe');
     [retained,~]=cce_subsystem(model,model_p,2,struct(),[]);
-    [H,R,K,local]=cce_generators(retained,model_p,[]);
-    local=rmfield(local,'bath_jumps');
-    [~,aux]=bath_pumped_hahn(retained,local,H,R,K);
+    [H,R,K,retained]=cce_generators(retained,model_p,[]);
+    [~,aux]=bath_pumped_hahn(retained,rmfield(model_p,'bath_jumps'),H,R,K);
     if strcmp(approximation{1},'projected')
         dim=2;
         initial=abs(q.rho0(1,2));

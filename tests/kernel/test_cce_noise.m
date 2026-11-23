@@ -67,7 +67,7 @@ q=state_parameters;
 q.rho0=observed_state;
 q.times=linspace(0,1,128);
 local=cce_subsystem(model,model_p,cluster.sites,spin_config,[]);
-[ham,R,K,q]=cce_generators(local,q,[]);
+[ham,R,K,local]=cce_generators(local,q,[]);
 local.tols.cce_mem=4096;
 refused=false;
 try

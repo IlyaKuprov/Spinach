@@ -190,13 +190,12 @@ namespace {
         t->Frame=model->RefFrameCollection[1]; model->InteractionCollection->Add(t);
     }
 
-    // Gaussian mass numbers and magnetic isotope labels need not agree (e.g. 12C geometry, 13C HFC).
-    Isotope^ isotope(ArrayList^ library,int z,int mass,int magnetic)
+    // Catalogue isotope of the given mass, or the first catalogue entry of the element.
+    Isotope^ isotope(ArrayList^ library,int z,int mass)
     {
         Isotope^ first=nullptr; Isotope^ massMatch=nullptr;
         for each(Isotope^ iso in library) if(iso->AtomNumber==z) {
             if(first==nullptr) first=iso;
-            if(iso->Mass==magnetic) return iso;
             if(iso->Mass==mass) massMatch=iso;
         }
         if(first==nullptr) throw gcnew FormatException("The GUI isotope table has no element with atomic number "+z+".");
@@ -232,12 +231,13 @@ namespace {
         130,127,132,133,138,139,140,141,142,145,152,153,158,159,164,165,166,169,174,175,180,181,184,187,190,193,
         195,197,202,205,208,209,209,211,222,223,226,227,232,231,238,237,242,243,246,247,249,252,252,255,259,262};
 
-    // Gaussian prints reduced couplings K beside J: J/K=(hbar/mu_N)^2*gamma_i*gamma_j identifies
-    // the isotopes that the J values refer to, whatever the log says about masses.
-    IsotopeTable^ coupledIsotopes(AtomTable^ geometry,PairTable^ J,PairTable^ K,ArrayList^ library)
+    // Gaussian prints reduced couplings K beside J: J/K=(hbar/mu_N)^2*gamma_i*gamma_j. The ratio fixes
+    // only the product, so a centre whose isotope the log does not state is resolved from its couplings
+    // to centres that are already known; a centre without a known partner is left alone.
+    void inferIsotopes(AtomTable^ geometry,PairTable^ J,PairTable^ K,ArrayList^ library,Dictionary<int,Isotope^>^ chosen)
     {
         typedef List<Tuple<int,double>^> Partners; typedef List<Isotope^> Candidates;
-        Dictionary<int,Partners^>^ partners=gcnew Dictionary<int,Partners^>(); IsotopeTable^ found=gcnew IsotopeTable();
+        Dictionary<int,Partners^>^ partners=gcnew Dictionary<int,Partners^>();
         Dictionary<int,Candidates^>^ magnetic=gcnew Dictionary<int,Candidates^>();
         for each(Isotope^ iso in library) if(iso->Magnetogyric!=0.0) {
             if(!magnetic->ContainsKey(iso->AtomNumber)) magnetic[iso->AtomNumber]=gcnew Candidates();
@@ -252,20 +252,28 @@ namespace {
             if(!partners->ContainsKey(b)) partners[b]=gcnew Partners();
             partners[a]->Add(Tuple::Create(b,product)); partners[b]->Add(Tuple::Create(a,product));
         }
+        // An element with a single magnetic isotope needs no statement.
         for each(int id in partners->Keys) {
-            double best=Double::MaxValue;
-            for each(Isotope^ a in magnetic[(int)geometry[id][0]]) {
-                double misfit=0.0;
-                for each(Tuple<int,double>^ p in partners[id]) {
-                    double nearest=Double::MaxValue;
-                    for each(Isotope^ b in magnetic[(int)geometry[p->Item1][0]])
-                        nearest=Math::Min(nearest,Math::Abs(p->Item2/(a->Magnetogyric*b->Magnetogyric)-1.0));
-                    misfit+=nearest;
-                }
-                if(misfit<best) {best=misfit; found[id]=a->Mass;}
-            }
+            Candidates^ only=magnetic[(int)geometry[id][0]];
+            if(!chosen->ContainsKey(id) && only->Count==1) chosen[id]=only[0];
         }
-        return found;
+        for(bool progress=true;progress;) {
+            Dictionary<int,Isotope^>^ resolved=gcnew Dictionary<int,Isotope^>();
+            for each(int id in partners->Keys) {
+                if(chosen->ContainsKey(id)) continue;
+                double best=Double::MaxValue;
+                for each(Isotope^ a in magnetic[(int)geometry[id][0]]) {
+                    double misfit=0.0; bool known=false;
+                    for each(Tuple<int,double>^ p in partners[id]) {
+                        Isotope^ b; if(!chosen->TryGetValue(p->Item1,b) || b->Magnetogyric==0.0) continue;
+                        misfit+=Math::Abs(p->Item2/(a->Magnetogyric*b->Magnetogyric)-1.0); known=true;
+                    }
+                    if(known && misfit<best) {best=misfit; resolved[id]=a;}
+                }
+            }
+            for each(KeyValuePair<int,Isotope^> r in resolved) chosen[r.Key]=r.Value;
+            progress=resolved->Count>0;
+        }
     }
 
     bool sameSites(AtomTable^ a,AtomTable^ b)
@@ -468,15 +476,21 @@ bool Gauss::LoadFile()
     ArrayList^ library=Isotopes::getAllIsotopes(); Dictionary<int,Atom^>^ atoms=gcnew Dictionary<int,Atom^>();
     SystemModel->AtomCollection->Refreshing=false;
     try {
-        IsotopeTable^ coupled=coupledIsotopes(geometry,coupling,reduced,library);
+        // Statements in the log come first, each accepted only if it names a catalogue isotope:
+        // magnetic labels, the mass table, then an isotope stated for a centre that still holds
+        // the same element.
+        Dictionary<int,Isotope^>^ chosen=gcnew Dictionary<int,Isotope^>();
         for each(int id in geometry->Keys) {
-            Values^ row=geometry[id]; Atom^ a=gcnew Atom(); int z=(int)row[0];
-            int mass=massOf(coupled,id); if(!mass) mass=massOf(hmass,id); if(!mass) mass=massOf(qmass,id);
-            // A stated isotope applies only while its centre holds the same element.
-            int printed=massOf(masses,id), said;
-            if(!printed && stated->TryGetValue(id,said) && said/1000==z) printed=said%1000;
-            if(!printed && z>=0 && z<(int)(sizeof(gaussianMass)/sizeof(*gaussianMass))) printed=gaussianMass[z];
-            a->isotope=isotope(library,z,printed,mass);
+            int z=(int)geometry[id][0], said=0; if(stated->TryGetValue(id,said) && said/1000!=z) said=0;
+            int sources[]={massOf(hmass,id),massOf(qmass,id),massOf(masses,id),said%1000};
+            for(int k=0;k<4 && !chosen->ContainsKey(id);++k)
+                for each(Isotope^ iso in library) if(iso->AtomNumber==z && iso->Mass==sources[k]) chosen[id]=iso;
+        }
+        inferIsotopes(geometry,coupling,reduced,library,chosen);
+        for each(int id in geometry->Keys) {
+            Values^ row=geometry[id]; Atom^ a=gcnew Atom(); int z=(int)row[0]; Isotope^ iso;
+            if(!chosen->TryGetValue(id,iso)) iso=isotope(library,z,z>=0 && z<(int)(sizeof(gaussianMass)/sizeof(*gaussianMass))?gaussianMass[z]:0);
+            a->isotope=iso;
             a->X=row[1]; a->Y=row[2]; a->Z=row[3]; atoms[id]=a; SystemModel->AtomCollection->Add(a);
             if(shielding->ContainsKey(id)) {addTensor(SystemModel,a,a,InteractionKind::CShielding,Units::ppm,shielding[id]); ToShift=true;}
             if(quadrupole->ContainsKey(id)) addTensor(SystemModel,a,a,InteractionKind::Quadrupolar,Units::MHz,quadrupole[id]);

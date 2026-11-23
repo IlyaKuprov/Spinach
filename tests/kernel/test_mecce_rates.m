@@ -59,7 +59,7 @@ small.tols.small_matrix=1;
 small.tols.prop_chop=1e-4;
 weak_model=cce_compile(small,weak,'labframe');
 [weak_system,~]=cce_subsystem(weak_model,[],struct(),[]);
-[H,R,K,weak]=cce_generators(weak_system,weak_model.parameters,[]);
+[H,R,K,weak]=cce_generators(weak_system,weak_model.cce.parameters,[]);
 [clean,clean_details]=free_evolution(weak_system,weak,H,R,K);
 population_error=abs(clean(end,1)-exp(-1e-5));
 result=test_true(result,'Stock ME clean-up error covered',...
@@ -83,7 +83,7 @@ result=test_close(result,'C7 numerical check',projected,2*expected(:),1e-12,1e-1
 p.bath_jumps.operator=[0 1;0 0];
 s.bas.formalism='zeeman-liouv';
 m=cce_compile(s,p,'labframe');
-p=m.parameters;
+p=m.cce.parameters;
 [subsystem,~]=cce_subsystem(m,[],struct(),[]);
 refused=false;
 try
@@ -142,13 +142,13 @@ p.cce.bath_spins=2;
 p.bath_jumps=struct('support',2,'operator',[0 1;0 0],'rate',1);
 p.cce.order=1;
 model=cce_compile(bath_system,p,'labframe');
-model.parameters.cce.meanfield='static';
+model.cce.parameters.cce.meanfield='static';
 refused=false;
 try
     configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},...
                          'exterior_ids',2,'exterior_expectations',[0 0 0.5]);
     [exterior_system,~]=cce_subsystem(model,[],configuration,[]);
-    cce_generators(exterior_system,model.parameters,[]);
+    cce_generators(exterior_system,model.cce.parameters,[]);
 catch err
     refused=strcmp(err.identifier,'cce:exteriorJump');
 end

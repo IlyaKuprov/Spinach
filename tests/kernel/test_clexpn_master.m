@@ -95,7 +95,7 @@ zero.output='signal';
 zero.bath_jumps=struct('support',1,'operator',[0 1;0 0],'rate',0);
 zero_model=cce_compile(s,zero,'labframe');
 [zero_system,~]=cce_subsystem(zero_model,[],struct(),[]);
-zero_parameters=zero_model.parameters;
+zero_parameters=zero_model.cce.parameters;
 [with_zero,~,~]=cce_generators(zero_system,zero_parameters,[]);
 zero_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
 [without_jump,~,~]=cce_generators(zero_system,zero_parameters,[]);
@@ -117,7 +117,7 @@ configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},...
 [exterior_system,~]=cce_subsystem(exterior_model,[],configuration,[]);
 rejected=false;
 try
-    cce_generators(exterior_system,exterior_model.parameters,[]);
+    cce_generators(exterior_system,exterior_model.cce.parameters,[]);
 catch exception
     rejected=strcmp(exception.identifier,'cce:exteriorJump');
 end
@@ -126,8 +126,8 @@ result=test_true(result,'Active exterior jump refused',rejected,...
 
 % Exercise the recursive and complete-bath conditioned paths
 model=cce_compile(s,df.parameters,'labframe');
-model.formalism='zeeman-liouv';
-model.clusters=df.clusters;
+model.cce.formalism='zeeman-liouv';
+model.cce.clusters=df.clusters;
 local=df.parameters;
 local.cce.interlaced.reference_state=1;
 raw=cce_interlace(model,df.clusters(1),df.ensemble,@free_evolution,local);
@@ -165,7 +165,7 @@ request.drive(2).amplitude=3;
 [~,driven]=clexpn(s,@finite_drive,request,'labframe');
 request=driven.parameters;
 drive_model=cce_compile(s,request,'labframe');
-drive_model.formalism='zeeman-liouv';
+drive_model.cce.formalism='zeeman-liouv';
 checks=cce_diagnostics(drive_model,driven.raw,driven.reduction,request);
 result=test_true(result,'Driven Liouville numerical budget is not exact',...
                  all(driven.raw{1}(end).abs_error_bound(2:end)>0)&&...
@@ -173,7 +173,7 @@ result=test_true(result,'Driven Liouville numerical budget is not exact',...
                  'Full-bath reductions propagate nonzero segment estimates into budget diagnostics.');
 
 % Independently sum the declared arithmetic estimate over all finite intervals
-[retained,~]=cce_subsystem(drive_model,drive_model.bath_ids,struct(),[]);
+[retained,~]=cce_subsystem(drive_model,drive_model.cce.bath_ids,struct(),[]);
 [H,R,K,local]=cce_generators(retained,request,[]);
 L=H+1i*R+1i*K;
 [~,aux]=finite_drive(retained,local,H,R,K);

@@ -220,7 +220,7 @@ if (isstruct(L)&&~isempty(L.dissipator))||...
    (~isstruct(L)&&strcmp(system.formalism,'zeeman-liouv'))
     bytes=bytes+16*4*d^4;
 end
-if bytes>system.model.parameters.cce.numerics.max_memory_bytes
+if bytes>system.model.cce.parameters.cce.numerics.max_memory_bytes
     error('cce:memory','Propagation exceeds max_memory_bytes.');
 end
 end

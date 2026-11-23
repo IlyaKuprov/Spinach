@@ -3,7 +3,7 @@
 %                   manifolds=cce_project(model,parameters)
 %
 % parameters.transition.alpha and beta are normalised orthogonal vectors in
-% model.observed_ids product order. Optional second_order.enabled defaults
+% model.cce.observed_ids product order. Optional second_order.enabled defaults
 % to false; when true, gap_tolerance (rad/s) and overlap_tolerance (0..1)
 % are mandatory. Only cce/mecce admit the projected second-order model.
 %
@@ -45,9 +45,9 @@ operators=reshape(meta.operators.',1,[]);
 enabled=isfield(parameters,'second_order')&&parameters.second_order.enabled;
 manifolds.second_order_enabled=enabled;
 manifolds.observed_hamiltonian=H_obs;
-manifolds.observed_ids=model.observed_ids;
+manifolds.observed_ids=model.cce.observed_ids;
 manifolds.eigenvalues=eigenvalues;
-manifolds.source_hash=model.source_hash;
+manifolds.source_hash=model.cce.source_hash;
 
 % Project both user-supplied vectors without selecting arbitrary eigenindices
 for name={'alpha','beta'}
@@ -57,8 +57,8 @@ for name={'alpha','beta'}
     manifold.vector=state;
     manifold.projector=state*state';
     manifold.energy=real(state'*H_obs*state);
-    manifold.expectations=zeros(numel(model.observed_ids),3);
-    for n=1:numel(model.observed_ids)
+    manifold.expectations=zeros(numel(model.cce.observed_ids),3);
+    for n=1:numel(model.cce.observed_ids)
         for a=1:3
             manifold.expectations(n,a)=real(state'*meta.operators{n,a}*state);
         end
@@ -104,14 +104,14 @@ end
 
 % Reject invalid state vectors and unresolved perturbation settings
 function grumble(model,parameters)
-if ~isstruct(model)||~all(isfield(model,{'observed_ids','multiplicities','source_hash'}))
+if ~isstruct(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'observed_ids','multiplicities','source_hash'}))
     error('model must be returned by cce_compile.');
 end
 if ~isstruct(parameters)||~isfield(parameters,'transition')||...
    ~isstruct(parameters.transition)||~all(isfield(parameters.transition,{'alpha','beta'}))
     error('transition.alpha and transition.beta must be explicitly supplied.');
 end
-dimension=prod(model.multiplicities(model.observed_ids));
+dimension=prod(model.cce.multiplicities(model.cce.observed_ids));
 for name={'alpha','beta'}
     state=parameters.transition.(name{1});
     if ~isa(state,'double')||~isequal(size(state),[dimension 1])||any(~isfinite(state))

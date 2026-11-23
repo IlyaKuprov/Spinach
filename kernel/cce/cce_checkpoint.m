@@ -48,7 +48,7 @@ if strcmp(action,'read')
         names=fieldnames(state.payload.parameters);
         if isequal(sort(names),sort(fieldnames(physical.parameters)))
             physical.parameters=orderfields(physical.parameters,names);
-            physical.model.parameters=orderfields(physical.model.parameters,names);
+            physical.model.cce.parameters=orderfields(physical.model.cce.parameters,names);
             expected.identity.parameters=md5_hash(physical.parameters);
             expected.identity.model=md5_hash(physical.model);
         end

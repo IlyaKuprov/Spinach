@@ -44,14 +44,14 @@ grumble(cluster_system,parameters);
 model=cluster_system.model;
 dc=cluster_system.observed_dimension;
 db=cluster_system.bath_dimension;
-ids=model.observed_ids;
+ids=model.cce.observed_ids;
 local=cluster_system;
 local.physical_ids=ids;
 local.sites=[];
-local.multiplicities=model.multiplicities(ids);
+local.multiplicities=model.cce.multiplicities(ids);
 local.dimension=dc;
-local.isotopes=model.isotopes(ids);
-local.physical_to_local=zeros(size(model.physical_ids));
+local.isotopes=model.cce.isotopes(ids);
+local.physical_to_local=zeros(size(model.cce.physical_ids));
 local.physical_to_local(ids)=1:numel(ids);
 local.formalism='zeeman-hilb';
 local.local_operators=cellfun(@pauli,num2cell(local.multiplicities),...
@@ -74,7 +74,7 @@ elseif isfield(parameters,'preparation')&&isstruct(parameters.preparation)
     spec=parameters.preparation;
     observed=cce_state(local,spec.states,spec.spins);
 else
-    vector=(model.transition.alpha+model.transition.beta)/sqrt(2);
+    vector=(model.cce.transition.alpha+model.cce.transition.beta)/sqrt(2);
     observed=vector*vector';
 end
 if ~isnumeric(observed)||~isequal(size(observed),[dc dc])||any(~isfinite(observed),'all')
@@ -88,7 +88,7 @@ elseif isfield(parameters,'detection')&&isstruct(parameters.detection)
     spec=parameters.detection;
     detectors=cce_operator(local,spec.operators,spec.spins);
 else
-    detectors=model.transition.alpha*model.transition.beta';
+    detectors=model.cce.transition.alpha*model.cce.transition.beta';
 end
 if ~iscell(detectors)
     detectors={detectors};
@@ -98,7 +98,7 @@ for k=1:numel(detectors)
 end
 reference=cellfun(@(x)trace(x'*observed),detectors(:).');
 if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
-    reference=exp(-1i*phase)*(model.transition.alpha'*observed*model.transition.beta);
+    reference=exp(-1i*phase)*(model.cce.transition.alpha'*observed*model.cce.transition.beta);
 end
 if normalised&&any(abs(reference)<=cellfun(@(x)dc*eps*norm(x,'fro')*...
                                              norm(observed,'fro'),detectors(:).'))
@@ -112,8 +112,8 @@ for k=1:numel(cluster_system.bath_rho)
 end
 projected=strcmp(parameters.cce.approximation,'projected');
 if projected
-    alpha=model.transition.alpha;
-    beta=model.transition.beta;
+    alpha=model.cce.transition.alpha;
+    beta=model.cce.transition.beta;
     basis_detector=alpha*beta';
     coefficient=trace(basis_detector'*detectors{1});
     if norm(detectors{1}-coefficient*basis_detector,'fro')>...
@@ -147,8 +147,8 @@ meta=struct('physical_ids',cluster_system.physical_ids,'observed_ids',ids,...
 if normalised
     meta.normalization_divisor=reference;
 end
-if isfield(model,'transition')
-    meta.transition=model.transition;
+if isfield(model.cce,'transition')
+    meta.transition=model.cce.transition;
 end
 
 end
@@ -179,9 +179,9 @@ for name={'preparation','detection'}
     if isfield(parameters,name{1})
         value=parameters.(name{1});
         if ischar(value)
-            valid=strcmp(value,'transition')&&isfield(system.model,'transition');
+            valid=strcmp(value,'transition')&&isfield(system.model.cce,'transition');
             if strcmp(name{1},'preparation')&&strcmp(value,'transverse')
-                valid=isscalar(system.model.observed_ids)&&system.observed_dimension==2;
+                valid=isscalar(system.model.cce.observed_ids)&&system.observed_dimension==2;
             end
         elseif isstruct(value)&&isscalar(value)
             if strcmp(name{1},'preparation')
@@ -214,10 +214,10 @@ if isfield(parameters,'rho0')
         error('cce_observation:density','An explicit preparation is a positive trace-one density matrix.');
     end
 end
-if ~isfield(system.model,'transition')&&~any(isfield(parameters,{'rho0','preparation'}))
+if ~isfield(system.model.cce,'transition')&&~any(isfield(parameters,{'rho0','preparation'}))
     error('cce_observation:preparation','Declare a preparation or select an observed transition.');
 end
-if ~isfield(system.model,'transition')&&~any(isfield(parameters,{'coil','detection'}))
+if ~isfield(system.model.cce,'transition')&&~any(isfield(parameters,{'coil','detection'}))
     error('cce_observation:detection','Declare a detector or select an observed transition.');
 end
 count=1;
@@ -233,11 +233,11 @@ if isfield(parameters,'coil')
     end
     count=numel(coil);
 end
-if 16*system.dimension^2*(4+count)>system.model.parameters.cce.numerics.max_memory_bytes
+if 16*system.dimension^2*(4+count)>system.model.cce.parameters.cce.numerics.max_memory_bytes
     error('cce:memory','Observation construction exceeds max_memory_bytes.');
 end
 if strcmp(parameters.cce.approximation,'projected')&&...
-   (~isfield(system.model,'transition')||count~=1)
+   (~isfield(system.model.cce,'transition')||count~=1)
     error('cce_observation:projected','Projected evolution requires one selected-transition detector.');
 end
 end

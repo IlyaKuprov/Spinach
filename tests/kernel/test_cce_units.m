@@ -51,7 +51,7 @@ result=test_close(result,'dipole SI units',...
                   H,reference,0,2e-7,'Independent gamma/hbar formula and Angstrom conversion.');
 
 % Check one full ordered cell versus two transposed half cells
-system=model.spin_system;
+system=model;
 tensor=cce_test_read(system,[1 2])+...
         cce_test_read(system,[2 1]).';
 system=cce_test_write(system,[1 2],tensor);
@@ -83,7 +83,7 @@ end
 parameters.unrecognised=1;
 rejected=false;
 try
-    cce_options(model.spin_system,parameters,@free_evolution,'labframe');
+    cce_options(model,parameters,@free_evolution,'labframe');
 catch
     rejected=true;
 end

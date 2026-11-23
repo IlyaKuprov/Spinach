@@ -99,7 +99,7 @@ if ~iscell(states)||~isrow(states)||~isnumeric(spins)||~isrow(spins)||...
     error('cce_state:descriptor','Explicit states must specify every retained physical spin once.');
 end
 [~,order]=ismember(system.physical_ids,spins);
-numerics=system.model.numerics;
+numerics=system.model.cce.numerics;
 for n=1:numel(system.physical_ids)
     d=system.multiplicities(n);
     local=states{order(n)};

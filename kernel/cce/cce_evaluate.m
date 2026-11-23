@@ -88,7 +88,7 @@ end
 
 % Consistency enforcement
 function grumble(model,cluster,configuration,pulse_sequence,parameters)
-if ~isstruct(model)||~isfield(model,'kind')||~strcmp(model.kind,'cce_model')||...
+if ~isstruct(model)||~isfield(model,'cce')||...
    ~isstruct(cluster)||~isscalar(cluster)||~all(isfield(cluster,{'id','sites'}))||...
    ~isstruct(configuration)||~isscalar(configuration)||~isfield(configuration,'weight')||...
    ~isa(pulse_sequence,'function_handle')||...
@@ -98,7 +98,7 @@ end
 if isfield(parameters.cce,'checkpoint')
     error('cce_options:checkpoint','Only the scheduler may consume checkpoint requests.');
 end
-dc=prod(model.multiplicities(model.observed_ids));
+dc=prod(model.cce.multiplicities(model.cce.observed_ids));
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=dc^2;

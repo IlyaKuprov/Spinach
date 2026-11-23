@@ -163,7 +163,7 @@ expectations=zeros(3,1);
 for k=1:3
     expectations(k)=real(trace(spin.(axes{k})*spin_config.bath_rho{1}));
 end
-field=model.pairs(1).retained*expectations;
+field=model.cce.pairs(1).retained*expectations;
 x=[0 1;1 0]/2;
 y=[0 -1i;1i 0]/2;
 z=diag([1 -1])/2;

@@ -287,17 +287,17 @@ end
 
 % Compile immutable physical data, not a full-bath basis
 model=cce_compile(spin_system,parameters,assumptions);
-model.pulse_sequence=pulse_sequence;
+model.cce.pulse_sequence=pulse_sequence;
 if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
-    model.formalism=parameters.cce.basis.formalism;
+    model.cce.formalism=parameters.cce.basis.formalism;
 elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
-    model.formalism='zeeman-liouv';
+    model.cce.formalism='zeeman-liouv';
 end
 
 % Validate propagation choices here rather than in graph or reduction services
 if isfield(parameters.cce.numerics,'propagator')
     supported={'eig'};
-    if strcmp(model.formalism,'zeeman-liouv')
+    if strcmp(model.cce.formalism,'zeeman-liouv')
         supported={'stock'};
     elseif isequal(pulse_sequence,@hahn_echo)&&strcmp(parameters.cce.approximation,'generalized')
         supported={'eig','expm'};
@@ -342,12 +342,12 @@ if isfield(options,'partition')
     if ~isempty(partition.groups)
         parameters.cce.groups=partition.groups;
     end
-    model.parameters=parameters;
-    model.groups=partition.groups;
+    model.cce.parameters=parameters;
+    model.cce.groups=partition.groups;
     diagnostics.partition=partition;
 end
 clusters=cce_clusters(model,graph,selection);
-model.parameters=parameters;
+model.cce.parameters=parameters;
 
 % Evaluate every cluster through the scheduler
 raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters);
@@ -363,9 +363,9 @@ diagnostics.clusters=clusters;
 diagnostics.graph=graph;
 diagnostics.reduction=reduced;
 diagnostics.parameters=parameters;
-diagnostics.physical_ids=model.physical_ids;
-diagnostics.observed_ids=model.observed_ids;
-diagnostics.bath_ids=model.bath_ids;
+diagnostics.physical_ids=model.cce.physical_ids;
+diagnostics.observed_ids=model.cce.observed_ids;
+diagnostics.bath_ids=model.cce.bath_ids;
 diagnostics.ensemble=ensemble;
 if isfield(parameters,'spectrum')
     diagnostics.spectrum=cce_spectrum(parameters.times,reduced.value,...

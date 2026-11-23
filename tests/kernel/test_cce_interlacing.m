@@ -49,7 +49,7 @@ p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 [~,details]=clexpn(spin_system,@free_evolution,p,'labframe');
 p=details.parameters;
 model=cce_compile(spin_system,p,'labframe');
-model.clusters=details.clusters;
+model.cce.clusters=details.clusters;
 ensemble=details.ensemble;
 schedule=@free_evolution;
 
@@ -80,7 +80,7 @@ q.cce.bath_state.samples=1024;
 q.cce.numerics.max_memory_bytes=4096;
 refused=false;
 try
-    clexpn(model.spin_system,@free_evolution,q,'labframe');
+    clexpn(model,@free_evolution,q,'labframe');
 catch exception
     refused=strcmp(exception.identifier,'clexpn:memory');
 end
@@ -163,7 +163,7 @@ baseline_ok=true;
 baseline_error=Inf;
 try
     empty_model=model;
-    empty_model.clusters=model.clusters([]);
+    empty_model.cce.clusters=model.cce.clusters([]);
     baseline=cce_interlace(empty_model,empty_cluster,ensemble,schedule,q);
     reference=ensemble.spin_config(1);
     reference.bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
@@ -196,7 +196,7 @@ for method={'cce','gcce','mecce','megcce'}
         q=rmfield(q,'rho0');
     end
     try
-        [driver,~]=clexpn(model.spin_system,pulse_sequence,q,'labframe');
+        [driver,~]=clexpn(model,pulse_sequence,q,'labframe');
         driver_ok=all(isfinite(driver(:)));
     catch exception
         driver_ok=false;
@@ -256,10 +256,10 @@ probe.cce.interlaced.raw_only=true;
 probe.cce.interlaced.condition_sites={[2 3 4]};
 probe.cce.bath_state.basis={eye(2),[0 1;1 0],eye(2)};
 probe_model=model;
-probe_model.zeeman{2}(3,:)=[0.731 0.473 0.122];
+probe_model.cce.zeeman{2}(3,:)=[0.731 0.473 0.122];
 sample=probe;
 sample.cce.interlaced.raw_only=false;
-[~,probe_details]=clexpn(probe_model.spin_system,@free_evolution,sample,'labframe');
+[~,probe_details]=clexpn(probe_model,@free_evolution,sample,'labframe');
 probe_ensemble=probe_details.ensemble;
 measured=cce_interlace(probe_model,cluster,probe_ensemble,schedule,probe);
 residual=0;
@@ -301,13 +301,13 @@ result=test_true(result,'Included-supercluster family generates the same K autom
 % At full order every conditioning cylinder is the full bath and W12 is exact
 p.cce.order=3;
 p.cce.interlaced.max_states=32;
-[integrated,~]=clexpn(model.spin_system,pulse_sequence,p,'labframe');
+[integrated,~]=clexpn(model,pulse_sequence,p,'labframe');
 mixture=p;
 mixture.cce.bath_state=struct('mode','explicit_product',...
                               'rho',{{diag([0.7 0.3]),diag([0.2 0.8]),diag([0.6 0.4])}});
 mixture.cce.meanfield='none';
 mixture.cce=rmfield(mixture.cce,'interlaced');
-[exact,~]=clexpn(model.spin_system,pulse_sequence,mixture,'labframe');
+[exact,~]=clexpn(model,pulse_sequence,mixture,'labframe');
 result=test_close(result,'Full-order W12 equals exact mixed bath',integrated,exact,...
                   1e-11,0,'Shared-K recursion telescopes at full bath order');
 

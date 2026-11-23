@@ -360,8 +360,8 @@ end
 % Evaluate the same raw conditional average using the registered callback
 parameters=cce_options(spin_system,parameters,pulse_sequence,'labframe');
 model=cce_compile(spin_system,parameters,'labframe');
-model.formalism=parameters.cce.basis.formalism;
-model.clusters=diagnostics.clusters;
+model.cce.formalism=parameters.cce.basis.formalism;
+model.cce.clusters=diagnostics.clusters;
 parameters.cce.interlaced.raw_only=true;
 parameters.cce.interlaced.reference_state=1;
 cluster=struct('id',uint64(1),'sites',parameters.cce.bath_spins(1:parameters.cce.order));

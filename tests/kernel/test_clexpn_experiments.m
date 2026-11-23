@@ -226,9 +226,9 @@ phase=0.37;
 phased=p;
 phased.output='observable';
 phased.normalized=false;
-phased.coil=exp(1i*phase)*model.transition.alpha*model.transition.beta';
+phased.coil=exp(1i*phase)*model.cce.transition.alpha*model.cce.transition.beta';
 unphased=phased;
-unphased.coil=model.transition.alpha*model.transition.beta';
+unphased.coil=model.cce.transition.alpha*model.cce.transition.beta';
 actual=free_evolution(cluster,phased,H,R,K);
 expected=exp(-1i*phase)*free_evolution(cluster,unphased,H,R,K);
 result=test_close(result,'Complex receiver phase',actual,expected,3e-13,3e-13,...
@@ -236,7 +236,7 @@ result=test_close(result,'Complex receiver phase',actual,expected,3e-13,3e-13,..
 
 % Inclusive spectral-window boundaries select the same physical bath pulse
 p.output='signal';
-p.pump.center=model.zeeman{2}(3,3);
+p.pump.center=model.cce.zeeman{2}(3,3);
 p.pump.units='rad/s';
 p.pump.halfwidth=0;
 p.pump.allow_empty=false;
@@ -534,10 +534,10 @@ p.cce.numerics=struct('atol',1e-20,'rtol',1e-20,'max_memory_bytes',2^28);
 model=cce_compile(system,d.parameters,'labframe');
 [stock_transition,stock_meta]=cce_transition(system,d.parameters,'labframe');
 result=test_close(result,'Compiled observed transition matches stock',...
-                  model.transition.alpha,stock_transition.alpha,0,0,...
+                  model.cce.transition.alpha,stock_transition.alpha,0,0,...
                   'Native observed-only preparation uses the same ordered physical state.');
 result=test_close(result,'Compiled observed energies match stock',...
-                  model.transition_meta.energies,stock_meta.energies,1e-13,1e-13,...
+                  model.cce.transition_meta.energies,stock_meta.energies,1e-13,1e-13,...
                   'Independent stock Hamiltonian assembly validates the observed generator.');
 configuration=d.ensemble.spin_config;
 configuration=rmfield(configuration,'assignment');
@@ -662,7 +662,7 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 q.normalized=normalised;
                 [~,d]=clexpn(invariant,sequence{1},q,'labframe');
                 model=cce_compile(invariant,d.parameters,'labframe');
-                model.formalism=formalism{1};
+                model.cce.formalism=formalism{1};
                 checks=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
                 [retained,~]=cce_subsystem(model,2,struct(),[]);
                 [H,R,K,local]=cce_generators(retained,d.parameters,[]);
@@ -732,9 +732,9 @@ for approximation={'projected','generalized'}
     % Compare local errors against the analytic polarisation of an initially mixed bath
     q.cce.approximation=approximation{1};
     model=cce_compile(system,q,'labframe');
-    model.formalism='zeeman-liouv';
+    model.cce.formalism='zeeman-liouv';
     [retained,~]=cce_subsystem(model,2,struct(),[]);
-    [H,R,K,local]=cce_generators(retained,model.parameters,[]);
+    [H,R,K,local]=cce_generators(retained,model.cce.parameters,[]);
     [~,aux]=bath_pumped_hahn(retained,local,H,R,K);
     if strcmp(approximation{1},'projected')
         dim=2;

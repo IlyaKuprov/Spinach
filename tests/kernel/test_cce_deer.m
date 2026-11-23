@@ -49,8 +49,8 @@ s=selection(model,p);
 result=test_true(result,'Explicit empty-selection opt-in accepted',isempty(s.selected_sites),'Explicit empty-selection opt-in accepted');
 
 % Check canonical rad/s values are not shifted by a second gamma B term
-model.spin_system.inter.magnet=2;
-model.spin_system.inter.gammas=3*ones(1,6);
+model.inter.magnet=2;
+model.inter.gammas=3*ones(1,6);
 p.pump.halfwidth=10;
 p.pump.center=0;
 s=selection(model,p);
@@ -86,7 +86,7 @@ result=test_close(result,'Public DEER species and site filters agree',...
 
 % Reject a non-axial canonical Zeeman field before frequency-window selection
 rotated=cce_compile(ss,q,'labframe');
-rotated.zeeman{2}(3,:)=[3 0 4];
+rotated.cce.zeeman{2}(3,:)=[3 0 4];
 axial=q;
 axial.pump.center=4;
 axial.pump.halfwidth=0.1;
@@ -361,7 +361,7 @@ for method={'cce','mecce','megcce'}
         difference=Inf;
         try
             with_radius=cce_compile(ss,r,'labframe');
-            difference=double(~isequaln(with_radius.pairs,reference.pairs));
+            difference=double(~isequaln(with_radius.cce.pairs,reference.cce.pairs));
         catch
             passed=false;
         end
@@ -400,16 +400,16 @@ for method={'cce','gcce','mecce','megcce'}
         base.cce.basis.formalism='zeeman-liouv';
     end
     model=cce_compile(ss,base,'labframe');
-    base=model.parameters;
+    base=model.cce.parameters;
     spin_config=struct('bath_ids',[2 3],'bath_rho',{base.cce.bath_state.rho},...
                        'state_id',1,'configuration_id',1,'weight',1);
     schedule=@free_evolution;
 
     % Distinguish missing observed and exterior sites from irrelevant included sites
-    for missing=[model.observed_ids 3]
+    for missing=[model.cce.observed_ids 3]
         partial=model;
-        partial.coordinates_A=[0 0 0;1 0 0;3 0 0];
-        partial.coordinates_A(missing,:)=NaN;
+        partial.cce.coordinates_A=[0 0 0;1 0 0;3 0 0];
+        partial.cce.coordinates_A(missing,:)=NaN;
         rejected=false;
         try
             cce_evaluate(partial,cluster,spin_config,schedule,base);
@@ -421,7 +421,7 @@ for method={'cce','gcce','mecce','megcce'}
                          rejected,'Each observed and exterior site needs finite coordinates.');
     end
     spatial=model;
-    spatial.coordinates_A=[0 0 0;NaN NaN NaN;3 0 0];
+    spatial.cce.coordinates_A=[0 0 0;NaN NaN NaN;3 0 0];
     accepted=true;
     try
         cce_evaluate(spatial,cluster,spin_config,schedule,base);
@@ -565,13 +565,13 @@ end
 
 % A finite radius excludes an actual polarised exterior coupling
 field_model=cce_compile(spatial,base,'labframe');
-field_model.pairs(end+1)=struct('ids',[1 3],'tensor',zeros(3),'retained',diag([0 0 4]));
-field_model.parameters.cce.meanfield_radius=2;
+field_model.cce.pairs(end+1)=struct('ids',[1 3],'tensor',zeros(3),'retained',diag([0 0 4]));
+field_model.cce.parameters.cce.meanfield_radius=2;
 [near,~]=cce_subsystem(field_model,2,struct(),[]);
-[h_near,~,~]=cce_generators(near,field_model.parameters,[]);
-field_model.parameters.cce.meanfield_radius=4;
+[h_near,~,~]=cce_generators(near,field_model.cce.parameters,[]);
+field_model.cce.parameters.cce.meanfield_radius=4;
 [far,~]=cce_subsystem(field_model,2,struct(),[]);
-[h_far,R,K,field_par]=cce_generators(far,field_model.parameters,[]);
+[h_far,R,K,field_par]=cce_generators(far,field_model.cce.parameters,[]);
 result=test_close(result,'Finite radius retains the physical exterior field',...
                   full(h_far-h_near),kron(diag([1 -1]),eye(2)),0,0,...
                   'Only the exterior spin inside the declared radius contributes its measured moment.');
@@ -622,15 +622,15 @@ function selected=selection(model,parameters)
 parameters.times=0;
 parameters.output='signal';
 parameters=rmfield(parameters,intersect(fieldnames(parameters),{'refocusing','noise'}));
-parameters.cce=model.parameters.cce;
+parameters.cce=model.cce.parameters.cce;
 parameters.cce.meanfield='none';
 parameters.cce.approximation='generalized';
 if isfield(parameters.cce,'meanfield_radius')
     parameters.cce=rmfield(parameters.cce,'meanfield_radius');
 end
-model.parameters=parameters;
-model.formalism='zeeman-hilb';
-[system,~]=cce_subsystem(model,model.bath_ids,struct(),[]);
+model.cce.parameters=parameters;
+model.cce.formalism='zeeman-hilb';
+[system,~]=cce_subsystem(model,model.cce.bath_ids,struct(),[]);
 [~,selected]=bath_pumped_hahn(system,parameters,zeros(system.dimension),0,0);
 
 end

@@ -100,7 +100,7 @@ for method={'gcce','megcce'}
         else
             q.refocusing=ideal;
         end
-        values{variant}=clexpn(model.spin_system,@hahn_echo,q,'labframe');
+        values{variant}=clexpn(model,@hahn_echo,q,'labframe');
     end
     result=test_close(result,[method{1} ' omitted ideal operator angle'],...
                       values{1},values{3},1e-12,1e-12,...
@@ -129,7 +129,7 @@ for method={'gcce','megcce'}
             q=rmfield(q,'drive');
             sequence=@free_evolution;
         end
-        scaled=clexpn(model.spin_system,sequence,q,'labframe');
+        scaled=clexpn(model,sequence,q,'labframe');
         result=test_close(result,[method{1} ' scaled observable driver ' num2str(driven)],...
                           scaled,ones(numel(q.times),3),1e-11,1e-11,...
                           'Operator units must not change normalized signal through any propagation path.');
@@ -151,14 +151,14 @@ for driven=[false true]
     accepted=false;
     pulse_error=Inf;
     try
-        [operator_result,operator_details]=clexpn(model.spin_system,sequence,q,'labframe');
+        [operator_result,operator_details]=clexpn(model,sequence,q,'labframe');
         pulse=struct('spins',2,'time',0.05,'axis','x','angle',pi);
         if driven
             q.refocusing={pulse};
         else
             q.refocusing=pulse;
         end
-        axis_result=clexpn(model.spin_system,sequence,q,'labframe');
+        axis_result=clexpn(model,sequence,q,'labframe');
         pulse_error=norm(operator_result(:)-axis_result(:));
         accepted=all(operator_details.reduction.valid,'all');
     catch exception
@@ -178,7 +178,7 @@ q.refocusing={ideal};
 q.cce.meanfield='static';
 rejected=false;
 try
-    clexpn(model.spin_system,@finite_drive,q,'labframe');
+    clexpn(model,@finite_drive,q,'labframe');
 catch exception
     rejected=strcmp(exception.identifier,'cce_segments:exterior_correlations');
 end
@@ -189,7 +189,7 @@ result=test_true(result,'Exterior operator static-field rejection',rejected,...
 q=rmfield(p,'drive');
 q.output='signal';
 q.rho0=ones(2)/2;
-ss=model.spin_system;
+ss=model;
 for normalised=[false true]
     q.normalized=normalised;
     plain=clexpn(ss,@free_evolution,q,'labframe');
@@ -241,7 +241,7 @@ result=test_close(result,'Driven cell coil detection',observed,exact,...
 fprintf('Driven operators discrepancy %.3g.\n',max(abs(observed-exact),[],'all'));
 
 % Exercise the public driver through the named/finite dispatch hooks
-integrated=clexpn(model.spin_system,@finite_drive,p,'labframe');
+integrated=clexpn(model,@finite_drive,p,'labframe');
 result=test_close(result,'Public finite-control driver',reshape(integrated(end,:),2,2),expected,...
                   1e-12,0,'Driver consumes the identical segment propagator');
 
@@ -303,7 +303,7 @@ result=test_true(result,'Retained control segment memory cap',rejected,...
 q.cce.numerics.max_memory_bytes=5e5;
 rejected=false;
 try
-    clexpn(model.spin_system,@refocusing_train,q,'labframe');
+    clexpn(model,@refocusing_train,q,'labframe');
 catch err
     rejected=strcmp(err.identifier,'cce_schedule:memory');
 end
@@ -347,7 +347,7 @@ p.cce.approximation='projected';
 p.drive.spins=1;
 refused=false;
 try
-    clexpn(model.spin_system,@finite_drive,p,'labframe');
+    clexpn(model,@finite_drive,p,'labframe');
 catch exception
     refused=strcmp(exception.identifier,'finite_drive:generators');
 end
@@ -444,7 +444,7 @@ catch
     rejected(1)=true;
 end
 try
-    clexpn(model.spin_system,@refocusing_train,q,'labframe');
+    clexpn(model,@refocusing_train,q,'labframe');
 catch
     rejected(2)=true;
 end
@@ -461,9 +461,9 @@ for coil_sequence={@refocusing_train,@finite_drive}
     if isequal(coil_sequence{1},@finite_drive)
         coil_request.drive=struct('spins',1,'duration',0.1,'axis','x','amplitude',7,'detuning',3);
     end
-    implicit=clexpn(coil_model.spin_system,coil_sequence{1},coil_request,'labframe');
-    coil_request.coil=coil_model.transition.alpha*coil_model.transition.beta';
-    explicit=clexpn(coil_model.spin_system,coil_sequence{1},coil_request,'labframe');
+    implicit=clexpn(coil_model,coil_sequence{1},coil_request,'labframe');
+    coil_request.coil=coil_model.cce.transition.alpha*coil_model.cce.transition.beta';
+    explicit=clexpn(coil_model,coil_sequence{1},coil_request,'labframe');
     result=test_close(result,['Optional coil: ' func2str(coil_sequence{1})],implicit,explicit,...
                       1e-12,1e-12,'Omitted coils use the selected transition in segmented propagation.');
 end
@@ -524,8 +524,8 @@ end
 function [answer,aux]=controlled(model,sites,configuration,p,experiment)
 
 % Construct the conditioned subsystem and execute its native experiment
-p=cce_options(model.spin_system,p,experiment,'labframe');
-model=cce_compile(model.spin_system,p,'labframe');
+p=cce_options(model,p,experiment,'labframe');
+model=cce_compile(model,p,'labframe');
 local=cce_subsystem(model,sites,configuration,[]);
 [H,R,K,p]=cce_generators(local,p,[]);
 [answer,aux]=experiment(local,p,H,R,K);

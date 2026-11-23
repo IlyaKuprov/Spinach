@@ -1,7 +1,7 @@
 % Compile canonical tensors and metadata for native cluster expansion.
 % Syntax:
 %
-%           model=cce_compile(spin_system,parameters,assumptions)
+%     spin_system=cce_compile(spin_system,parameters,assumptions)
 %
 % spin_system is create output; parameters obeys cce_options. Tensors
 % remain in rad/s and coordinates in Angstrom. No full-bath basis is built.
@@ -9,8 +9,8 @@
 % Observed and bath IDs retain the caller's order; groups retain physical IDs.
 % A supplied basis selects zeeman-hilb or zeeman-liouv; absent basis selects
 % zeeman-hilb. Stale full-system basis arrays are removed. Local representations
-% are complete, not restricted bases. The model owns canonical tensors,
-% assumptions, native parameters, isotope labels, dimensions, and projectors.
+% are complete, not restricted bases. The compiled data is stored in the
+% cce subfield of the returned spin system.
 %
 % Parameters:
 %
@@ -21,12 +21,13 @@
 %
 % Outputs:
 %
-%   model - canonical angular-frequency tensors, physical-spin ordering,
-%           coordinates in Angstrom, and retained approximation metadata
+%   spin_system - the input with the requested assumptions applied and a cce
+%                 subfield holding canonical angular-frequency tensors,
+%                 coordinates in Angstrom, and retained approximation data
 %
 % ilya.kuprov@weizmann.ac.il
 
-function model=cce_compile(spin_system,parameters,assumptions)
+function spin_system=cce_compile(spin_system,parameters,assumptions)
 
 % Resolve native defaults without translating obsolete parameter forms
 parameters=cce_options(spin_system,parameters,@cce_compile,assumptions);
@@ -48,53 +49,51 @@ end
 spin_system=assume(spin_system,assumptions{:});
 
 % Copy immutable source metadata and stable physical identifiers
-model.spin_system=spin_system;
-model.parameters=parameters;
-model.kind='cce_model';
-model.formalism=formalism;
-model.isotopes=spin_system.comp.isotopes;
-model.groups={};
+spin_system.cce.parameters=parameters;
+spin_system.cce.formalism=formalism;
+spin_system.cce.isotopes=spin_system.comp.isotopes;
+spin_system.cce.groups={};
 if isfield(parameters.cce,'groups')
-    model.groups=parameters.cce.groups;
+    spin_system.cce.groups=parameters.cce.groups;
 end
-model.manifold_projectors=struct();
-model.physical_ids=1:spin_system.comp.nspins;
-model.observed_ids=parameters.observed;
-model.bath_ids=parameters.cce.bath_spins;
-model.multiplicities=spin_system.comp.mults;
-model.gamma=spin_system.inter.gammas;
-model.units=struct('frequency','rad/s','distance','Angstrom','angle','radian');
-model.numerical_cutoffs=struct('interaction_Hz',spin_system.tols.inter_cutoff,...
+spin_system.cce.manifold_projectors=struct();
+spin_system.cce.physical_ids=1:spin_system.comp.nspins;
+spin_system.cce.observed_ids=parameters.observed;
+spin_system.cce.bath_ids=parameters.cce.bath_spins;
+spin_system.cce.multiplicities=spin_system.comp.mults;
+spin_system.cce.gamma=spin_system.inter.gammas;
+spin_system.cce.units=struct('frequency','rad/s','distance','Angstrom','angle','radian');
+spin_system.cce.numerical_cutoffs=struct('interaction_Hz',spin_system.tols.inter_cutoff,...
                               'operator_rad_s',spin_system.tols.liouv_zero);
-model.assumptions=assumptions;
-model.orientation=parameters.orientation;
-model.interaction_cutoff=inf;
+spin_system.cce.assumptions=assumptions;
+spin_system.cce.orientation=parameters.orientation;
+spin_system.cce.interaction_cutoff=inf;
 if isfield(parameters.cce,'interaction_cutoff')
-    model.interaction_cutoff=parameters.cce.interaction_cutoff;
+    spin_system.cce.interaction_cutoff=parameters.cce.interaction_cutoff;
 end
-model.numerics=parameters.cce.numerics;
-model.backend=parameters.cce.backend;
+spin_system.cce.numerics=parameters.cce.numerics;
+spin_system.cce.backend=parameters.cce.backend;
 
 % Preserve absent coordinates rather than inventing spatial positions
 nspins=spin_system.comp.nspins;
-model.coordinates_A=nan(nspins,3);
+spin_system.cce.coordinates_A=nan(nspins,3);
 if isfield(spin_system.inter,'coordinates')
     for n=1:nspins
         if ~isempty(spin_system.inter.coordinates{n})
-            model.coordinates_A(n,:)=spin_system.inter.coordinates{n};
+            spin_system.cce.coordinates_A(n,:)=spin_system.inter.coordinates{n};
         end
     end
 end
 
 % Rotate canonical Cartesian tensors into the requested laboratory frame
 rotation=euler2dcm(parameters.orientation);
-model.zeeman=cell(1,nspins);
-model.quadratic=repmat({zeros(3)},1,nspins);
-model.quadratic_strength=repmat({'ignore'},1,nspins);
-model.pairs=struct('ids',{},'tensor',{},'retained',{});
-model.omitted_pairs=zeros(0,2);
+spin_system.cce.zeeman=cell(1,nspins);
+spin_system.cce.quadratic=repmat({zeros(3)},1,nspins);
+spin_system.cce.quadratic_strength=repmat({'ignore'},1,nspins);
+spin_system.cce.pairs=struct('ids',{},'tensor',{},'retained',{});
+spin_system.cce.omitted_pairs=zeros(0,2);
 for n=1:nspins
-    model.zeeman{n}=rotation*spin_system.inter.zeeman.matrix{n}*rotation.';
+    spin_system.cce.zeeman{n}=rotation*spin_system.inter.zeeman.matrix{n}*rotation.';
 end
 
 % Index the directed records and rotate the on-site terms
@@ -107,9 +106,9 @@ for r=find(from==to).'
     n=from(r);
     tensor=list{r,3};
     if norm(tensor,2)>2*pi*spin_system.tols.inter_cutoff
-        model.quadratic{n}=rotation*tensor*rotation.';
+        spin_system.cce.quadratic{n}=rotation*tensor*rotation.';
     end
-    model.quadratic_strength{n}=spin_system.inter.coupling.strength{r,3};
+    spin_system.cce.quadratic_strength{n}=spin_system.inter.coupling.strength{r,3};
 end
 
 % Combine opposite directions in ascending unordered physical pair order
@@ -163,12 +162,12 @@ for p=1:numel(n_ids)
     end
 
     % Apply only the explicitly requested physical distance cutoff
-    if isfinite(model.interaction_cutoff)&&(norm(tensor,'fro')>0)
-        if any(~isfinite(model.coordinates_A([n k],:)),'all')
+    if isfinite(spin_system.cce.interaction_cutoff)&&(norm(tensor,'fro')>0)
+        if any(~isfinite(spin_system.cce.coordinates_A([n k],:)),'all')
             error('finite interaction_cutoff requires coordinates for every coupled pair.');
         end
-        if norm(model.coordinates_A(n,:)-model.coordinates_A(k,:))>model.interaction_cutoff
-            model.omitted_pairs(end+1,:)=[n k];
+        if norm(spin_system.cce.coordinates_A(n,:)-spin_system.cce.coordinates_A(k,:))>spin_system.cce.interaction_cutoff
+            spin_system.cce.omitted_pairs(end+1,:)=[n k];
             rows=[index(n,k) index(k,n)];
             omit(rows(rows>0))=true;
             tensor=zeros(3);
@@ -178,7 +177,7 @@ for p=1:numel(n_ids)
 
     % A cancelled bare tensor can still have a nonzero retained part
     if any(tensor,'all')||any(retained,'all')
-        model.pairs(end+1)=struct('ids',[n k],'tensor',tensor,'retained',retained);
+        spin_system.cce.pairs(end+1)=struct('ids',[n k],'tensor',tensor,'retained',retained);
     end
 
 end
@@ -187,15 +186,14 @@ end
 spin_system.inter.coupling.matrix(omit,:)=[];
 spin_system.inter.coupling.strength(omit,:)=[];
 
-% Bind the physically pruned stock fallback to the same model
-model.spin_system=spin_system;
-model.canonical_roundoff=0;
+% Bound tensor rotation and carrier subtraction
+spin_system.cce.canonical_roundoff=0;
 for n=1:nspins
 
     % Bound tensor rotation and carrier subtraction before small residuals
     scale=norm(spin_system.inter.zeeman.matrix{n},'fro')+...
           abs(spin_system.inter.basefrqs(n));
-    model.canonical_roundoff=model.canonical_roundoff+27*eps*scale;
+    spin_system.cce.canonical_roundoff=spin_system.cce.canonical_roundoff+27*eps*scale;
 
 end
 
@@ -206,36 +204,36 @@ for name={'parallel','checkpoint','retain_raw','convergence'}
         physical.cce=rmfield(physical.cce,name{1});
     end
 end
-model.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,...
+spin_system.cce.source_hash=md5_hash({spin_system.comp,spin_system.inter,spin_system.tols,...
                             physical,assumptions,formalism});
 
 % Declare the validated direct domain rather than guessing new physics
-model.direct_supported=ismember(assumptions{1},{'labframe','nmr','esr','deer','deer-zz'});
-model.fallback_reason='';
-if ~model.direct_supported
-    model.fallback_reason='unvalidated assumption set';
+spin_system.cce.direct_supported=ismember(assumptions{1},{'labframe','nmr','esr','deer','deer-zz'});
+spin_system.cce.fallback_reason='';
+if ~spin_system.cce.direct_supported
+    spin_system.cce.fallback_reason='unvalidated assumption set';
 end
 if any(~cellfun(@isempty,spin_system.inter.giant.coeff))
-    model.direct_supported=false;
-    model.fallback_reason='giant-spin spherical terms';
+    spin_system.cce.direct_supported=false;
+    spin_system.cce.fallback_reason='giant-spin spherical terms';
 end
 if isfield(spin_system.inter,'modes')
-    model.direct_supported=false;
-    model.fallback_reason='spin-boson terms';
+    spin_system.cce.direct_supported=false;
+    spin_system.cce.fallback_reason='spin-boson terms';
 end
-if strcmp(model.backend,'direct')&&~model.direct_supported
-    error('direct Hamiltonian is not validated for %s.',model.fallback_reason);
+if strcmp(spin_system.cce.backend,'direct')&&~spin_system.cce.direct_supported
+    error('direct Hamiltonian is not validated for %s.',spin_system.cce.fallback_reason);
 end
 
 % Resolve the observed transition after compiling its native tensor model
 if isfield(parameters,'transition')
-    [model.transition,model.transition_meta]=cce_transition(model,parameters,assumptions);
-    dimension=numel(model.transition.alpha);
+    [spin_system.cce.transition,spin_system.cce.transition_meta]=cce_transition(spin_system,parameters,assumptions);
+    dimension=numel(spin_system.cce.transition.alpha);
     if 32*dimension^2>parameters.cce.numerics.max_memory_bytes
         error('observed projectors exceed numerics.max_memory_bytes.');
     end
-    model.manifold_projectors.alpha=model.transition.alpha*model.transition.alpha';
-    model.manifold_projectors.beta=model.transition.beta*model.transition.beta';
+    spin_system.cce.manifold_projectors.alpha=spin_system.cce.transition.alpha*spin_system.cce.transition.alpha';
+    spin_system.cce.manifold_projectors.beta=spin_system.cce.transition.beta*spin_system.cce.transition.beta';
 end
 
 end

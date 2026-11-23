@@ -140,7 +140,7 @@ reference=cce_hamiltonian(model,[2 3],struct('backend','stock'));
 result=test_close(result,'physical distance cutoff',...
                   H,reference,meta.roundoff_bound,0,'Both paths omit the same declared pairs.');
 result=test_true(result,'cutoff omission count',...
-                 size(model.omitted_pairs,1)==2,'Two physical pairs exceed three Angstrom.');
+                 size(model.cce.omitted_pairs,1)==2,'Two physical pairs exceed three Angstrom.');
 
 % Reject a declared memory budget before allocating cluster-sized matrices
 small=parameters;

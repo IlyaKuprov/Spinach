@@ -62,8 +62,8 @@ end
 model=spin_system.model;
 obs_dim=spin_system.observed_dimension;
 bath_dim=spin_system.bath_dimension;
-alpha=model.transition.alpha;
-beta=model.transition.beta;
+alpha=model.cce.transition.alpha;
+beta=model.cce.transition.beta;
 rotation=eye(obs_dim)-alpha*alpha'-beta*beta'-1i*(alpha*beta'+beta*alpha');
 rotation=kron(rotation,eye(bath_dim));
 fractions=((1:parameters.nloops)-0.5)/parameters.nloops;
@@ -163,7 +163,7 @@ if ~isfield(parameters,'nloops')||~isscalar(parameters.nloops)||...
    parameters.nloops<1||parameters.nloops~=fix(parameters.nloops)
     error('cpmg_echo:nloops','nloops must be a positive integer.');
 end
-if ~isfield(spin_system.model,'transition')
+if ~isfield(spin_system.model.cce,'transition')
     error('cpmg_echo:transition',...
           'An explicit transition is required for ideal refocusing.');
 end

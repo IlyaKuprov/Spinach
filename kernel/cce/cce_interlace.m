@@ -57,8 +57,8 @@ if isfield(spec,'condition_sites')
     cylinders=spec.condition_sites;
 else
     cylinders={};
-    for k=1:numel(model.clusters)
-        parent=model.clusters(k);
+    for k=1:numel(model.cce.clusters)
+        parent=model.cce.clusters(k);
         if all(ismember(cluster.sites,parent.sites))
             cylinders{end+1}=parent.sites; %#ok<AGROW>
         end
@@ -79,9 +79,9 @@ for j=1:numel(cylinders)
     end
 end
 cylinders=cylinders(keep);
-nb=numel(model.bath_ids);
-dimensions=model.multiplicities(model.bath_ids);
-counts=cellfun(@(sites)prod(dimensions(ismember(model.bath_ids,sites))),cylinders);
+nb=numel(model.cce.bath_ids);
+dimensions=model.cce.multiplicities(model.cce.bath_ids);
+counts=cellfun(@(sites)prod(dimensions(ismember(model.cce.bath_ids,sites))),cylinders);
 count=sum(counts);
 if count>spec.max_states
     error('cce_interlace:budget','Cylinder enumeration exceeds interlaced.max_states.');
@@ -95,7 +95,7 @@ end
 assignments=zeros(count,nb);
 position=0;
 for k=1:numel(cylinders)
-    varied=find(ismember(model.bath_ids,cylinders{k}));
+    varied=find(ismember(model.cce.bath_ids,cylinders{k}));
     for n=1:counts(k)
         position=position+1;
         assignments(position,:)=reference.assignment;
@@ -160,7 +160,7 @@ raw.factor_valid=[];
 raw.factor_abs_error_bound=[];
 raw.reference=raw.value;
 raw.reference_error=raw.abs_error_bound;
-raw.full_bath=isequal(sort(cluster.sites),sort(model.bath_ids));
+raw.full_bath=isequal(sort(cluster.sites),sort(model.cce.bath_ids));
 if isfield(spec,'raw_only')&&spec.raw_only
     return;
 end
@@ -170,7 +170,7 @@ if ~isempty(cluster.sites)&&~raw.full_bath
     local=parameters;
     local.cce.interlaced.condition_sites=cylinders;
     local.cce.interlaced.raw_only=true;
-    family=model.clusters;
+    family=model.cce.clusters;
     included=arrayfun(@(member)all(ismember(member.sites,cluster.sites)),family);
     family=family(included);
     records=cell(1,numel(family)+1);
@@ -190,7 +190,7 @@ if ~isempty(cluster.sites)&&~raw.full_bath
         denominator_error=records{1}.abs_error_bound;
         valid=records{1}.valid&item.valid;
         for j=family(k).proper_subsets
-            position=find([family.id]==model.clusters(j).id,1);
+            position=find([family.id]==model.cce.clusters(j).id,1);
             if isempty(position)
                 continue;
             end
@@ -230,7 +230,7 @@ end
 
 % Validate the resolved ensemble contract without a method-name fallback
 function grumble(model,cluster,ensemble,pulse_sequence,parameters)
-if ~isstruct(model)||~all(isfield(model,{'bath_ids','multiplicities'}))||...
+if ~isstruct(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'bath_ids','multiplicities'}))||...
    ~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
    ~isstruct(ensemble)||~all(isfield(ensemble,{'spin_config','bases','probabilities'}))||...
    ~isa(pulse_sequence,'function_handle')||...
@@ -253,12 +253,12 @@ if ~isfield(spec,'max_states')||~isscalar(spec.max_states)||~isfinite(spec.max_s
     error('cce_interlace:budget','An explicit positive integer state budget is required.');
 end
 reference=ensemble.spin_config(spec.reference_state);
-if ~isequal(reference.bath_ids,model.bath_ids)||...
-   numel(reference.assignment)~=numel(model.bath_ids)
+if ~isequal(reference.bath_ids,model.cce.bath_ids)||...
+   numel(reference.assignment)~=numel(model.cce.bath_ids)
     error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
 end
-for j=1:numel(model.bath_ids)
-    dimension=model.multiplicities(model.bath_ids(j));
+for j=1:numel(model.cce.bath_ids)
+    dimension=model.cce.multiplicities(model.cce.bath_ids(j));
     index=reference.assignment(j);
     if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
         error('cce:spin_config','Interlaced reference assignments must select local basis states.');

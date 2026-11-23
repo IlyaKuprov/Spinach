@@ -22,18 +22,18 @@ function [index,tensors]=cce_pair_index(model)
 grumble(model);
 
 % Index the reverse direction after the forward records
-ids=reshape([model.pairs.ids],2,[]);
-n=numel(model.physical_ids);
+ids=reshape([model.cce.pairs.ids],2,[]);
+n=numel(model.cce.physical_ids);
 count=size(ids,2);
 index=sparse([ids(1,:) ids(2,:)],[ids(2,:) ids(1,:)],1:2*count,n,n);
-forward={model.pairs.retained};
+forward={model.cce.pairs.retained};
 tensors=[{zeros(3)} forward cellfun(@transpose,forward,'UniformOutput',false)];
 
 end
 
 % Consistency enforcement
 function grumble(model)
-if ~isstruct(model)||~all(isfield(model,{'physical_ids','pairs'}))
+if ~isstruct(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'physical_ids','pairs'}))
     error('a compiled CCE model is required.');
 end
 end

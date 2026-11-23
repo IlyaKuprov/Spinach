@@ -179,7 +179,7 @@ q.cce.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{
 selection=struct('method','gcce','expansion','standard','graph',q.cce.graph,'order',q.cce.order,...
                  'numerics',q.cce.numerics);
 family=cce_clusters(model,cce_graph(model,selection),selection);
-model.clusters=family;
+model.cce.clusters=family;
 selected=family(find(arrayfun(@(item)isequal(item.sites,[2 3]),family),1));
 raw=cce_interlace(model,selected,ensemble,@free_evolution,q);
 result=test_true(result,'Recursive conditioned factor',...
@@ -190,11 +190,11 @@ q.cce.interlaced.condition_sites={2:4};
 selection=struct('method','gcce','expansion','standard','graph',q.cce.graph,'order',q.cce.order,...
                  'numerics',q.cce.numerics);
 family=cce_clusters(model,cce_graph(model,selection),selection);
-model.clusters=family;
+model.cce.clusters=family;
 selected=family(end);
 raw=cce_interlace(model,selected,ensemble,@free_evolution,q);
 result=test_true(result,'Full-bath conditioned factor',...
-                 raw.assignment_count==prod(model.multiplicities(model.bath_ids))&&raw.full_bath,...
+                 raw.assignment_count==prod(model.cce.multiplicities(model.cce.bath_ids))&&raw.full_bath,...
                  'Every complete-bath configuration is evaluated exactly once.');
 
 end

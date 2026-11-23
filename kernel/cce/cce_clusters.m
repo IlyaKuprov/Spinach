@@ -190,14 +190,14 @@ index=dictionary(keys,(1:numel(family)).');
 
 % Bound decimal family signatures, including old/new concatenation copies
 physical_digits=1;
-if ~isempty(model.physical_ids)
-    physical_digits=1+floor(log10(max(model.physical_ids)));
+if ~isempty(model.cce.physical_ids)
+    physical_digits=1+floor(log10(max(model.cce.physical_ids)));
 end
 group_digits=1;
 if ng>0
     group_digits=1+floor(log10(ng));
 end
-characters=(physical_digits+1)*numel(model.bath_ids)+2*ng+1+...
+characters=(physical_digits+1)*numel(model.cce.bath_ids)+2*ng+1+...
            (group_digits+1)*sum(cellfun(@numel,family))+2*numel(family);
 if ~isfinite(characters)||6*characters>budget
     error('cce_clusters:memory',...
@@ -236,7 +236,7 @@ entry=struct('id',uint64(0),'groups',[],'sites',[],'order',0,'dimension',1,...
 metadata=whos('entry');
 subset_limit=min(numel(family),2^max_order-1);
 bytes=6*characters+3*numel(family)*(metadata.bytes+16*subset_limit+...
-                                  8*(4*max_order+3*numel(model.bath_ids)));
+                                  8*(4*max_order+3*numel(model.cce.bath_ids)));
 if ~isfinite(bytes)||bytes>budget
     error('cce_clusters:memory',...
           'Cluster records and subset maps exceed numerics.max_memory_bytes.');
@@ -245,18 +245,18 @@ entry.family_id=family_id;
 clusters=repmat(entry,numel(family),1);
 
 % Build canonical physical cluster metadata and subset index maps
-[~,observed_pos]=ismember(model.observed_ids,model.physical_ids);
-observed_dimension=prod(model.multiplicities(observed_pos));
+[~,observed_pos]=ismember(model.cce.observed_ids,model.cce.physical_ids);
+observed_dimension=prod(model.cce.multiplicities(observed_pos));
 for k=1:numel(family)
 
     % Map group unions to physical Hilbert dimensions
     sites=sort([groups{family{k}}]);
-    [~,positions]=ismember(sites,model.physical_ids);
+    [~,positions]=ismember(sites,model.cce.physical_ids);
     clusters(k).id=uint64(k);
     clusters(k).groups=family{k};
     clusters(k).sites=sites;
     clusters(k).order=numel(family{k});
-    clusters(k).bath_dimension=prod(model.multiplicities(positions));
+    clusters(k).bath_dimension=prod(model.cce.multiplicities(positions));
     clusters(k).dimension=observed_dimension*clusters(k).bath_dimension;
     if ~isfinite(clusters(k).dimension)||clusters(k).dimension>flintmax
         error('cce_clusters:dimension','Hilbert dimension exceeds exact double integer range.');
@@ -336,21 +336,21 @@ end
 
 % Validate the immutable metadata and explicit combinatorial decisions
 function grumble(model,graph,parameters)
-if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'physical_ids',...
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'physical_ids',...
         'bath_ids','observed_ids','multiplicities'}))||...
-   numel(model.physical_ids)~=numel(model.multiplicities)||...
-   numel(unique(model.physical_ids))~=numel(model.physical_ids)||...
-   ~all(ismember([model.observed_ids model.bath_ids],model.physical_ids))||...
-   ~isempty(intersect(model.observed_ids,model.bath_ids))||...
-   any(~isfinite(model.multiplicities))||any(model.multiplicities<1)||...
-   any(model.multiplicities~=fix(model.multiplicities))
+   numel(model.cce.physical_ids)~=numel(model.cce.multiplicities)||...
+   numel(unique(model.cce.physical_ids))~=numel(model.cce.physical_ids)||...
+   ~all(ismember([model.cce.observed_ids model.cce.bath_ids],model.cce.physical_ids))||...
+   ~isempty(intersect(model.cce.observed_ids,model.cce.bath_ids))||...
+   any(~isfinite(model.cce.multiplicities))||any(model.cce.multiplicities<1)||...
+   any(model.cce.multiplicities~=fix(model.cce.multiplicities))
     error('cce_clusters:model','physical IDs and integer multiplicities are required.');
 end
 if ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','adjacency','scores'}))
     error('cce_clusters:graph','cce_graph output is required.');
 end
 n=numel(graph.bath_ids);
-if numel(unique(graph.bath_ids))~=n||~all(ismember(graph.bath_ids,model.bath_ids))||...
+if numel(unique(graph.bath_ids))~=n||~all(ismember(graph.bath_ids,model.cce.bath_ids))||...
    ~isequal(size(graph.adjacency),[n n])||~islogical(graph.adjacency)||...
    ~isequal(graph.adjacency,graph.adjacency.')||any(diag(graph.adjacency))||...
    ~isequal(size(graph.scores),[n n])||~isreal(graph.scores)||...

@@ -48,35 +48,35 @@ if ~isempty(cache)&&isequaln(cache.signature,signature)
 end
 
 % Preserve observed-first tensor-product order and explicit physical mappings
-ids=[model.observed_ids sites];
-dims=model.multiplicities(ids);
+ids=[model.cce.observed_ids sites];
+dims=model.cce.multiplicities(ids);
 cluster_system.kind='cce_subsystem';
 cluster_system.model=model;
-cluster_system.formalism=model.formalism;
+cluster_system.formalism=model.cce.formalism;
 cluster_system.sites=sites;
 cluster_system.physical_ids=ids;
 cluster_system.local_to_physical=ids;
-cluster_system.physical_to_local=zeros(size(model.physical_ids));
+cluster_system.physical_to_local=zeros(size(model.cce.physical_ids));
 cluster_system.physical_to_local(ids)=1:numel(ids);
 cluster_system.multiplicities=dims;
 cluster_system.dimension=prod(dims);
-cluster_system.observed_dimension=prod(model.multiplicities(model.observed_ids));
-cluster_system.bath_dimension=prod(model.multiplicities(sites));
-cluster_system.isotopes=model.isotopes(ids);
-cluster_system.coordinates_A=model.coordinates_A(ids,:);
-cluster_system.assumptions=model.assumptions;
+cluster_system.observed_dimension=prod(model.cce.multiplicities(model.cce.observed_ids));
+cluster_system.bath_dimension=prod(model.cce.multiplicities(sites));
+cluster_system.isotopes=model.cce.isotopes(ids);
+cluster_system.coordinates_A=model.cce.coordinates_A(ids,:);
+cluster_system.assumptions=model.cce.assumptions;
 cluster_system.groups=cellfun(@(group)group(ismember(group,ids)),...
-                              model.groups,'UniformOutput',false);
+                              model.cce.groups,'UniformOutput',false);
 cluster_system.local_operators=cellfun(@pauli,num2cell(dims),'UniformOutput',false);
 
 % Bind a declared product bath density, never an inferred population
-bath_ids=model.bath_ids;
-state=model.parameters.cce.bath_state;
+bath_ids=model.cce.bath_ids;
+state=model.cce.parameters.cce.bath_state;
 if isfield(configuration,'bath_rho')
     bath_ids=configuration.bath_ids;
     densities=configuration.bath_rho;
 elseif strcmp(state.mode,'mixed_product')
-    densities=arrayfun(@(id)speye(model.multiplicities(id))/model.multiplicities(id),...
+    densities=arrayfun(@(id)speye(model.cce.multiplicities(id))/model.cce.multiplicities(id),...
                        bath_ids,'UniformOutput',false);
 else
     densities=state.rho;
@@ -85,7 +85,7 @@ expectations=zeros(numel(bath_ids),3);
 for n=1:numel(bath_ids)
 
     % Compute physical Cartesian expectations from each validated local density
-    d=model.multiplicities(bath_ids(n));
+    d=model.cce.multiplicities(bath_ids(n));
     rho=densities{n};
     operators=pauli(d);
     expectations(n,:)=[real(trace(rho*operators.x)) real(trace(rho*operators.y))...
@@ -93,7 +93,7 @@ for n=1:numel(bath_ids)
 
 end
 if isfield(configuration,'expectations')&&...
-   ~close_values(configuration.expectations,expectations,model.numerics)
+   ~close_values(configuration.expectations,expectations,model.cce.numerics)
     error('cce_subsystem:expectations','Spin expectations disagree with the supplied density.');
 end
 
@@ -108,7 +108,7 @@ if isfield(configuration,'exterior_ids')
     [present,indices]=ismember(supplied,exterior_ids);
     if ~all(present)||numel(indices)~=numel(exterior_ids)||...
        ~close_values(configuration.exterior_expectations,...
-                     exterior_values(indices,:),model.numerics)
+                     exterior_values(indices,:),model.cce.numerics)
         error('cce_subsystem:exterior','Exterior fields must match the common bath configuration.');
     end
 end
@@ -118,15 +118,15 @@ cluster_system.configuration.bath_rho=densities;
 cluster_system.configuration.expectations=expectations;
 cluster_system.configuration.exterior_ids=[];
 cluster_system.configuration.exterior_expectations=zeros(0,3);
-if strcmp(model.parameters.cce.meanfield,'static')
-    if isfield(model.parameters.cce,'meanfield_radius')&&...
-       isfinite(model.parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
+if strcmp(model.cce.parameters.cce.meanfield,'static')
+    if isfield(model.cce.parameters.cce,'meanfield_radius')&&...
+       isfinite(model.cce.parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
         distance=inf(1,numel(exterior_ids));
-        for id=model.observed_ids
-            delta=model.coordinates_A(exterior_ids,:)-model.coordinates_A(id,:);
+        for id=model.cce.observed_ids
+            delta=model.cce.coordinates_A(exterior_ids,:)-model.cce.coordinates_A(id,:);
             distance=min(distance,sqrt(sum(delta.^2,2)).');
         end
-        keep=distance<=model.parameters.cce.meanfield_radius;
+        keep=distance<=model.cce.parameters.cce.meanfield_radius;
         exterior_ids=exterior_ids(keep);
         exterior_values=exterior_values(keep,:);
     end
@@ -155,12 +155,11 @@ end
 
 % Validate the complete public service boundary
 function grumble(model,sites,configuration,cache)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'kind')||...
-   ~strcmp(model.kind,'cce_model')
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')
     error('cce_subsystem:model','model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
-   any(~ismember(sites,model.bath_ids))||numel(unique(sites))~=numel(sites)
+   any(~ismember(sites,model.cce.bath_ids))||numel(unique(sites))~=numel(sites)
     error('cce_subsystem:sites','sites must be distinct physical bath IDs in the requested order.');
 end
 if ~isstruct(configuration)||~isscalar(configuration)
@@ -177,7 +176,7 @@ end
 if isfield(configuration,'bath_ids')
     ids=configuration.bath_ids;
     if ~isnumeric(ids)||(~isempty(ids)&&~isrow(ids))||...
-       ~isequal(sort(ids),sort(model.bath_ids))
+       ~isequal(sort(ids),sort(model.cce.bath_ids))
         error('cce_subsystem:configuration','bath_ids must list the selected bath exactly once.');
     end
 end
@@ -200,16 +199,16 @@ if isfield(configuration,'bath_rho')
         error('cce_subsystem:density','Supply one density matrix per bath ID.');
     end
     for n=1:numel(bath_ids)
-        d=model.multiplicities(bath_ids(n));
+        d=model.cce.multiplicities(bath_ids(n));
         rho=densities{n};
-        tolerance=model.numerics.atol+model.numerics.rtol*norm(rho,'fro');
+        tolerance=model.cce.numerics.atol+model.cce.numerics.rtol*norm(rho,'fro');
         if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...
            norm(rho-rho','fro')>tolerance||abs(trace(rho)-1)>tolerance||...
            min(real(eig(full((rho+rho')/2))))<-tolerance
             error('cce_subsystem:density','Bath densities must be positive, Hermitian and trace one.');
         end
     end
-elseif ismember(model.parameters.cce.bath_state.mode,{'sampled','interlaced'})
+elseif ismember(model.cce.parameters.cce.bath_state.mode,{'sampled','interlaced'})
     error('cce_subsystem:configuration','Sampling requires explicit bath density matrices.');
 end
 if isfield(configuration,'exterior_ids')
@@ -219,12 +218,12 @@ if isfield(configuration,'exterior_ids')
         error('cce_subsystem:exterior','Exterior IDs must be a distinct physical-ID row.');
     end
 end
-if strcmp(model.parameters.cce.meanfield,'static')&&...
-   isfield(model.parameters.cce,'meanfield_radius')&&...
-   isfinite(model.parameters.cce.meanfield_radius)
-    exterior=setdiff(model.bath_ids,sites);
+if strcmp(model.cce.parameters.cce.meanfield,'static')&&...
+   isfield(model.cce.parameters.cce,'meanfield_radius')&&...
+   isfinite(model.cce.parameters.cce.meanfield_radius)
+    exterior=setdiff(model.cce.bath_ids,sites);
     if ~isempty(exterior)&&...
-       any(~isfinite(model.coordinates_A([model.observed_ids exterior],:)),'all')
+       any(~isfinite(model.cce.coordinates_A([model.cce.observed_ids exterior],:)),'all')
         error('cce:coordinates','cce.meanfield_radius requires finite observed and exterior coordinates.');
     end
 end

@@ -75,25 +75,25 @@ end
 model=spin_system.model;
 dc=spin_system.observed_dimension;
 db=spin_system.bath_dimension;
-a=model.transition.alpha;
-b=model.transition.beta;
+a=model.cce.transition.alpha;
+b=model.cce.transition.beta;
 rotation=eye(dc)-a*a'-b*b'-1i*(a*b'+b*a');
 rotation=kron(rotation,eye(db));
 
 % Select against canonical laboratory-frame bath frequencies in rad/s
 spec=parameters.pump;
-ids=model.bath_ids;
+ids=model.cce.bath_ids;
 if isfield(spec,'sites')
     ids=intersect(ids,spec.sites,'stable');
 end
 if isfield(spec,'species')
-    ids=ids(ismember(model.isotopes(ids),cellstr(spec.species)));
+    ids=ids(ismember(model.cce.isotopes(ids),cellstr(spec.species)));
 end
 frequencies=zeros(size(ids));
 for k=1:numel(ids)
 
     % Read the axial bath Zeeman frequency
-    tensor=model.zeeman{ids(k)};
+    tensor=model.cce.zeeman{ids(k)};
     frequencies(k)=tensor(3,3);
 
 end
@@ -141,7 +141,7 @@ if projected&&isempty(H.dissipator)&&...
     db=spin_system.bath_dimension;
 
     % Construct the physical ideal rotations in retained spin order
-    transition=spin_system.model.transition;
+    transition=spin_system.model.cce.transition;
     pa=kron(transition.alpha,eye(db));
     pb=kron(transition.beta,eye(db));
     observed=kron((transition.alpha*transition.beta'+...
@@ -403,25 +403,25 @@ if ~isscalar(spec)||~isnumeric(spec.center)||~isreal(spec.center)||...
 end
 if isfield(spec,'sites')&&(~isnumeric(spec.sites)||~isreal(spec.sites)||...
    (~isempty(spec.sites)&&~isrow(spec.sites))||...
-   any(~ismember(spec.sites,spin_system.model.bath_ids))||...
+   any(~ismember(spec.sites,spin_system.model.cce.bath_ids))||...
    numel(unique(spec.sites))~=numel(spec.sites))
     error('bath_pumped_hahn:sites','Pump sites must be distinct physical bath IDs.');
 end
 if isfield(spec,'species')&&(~iscellstr(spec.species)||~isrow(spec.species)||...
-   any(~ismember(spec.species,spin_system.model.isotopes)))
+   any(~ismember(spec.species,spin_system.model.cce.isotopes)))
     error('bath_pumped_hahn:species','Pump species must be a row of isotope labels from the model.');
 end
-if ~isfield(spin_system.model,'transition')
+if ~isfield(spin_system.model.cce,'transition')
     error('bath_pumped_hahn:transition','An explicit transition is required for ideal refocusing.');
 end
-ids=spin_system.model.bath_ids;
+ids=spin_system.model.cce.bath_ids;
 if isfield(spec,'sites')
     ids=intersect(ids,spec.sites,'stable');
 end
 if isfield(spec,'species')
-    ids=ids(ismember(spin_system.model.isotopes(ids),spec.species));
+    ids=ids(ismember(spin_system.model.cce.isotopes(ids),spec.species));
 end
-if any(cellfun(@(z)norm(z(3,1:2))>3*eps*norm(z(3,:)),spin_system.model.zeeman(ids)))
+if any(cellfun(@(z)norm(z(3,1:2))>3*eps*norm(z(3,:)),spin_system.model.cce.zeeman(ids)))
     error('bath_pumped_hahn:axial','Spectral selection requires an axial canonical Zeeman field.');
 end
 end

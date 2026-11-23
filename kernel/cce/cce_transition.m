@@ -38,9 +38,8 @@ grumble(spin_system,parameters,assumptions);
 
 % A compiled model reuses the retained generator; ordinary callers use stock
 model=[];
-if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
+if isfield(spin_system,'cce')
     model=spin_system;
-    spin_system=model.spin_system;
 end
 
 % Preserve the caller's random stream across stock subsystem construction
@@ -62,9 +61,9 @@ else
     assumption_args=assumptions;
 end
 native=~isempty(model)&&isfield(parameters.transition,'ms')&&...
-       strcmp(model.formalism,'zeeman-hilb')&&...
-       strcmp(model.parameters.cce.bath_state.mode,'mixed_product')&&...
-       (~isfield(model.parameters,'bath_jumps')||isempty(model.parameters.bath_jumps));
+       strcmp(model.cce.formalism,'zeeman-hilb')&&...
+       strcmp(model.cce.parameters.cce.bath_state.mode,'mixed_product')&&...
+       (~isfield(model.cce.parameters,'bath_jumps')||isempty(model.cce.parameters.bath_jumps));
 if ~native
     system=spin_system;
     if isfield(system,'bas')
@@ -95,11 +94,11 @@ if ~native
 else
 
     % Reuse the compiled observed subsystem without exterior mean fields
-    model.parameters.cce.meanfield='none';
-    model.formalism='zeeman-hilb';
+    model.cce.parameters.cce.meanfield='none';
+    model.cce.formalism='zeeman-hilb';
     config=struct('configuration_id',1,'state_id',1,'weight',1);
     [system,~]=cce_subsystem(model,[],config,[]);
-    p=model.parameters;
+    p=model.cce.parameters;
     p.cce.approximation='generalized';
     [H,~,~,~]=cce_generators(system,p,[]);
     H=full(H);
@@ -169,9 +168,6 @@ end
 
 % Validate physical spin IDs and exactly one descriptive transition selector
 function grumble(spin_system,p,assumptions)
-if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
-    spin_system=spin_system.spin_system;
-end
 if ~isstruct(p)||~isscalar(p)||~all(isfield(p,{'observed','transition'}))
     error('cce_transition:inputs','parameters.observed and transition are required.');
 end

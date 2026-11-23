@@ -49,8 +49,8 @@ if isfield(options,'parallel')
 end
 if ~strcmp(mode,'serial')
     pool=gcp('nocreate');
-    if isempty(pool)||~isfield(model.spin_system.sys,'parallel')||...
-       pool.NumWorkers~=model.spin_system.sys.parallel{2}
+    if isempty(pool)||~isfield(model.sys,'parallel')||...
+       pool.NumWorkers~=model.sys.parallel{2}
         error('cce_schedule:pool','Parallel scheduling requires an explicitly configured pool.');
     end
     workers=pool.NumWorkers;
@@ -65,16 +65,16 @@ if isfield(options,'parallel')&&isfield(options.parallel,'max_tasks')
 end
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-    components=prod(model.multiplicities(model.observed_ids))^2;
+    components=prod(model.cce.multiplicities(model.cce.observed_ids))^2;
 elseif isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
 nt=numel(parameters.times);
-dc=prod(model.multiplicities(model.observed_ids));
+dc=prod(model.cce.multiplicities(model.cce.observed_ids));
 metadata=whos('model','clusters','ensemble','parameters');
 resident=3*ns*nc*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
 noise=isequal(pulse_sequence,@noise_correlation);
-master=strcmp(model.formalism,'zeeman-liouv')||...
+master=strcmp(model.cce.formalism,'zeeman-liouv')||...
        (isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps));
 if noise
     resident=resident+3*ns*nc*(32*nt+16);
@@ -107,12 +107,12 @@ for k=0:numel(clusters)
     if k>0
         sites=clusters(k).sites;
     end
-    ids=[model.observed_ids sites];
-    db=prod(model.multiplicities(sites));
+    ids=[model.cce.observed_ids sites];
+    db=prod(model.cce.multiplicities(sites));
     dimension=dc*db;
     copies=12+3*numel(ids);
-    if ~model.direct_supported||strcmp(model.backend,'stock')
-        ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
+    if ~model.cce.direct_supported||strcmp(model.cce.backend,'stock')
+        ranks=max([2 cellfun(@numel,model.inter.giant.coeff).']);
         copies=copies+sum((2*(1:ranks)+1).^2);
     end
     workspace=16*copies*dimension^2;
@@ -140,7 +140,7 @@ for k=0:numel(clusters)
         propagated=propagated^2;
 
     end
-    workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
+    workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(model.cce.bath_ids)+8);
     peak=max(peak,workspace);
 end
 if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_bytes
@@ -149,7 +149,7 @@ end
 
 % Keep the full family out of conventional worker payloads
 if strcmp(options.bath_state.mode,'interlaced')
-    model.clusters=clusters;
+    model.cce.clusters=clusters;
 end
 task_clusters=[struct('id',uint64(0),'sites',[]);...
                struct('id',{clusters.id},'sites',{clusters.sites}).'];
@@ -161,13 +161,13 @@ for field={'checkpoint','parallel','retain_raw'}
     if isfield(payload.parameters.cce,field{1})
         payload.parameters.cce=rmfield(payload.parameters.cce,field{1});
     end
-    if isfield(payload.model.parameters.cce,field{1})
-        payload.model.parameters.cce=rmfield(payload.model.parameters.cce,field{1});
+    if isfield(payload.model.cce.parameters.cce,field{1})
+        payload.model.cce.parameters.cce=rmfield(payload.model.cce.parameters.cce,field{1});
     end
 end
 
 % The model is hashed from its full physical content, not its derived cache key
-payload.model=rmfield(payload.model,'source_hash');
+payload.model.cce=rmfield(payload.model.cce,'source_hash');
 ids=zeros(ns*nc,3);
 indices=zeros(ns*nc,2);
 position=0;
@@ -190,11 +190,11 @@ identity=struct();
 if isfield(options,'checkpoint')
 
     % Available memory is a dispatch limit, not part of the physical calculation
-    payload.model.clusters=clusters;
+    payload.model.cce.clusters=clusters;
     physical=payload;
     physical.parameters.cce.numerics=rmfield(physical.parameters.cce.numerics,'max_memory_bytes');
-    physical.model.parameters.cce.numerics=rmfield(physical.model.parameters.cce.numerics,'max_memory_bytes');
-    physical.model.numerics=rmfield(physical.model.numerics,'max_memory_bytes');
+    physical.model.cce.parameters.cce.numerics=rmfield(physical.model.cce.parameters.cce.numerics,'max_memory_bytes');
+    physical.model.cce.numerics=rmfield(physical.model.cce.numerics,'max_memory_bytes');
     identity=struct('model',md5_hash(physical.model),'parameters',md5_hash(physical.parameters),...
                     'clusters',md5_hash(clusters),'schedule',md5_hash(payload.experiment),...
                     'samples',md5_hash(ensemble));
@@ -261,8 +261,8 @@ function raw=native_task(model,cluster,ensemble,pulse_sequence,parameters,config
 % Keep conditioned tasks on the same physical family and configuration
 if strcmp(parameters.cce.bath_state.mode,'interlaced')
     parameters.cce.interlaced.reference_state=config_id;
-    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.bath_ids)),model.clusters));
-    if complete&&~isequal(sort(cluster.sites),sort(model.bath_ids))
+    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.cce.bath_ids)),model.cce.clusters));
+    if complete&&~isequal(sort(cluster.sites),sort(model.cce.bath_ids))
         channels=1;
         if isfield(parameters,'coil')&&iscell(parameters.coil)
             channels=numel(parameters.coil);
@@ -273,7 +273,7 @@ if strcmp(parameters.cce.bath_state.mode,'interlaced')
                    'weight',ensemble.spin_config(config_id).weight,...
                    'condition_sites',{{}},'assignment_count',0,'reference',[],...
                    'reference_error',[],'full_bath',false,'kind','not_evaluated');
-        if strcmp(model.formalism,'zeeman-liouv')||...
+        if strcmp(model.cce.formalism,'zeeman-liouv')||...
            (isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps))
             raw.generator=[];
         end
@@ -287,7 +287,7 @@ end
 
 % Consistency enforcement
 function grumble(model,clusters,ensemble,pulse_sequence,parameters)
-if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'spin_system','multiplicities','observed_ids'}))||...
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'multiplicities','observed_ids'}))||...
    ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
    ~isstruct(ensemble)||~isfield(ensemble,'spin_config')||isempty(ensemble.spin_config)||...
    ~isa(pulse_sequence,'function_handle')||...

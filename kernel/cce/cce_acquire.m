@@ -218,7 +218,7 @@ end
 % Preserve the stock density action and its arithmetic estimate
 if liouville||driven_liouville
     if liouville
-        engine=spin_system.model.spin_system;
+        engine=spin_system.model;
         engine.bas.formalism='sphten-liouv';
         engine.tols.prop_chop=0;
     end

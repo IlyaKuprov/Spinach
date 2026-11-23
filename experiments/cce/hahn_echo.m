@@ -108,8 +108,8 @@ end
 model=spin_system.model;
 dc=spin_system.observed_dimension;
 db=spin_system.bath_dimension;
-a=model.transition.alpha;
-b=model.transition.beta;
+a=model.cce.transition.alpha;
+b=model.cce.transition.beta;
 rotation=expm(-1i*pi*kron((a*b'+b*a')/2,eye(db)));
 positions=parameters.times/2;
 h_after=H;
@@ -121,7 +121,7 @@ if isfield(parameters,'refocusing')
         positions=repmat(pulse.time,size(parameters.times));
     end
     if isfield(pulse,'axis')
-        if strcmp(parameters.cce.meanfield,'static')&&any(ismember(pulse.spins,model.bath_ids))
+        if strcmp(parameters.cce.meanfield,'static')&&any(ismember(pulse.spins,model.cce.bath_ids))
             parameters.cce.numerics.propagator='expm';
         end
         axis=pulse.axis;
@@ -151,7 +151,7 @@ if isfield(parameters,'refocusing')
 
                 % Rotate the exterior product density
                 index=find(configuration.bath_ids==id,1);
-                operators=pauli(model.multiplicities(id));
+                operators=pauli(model.cce.multiplicities(id));
                 rotation=expm(-1i*pulse.angle*(axis(1)*operators.x+axis(2)*operators.y+axis(3)*operators.z));
                 configuration.bath_rho{index}=rotation*configuration.bath_rho{index}*rotation';
 
@@ -160,7 +160,7 @@ if isfield(parameters,'refocusing')
             [h_after,~,~]=cce_generators(after,parameters,[]);
             parameters.cce.numerics.propagator='expm';
         end
-    elseif isequal(pulse.spins,model.observed_ids)
+    elseif isequal(pulse.spins,model.cce.observed_ids)
         generator=kron(pulse.operator,eye(db));
     else
         position=find(spin_system.physical_ids==pulse.spins,1);
@@ -192,7 +192,7 @@ if projected&&~density&&isempty(H.dissipator)&&...
     db=spin_system.bath_dimension;
 
     % Resolve whether the physical pulse preserves or interchanges the manifolds
-    transition=spin_system.model.transition;
+    transition=spin_system.model.cce.transition;
     pa=kron(transition.alpha,eye(db));
     pb=kron(transition.beta,eye(db));
     aa=pa'*rotation*pa;
@@ -302,8 +302,8 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
         flip=reshape(1:db^2,db,db).';
         flip=flip(:);
         alternate=conj(G(flip,flip));
-        a=kron(spin_system.model.transition.alpha,eye(db));
-        b=kron(spin_system.model.transition.beta,eye(db));
+        a=kron(spin_system.model.cce.transition.alpha,eye(db));
+        b=kron(spin_system.model.cce.transition.beta,eye(db));
         aa=a'*rotation*a;
         ab=a'*rotation*b;
         ba=b'*rotation*a;
@@ -340,7 +340,7 @@ if strcmp(spin_system.formalism,'zeeman-liouv')||(projected&&~isempty(H.dissipat
     end
 
     % Select the stock action propagator engine
-    engine=spin_system.model.spin_system;
+    engine=spin_system.model;
     engine.bas.formalism='sphten-liouv';
     engine.tols.prop_chop=0;
     aux.density=complex(zeros(dc,dc,numel(parameters.times)));
@@ -709,11 +709,11 @@ if isfield(parameters,'refocusing')
     end
     ids=pulse.spins;
     if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
-       any(~ismember(ids,spin_system.model.physical_ids))||numel(unique(ids))~=numel(ids)||...
-       ~(isscalar(ids)||isequal(ids,spin_system.model.observed_ids))
+       any(~ismember(ids,spin_system.model.cce.physical_ids))||numel(unique(ids))~=numel(ids)||...
+       ~(isscalar(ids)||isequal(ids,spin_system.model.cce.observed_ids))
         error('hahn_echo:operator_target','An operator pulse addresses the whole observed system or one physical site.');
     end
-    d=prod(spin_system.model.multiplicities(ids));
+    d=prod(spin_system.model.cce.multiplicities(ids));
     if isfield(pulse,'operator')&&(~isnumeric(pulse.operator)||~isequal(size(pulse.operator),[d d])||...
        any(~isfinite(pulse.operator),'all')||...
        norm(pulse.operator-pulse.operator','fro')>d*eps*max(1,norm(pulse.operator,'fro')))
@@ -751,7 +751,7 @@ end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&isstruct(H)
     error('hahn_echo:density','Projected blocks do not define an observed density.');
 end
-if ~isfield(spin_system.model,'transition')
+if ~isfield(spin_system.model.cce,'transition')
     error('hahn_echo:transition','An explicit transition is required for ideal refocusing.');
 end
 if isfield(parameters,'refocusing')&&strcmp(parameters.cce.meanfield,'static')&&...

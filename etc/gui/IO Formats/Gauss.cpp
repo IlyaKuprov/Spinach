@@ -371,8 +371,9 @@ bool Gauss::LoadFile()
         else if(line=="Total nuclear spin-spin coupling K (Hz):") n=pairs(lines,n,reduced);
         else if(line=="Symbolic Z-matrix:") {
             // Isotopes of the molecule specification, e.g. H(Iso=2). Jobs that take the
-            // geometry from the checkpoint print no such block and inherit these.
-            stated->Clear(); int centre=0;
+            // geometry from the checkpoint print no such block and inherit these. The mass
+            // table of an earlier job no longer applies; this job prints its own afterwards.
+            stated->Clear(); masses->Clear(); int centre=0;
             for(int k=n+1;k<lines->Length;++k) {
                 String^ row=lines[k]->Trim(); if(row->StartsWith("Charge =")) continue;
                 Match^ m=Regex::Match(row,"^([A-Za-z]{1,2}|-?\\d+)(?![A-Za-z])[^\\s(]*(?:\\(([^)]*)\\))?");
@@ -385,10 +386,13 @@ bool Gauss::LoadFile()
             }
         }
         else if(line->StartsWith("Atom ") && line->Contains(" has atomic number ")) {
-            // Thermochemistry lists the isotopes in effect, including those set by Freq=ReadIsotopes.
+            // Thermochemistry lists the isotopes in effect, including those set by Freq=ReadIsotopes,
+            // and supersedes a mass table printed before it.
             Match^ m=Regex::Match(line,"^Atom\\s+(\\d+) has atomic number\\s+(\\d+) and mass\\s+(\\d+\\.\\d+)$");
-            if(m->Success) stated[Int32::Parse(m->Groups[1]->Value)]=Int32::Parse(m->Groups[2]->Value)*1000+
-                (int)Math::Round(Double::Parse(m->Groups[3]->Value,CultureInfo::InvariantCulture));
+            if(m->Success) {
+                int id=Int32::Parse(m->Groups[1]->Value); masses->Remove(id);
+                stated[id]=Int32::Parse(m->Groups[2]->Value)*1000+(int)Math::Round(Double::Parse(m->Groups[3]->Value,CultureInfo::InvariantCulture));
+            }
         }
         else if(line=="Isotropic Fermi Contact Couplings") {
             if(fullSystem) {contact->Clear(); hmass->Clear(); compositeDipolar->Clear(); compositeContact->Clear();}

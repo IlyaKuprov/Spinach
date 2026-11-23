@@ -235,6 +235,35 @@ result=test_true(result,'Incomplete branch cell rejected',...
                  rejects(@()cce_evolution(cluster,{H},[],rho,time,1,'final')),...
                  'A projected generator needs both branches and the dissipator.');
 
+% Stock and direct generators agree when the retained physical IDs have a gap
+gap_sys.magnet=1;
+gap_sys.isotopes={'E','13C','13C'};
+gap_sys.output='hush';
+gap_sys.disable={'hygiene'};
+gap_inter.zeeman.scalar={2.0023,10,20};
+gap_inter.coupling.matrix=cell(3,3);
+gap_inter.coupling.matrix{1,2}=diag([1e5 1e5  3e5]);
+gap_inter.coupling.matrix{1,3}=diag([2e5 2e5 -1e5]);
+gap_inter.coupling.matrix{2,3}=diag([ 50  50 -100]);
+gap_system=create(gap_sys,gap_inter);
+gap_p.observed=1;
+gap_p.times=0;
+gap_p.cce.bath_spins=[2 3];
+gap_p.cce.numerics=struct('atol',1e-10,'rtol',1e-10,'max_memory_bytes',1e9);
+gap_config=struct('configuration_id',1,'state_id',1,'weight',1);
+gap_H=cell(1,2);
+gap_backends={'direct','stock'};
+for n=1:2
+    gap_q=gap_p;
+    gap_q.cce.backend=gap_backends{n};
+    gap_q=cce_options(gap_system,gap_q,@free_evolution,'labframe');
+    gap_cluster=cce_subsystem(cce_compile(gap_system,gap_q,'labframe'),gap_q,3,gap_config,[]);
+    gap_H{n}=full(cce_generators(gap_cluster,gap_q,[]));
+end
+result=test_close(result,'Stock generator with a gap in physical IDs',gap_H{2},gap_H{1},...
+                  1e-12*norm(gap_H{1},'fro'),1e-12,...
+                  'The stock backend keeps the retained multiplicities of the compiled system.');
+
 end
 
 % Catch expected contract errors without accepting a silent fallback

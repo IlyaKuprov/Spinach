@@ -376,26 +376,27 @@ if strcmp(backend,'direct')
 else
 
     % Remove an inherited basis before slicing immutable physical metadata
-    if isfield(system,'bas')
-        system=rmfield(system,'bas');
+    reduced=system;
+    if isfield(reduced,'bas')
+        reduced=rmfield(reduced,'bas');
     end
-    system=kill_spin(system,setdiff(1:system.comp.nspins,ids));
+    reduced=kill_spin(reduced,setdiff(1:system.comp.nspins,ids));
     if conditional
 
         % Remove only pure-register terms before stock Hamiltonian construction
         register=find(ismember(sort(ids),parameters.observed));
-        system.inter.zeeman.matrix(register)={zeros(3)};
-        system.inter.basefrqs(register)=0;
-        keys=reshape(cell2mat(system.inter.coupling.matrix(:,1:2)),[],2);
-        system.inter.coupling.matrix(all(ismember(keys,register),2),:)=[];
-        system.inter.giant.coeff(register)={[]};
+        reduced.inter.zeeman.matrix(register)={zeros(3)};
+        reduced.inter.basefrqs(register)=0;
+        keys=reshape(cell2mat(reduced.inter.coupling.matrix(:,1:2)),[],2);
+        reduced.inter.coupling.matrix(all(ismember(keys,register),2),:)=[];
+        reduced.inter.giant.coeff(register)={[]};
 
     end
     basis_parameters.formalism='zeeman-hilb';
     basis_parameters.approximation={'none'};
-    system=basis(system,basis_parameters);
-    system=assume(system,system.cce.assumptions{:});
-    [H,Q]=hamiltonian(system);
+    reduced=basis(reduced,basis_parameters);
+    reduced=assume(reduced,system.cce.assumptions{:});
+    [H,Q]=hamiltonian(reduced);
     H=H+orientation(Q,parameters.orientation);
 
     % Reorder the stock ascending physical indices into observed-first order

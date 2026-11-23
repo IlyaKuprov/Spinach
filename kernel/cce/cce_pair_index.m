@@ -23,7 +23,7 @@ grumble(model);
 
 % Index the reverse direction after the forward records
 ids=reshape([model.cce.pairs.ids],2,[]);
-n=numel(model.cce.physical_ids);
+n=model.comp.nspins;
 count=size(ids,2);
 index=sparse([ids(1,:) ids(2,:)],[ids(2,:) ids(1,:)],1:2*count,n,n);
 forward={model.cce.pairs.retained};
@@ -33,7 +33,7 @@ end
 
 % Consistency enforcement
 function grumble(model)
-if ~isstruct(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'physical_ids','pairs'}))
+if ~isstruct(model)||~isfield(model,'cce')||~isfield(model.cce,'pairs')
     error('a compiled CCE model is required.');
 end
 end

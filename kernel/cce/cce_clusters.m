@@ -190,8 +190,8 @@ index=dictionary(keys,(1:numel(family)).');
 
 % Bound decimal family signatures, including old/new concatenation copies
 physical_digits=1;
-if ~isempty(model.cce.physical_ids)
-    physical_digits=1+floor(log10(max(model.cce.physical_ids)));
+if (model.comp.nspins>0)
+    physical_digits=1+floor(log10(model.comp.nspins));
 end
 group_digits=1;
 if ng>0
@@ -245,18 +245,18 @@ entry.family_id=family_id;
 clusters=repmat(entry,numel(family),1);
 
 % Build canonical physical cluster metadata and subset index maps
-[~,observed_pos]=ismember(model.cce.observed_ids,model.cce.physical_ids);
-observed_dimension=prod(model.cce.multiplicities(observed_pos));
+[~,observed_pos]=ismember(model.cce.observed_ids,1:model.comp.nspins);
+observed_dimension=prod(model.comp.mults(observed_pos));
 for k=1:numel(family)
 
     % Map group unions to physical Hilbert dimensions
     sites=sort([groups{family{k}}]);
-    [~,positions]=ismember(sites,model.cce.physical_ids);
+    [~,positions]=ismember(sites,1:model.comp.nspins);
     clusters(k).id=uint64(k);
     clusters(k).groups=family{k};
     clusters(k).sites=sites;
     clusters(k).order=numel(family{k});
-    clusters(k).bath_dimension=prod(model.cce.multiplicities(positions));
+    clusters(k).bath_dimension=prod(model.comp.mults(positions));
     clusters(k).dimension=observed_dimension*clusters(k).bath_dimension;
     if ~isfinite(clusters(k).dimension)||clusters(k).dimension>flintmax
         error('cce_clusters:dimension','Hilbert dimension exceeds exact double integer range.');
@@ -336,15 +336,11 @@ end
 
 % Validate the immutable metadata and explicit combinatorial decisions
 function grumble(model,graph,parameters)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'physical_ids',...
-        'bath_ids','observed_ids','multiplicities'}))||...
-   numel(model.cce.physical_ids)~=numel(model.cce.multiplicities)||...
-   numel(unique(model.cce.physical_ids))~=numel(model.cce.physical_ids)||...
-   ~all(ismember([model.cce.observed_ids model.cce.bath_ids],model.cce.physical_ids))||...
-   ~isempty(intersect(model.cce.observed_ids,model.cce.bath_ids))||...
-   any(~isfinite(model.cce.multiplicities))||any(model.cce.multiplicities<1)||...
-   any(model.cce.multiplicities~=fix(model.cce.multiplicities))
-    error('cce_clusters:model','physical IDs and integer multiplicities are required.');
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
+   ~all(isfield(model.cce,{'bath_ids','observed_ids'}))||...
+   ~all(ismember([model.cce.observed_ids model.cce.bath_ids],1:model.comp.nspins))||...
+   ~isempty(intersect(model.cce.observed_ids,model.cce.bath_ids))
+    error('cce_clusters:model','observed and bath spins must be distinct spins of the system.');
 end
 if ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','adjacency','scores'}))
     error('cce_clusters:graph','cce_graph output is required.');

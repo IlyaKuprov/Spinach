@@ -51,20 +51,13 @@ spin_system=assume(spin_system,assumptions{:});
 % Copy immutable source metadata and stable physical identifiers
 spin_system.cce.parameters=parameters;
 spin_system.cce.formalism=formalism;
-spin_system.cce.isotopes=spin_system.comp.isotopes;
 spin_system.cce.groups={};
 if isfield(parameters.cce,'groups')
     spin_system.cce.groups=parameters.cce.groups;
 end
 spin_system.cce.manifold_projectors=struct();
-spin_system.cce.physical_ids=1:spin_system.comp.nspins;
 spin_system.cce.observed_ids=parameters.observed;
 spin_system.cce.bath_ids=parameters.cce.bath_spins;
-spin_system.cce.multiplicities=spin_system.comp.mults;
-spin_system.cce.gamma=spin_system.inter.gammas;
-spin_system.cce.units=struct('frequency','rad/s','distance','Angstrom','angle','radian');
-spin_system.cce.numerical_cutoffs=struct('interaction_Hz',spin_system.tols.inter_cutoff,...
-                              'operator_rad_s',spin_system.tols.liouv_zero);
 spin_system.cce.assumptions=assumptions;
 spin_system.cce.orientation=parameters.orientation;
 spin_system.cce.interaction_cutoff=inf;

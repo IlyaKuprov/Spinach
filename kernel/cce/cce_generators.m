@@ -131,8 +131,8 @@ if projected
         for c=1:numel(observed)
             for a=1:3
                 slot=3*(c-1)+a;
-                ops{slot}=embed(pauli_axis(model.cce.multiplicities(observed(c)),axes{a}),...
-                               c,model.cce.multiplicities(observed));
+                ops{slot}=embed(pauli_axis(model.comp.mults(observed(c)),axes{a}),...
+                               c,model.comp.mults(observed));
                 field=zeros(cluster_system.bath_dimension);
                 for b=1:numel(cluster_system.sites)
                     tensor=tensors{1+pair_index(observed(c),cluster_system.sites(b))};
@@ -392,7 +392,7 @@ else
     if isfield(system,'bas')
         system=rmfield(system,'bas');
     end
-    system=kill_spin(system,setdiff(model.cce.physical_ids,ids));
+    system=kill_spin(system,setdiff(1:model.comp.nspins,ids));
     if conditional
 
         % Remove only pure-register terms before stock Hamiltonian construction
@@ -413,7 +413,7 @@ else
 
     % Reorder the stock ascending physical indices into observed-first order
     sorted_ids=sort(ids);
-    sorted_dims=model.cce.multiplicities(sorted_ids);
+    sorted_dims=model.comp.mults(sorted_ids);
     [~,order]=ismember(ids,sorted_ids);
     if numel(ids)>1
         indices=reshape(1:dimension,fliplr(sorted_dims));
@@ -467,7 +467,7 @@ H=(H+H')/2;
 meta.physical_ids=ids;
 meta.dimensions=dims;
 meta.dimension=dimension;
-meta.observed_dimension=prod(model.cce.multiplicities(model.cce.observed_ids));
+meta.observed_dimension=prod(model.comp.mults(model.cce.observed_ids));
 meta.bath_dimension=bath_dimension;
 meta.operators=ops;
 meta.backend=backend;
@@ -650,7 +650,7 @@ if isfield(parameters,'bath_jumps')
                 error('cce_options:jumps','A named local jump needs one supporting spin.');
             end
         elseif ~isnumeric(jump.operator)||any(~isfinite(jump.operator),'all')||...
-               ~isequal(size(jump.operator),[prod(model.cce.multiplicities(ids)) prod(model.cce.multiplicities(ids))])
+               ~isequal(size(jump.operator),[prod(model.comp.mults(ids)) prod(model.comp.mults(ids))])
             error('cce_options:jumps','A jump matrix must match its ordered support.');
         end
         included=ismember(ids,system.physical_ids);

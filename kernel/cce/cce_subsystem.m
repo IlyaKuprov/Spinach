@@ -49,20 +49,20 @@ end
 
 % Preserve observed-first tensor-product order and explicit physical mappings
 ids=[model.cce.observed_ids sites];
-dims=model.cce.multiplicities(ids);
+dims=model.comp.mults(ids);
 cluster_system.kind='cce_subsystem';
 cluster_system.model=model;
 cluster_system.formalism=model.cce.formalism;
 cluster_system.sites=sites;
 cluster_system.physical_ids=ids;
 cluster_system.local_to_physical=ids;
-cluster_system.physical_to_local=zeros(size(model.cce.physical_ids));
+cluster_system.physical_to_local=zeros(1,model.comp.nspins);
 cluster_system.physical_to_local(ids)=1:numel(ids);
 cluster_system.multiplicities=dims;
 cluster_system.dimension=prod(dims);
-cluster_system.observed_dimension=prod(model.cce.multiplicities(model.cce.observed_ids));
-cluster_system.bath_dimension=prod(model.cce.multiplicities(sites));
-cluster_system.isotopes=model.cce.isotopes(ids);
+cluster_system.observed_dimension=prod(model.comp.mults(model.cce.observed_ids));
+cluster_system.bath_dimension=prod(model.comp.mults(sites));
+cluster_system.isotopes=model.comp.isotopes(ids);
 cluster_system.coordinates_A=model.cce.coordinates_A(ids,:);
 cluster_system.assumptions=model.cce.assumptions;
 cluster_system.groups=cellfun(@(group)group(ismember(group,ids)),...
@@ -76,7 +76,7 @@ if isfield(configuration,'bath_rho')
     bath_ids=configuration.bath_ids;
     densities=configuration.bath_rho;
 elseif strcmp(state.mode,'mixed_product')
-    densities=arrayfun(@(id)speye(model.cce.multiplicities(id))/model.cce.multiplicities(id),...
+    densities=arrayfun(@(id)speye(model.comp.mults(id))/model.comp.mults(id),...
                        bath_ids,'UniformOutput',false);
 else
     densities=state.rho;
@@ -85,7 +85,7 @@ expectations=zeros(numel(bath_ids),3);
 for n=1:numel(bath_ids)
 
     % Compute physical Cartesian expectations from each validated local density
-    d=model.cce.multiplicities(bath_ids(n));
+    d=model.comp.mults(bath_ids(n));
     rho=densities{n};
     operators=pauli(d);
     expectations(n,:)=[real(trace(rho*operators.x)) real(trace(rho*operators.y))...
@@ -199,7 +199,7 @@ if isfield(configuration,'bath_rho')
         error('cce_subsystem:density','Supply one density matrix per bath ID.');
     end
     for n=1:numel(bath_ids)
-        d=model.cce.multiplicities(bath_ids(n));
+        d=model.comp.mults(bath_ids(n));
         rho=densities{n};
         tolerance=model.cce.numerics.atol+model.cce.numerics.rtol*norm(rho,'fro');
         if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...

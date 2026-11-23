@@ -13,8 +13,9 @@ function result=test_cce_reduction()
 % Compile a nontrivial signed-power family with disconnected subsets
 result=new_test_result('kernel/cce_reduction','CCE deterministic reduction',...
                        'Compare direct factors, signed powers and additive inclusion-exclusion.');
-model.cce=struct('physical_ids',1:5,'observed_ids',1,'bath_ids',2:5,...
-             'multiplicities',2*ones(1,5));
+model.cce=struct('observed_ids',1,'bath_ids',2:5);
+model.comp.mults=2*ones(1,5);
+model.comp.nspins=numel(model.comp.mults);
 adjacency=logical([0 1 0 0;1 0 1 0;0 1 0 1;0 0 1 0]);
 graph=struct('bath_ids',2:5,'adjacency',sparse(adjacency),'scores',double(adjacency));
 parameters=struct('method','cce','order',3,'expansion','standard',...

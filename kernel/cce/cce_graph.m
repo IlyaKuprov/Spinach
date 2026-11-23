@@ -47,21 +47,21 @@ function graph=cce_graph(model,parameters)
 grumble(model,parameters);
 
 % Locate physical sites without interpreting IDs as array subscripts
-[~,bath_pos]=ismember(model.cce.bath_ids,model.cce.physical_ids);
-[~,observed_pos]=ismember(model.cce.observed_ids,model.cce.physical_ids);
+[~,bath_pos]=ismember(model.cce.bath_ids,1:model.comp.nspins);
+[~,observed_pos]=ismember(model.cce.observed_ids,1:model.comp.nspins);
 ids=model.cce.bath_ids;
 n=numel(ids);
 
 % Obtain physical two-spin operator norms before graph pruning
 ends=reshape([model.cce.pairs.ids],2,[]);
-[~,positions]=ismember(ends,model.cce.physical_ids);
+[~,positions]=ismember(ends,1:model.comp.nspins);
 weights=zeros(1,numel(model.cce.pairs));
 for k=1:numel(model.cce.pairs)
 
     % Resolve this unordered physical pair
     pair=model.cce.pairs(k);
-    ma=model.cce.multiplicities(positions(1,k));
-    mb=model.cce.multiplicities(positions(2,k));
+    ma=model.comp.mults(positions(1,k));
+    mb=model.comp.mults(positions(2,k));
     spins=cell(2,3);
     for q=1:2
 
@@ -190,16 +190,12 @@ end
 
 % Validate shapes, physical IDs, graph semantics, and physical units
 function grumble(model,parameters)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'physical_ids',...
-        'observed_ids','bath_ids','multiplicities','coordinates_A','pairs'}))
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
+   ~all(isfield(model.cce,{'observed_ids','bath_ids','coordinates_A','pairs'}))
     error('cce_graph:model','incomplete scalar model structure.');
 end
-ids=model.cce.physical_ids;
+ids=1:model.comp.nspins;
 n=numel(model.cce.bath_ids);
-if ~isnumeric(ids)||~isreal(ids)||(~isrow(ids)&&~isempty(ids))||...
-   any(~isfinite(ids))||any(ids<1)||any(ids~=fix(ids))||numel(unique(ids))~=numel(ids)
-    error('cce_graph:ids','physical IDs must be distinct positive integers.');
-end
 for name={'observed_ids','bath_ids'}
     values=model.cce.(name{1});
     if ~isnumeric(values)||~isreal(values)||(~isrow(values)&&~isempty(values))||...
@@ -209,11 +205,6 @@ for name={'observed_ids','bath_ids'}
 end
 if ~isempty(intersect(model.cce.observed_ids,model.cce.bath_ids))||isempty(model.cce.observed_ids)
     error('cce_graph:ids','observed IDs must be nonempty and disjoint from bath IDs.');
-end
-if ~isnumeric(model.cce.multiplicities)||~isreal(model.cce.multiplicities)||...
-   numel(model.cce.multiplicities)~=numel(ids)||any(~isfinite(model.cce.multiplicities))||...
-   any(model.cce.multiplicities<1)||any(model.cce.multiplicities~=fix(model.cce.multiplicities))
-    error('cce_graph:dimensions','multiplicities must be positive integers.');
 end
 if ~isnumeric(model.cce.coordinates_A)||~isreal(model.cce.coordinates_A)||...
    ~isequal(size(model.cce.coordinates_A),[numel(ids) 3])||any(isinf(model.cce.coordinates_A),'all')

@@ -46,7 +46,7 @@ baseline=parameters;
 baseline.cce=rmfield(baseline.cce,'convergence');
 [answer,diagnostics]=clexpn(spin_system,pulse_sequence,baseline,assumptions);
 work=1;
-model=struct('multiplicities',spin_system.comp.mults,'observed_ids',parameters.observed);
+model=struct('comp',spin_system.comp,'cce',struct('observed_ids',parameters.observed));
 audit=cce_diagnostics(model,diagnostics.raw,diagnostics.reduction,diagnostics.parameters);
 capacity=sum(arrayfun(@(x) numel(x.values)-1,control.ladders));
 if isfield(control,'checks')

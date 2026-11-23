@@ -151,7 +151,7 @@ if isfield(parameters,'refocusing')
 
                 % Rotate the exterior product density
                 index=find(configuration.bath_ids==id,1);
-                operators=pauli(model.cce.multiplicities(id));
+                operators=pauli(model.comp.mults(id));
                 rotation=expm(-1i*pulse.angle*(axis(1)*operators.x+axis(2)*operators.y+axis(3)*operators.z));
                 configuration.bath_rho{index}=rotation*configuration.bath_rho{index}*rotation';
 
@@ -709,11 +709,11 @@ if isfield(parameters,'refocusing')
     end
     ids=pulse.spins;
     if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
-       any(~ismember(ids,spin_system.model.cce.physical_ids))||numel(unique(ids))~=numel(ids)||...
+       any(~ismember(ids,1:spin_system.model.comp.nspins))||numel(unique(ids))~=numel(ids)||...
        ~(isscalar(ids)||isequal(ids,spin_system.model.cce.observed_ids))
         error('hahn_echo:operator_target','An operator pulse addresses the whole observed system or one physical site.');
     end
-    d=prod(spin_system.model.cce.multiplicities(ids));
+    d=prod(spin_system.model.comp.mults(ids));
     if isfield(pulse,'operator')&&(~isnumeric(pulse.operator)||~isequal(size(pulse.operator),[d d])||...
        any(~isfinite(pulse.operator),'all')||...
        norm(pulse.operator-pulse.operator','fro')>d*eps*max(1,norm(pulse.operator,'fro')))

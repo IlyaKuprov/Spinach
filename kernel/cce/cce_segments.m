@@ -66,7 +66,7 @@ end
 
 % Reserve sparse complex Hamiltonians, dense pulses, and exterior expectations
 retained=segment_count*(48*dimension^2+24*numel(model.cce.bath_ids)+8);
-dc=prod(model.cce.multiplicities(model.cce.observed_ids));
+dc=prod(model.comp.mults(model.cce.observed_ids));
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=dc^2;
@@ -166,7 +166,7 @@ for t=1:numel(schedule.times)
                     slots=arrayfun(@(id) find(ids==id),event.target);
                     rest=setdiff(1:numel(ids),slots,'stable');
                     order=[slots rest];
-                    dims=model.cce.multiplicities(ids);
+                    dims=model.comp.mults(ids);
                     d=prod(dims);
                     base=kron(event.operator,eye(prod(dims(rest))));
                     map=zeros(d,1);
@@ -200,7 +200,7 @@ for t=1:numel(schedule.times)
                     pulse=expm(-1i*event.angle*generator)*pulse;
                     for id=reshape(exterior,1,[])
                         pos=find(spin_config.bath_ids==id);
-                        spin=pauli(model.cce.multiplicities(id));
+                        spin=pauli(model.comp.mults(id));
                         x=spin.x;
                         y=spin.y;
                         z=spin.z;
@@ -259,7 +259,7 @@ for event=events
        ~ismember(event.type,{'ideal','finite'})||...
        ~isnumeric(event.target)||~isrow(event.target)||isempty(event.target)||...
        numel(unique(event.target))~=numel(event.target)||...
-       any(~ismember(event.target,system.model.cce.physical_ids))||...
+       any(~ismember(event.target,1:system.model.comp.nspins))||...
        ~ismember(event.placement,{'absolute','fraction'})||...
        ~isnumeric(event.at)||~isreal(event.at)||~isscalar(event.at)||...
        ~isfinite(event.at)||event.at<0||...
@@ -283,7 +283,7 @@ for event=events
             error('cce_segments:manifold_drive','Finite observed drives require gCCE.');
         end
     elseif isfield(event,'operator')&&~isempty(event.operator)
-        d=prod(system.model.cce.multiplicities(event.target));
+        d=prod(system.model.comp.mults(event.target));
         if ~isnumeric(event.operator)||~isequal(size(event.operator),[d d])||...
            any(~isfinite(event.operator),'all')||...
            norm(event.operator-event.operator','fro')>d*eps*norm(event.operator,'fro')

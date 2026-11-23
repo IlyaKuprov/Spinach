@@ -87,7 +87,7 @@ if isfield(spec,'sites')
     ids=intersect(ids,spec.sites,'stable');
 end
 if isfield(spec,'species')
-    ids=ids(ismember(model.cce.isotopes(ids),cellstr(spec.species)));
+    ids=ids(ismember(model.comp.isotopes(ids),cellstr(spec.species)));
 end
 frequencies=zeros(size(ids));
 for k=1:numel(ids)
@@ -408,7 +408,7 @@ if isfield(spec,'sites')&&(~isnumeric(spec.sites)||~isreal(spec.sites)||...
     error('bath_pumped_hahn:sites','Pump sites must be distinct physical bath IDs.');
 end
 if isfield(spec,'species')&&(~iscellstr(spec.species)||~isrow(spec.species)||...
-   any(~ismember(spec.species,spin_system.model.cce.isotopes)))
+   any(~ismember(spec.species,spin_system.model.comp.isotopes)))
     error('bath_pumped_hahn:species','Pump species must be a row of isotope labels from the model.');
 end
 if ~isfield(spin_system.model.cce,'transition')
@@ -419,7 +419,7 @@ if isfield(spec,'sites')
     ids=intersect(ids,spec.sites,'stable');
 end
 if isfield(spec,'species')
-    ids=ids(ismember(spin_system.model.cce.isotopes(ids),spec.species));
+    ids=ids(ismember(spin_system.model.comp.isotopes(ids),spec.species));
 end
 if any(cellfun(@(z)norm(z(3,1:2))>3*eps*norm(z(3,:)),spin_system.model.cce.zeeman(ids)))
     error('bath_pumped_hahn:axial','Spectral selection requires an axial canonical Zeeman field.');

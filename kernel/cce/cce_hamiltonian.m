@@ -47,7 +47,7 @@ end
 
 % Bound simultaneous dense matrices before allocating cluster operators
 ids=[model.cce.observed_ids sites];
-dims=model.cce.multiplicities(ids);
+dims=model.comp.mults(ids);
 dimension=prod(dims);
 copies=4+3*numel(ids);
 if strcmp(backend,'stock')
@@ -177,7 +177,7 @@ else
     if isfield(system,'bas')
         system=rmfield(system,'bas');
     end
-    system=kill_spin(system,setdiff(model.cce.physical_ids,ids));
+    system=kill_spin(system,setdiff(1:model.comp.nspins,ids));
     basis_parameters.formalism='zeeman-hilb';
     basis_parameters.approximation={'none'};
     system=basis(system,basis_parameters);
@@ -187,7 +187,7 @@ else
 
     % Reorder the stock ascending physical indices into observed-first order
     sorted_ids=sort(ids);
-    sorted_dims=model.cce.multiplicities(sorted_ids);
+    sorted_dims=model.comp.mults(sorted_ids);
     [~,order]=ismember(ids,sorted_ids);
     if numel(ids)>1
         indices=reshape(1:dimension,fliplr(sorted_dims));
@@ -230,8 +230,8 @@ H=(H+H')/2;
 meta.physical_ids=ids;
 meta.dimensions=dims;
 meta.dimension=dimension;
-meta.observed_dimension=prod(model.cce.multiplicities(model.cce.observed_ids));
-meta.bath_dimension=prod(model.cce.multiplicities(sites));
+meta.observed_dimension=prod(model.comp.mults(model.cce.observed_ids));
+meta.bath_dimension=prod(model.comp.mults(sites));
 meta.operators=ops;
 meta.backend=backend;
 meta.fallback_reason=model.cce.fallback_reason;
@@ -244,7 +244,7 @@ end
 % Validate structure, IDs, and explicitly supplied exterior expectations
 function grumble(model,sites,spin_config)
 if ~isstruct(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'source_hash','observed_ids',...
-   'bath_ids','multiplicities','pairs','numerics','backend'}))
+   'bath_ids','pairs','numerics','backend'}))
     error('model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
@@ -272,12 +272,12 @@ if isfield(spin_config,'exterior_ids')
     values=spin_config.exterior_expectations;
     if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
        any(~isfinite(ids))||numel(unique(ids))~=numel(ids)||...
-       ~all(ismember(ids,setdiff(model.cce.physical_ids,[model.cce.observed_ids sites])))||...
+       ~all(ismember(ids,setdiff(1:model.comp.nspins,[model.cce.observed_ids sites])))||...
        ~isnumeric(values)||~isreal(values)||~isequal(size(values),[numel(ids) 3])||...
        any(~isfinite(values),'all')
         error('invalid exterior IDs or expectation rows.');
     end
-    if any(vecnorm(values,2,2)>(model.cce.multiplicities(ids).'-1)/2+eps)
+    if any(vecnorm(values,2,2)>(model.comp.mults(ids).'-1)/2+eps)
         error('exterior expectation exceeds the physical spin length.');
     end
     if ~model.cce.direct_supported&&~isempty(ids)

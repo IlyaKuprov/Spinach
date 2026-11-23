@@ -65,12 +65,12 @@ if isfield(options,'parallel')&&isfield(options.parallel,'max_tasks')
 end
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-    components=prod(model.cce.multiplicities(model.cce.observed_ids))^2;
+    components=prod(model.comp.mults(model.cce.observed_ids))^2;
 elseif isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
 nt=numel(parameters.times);
-dc=prod(model.cce.multiplicities(model.cce.observed_ids));
+dc=prod(model.comp.mults(model.cce.observed_ids));
 metadata=whos('model','clusters','ensemble','parameters');
 resident=3*ns*nc*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
 noise=isequal(pulse_sequence,@noise_correlation);
@@ -108,7 +108,7 @@ for k=0:numel(clusters)
         sites=clusters(k).sites;
     end
     ids=[model.cce.observed_ids sites];
-    db=prod(model.cce.multiplicities(sites));
+    db=prod(model.comp.mults(sites));
     dimension=dc*db;
     copies=12+3*numel(ids);
     if ~model.cce.direct_supported||strcmp(model.cce.backend,'stock')
@@ -287,7 +287,7 @@ end
 
 % Consistency enforcement
 function grumble(model,clusters,ensemble,pulse_sequence,parameters)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'multiplicities','observed_ids'}))||...
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~isfield(model.cce,'observed_ids')||...
    ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
    ~isstruct(ensemble)||~isfield(ensemble,'spin_config')||isempty(ensemble.spin_config)||...
    ~isa(pulse_sequence,'function_handle')||...

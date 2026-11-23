@@ -36,7 +36,7 @@ grumble(model,raw,result,parameters);
 % Select the declared numerical policy and observed-density representation
 if isfield(parameters,'cce')
     if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-        dimension=prod(model.cce.multiplicities(model.cce.observed_ids));
+        dimension=prod(model.comp.mults(model.cce.observed_ids));
         result.density=reshape(result.value.',dimension,dimension,numel(parameters.times));
     end
     parameters=struct('times',parameters.times,'numerics',parameters.cce.numerics);
@@ -170,8 +170,8 @@ if isfield(parameters,'cce')
         error('cce_diagnostics:input','Supply the declared numerical tolerances.');
     end
     if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-        if ~isfield(model,'cce')||~all(isfield(model.cce,{'multiplicities','observed_ids'}))||...
-           size(result.value,2)~=prod(model.cce.multiplicities(model.cce.observed_ids))^2
+        if ~isfield(model,'cce')||~isfield(model.cce,'observed_ids')||...
+           size(result.value,2)~=prod(model.comp.mults(model.cce.observed_ids))^2
             error('cce_diagnostics:input','Density values must match the observed Hilbert dimension.');
         end
     end

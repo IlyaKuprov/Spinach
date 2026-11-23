@@ -52,8 +52,8 @@ end
 % Canonicalise physical group membership
 p=parameters.partition;
 ids=graph.bath_ids;
-[~,positions]=ismember(ids,model.cce.physical_ids);
-dims=model.cce.multiplicities(positions);
+[~,positions]=ismember(ids,1:model.comp.nspins);
+dims=model.comp.mults(positions);
 groups=num2cell(ids);
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
     groups=cellfun(@sort,parameters.groups,'UniformOutput',false);
@@ -308,7 +308,7 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         local_model.cce.bath_ids=sites;
         local_graph=cce_graph(local_model,local);
         family=cce_clusters(local_model,local_graph,local);
-        dc=prod(model.cce.multiplicities(model.cce.observed_ids));
+        dc=prod(model.comp.mults(model.cce.observed_ids));
         components=1;
         if isfield(native_parameters,'output')&&strcmp(native_parameters.output,'density')
             components=dc^2;
@@ -402,7 +402,7 @@ end
 
 % Validate declared group membership and partition bounds
 function grumble(model,graph,parameters)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'physical_ids','multiplicities'}))||...
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
    ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','pair_norm'}))||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
    ~isstruct(parameters.cce)||~isscalar(parameters.cce)||...
@@ -421,13 +421,6 @@ if ~isstruct(parameters.numerics)||~isscalar(parameters.numerics)||...
    ~isfinite(parameters.numerics.max_memory_bytes)||parameters.numerics.max_memory_bytes<=0
     error('A finite positive partition memory budget is required.');
 end
-if ~isnumeric(model.cce.physical_ids)||~isreal(model.cce.physical_ids)||...
-   ~isrow(model.cce.physical_ids)||any(~isfinite(model.cce.physical_ids))||...
-   ~isnumeric(model.cce.multiplicities)||~isreal(model.cce.multiplicities)||...
-   numel(model.cce.multiplicities)~=numel(model.cce.physical_ids)||...
-   any(~isfinite(model.cce.multiplicities)|model.cce.multiplicities<1|mod(model.cce.multiplicities,1)~=0)
-    error('Physical multiplicities must be finite positive integers.');
-end
 if ~all(isfield(p,{'mode','max_dimension'}))||~ischar(p.mode)||...
    ~ismember(p.mode,{'user','coupling','spatial','adaptive'})||~integer(p.max_dimension,1)
     error('A recognised partition mode and finite positive integer dimension are required.');
@@ -439,8 +432,8 @@ if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
    any(~isfinite(ids)|ids<1|mod(ids,1)~=0)||numel(unique(ids))~=numel(ids)
     error('Bath IDs must be distinct positive integers in a row.');
 end
-[found,index]=ismember(ids,model.cce.physical_ids);
-if any(~found)||any(model.cce.multiplicities(index)>p.max_dimension)
+[found,index]=ismember(ids,1:model.comp.nspins);
+if any(~found)||any(model.comp.mults(index)>p.max_dimension)
     error('A bath spin is missing or exceeds the partition capacity.');
 end
 if ~isnumeric(graph.pair_norm)||~isreal(graph.pair_norm)||...
@@ -457,7 +450,7 @@ if isfield(parameters,'groups')&&~isempty(parameters.groups)
     if ~iscell(groups)||~isrow(groups)||any(cellfun(@(g)~isnumeric(g)||...
        ~isreal(g)||~isrow(g)||isempty(g)||any(~isfinite(g)|g<1|mod(g,1)~=0),groups))||...
        ~isequal(sort([groups{:}]),sort(ids))||...
-       any(cellfun(@(g)dimension(g,ids,model.cce.multiplicities(index)),groups)>p.max_dimension)
+       any(cellfun(@(g)dimension(g,ids,model.comp.mults(index)),groups)>p.max_dimension)
         error('Groups must partition physical bath IDs within capacity.');
     end
 end
@@ -466,7 +459,7 @@ if strcmp(p.mode,'spatial')
        p.group_count>numel(ids)||(~isempty(ids)&&p.group_count<1)||...
        ~integer(p.max_rounds,1)||~isfield(model.cce,'coordinates_A')||...
        ~isnumeric(model.cce.coordinates_A)||~isreal(model.cce.coordinates_A)||...
-       ~isequal(size(model.cce.coordinates_A),[numel(model.cce.physical_ids) 3])||...
+       ~isequal(size(model.cce.coordinates_A),[model.comp.nspins 3])||...
        any(~isfinite(model.cce.coordinates_A(index,:)),'all')
         error('Spatial grouping requires finite coordinates, group count, and round ceiling.');
     end

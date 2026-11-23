@@ -104,14 +104,14 @@ end
 
 % Reject invalid state vectors and unresolved perturbation settings
 function grumble(model,parameters)
-if ~isstruct(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'observed_ids','multiplicities','source_hash'}))
+if ~isstruct(model)||~isfield(model,'cce')||~all(isfield(model.cce,{'observed_ids','source_hash'}))
     error('model must be returned by cce_compile.');
 end
 if ~isstruct(parameters)||~isfield(parameters,'transition')||...
    ~isstruct(parameters.transition)||~all(isfield(parameters.transition,{'alpha','beta'}))
     error('transition.alpha and transition.beta must be explicitly supplied.');
 end
-dimension=prod(model.cce.multiplicities(model.cce.observed_ids));
+dimension=prod(model.comp.mults(model.cce.observed_ids));
 for name={'alpha','beta'}
     state=parameters.transition.(name{1});
     if ~isa(state,'double')||~isequal(size(state),[dimension 1])||any(~isfinite(state))

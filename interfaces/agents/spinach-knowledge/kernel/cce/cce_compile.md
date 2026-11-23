@@ -1,20 +1,20 @@
-# cce_compile — native immutable cluster model
+# cce_compile — compiled cluster-expansion spin system
 
 [MATLAB source](../../../../../kernel/cce/cce_compile.m)
 
 ## Native role and invocation
 
-Internal compiler from create output and native parameters to the immutable retained-cluster model; no full-bath basis is constructed.
+Internal compiler from create output and native parameters to the compiled spin system; no full-bath basis is constructed.
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `model=cce_compile(spin_system,parameters,assumptions)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `spin_system=cce_compile(spin_system,parameters,assumptions)`. Engine records are not public experiment parameter structures.
 
 Keywords: cce_compile clexpn canonical tensors physical IDs assumptions Zeeman formalism groups units
 
-`cce_compile` accepts create output and the native cce_options contract. The caller resolves cce.numerics.atol, rtol, and max_memory_bytes before compilation; this lower-level service does not invent an accuracy or resource policy. Bath IDs are parameters.cce.bath_spins, not cce.bath. An absent interaction cutoff retains the complete finite interaction model.
+`cce_compile` accepts create output and parameters already resolved by `cce_options`; it does not resolve defaults itself. The caller resolves cce.numerics.atol, rtol, and max_memory_bytes before compilation; this lower-level service does not invent an accuracy or resource policy. Bath IDs are parameters.cce.bath_spins, not cce.bath. An absent interaction cutoff retains the complete finite interaction model.
 
-The model retains ordered observed_ids/bath_ids, all physical_ids, multiplicities, isotope labels, groups, coordinates_A, native parameters, resolved transition and its metadata/projectors, canonical rad/s tensors, assumptions, and numerical cutoffs. It applies assume without building a whole-bath basis. Its source_hash and caller-owned subsystem cache signatures include assumptions and representation. It never converts canonical tensors a second time or resamples isotope occupancy. Occupied sites and their physical-ID groups are those already supplied by spin_bath/create.
+The returned spin system carries the requested assumptions, `bas.formalism`, and a `cce` subfield with canonical rad/s tensors (zeeman, quadratic, pairs), the resolved transition with its metadata and projectors, the assumption arguments, a roundoff bound, and a source hash. Observed and bath spins, numerics, backend, and orientation stay in `parameters`; multiplicities, isotopes, and coordinates are read from the stock `comp` and `inter` fields. It applies assume without building a whole-bath basis. Its source_hash and caller-owned subsystem cache signatures include assumptions and representation. It never converts canonical tensors a second time or resamples isotope occupancy. Occupied sites and their physical-ID groups are those already supplied by spin_bath/create.
 
 An absent basis selects zeeman-hilb. An explicit zeeman-hilb or zeeman-liouv selects that complete local representation; global basis arrays are discarded, and other formalisms fail. The implementation ports the numerical compiler algebra directly and preserves native parameter ownership. Internal cce_hamiltonian can consume its retained tensor metadata. Context resource resolution and generator construction are separate services.
 Observed transitions are resolved once after native tensor compilation. Coherent mixed-product models with product-ms selectors reuse the observed-only native generator; other representations and bath-state modes retain stock observed-Hamiltonian construction. No bath mean field is included in the isolated observed transition.

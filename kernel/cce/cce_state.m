@@ -1,6 +1,6 @@
 % Construct a state in the declared retained-cluster representation. Syntax:
 %
-%                  rho=cce_state(cluster_system,states,spins)
+%                  rho=cce_state(spin_system,parameters,states,spins)
 %
 % Character descriptors and cell rows of character descriptors follow
 % cce_operator, with conventional unnormalised spin-density operators.
@@ -9,16 +9,17 @@
 % spin must occur exactly once: no unspecified population is invented.
 % Population vectors follow descending magnetic quantum number. Matrices
 % must be positive, Hermitian, and trace one. Their tensor-product order is
-% always cluster_system.cce.ids, not the input descriptor order.
+% always spin_system.cce.ids, not the input descriptor order.
 % Output is a sparse Hilbert density matrix or its column-major Liouville
 % vector. No full-bath state is built, and physical states are not rescaled.
 %
 % Parameters:
 %
-%   cluster_system - retained subsystem returned by cce_subsystem
-%   states         - operator descriptors or a cell row of local physical
-%                    density matrices/population vectors
-%   spins          - matching operator selections or a physical-ID row
+%   spin_system - retained subsystem returned by cce_subsystem
+%   parameters  - parameters resolved by cce_options
+%   states      - operator descriptors or a cell row of local physical
+%                 density matrices/population vectors
+%   spins       - matching operator selections or a physical-ID row
 %
 % Outputs:
 %

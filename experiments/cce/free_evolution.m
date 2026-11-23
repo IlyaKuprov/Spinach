@@ -21,8 +21,8 @@
 % This experiment has no controls. Use finite_drive for finite pulses,
 % refocusing_train for ideal trains, or hahn_echo for a Hahn experiment.
 % Caller-supplied sequence fields are rejected even when empty.
-% H,R,K are conventional angular-frequency generators or tagged projected
-% branches from cce_generators. L=H+1i*R+1i*K.
+% H,R,K are conventional angular-frequency generators, or the projected
+% branch pair and dissipator from cce_generators. L=H+1i*R+1i*K.
 %
 % Outputs:
 %

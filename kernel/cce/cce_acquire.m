@@ -19,8 +19,8 @@
 % Drift and relaxation remain active during drives; overlapping drives add.
 % Ideal and static-exterior Hilbert segments use cce_segments; pure finite
 % drives retain streamed propagation. Projected drives are unsupported.
-% H,R,K are conventional angular-frequency generators or explicitly tagged
-% projected branches from cce_generators. No pulse or receiver is implicit.
+% H,R,K are conventional angular-frequency generators, or the projected
+% branch pair and dissipator from cce_generators. No pulse or receiver is implicit.
 %
 % GKSL relaxation uses stock exponential action and its floating-point
 % estimate 64*eps*n*(1+norm(L,1)*time), scaled by the detector/reference.
@@ -33,8 +33,8 @@
 %
 %   spin_system - retained subsystem returned by cce_subsystem
 %   parameters  - experiment options with elapsed times in seconds,
-%                 preparation, detection, output, and resolved CCE policy
-%   H,R,K       - angular-frequency generators, or a tagged projected H
+%                 preparation, detection, output, and resolved CCE options
+%   H,R,K       - angular-frequency generators, or a projected branch pair H
 %
 % Outputs:
 %

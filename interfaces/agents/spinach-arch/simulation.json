@@ -187,7 +187,7 @@
     ],
     "contracts": [
       "clexpn accepts the output of create, physical observed-spin IDs, elapsed times in seconds, and the interaction assumptions. Experiment settings stay in parameters; algorithm controls live in parameters.cce. cce_evaluate builds the retained subsystem and generators of one cluster and calls the experiment with (spin_system,parameters,H,R,K); each experiment tests in its own grumbler what it supports.",
-      "The evaluator builds only the retained subsystem and calls its experiment as [answer,aux]=sequence(cluster_system,parameters,H,R,K). Projected generators are tagged branch objects, not numeric H+1i*R+1i*K. Signal, density, noise, and dissipative evolution are not interchangeable capabilities."
+      "The evaluator builds only the retained subsystem and calls its experiment as [answer,aux]=sequence(spin_system,parameters,H,R,K). Projected generators are a cell pair of branch Hamiltonians in H with the dissipator in R, not numeric H+1i*R+1i*K. Signal, density, noise, and dissipative evolution are not interchangeable capabilities."
     ],
     "change_guidance": [
       "For a new CCE sequence, implement the physical pulse protocol in experiments/cce with the five-argument signature and put its admissibility tests in its grumbler. For a wrong single-cluster response, inspect physical-to-retained ordering and the selected generator representation before changing the expansion."

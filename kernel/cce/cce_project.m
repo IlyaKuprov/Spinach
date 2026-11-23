@@ -1,6 +1,6 @@
 % Projects an observed-spin system onto two explicit states. Syntax:
 %
-%                   manifolds=cce_project(model,parameters)
+%                   manifolds=cce_project(spin_system,parameters)
 %
 % parameters.transition.alpha and beta are normalised orthogonal vectors in
 % parameters.observed product order. When parameters.cce.second_order.enabled
@@ -16,7 +16,7 @@
 %
 % Parameters:
 %
-%   model - spin system returned by cce_compile.
+%   spin_system - spin system returned by cce_compile.
 %   parameters - resolved clexpn parameters with transition.alpha and
 %   transition.beta, normalised orthogonal state vectors.
 %

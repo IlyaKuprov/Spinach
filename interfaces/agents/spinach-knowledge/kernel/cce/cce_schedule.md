@@ -1,6 +1,6 @@
 # cce_schedule — native experiment task scheduling
 
-`raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters)` schedules native cluster and configuration records prepared by `clexpn`. All five arguments are required. `pulse_sequence` is the experiment function handle; every task is evaluated by `cce_evaluate`. There is no method-name fallback.
+`raw=cce_schedule(spin_system,clusters,ensemble,pulse_sequence,parameters)` schedules native cluster and configuration records prepared by `clexpn`. All five arguments are required. `pulse_sequence` is the experiment function handle; every task is evaluated by `cce_evaluate`. There is no method-name fallback.
 
 ## Deterministic execution
 
@@ -10,7 +10,7 @@ Execution controls live under `parameters.cce.parallel`. Serial is the default; 
 
 ## Storage admission
 
-Before allocating the task ledger, the scheduler counts model/ensemble/schedule/parameter metadata, time-by-channel raw records, observed density arrays, and noise moments. Every detector column is included. It separately reserves full observed-plus-bath Hamiltonian and spin-operator construction, including stock spherical components when needed, and each simultaneous Hilbert/Liouville propagation workspace. The active task count is bounded by the pool, batch caps, and available tasks.
+Before allocating the task ledger, the scheduler counts spin-system/ensemble/parameter metadata, time-by-channel raw records, observed density arrays, and noise moments. Every detector column is included. It separately reserves full observed-plus-bath Hamiltonian and spin-operator construction, including stock spherical components when needed, and each simultaneous Hilbert/Liouville propagation workspace. The active task count is bounded by the pool, batch caps, and available tasks.
 
 Master-equation records retain manifold Hamiltonians, physical spin operators, and included Lindblad-operator pairs. These arrays accumulate across completed tasks and therefore count in resident memory as well as active construction. Dissipative noise also reserves full retained Liouville construction before restriction to the bath. A small projected propagator never replaces the larger physical construction dimension. An insufficient `cce.numerics.max_memory_bytes` raises an error instead of changing the physical model or dropping tasks.
 
@@ -24,6 +24,6 @@ Interlaced tasks use `cce_evaluate` in every conditional recursion. With a compl
 
 Native finite_drive and refocusing_train preflight counts every retained time-by-segment Hamiltonian, pulse, and exterior expectation before dispatch. This is added to the existing simultaneous-workspace requirement without changing physical task enumeration or batch semantics.
 
-Checkpoint identities omit `cce.numerics.max_memory_bytes` from the hashed parameter/model copies; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, and experiment remain bound to the ledger.
+Checkpoint identities omit `cce.numerics.max_memory_bytes` from the hashed parameter and spin-system copies; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, and experiment remain bound to the ledger.
 
 Caller-selected parallel mode, batch caps, and the interlaced enumeration declaration are checked before task bookkeeping. Existing-pool availability and calculated resident storage remain execution-time checks.

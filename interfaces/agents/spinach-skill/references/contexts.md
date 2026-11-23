@@ -513,7 +513,7 @@ retiled axes of a merged figure.
 
 ## Cluster-expansion context
 
-`[answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)` accepts `create` output without a full-bath basis. Supply ordered physical `parameters.observed` IDs and strictly increasing, nonnegative total `parameters.times` in seconds. The experiment receives a retained `(cluster_system,parameters,H,R,K)`; all observed spins are retained in every cluster. The first output is the numerical experiment answer, not an engine record.
+`[answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)` accepts `create` output without a full-bath basis. Supply ordered physical `parameters.observed` IDs and strictly increasing, nonnegative total `parameters.times` in seconds. The experiment receives a retained `(spin_system,parameters,H,R,K)`; all observed spins are retained in every cluster. The first output is the numerical experiment answer, not an engine record.
 
 The experiments are `@free_evolution`, `@hahn_echo`, `@cpmg_echo`, `@bath_pumped_hahn`, `@cce_eseem`, `@finite_drive`, `@refocusing_train`, and `@noise_correlation` in `experiments/cce/`. Each experiment tests in its own grumbler which generators and outputs it supports; noise correlation is reduced additively and every other experiment multiplicatively. The context builds retained systems and generators; experiments own pulse timing and propagation.
 

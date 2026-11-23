@@ -1,7 +1,7 @@
 % Audit CCE numerical coverage and density physicality without repair.
 % Syntax:
 %
-%       diagnostics=cce_diagnostics(model,raw,result,parameters)
+%       diagnostics=cce_diagnostics(spin_system,raw,result,parameters)
 %
 % raw is a cell of cluster-record arrays. result supplies value, valid,
 % abs_error_bound and optionally density/sampling_standard_error. Bounds
@@ -11,7 +11,7 @@
 %
 % Parameters:
 %
-%   model - prepared physical model; raw - cell of cluster-record arrays.
+%   spin_system - compiled spin system; raw - cell of cluster-record arrays.
 %   result - CCE value, valid mask, abs_error_bound, and optional
 %            density/sampling_standard_error.
 %   parameters - numerical tolerances and observable declarations.

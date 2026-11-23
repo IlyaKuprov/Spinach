@@ -1,6 +1,6 @@
 % Evaluate CCE state/cluster tasks in deterministic indexed batches. Syntax:
 %
-%     raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters)
+%     raw=cce_schedule(spin_system,clusters,ensemble,pulse_sequence,parameters)
 %
 % raw is a cell per input spin_config, containing the empty-cluster record
 % followed by cluster records in input order. Tasks execute in ascending
@@ -17,7 +17,7 @@
 %
 % Parameters:
 %
-%   model, clusters, ensemble, pulse_sequence, parameters - prepared
+%   spin_system, clusters, ensemble, pulse_sequence, parameters - prepared
 %   objects and the experiment function handle. Optional parallel.mode,
 %   parallel.batch_size, parallel.max_tasks, and checkpoint.file/resume;
 %   serial batch_size defaults to one and parallel batch_size to the pool
@@ -164,7 +164,7 @@ for field={'checkpoint','parallel','retain_raw'}
     end
 end
 
-% The model is hashed from its full physical content, not its derived cache key
+% The spin system is hashed from its full physical content, not its derived cache key
 payload.model.cce=rmfield(payload.model.cce,'source_hash');
 ids=zeros(ns*nc,3);
 indices=zeros(ns*nc,2);

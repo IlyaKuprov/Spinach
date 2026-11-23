@@ -1,6 +1,6 @@
 % Projected product-state averages for interlaced CCE (W12). Syntax:
 %
-%       raw=cce_interlace(model,cluster,clusters,ensemble,pulse_sequence,parameters)
+%       raw=cce_interlace(spin_system,cluster,clusters,ensemble,pulse_sequence,parameters)
 %
 % parameters.cce.interlaced contains max_states (explicit enumeration budget),
 % reference_state (ensemble spin_config index), and optionally condition_sites
@@ -14,9 +14,9 @@
 %
 % Parameters:
 %
-%   model, cluster, ensemble, pulse_sequence, parameters - physical model,
-%   selected cluster, complete sampled ensemble, experiment function handle,
-%   and interlaced settings.
+%   spin_system, cluster, clusters, ensemble, pulse_sequence, parameters -
+%   compiled spin system, selected cluster, cluster family, complete sampled
+%   ensemble, experiment function handle, and interlaced settings.
 %   parameters.cce.interlaced - max_states, reference_state (ensemble spin_config
 %   index), optional condition_sites cell array and raw_only flag.
 %

@@ -2,11 +2,11 @@
 % retained subsystem and its generators, and calls the pulse sequence.
 % Syntax:
 %
-%   raw=cce_evaluate(model,cluster,configuration,pulse_sequence,parameters)
+%   raw=cce_evaluate(spin_system,cluster,configuration,pulse_sequence,parameters)
 %
 % Parameters:
 %
-%    model          - CCE model returned by cce_compile
+%    spin_system    - spin system returned by cce_compile
 %
 %    cluster        - one element of the cluster array
 %                     returned by cce_clusters

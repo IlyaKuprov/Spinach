@@ -1,6 +1,6 @@
 # cce_evaluate — one cluster of a cluster correlation expansion
 
-`raw=cce_evaluate(model,cluster,configuration,pulse_sequence,parameters)` builds the retained subsystem of one cluster with `cce_subsystem`, its generators with `cce_generators`, and calls the experiment as `pulse_sequence(spin_system,parameters,H,R,K)`. It is called by `cce_schedule`, `cce_interlace`, and `cce_partition`; public calculations enter through `clexpn`.
+`raw=cce_evaluate(spin_system,cluster,configuration,pulse_sequence,parameters)` builds the retained subsystem of one cluster with `cce_subsystem`, its generators with `cce_generators`, and calls the experiment as `pulse_sequence(spin_system,parameters,H,R,K)`. It is called by `cce_schedule`, `cce_interlace`, and `cce_partition`; public calculations enter through `clexpn`.
 
 The returned record carries `cluster_id`, `value`, `abs_error_bound`, `valid`, and `weight`, plus the diagnostic fields that the experiment returned: generator evidence, spectral residuals, pulse timing, density, and noise moments. These records are consumed by `cce_reduce`; they are not the first output of `clexpn`.
 

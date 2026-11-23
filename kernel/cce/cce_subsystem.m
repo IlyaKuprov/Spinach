@@ -1,36 +1,39 @@
 % Bind a retained subsystem without constructing a full-bath basis.
 % Syntax:
 %
-%   [spin_system,cache]=cce_subsystem(spin_system,sites,configuration,cache)
+%   [spin_system,cache]=cce_subsystem(spin_system,parameters,sites,configuration,cache)
 %
-% spin_system is cce_compile output. sites is an ordered row of physical bath IDs.
+% spin_system is cce_compile output and parameters are resolved by
+% cce_options. sites is an ordered row of physical bath IDs.
 % configuration is a scalar structure; bath_ids and bath_rho specify product
-% density matrices in matching order. Omitted densities use the model's
+% density matrices in matching order. Omitted densities use the declared
 % mixed_product or explicit_product declaration; sampling requires an explicit
 % configuration. configuration_id, state_id and weight are optional metadata.
 % Explicit exterior_ids/exterior_expectations override no physical states:
 % they must agree with the corresponding configuration density matrices.
 % cache=[] starts a caller-owned single-entry cache, keyed by the entire spin_system,
 % ordered sites and configuration. No process-global or persistent cache exists.
-% cluster_system carries observed-first IDs, mappings, multiplicities, isotope
-% labels, local Pauli matrices, local bath densities, and exterior mean fields.
-% formalism is zeeman-hilb or zeeman-liouv; Hilbert dimensions are always explicit.
+% spin_system.cce carries observed-first IDs, mappings, dimensions, local
+% Pauli matrices, local bath densities, and exterior mean fields.
+% spin_system.bas.formalism is zeeman-hilb or zeeman-liouv.
 % A finite cce.meanfield_radius requires observed and exterior coordinates;
 % exterior sites within that Angstrom distance of any observed spin contribute.
 % Included sites need no geometry for this state-dependent radius selection.
 %
 % Parameters:
 %
-%   spin_system         - canonical physical spin_system returned by cce_compile
+%   spin_system   - spin system returned by cce_compile
+%   parameters    - parameters resolved by cce_options
 %   sites         - ordered row of retained physical bath IDs
 %   configuration - scalar product-state and ensemble-metadata structure
 %   cache         - empty or the caller-owned cache returned by this service
 %
 % Outputs:
 %
-%   cluster_system - retained tensor ordering, dimensions, product states,
-%                    local operators, and exterior spin expectations
-%   cache          - updated single-entry subsystem cache and hit counters
+%   spin_system - the input with the retained ordering, dimensions,
+%                 product states, local operators, and exterior spin
+%                 expectations in its cce subfield
+%   cache       - updated single-entry subsystem cache and hit counters
 %
 % ilya.kuprov@weizmann.ac.il
 

@@ -10,8 +10,8 @@
 %    parameters  - experiment structure; times is a real vector of
 %                  increasing nonnegative total durations in seconds
 %
-%    H,R,K       - conventional angular-frequency generators, or H
-%                  containing explicitly tagged projected branches
+%    H,R,K       - conventional angular-frequency generators, or the
+%                  projected branch pair in H
 %
 % transition selects the observed two-state transition. rho0/coil or
 % preparation may override the prepared density and detector. normalized

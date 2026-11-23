@@ -29,7 +29,7 @@ parameters.cce.partition.mode=adaptive is executed through the experiment, using
 
 For projected evolution, `parameters.cce.second_order` is included in graph construction. Enabled virtual-level corrections therefore retain observed-mediated bath pairs unless `parameters.cce.graph.approximate` is explicitly true.
 
-The experiment owns cce.numerics.propagator; graph and cluster-selection calls receive numerical selection controls without that propagation-only field. The resolved public parameters retain the requested propagation policy.
+The experiment owns cce.numerics.propagator; graph and cluster-selection calls receive the same resolved parameters as the experiment.
 
 Before propagation, the resolved representation validates the numerical preference: eig for Hilbert dynamics, stock for Liouville dynamics, with expm additionally available for generalised Hahn echo. Unknown or incompatible preferences are rejected rather than discarded.
 

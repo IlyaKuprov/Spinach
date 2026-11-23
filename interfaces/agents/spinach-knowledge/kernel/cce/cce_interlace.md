@@ -2,7 +2,7 @@
 
 ## Native role and invocation
 
-`raw=cce_interlace(model,cluster,ensemble,pulse_sequence,parameters)` is an internal service called by `cce_schedule` with the experiment function handle. Public calculations enter through `clexpn`; native interlaced controls are nested in `parameters.cce`. Every recursive conditional calculation is evaluated by `cce_evaluate`.
+`raw=cce_interlace(spin_system,cluster,clusters,ensemble,pulse_sequence,parameters)` is an internal service called by `cce_schedule` with the experiment function handle. Public calculations enter through `clexpn`; native interlaced controls are nested in `parameters.cce`. Every recursive conditional calculation is evaluated by `cce_evaluate`.
 
 ## Conditional averaging
 
@@ -20,12 +20,12 @@ With `raw_only=true`, the service returns the conditional physical raw average i
 
 ## Native reference validation
 
-Before enumerating a native conditional ensemble, the reference bath IDs and assignments must match the model. Every index must select a local basis vector and bath_rho must equal its projector within dimension^2*eps in Frobenius norm. Shape or density inconsistencies raise cce:spin_config before evaluation. This check does not use the propagation error tolerance; mixed reference densities belong to explicit_product.
+Before enumerating a native conditional ensemble, the reference bath IDs and assignments must match the spin system. Every index must select a local basis vector and bath_rho must equal its projector within dimension^2*eps in Frobenius norm. Shape or density inconsistencies raise cce:spin_config before evaluation. This check does not use the propagation error tolerance; mixed reference densities belong to explicit_product.
 
 The conditioning contract uses cce.interlaced.max_states. Returned assignments, weights, condition_mass, log_condition_mass, and distribution_signature describe the deduplicated physical distribution; weights use the same shifted logarithmic product calculation as the established conditional average. raw.value, raw.valid, and raw.abs_error_bound always remain conditional raw quantities. factor, factor_valid, and factor_abs_error_bound separately carry the irreducible quotient; raw_only suppresses that quotient. kind identifies irreducible or raw_full_bath records. Every subset reuses the parent's cylinders. The allocation preflight includes assignment sorting workspace, and residual metadata retains the worst constituent solve, not merely the first assignment.
 
 A direct native interlacing request rejects cce.checkpoint, for both writes and resumes, before constructing its conditioning distribution. Interlaced calculations do not own an ordinary raw-task checkpoint ledger.
 
-All five arguments are mandatory; the service accepts native ensemble records and an experiment function handle only. Its local validator checks reference indices, required native records, and checkpoint ownership before conditional enumeration.
+All six arguments are mandatory; the service accepts native ensemble records and an experiment function handle only. Its local validator checks reference indices, required native records, and checkpoint ownership before conditional enumeration.
 
 The local entry validator checks the state budget and the common reference density/assignment before recursive conditional evaluation. The recursion changes conditioning cylinders but retains that same validated reference.

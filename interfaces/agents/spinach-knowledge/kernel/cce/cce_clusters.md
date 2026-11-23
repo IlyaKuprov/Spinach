@@ -2,11 +2,11 @@
 
 ## Native role and invocation
 
-Internal deterministic cluster-family enumerator. clexpn supplies a compiled model and resolved selection policy.
+Internal deterministic cluster-family enumerator. clexpn supplies the compiled spin system and the resolved parameters.
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `clusters=cce_clusters(model,graph,parameters)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `clusters=cce_clusters(spin_system,graph,parameters)`. Engine records are not public experiment parameter structures.
 
 [MATLAB source](../../../../../kernel/cce/cce_clusters.m)
 
@@ -26,7 +26,7 @@ Enumerate a deterministic subset-closed CCE cluster family.
 
 **Inputs**
 
-- `model`, `graph` — prepared model and physical connectivity.
+- `spin_system`, `graph` — compiled spin system and physical connectivity.
 - `parameters` — `order`, optional `groups` (default singleton sites), explicit group-ID `clusters`, and `cluster_cap` (default Inf); frozen partition groups are passed in by the driver.
 
 **Outputs**

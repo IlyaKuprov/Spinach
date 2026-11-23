@@ -1,11 +1,11 @@
 % Index the retained Cartesian pair tensors in both physical directions.
 % Syntax:
 %
-%              [index,tensors]=cce_pair_index(model)
+%              [index,tensors]=cce_pair_index(spin_system)
 %
 % Parameters:
 %
-%    model - CCE model returned by cce_compile
+%    spin_system - spin system returned by cce_compile
 %
 % Outputs:
 %

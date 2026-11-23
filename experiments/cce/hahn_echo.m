@@ -10,7 +10,7 @@
 %
 %     parameters  - experiment settings described below
 %
-%     H,R,K       - conventional or tagged projected generators
+%     H,R,K       - conventional generators, or the projected branch pair in H
 %
 % Outputs:
 %
@@ -26,7 +26,7 @@
 % experiment requires nloops; bath_pumped_hahn requires pump.center, halfwidth,
 % units (Hz or rad/s), fraction, and allow_empty, with optional sites/species.
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
-% conventional generators or explicitly tagged projected branch generators.
+% conventional generators, or the projected branch pair with its dissipator.
 % Detection uses a fixed physical receiver: an odd manifold interchange takes
 % the bath-coherence adjoint, including the prepared coherence, before detection.
 %

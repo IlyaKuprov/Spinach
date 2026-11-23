@@ -10,7 +10,7 @@
 %
 %     parameters  - experiment settings described below
 %
-%     H,R,K       - conventional or tagged projected generators
+%     H,R,K       - conventional generators, or the projected branch pair in H
 %
 % Outputs:
 %
@@ -25,7 +25,7 @@
 % pump.center, halfwidth, units (Hz or rad/s), fraction, and allow_empty;
 % optional sites/species restrict the bath.
 % Ideal refocusing acts on the selected transition about x. H,R,K are the
-% conventional generators or explicitly tagged projected branch generators.
+% conventional generators, or the projected branch pair with its dissipator.
 % Detection uses a fixed physical receiver: the observed inversion takes the
 % bath-coherence adjoint, including the prepared coherence, before detection.
 %

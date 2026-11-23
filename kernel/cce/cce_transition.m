@@ -36,7 +36,7 @@ function [transition,meta]=cce_transition(spin_system,parameters,assumptions)
 % Check the selection before constructing the observed subsystem
 grumble(spin_system,parameters,assumptions);
 
-% A compiled model reuses the retained generator; ordinary callers use stock
+% A compiled spin system reuses the retained generator; ordinary callers use stock
 model=[];
 if isfield(spin_system,'cce')
     model=spin_system;

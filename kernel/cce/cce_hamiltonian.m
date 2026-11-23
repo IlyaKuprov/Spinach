@@ -1,21 +1,22 @@
 % Builds a cluster Hamiltonian in rad/s. Syntax:
 %
-%                [H,meta]=cce_hamiltonian(model,sites,spin_config)
+%                [H,meta]=cce_hamiltonian(spin_system,parameters,sites,spin_config)
 %
-% model is returned by cce_compile; sites are physical bath spin IDs.
+% spin_system is returned by cce_compile; sites are physical bath spin IDs.
 % Ordering is parameters.observed followed by sites, in the supplied order.
 % spin_config is a scalar struct with optional backend (auto/direct/stock),
 % exterior_ids and exterior_expectations (one real [Ix Iy Iz] row per ID).
-% Exterior fields use exactly the model's retained pair interactions.
+% Exterior fields use exactly the retained pair interactions.
 % meta reports IDs, dimensions, operators, backend, and roundoff residuals.
 %
 % Parameters:
 %
-%   model - output of cce_compile.
+%   spin_system - output of cce_compile.
+%   parameters - parameters resolved by cce_options.
 %   sites - physical bath IDs; [] selects the observed baseline.
 %   spin_config - scalar structure with optional backend override, exterior_ids
 %                 and exterior_expectations (one real Ix/Iy/Iz row per exterior ID).
-%                 Exterior fields use retained model pair interactions.
+%                 Exterior fields use retained pair interactions.
 %
 % Outputs:
 %

@@ -1,7 +1,7 @@
 % Compile retained-cluster preparation, detection, and normalisation reference.
 % Syntax:
 %
-%   [rho0,coil,reference,meta]=cce_observation(cluster_system,parameters)
+%   [rho0,coil,reference,meta]=cce_observation(spin_system,parameters)
 %
 % Explicit rho0 is an observed-spin density matrix; coil is an observed
 % detector matrix or cell vector. Otherwise preparation is 'transition' (the
@@ -19,11 +19,11 @@
 % meta.initial_signal always reports the unnormalised initial detection.
 % Nothing in this service divides the state or detector by the reference.
 % Projected output is a column-major bath-coherence block with a trace
-% detector; generalised output follows cluster_system.bas.formalism.
+% detector; generalised output follows spin_system.bas.formalism.
 %
 % Parameters:
 %
-%   cluster_system - retained subsystem returned by cce_subsystem
+%   spin_system - retained subsystem returned by cce_subsystem
 %   parameters     - preparation and detection descriptors, optional observed
 %                    density rho0 and detector coil, receiver_phase in radians,
 %                    and the declared cce.approximation

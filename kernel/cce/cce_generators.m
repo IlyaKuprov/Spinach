@@ -1,24 +1,23 @@
 % Construct retained-cluster generators in Spinach angular-frequency units.
 % Syntax:
 %
-%   [H,R,K,parameters,cache]=cce_generators(cluster_system,parameters,cache)
+%   [H,R,K,parameters,cache]=cce_generators(spin_system,parameters,cache)
 %
-% cluster_system is cce_subsystem output; parameters is a resolved native
+% spin_system is cce_subsystem output; parameters is a resolved native
 % experiment structure. Conventional generators obey L=H+1i*R+1i*K and
 % exp(-1i*L*t). R is the GKSL dissipator in s^-1; K is zero. Dissipation
-% requires zeeman-liouv, except explicitly tagged projected branches. A
-% projected dissipator acts on an alpha/beta coherence block, not a density.
-% Its swapped branch is swap_matrix*conj(dissipator)*swap_matrix'.
+% requires zeeman-liouv, except for projected branches. A projected
+% dissipator acts on an alpha/beta coherence block, not a density. Its
+% swapped branch is S*conj(R)*S', where S transposes the bath indices.
 % parameters.bath_jumps uses support, operator, and rate; supported spin
 % descriptors are L+, L-, Lx, Ly, and Lz, or explicit ordered matrices.
 % Zero-rate jumps are omitted before closure checks; active split supports
 % and exterior jumps driving a frozen mean field are refused, except that
 % periodic_segments explicitly freezes the exterior and omits exterior jumps.
-% Projected H has kind='cce_projected', left/right Hamiltonians and a
-% dissipator acting on column-vectorised bath coherence. R and K are []:
-% the tagged object, not numeric addition, goes to cce_evolution. Swap
-% left/right and reverse the projected dissipator with swap_matrix for
-% a refocusing pulse. These tags are never stock pulse-sequence inputs.
+% Projected H is the cell pair {left,right} of branch Hamiltonians, R is
+% the dissipator acting on column-vectorised bath coherence, and K is [].
+% cce_evolution takes them as {left,right,R}. A refocusing pulse swaps
+% the two branches and reverses the projected dissipator.
 % Conditional midpoint Hahn projection omits the isolated register terms:
 % their two scalar phases cancel exactly between equal swapped intervals.
 % parameters.cce.backend selects auto/direct/stock. The returned
@@ -29,13 +28,13 @@
 %
 % Parameters:
 %
-%   cluster_system - retained subsystem returned by cce_subsystem
-%   parameters     - resolved native experiment and numerical options
-%   cache          - [] or the exact generator cache returned previously
+%   spin_system - retained subsystem returned by cce_subsystem
+%   parameters  - resolved native experiment and numerical options
+%   cache       - [] or the exact generator cache returned previously
 %
 % Outputs:
 %
-%   H,R,K      - retained generators or tagged projected branches
+%   H,R,K      - retained generators, or the projected branch pair in H
 %   parameters - input options with generator diagnostics in cce_aux
 %   cache      - exact-input generator cache with hit and miss counts
 %

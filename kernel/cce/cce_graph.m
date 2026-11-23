@@ -1,9 +1,9 @@
 % Physical bath connectivity and deterministic selection scores. Syntax:
 %
-%                  graph=cce_graph(model,parameters)
+%                  graph=cce_graph(spin_system,parameters)
 %
-% model contains physical_ids, observed_ids, bath_ids, multiplicities,
-% coordinates_A, and pairs: records ids,tensor, where ids is a two-element physical
+% spin_system is returned by cce_compile; parameters supplies the observed and
+% bath spins. Pair records are ids,tensor, where ids is a two-element physical
 % ID row and tensor is a real Cartesian coupling in rad/s. Empty pairs
 % must be an empty struct array. Coordinates are in Angstrom.
 %
@@ -21,8 +21,8 @@
 %
 % Parameters:
 %
-%   model - physical IDs, observed/bath IDs, multiplicities, coordinates in
-%           Angstrom and pair records (ids, real Cartesian tensor in rad/s).
+%   spin_system - compiled spin system with coordinates in Angstrom and
+%                 pair records (ids, real Cartesian tensor in rad/s).
 %   parameters.cce.graph - mode; mode-specific radius (Angstrom), threshold
 %                      (rad/s), or adjacency; score is coupling_norm (default), resonance
 %                      (mismatch matrix and positive mismatch_scale, both rad/s), or supplied

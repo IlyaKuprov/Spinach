@@ -6,7 +6,7 @@ Expert conditional observed-manifold projection for compiled retained Hamiltonia
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `manifolds=cce_project(model,parameters)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `manifolds=cce_project(spin_system,parameters)`. Engine records are not public experiment parameter structures.
 
 [MATLAB source](../../../../../kernel/cce/cce_project.m)
 
@@ -24,7 +24,7 @@ Project an observed-spin system onto two explicit orthogonal states.
 
 **Inputs**
 
-- `model` — prepared observed-spin system model.
+- `spin_system` — spin system returned by `cce_compile`.
 - `parameters.transition.alpha`, `.beta` — normalised orthogonal state vectors. Optional `parameters.second_order.enabled`; when true, `parameters.second_order.gap_tolerance` in rad/s and `overlap_tolerance` are mandatory.
 
 **Outputs**

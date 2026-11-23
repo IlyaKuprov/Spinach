@@ -1,10 +1,10 @@
-% Propagate a retained cluster using conventional or tagged branch generators.
+% Propagate a retained cluster using conventional or projected branch generators.
 % Syntax:
 %
-%   [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
+%   [answer,state_error]=cce_evolution(spin_system,L,coil,rho,timestep,nsteps,output)
 %
-% L is H+1i*R+1i*K for conventional generators, or cce_generators projected
-% output. timestep is seconds; nsteps is a nonnegative integer. 'final'
+% L is H+1i*R+1i*K for conventional generators, or the projected cell
+% {left,right,dissipator}. timestep is seconds; nsteps is a nonnegative integer. 'final'
 % returns the state after nsteps intervals; 'trajectory' includes t=0 in
 % its columns (Liouville/projected) or pages (Hilbert); 'observable' returns
 % a column per detector, including t=0, with Hilbert-Schmidt detection.
@@ -15,13 +15,13 @@
 %
 % Parameters:
 %
-%   cluster_system - retained subsystem returned by cce_subsystem
-%   L              - angular-frequency generator or tagged projected pair
-%   coil           - detector matrix/vector or cell of detectors
-%   rho            - initial Hilbert matrix or column-major state vector
-%   timestep       - finite time step in seconds
-%   nsteps         - nonnegative integer number of intervals
-%   output         - 'final', 'trajectory', 'observable', or 'total'
+%   spin_system - retained subsystem returned by cce_subsystem
+%   L           - angular-frequency generator or projected cell
+%   coil        - detector matrix/vector or cell of detectors
+%   rho         - initial Hilbert matrix or column-major state vector
+%   timestep    - finite time step in seconds
+%   nsteps      - nonnegative integer number of intervals
+%   output      - 'final', 'trajectory', 'observable', or 'total'
 %
 % Outputs:
 %

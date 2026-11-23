@@ -1,8 +1,8 @@
 % Construct canonical spin operators on a retained cluster. Syntax:
 %
-%                 A=cce_operator(cluster_system,operators,spins)
+%                 A=cce_operator(spin_system,operators,spins)
 %
-% cluster_system is cce_subsystem output. operators is Lx, Ly, Lz, L+, L-
+% spin_system is cce_subsystem output. operators is Lx, Ly, Lz, L+, L-
 % or E. spins is a physical-ID row, isotope label, or 'all'; a row selects
 % a sum. Cell rows of operators and spins select an ordered product of sums,
 % as in the stock operator service. E is the dimensionless unit operator.
@@ -12,7 +12,7 @@
 %
 % Parameters:
 %
-%   cluster_system - retained subsystem returned by cce_subsystem
+%   spin_system - retained subsystem returned by cce_subsystem
 %   operators      - character label or cell row of canonical operator labels
 %   spins          - physical-ID row, isotope label, 'all', or matching cell row
 %

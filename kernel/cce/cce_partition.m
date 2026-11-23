@@ -1,11 +1,11 @@
 % Deterministic physical-spin partitions and bounded exact-patch adaptation.
 % Syntax:
 %
-%                  partition=cce_partition(model,graph,parameters,pulse_sequence)
+%                  partition=cce_partition(spin_system,graph,parameters,pulse_sequence)
 %
 % Parameters:
 %
-%   model, graph - canonical model and bath connectivity.
+%   spin_system, graph - compiled spin system and bath connectivity.
 %   parameters.cce.partition - native user/coupling/spatial/adaptive policy
 %   (maximum group Hilbert dimension). Spatial mode also requires
 %   group_count and max_rounds. Adaptive mode or optional adaptive=true requires patches,

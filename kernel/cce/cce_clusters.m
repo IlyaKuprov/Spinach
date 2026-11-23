@@ -1,8 +1,8 @@
 % Compile cluster families of physical bath groups. Syntax:
 %
-%             clusters=cce_clusters(model,graph,parameters)
+%             clusters=cce_clusters(spin_system,graph,parameters)
 %
-% model supplies physical_ids, bath_ids, observed_ids, and multiplicities.
+% spin_system is returned by cce_compile; parameters supplies the observed and bath spins.
 % graph is cce_graph output. parameters.cce.order counts groups, not sites;
 % groups is an optional cell partition of graph.bath_ids (default single
 % sites). Non-singleton group construction belongs to cce_partition.
@@ -21,7 +21,7 @@
 %
 % Parameters:
 %
-%   model, graph - prepared model and physical connectivity.
+%   spin_system, graph - compiled spin system and physical connectivity.
 %   parameters - order, optional groups (default singleton sites), explicit
 %                group-ID clusters, and cluster_cap (default Inf); frozen partition groups
 %                are passed in by the driver.
@@ -147,7 +147,7 @@ for order=1:max_order
 
 end
 
-% Close the selected family unless the model uses only periodic segments
+% Close the selected family unless the expansion uses only periodic segments
 family=selected;
 closure_order=max_order;
 if strcmp(parameters.cce.expansion,'periodic_segments')

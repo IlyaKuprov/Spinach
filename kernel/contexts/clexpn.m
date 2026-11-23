@@ -58,28 +58,13 @@
 
 function [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)
 
-% Check capabilities before constructing any retained Hilbert space
-grumble(spin_system,pulse_sequence,parameters,assumptions);
+% Resolve the experiment contract and the parameter defaults
 started=tic;
 contract=cce_capabilities(pulse_sequence);
 [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions);
-if strcmp(parameters.cce.approximation,'projected')&&~contract.projected
-    error('clexpn:projection','This experiment requires generalized evolution.');
-end
-if (isfield(parameters,'noise')||isfield(parameters,'spectrum'))&&...
-   ~isequal(pulse_sequence,@noise_correlation)
-    error('clexpn:noise','Noise and spectrum parameters belong to the noise_correlation experiment.');
-end
-if isequal(pulse_sequence,@noise_correlation)&&...
-   strcmp(parameters.cce.bath_state.mode,'interlaced')
-    error('clexpn:noise','Connected noise uses ordinary ensemble moment averaging, not interlaced factors.');
-end
-if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)&&~contract.dissipative
-    error('clexpn:dissipation','This experiment contract is closed-system only.');
-end
-if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&~contract.density_reduction
-    error('clexpn:density','Density requires a registered density output contract.');
-end
+
+% Check consistency
+grumble(spin_system,pulse_sequence,parameters,assumptions);
 
 % Derive default numerical controls from precision and available host memory
 numerics=parameters.cce.numerics;
@@ -97,11 +82,6 @@ if ~isfield(numerics,'max_memory_bytes')
     policy.defaults{end+1}='parameters.cce.numerics.max_memory_bytes';
 end
 parameters.cce.numerics=numerics;
-
-% Reject adaptive controllers until the convergence stage owns their execution
-if isfield(parameters.cce,'selection')&&isfield(parameters.cce.selection,'adaptive')
-    error('clexpn:adaptive','Adaptive convergence policy is not yet available.');
-end
 
 % Resolve the quadrature before any checkpoint or cluster evaluation
 if isfield(parameters,'grid')
@@ -447,6 +427,26 @@ end
 if ~isa(pulse_sequence,'function_handle')||~isstruct(parameters)||...
    ~isscalar(parameters)||~ischar(assumptions)||~isrow(assumptions)
     error('clexpn:input','Supply an experiment handle, parameter structure and assumptions string.');
+end
+contract=cce_capabilities(pulse_sequence);
+if strcmp(parameters.cce.approximation,'projected')&&~contract.projected
+    error('clexpn:projection','This experiment requires generalized evolution.');
+end
+if any(isfield(parameters,{'noise','spectrum'}))&&~isequal(pulse_sequence,@noise_correlation)
+    error('clexpn:noise','Noise and spectrum parameters belong to the noise_correlation experiment.');
+end
+if isequal(pulse_sequence,@noise_correlation)&&...
+   strcmp(parameters.cce.bath_state.mode,'interlaced')
+    error('clexpn:noise','Connected noise uses ordinary ensemble moment averaging, not interlaced factors.');
+end
+if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)&&~contract.dissipative
+    error('clexpn:dissipation','This experiment contract is closed-system only.');
+end
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&~contract.density_reduction
+    error('clexpn:density','Density requires a registered density output contract.');
+end
+if isfield(parameters.cce,'selection')&&isfield(parameters.cce.selection,'adaptive')
+    error('clexpn:adaptive','Adaptive convergence policy is not yet available.');
 end
 end
 

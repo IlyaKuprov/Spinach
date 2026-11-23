@@ -22,6 +22,15 @@ skill is installed or mirrored elsewhere, locate the actual distribution
 rather than resolving the file relative to the installed skill. If
 `AGENTS.md` cannot be read, stop and report the missing mandatory instructions.
 
+Development work carries a hard requirement: every change to the
+distribution (kernel, experiments, examples, tests, documentation, this
+skill, the knowledge base) must comply with every rule in the
+distribution-root `AGENTS.md`, without exception. Before delivering a change,
+check the complete diff against that file rule by rule and correct every
+departure. Precedent in surrounding code, convenience, and time pressure do
+not justify a departure; only an explicit instruction from the repository
+owner does.
+
 The distribution-root `AGENTS.md` is the sole authoritative source for
 Spinach programming style, kernel coding elegance, example coding, Wiki
 documentation, and task-execution policy. Consult it directly; do not keep

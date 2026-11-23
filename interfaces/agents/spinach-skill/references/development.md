@@ -5,7 +5,9 @@
 Read and follow the distribution-root `AGENTS.md` as mandatory instructions
 for every task, as required by [the skill entrypoint](../SKILL.md#mandatory-repository-instructions).
 Consult that file directly for repository policy; this reference does not
-maintain an independent version of its instructions. Preserve unrelated
+maintain an independent version of its instructions. Compliance is a hard
+requirement without exception: check the complete diff against `AGENTS.md`
+rule by rule before delivering, and correct every departure. Preserve unrelated
 changes and compiled MEX files. For source-style auditing, `exorcise('offline')`
 skips network checks; `exorcise('online')` also checks documentation URLs
 through native MATLAB HTTP requests.

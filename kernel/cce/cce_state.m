@@ -42,15 +42,11 @@ else
     ids=cluster_system.physical_ids;
     rho=sparse(1);
     [~,order]=ismember(ids,spins);
-    numerics=cluster_system.model.numerics;
     for n=1:numel(ids)
         d=cluster_system.multiplicities(n);
         local=states{order(n)};
         if isvector(local)&&numel(local)==d
             local=diag(local);
-        end
-        if 16*(size(rho,1)*d)^2>numerics.max_memory_bytes
-            error('cce_state:memory','Requested density exceeds the memory budget.');
         end
         rho=kron(rho,sparse(local));
     end
@@ -117,6 +113,9 @@ for n=1:numel(system.physical_ids)
        min(real(eig(full((local+local')/2))))<-tolerance
         error('cce_state:density','Supply positive, Hermitian, trace-one local density matrices.');
     end
+end
+if 16*prod(system.multiplicities)^2>numerics.max_memory_bytes
+    error('cce_state:memory','Requested density exceeds the memory budget.');
 end
 end
 

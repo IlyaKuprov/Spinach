@@ -75,9 +75,6 @@ end
 model=spin_system.model;
 dc=spin_system.observed_dimension;
 db=spin_system.bath_dimension;
-if ~isfield(model,'transition')
-    error('bath_pumped_hahn:transition','An explicit transition is required for ideal refocusing.');
-end
 a=model.transition.alpha;
 b=model.transition.beta;
 rotation=eye(dc)-a*a'-b*b'-1i*(a*b'+b*a');
@@ -97,9 +94,6 @@ for k=1:numel(ids)
 
     % Read the axial bath Zeeman frequency
     tensor=model.zeeman{ids(k)};
-    if norm(tensor(3,1:2))>3*eps*norm(tensor(3,:))
-        error('bath_pumped_hahn:axial','Spectral selection requires an axial canonical Zeeman field.');
-    end
     frequencies(k)=tensor(3,3);
 
 end
@@ -413,6 +407,19 @@ end
 if isfield(spec,'species')&&(~iscellstr(spec.species)||~isrow(spec.species)||...
    any(~ismember(spec.species,spin_system.model.isotopes)))
     error('bath_pumped_hahn:species','Pump species must be a row of isotope labels from the model.');
+end
+if ~isfield(spin_system.model,'transition')
+    error('bath_pumped_hahn:transition','An explicit transition is required for ideal refocusing.');
+end
+ids=spin_system.model.bath_ids;
+if isfield(spec,'sites')
+    ids=intersect(ids,spec.sites,'stable');
+end
+if isfield(spec,'species')
+    ids=ids(ismember(spin_system.model.isotopes(ids),spec.species));
+end
+if any(cellfun(@(z)norm(z(3,1:2))>3*eps*norm(z(3,:)),spin_system.model.zeeman(ids)))
+    error('bath_pumped_hahn:axial','Spectral selection requires an axial canonical Zeeman field.');
 end
 end
 

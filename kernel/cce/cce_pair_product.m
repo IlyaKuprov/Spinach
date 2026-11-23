@@ -31,9 +31,6 @@ grumble(xyz,axis,hf,dipolar,exchange,times,atol,bytes);
 % Budget row work arrays and simultaneous pair-by-time temporaries
 n_spins=size(xyz,1);
 block=min(max(n_spins,1),floor(bytes/(32*(4+numel(times)))));
-if block<1
-    error('cce_pair_product:memory','The memory budget cannot hold one pair trace.');
-end
 pair_tol=atol/max(1,n_spins*(n_spins-1)/2);
 angles=times.'/8;
 max_angle=max(angles);
@@ -106,6 +103,9 @@ if ~isnumeric(atol)||~isreal(atol)||~isscalar(atol)||~isfinite(atol)||atol<0
 end
 if ~isnumeric(bytes)||~isreal(bytes)||~isscalar(bytes)||~(bytes>0)
     error('bytes must be a positive real scalar.');
+end
+if bytes<32*(4+numel(times))
+    error('cce_pair_product:memory','The memory budget cannot hold one pair trace.');
 end
 end
 

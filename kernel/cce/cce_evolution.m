@@ -51,22 +51,6 @@ else
     coils={coil};
 end
 
-% Bound resident propagators and requested output before allocation
-elements=numel(rho);
-if strcmp(output,'trajectory')
-    elements=elements*(nsteps+1);
-end
-if strcmp(output,'observable')
-    elements=numel(coils)*(nsteps+1);
-end
-bytes=16*(12*d^2+elements);
-if ~hilbert&&(~projected||~isempty(L.dissipator))
-    bytes=bytes+16*4*d^4;
-end
-if bytes>cluster_system.model.parameters.cce.numerics.max_memory_bytes
-    error('cce:memory','Propagation exceeds max_memory_bytes.');
-end
-
 % Keep the established eigenvalue propagation for coherent retained systems
 if ~projected&&~hilbert
     L=full(L);
@@ -166,13 +150,6 @@ end
 
 end
 
-% Do not silently erase non-Hermitian evolution from a Hilbert generator
-function hermitian(H)
-if norm(H-H','fro')>size(H,1)*eps(max(1,norm(H,'fro')))
-    error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
-end
-end
-
 % Validate dimensions and explicit evolution semantics
 function grumble(system,L,coil,rho,timestep,nsteps,output)
 if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')
@@ -200,15 +177,19 @@ if isstruct(L)
        (~isequal(size(L.dissipator),[d^2 d^2])||any(~isfinite(L.dissipator),'all')))
         error('cce_evolution:branches','Projected branch dimensions must match the bath block.');
     end
-    hermitian(L.left);
-    hermitian(L.right);
+    if norm(L.left-L.left','fro')>d*eps(max(1,norm(L.left,'fro')))||...
+       norm(L.right-L.right','fro')>d*eps(max(1,norm(L.right,'fro')))
+        error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
+    end
 elseif strcmp(system.formalism,'zeeman-hilb')
     d=system.dimension;
     if ~isnumeric(L)||any(~isfinite(L),'all')||~isequal(size(L),[d d])||...
        ~isequal(size(rho),[d d])
         error('cce_evolution:hilbert','Hilbert generators and states must be square retained matrices.');
     end
-    hermitian(L);
+    if norm(L-L','fro')>d*eps(max(1,norm(L,'fro')))
+        error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
+    end
 elseif strcmp(system.formalism,'zeeman-liouv')
     d=system.dimension;
     if ~isnumeric(L)||any(~isfinite(L),'all')||~isequal(size(L),[d^2 d^2])||...
@@ -226,6 +207,21 @@ if strcmp(output,'observable')
                                  all(isfinite(x),'all'),coil))
         error('cce_evolution:coil','Every detector must match the propagated state.');
     end
+end
+elements=numel(rho);
+if strcmp(output,'trajectory')
+    elements=elements*(nsteps+1);
+end
+if strcmp(output,'observable')
+    elements=numel(coil)*(nsteps+1);
+end
+bytes=16*(12*d^2+elements);
+if (isstruct(L)&&~isempty(L.dissipator))||...
+   (~isstruct(L)&&strcmp(system.formalism,'zeeman-liouv'))
+    bytes=bytes+16*4*d^4;
+end
+if bytes>system.model.parameters.cce.numerics.max_memory_bytes
+    error('cce:memory','Propagation exceeds max_memory_bytes.');
 end
 end
 

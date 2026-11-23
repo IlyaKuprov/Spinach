@@ -61,10 +61,6 @@ end
 model=spin_system.model;
 obs_dim=spin_system.observed_dimension;
 bath_dim=spin_system.bath_dimension;
-if ~isfield(model,'transition')
-    error('cce_eseem:transition',...
-          'An explicit transition is required for ideal refocusing.');
-end
 alpha=model.transition.alpha;
 beta=model.transition.beta;
 rotation=eye(obs_dim)-alpha*alpha'-beta*beta'-1i*(alpha*beta'+beta*alpha');
@@ -158,6 +154,10 @@ if isfield(parameters,'output')&&strcmp(parameters.output,'density')
 end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('cce_eseem:generators','Supply conventional or tagged projected generators.');
+end
+if ~isfield(spin_system.model,'transition')
+    error('cce_eseem:transition',...
+          'An explicit transition is required for ideal refocusing.');
 end
 end
 

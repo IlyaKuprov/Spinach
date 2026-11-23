@@ -31,15 +31,8 @@ if ischar(operators)
     spins={spins};
 end
 
-% Check dense-equivalent storage before any retained-system allocation
+% Start from the unit operator on the retained space
 d=cluster_system.dimension;
-power=2;
-if strcmp(cluster_system.formalism,'zeeman-liouv')
-    power=4;
-end
-if 16*d^power>cluster_system.model.numerics.max_memory_bytes
-    error('cce_operator:memory','Requested representation exceeds the memory budget.');
-end
 A=speye(d);
 labels={'E','Lx','Ly','Lz','L+','L-'};
 fields={'u','x','y','z','p','m'};
@@ -112,6 +105,13 @@ for n=1:numel(operators)
     if ~ismember(operators{n},{'E','Lx','Ly','Lz','L+','L-'})
         error('cce_operator:label','Unsupported operator descriptor.');
     end
+end
+power=2;
+if strcmp(system.formalism,'zeeman-liouv')
+    power=4;
+end
+if 16*system.dimension^power>system.model.numerics.max_memory_bytes
+    error('cce_operator:memory','Requested representation exceeds the memory budget.');
 end
 end
 

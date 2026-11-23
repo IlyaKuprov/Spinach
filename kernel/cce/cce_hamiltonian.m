@@ -44,9 +44,6 @@ if strcmp(backend,'auto')
         backend='stock';
     end
 end
-if strcmp(backend,'direct')&&~model.direct_supported
-    error('direct Hamiltonian is not validated for %s.',model.fallback_reason);
-end
 
 % Bound simultaneous dense matrices before allocating cluster operators
 ids=[model.observed_ids sites];
@@ -205,9 +202,6 @@ end
 
 % Add static exterior mean fields after the common ordering is established
 if isfield(spin_config,'exterior_ids')
-    if ~model.direct_supported&&~isempty(spin_config.exterior_ids)
-        error('exterior mean fields require validated pair-retention semantics.');
-    end
     for n=1:numel(ids)
         for k=1:numel(spin_config.exterior_ids)
             field=tensors{1+pair_index(ids(n),spin_config.exterior_ids(k))}*...
@@ -265,6 +259,11 @@ end
 if isfield(spin_config,'backend')&&~ismember(spin_config.backend,{'auto','direct','stock'})
     error('spin_config.backend must be auto, direct, or stock.');
 end
+if ~model.direct_supported&&...
+   ((isfield(spin_config,'backend')&&strcmp(spin_config.backend,'direct'))||...
+    (~isfield(spin_config,'backend')&&strcmp(model.backend,'direct')))
+    error('direct Hamiltonian is not validated for %s.',model.fallback_reason);
+end
 if xor(isfield(spin_config,'exterior_ids'),isfield(spin_config,'exterior_expectations'))
     error('exterior_ids and exterior_expectations must be supplied together.');
 end
@@ -280,6 +279,9 @@ if isfield(spin_config,'exterior_ids')
     end
     if any(vecnorm(values,2,2)>(model.multiplicities(ids).'-1)/2+eps)
         error('exterior expectation exceeds the physical spin length.');
+    end
+    if ~model.direct_supported&&~isempty(ids)
+        error('exterior mean fields require validated pair-retention semantics.');
     end
 end
 end

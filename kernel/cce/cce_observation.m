@@ -68,22 +68,14 @@ end
 % Explicit expert density overrides the named experimental preparation
 if isfield(parameters,'rho0')
     observed=parameters.rho0;
-    tolerance=dc*eps;
-    if ~isnumeric(observed)||~isequal(size(observed),[dc dc])||...
-       any(~isfinite(observed),'all')||norm(observed-observed','fro')>tolerance||...
-       abs(trace(observed)-1)>tolerance||min(eig(full((observed+observed')/2)))<-tolerance
-        error('cce_observation:density','An explicit preparation is a positive trace-one density matrix.');
-    end
 elseif isfield(parameters,'preparation')&&isequal(parameters.preparation,'transverse')
     observed=(eye(dc)+2*cce_operator(local,'Lx',ids))/2;
 elseif isfield(parameters,'preparation')&&isstruct(parameters.preparation)
     spec=parameters.preparation;
     observed=cce_state(local,spec.states,spec.spins);
-elseif isfield(model,'transition')
+else
     vector=(model.transition.alpha+model.transition.beta)/sqrt(2);
     observed=vector*vector';
-else
-    error('cce_observation:preparation','Declare a preparation or select an observed transition.');
 end
 if ~isnumeric(observed)||~isequal(size(observed),[dc dc])||any(~isfinite(observed),'all')
     error('cce_observation:preparation','Preparation must be a finite observed-spin matrix.');
@@ -95,18 +87,11 @@ if isfield(parameters,'coil')
 elseif isfield(parameters,'detection')&&isstruct(parameters.detection)
     spec=parameters.detection;
     detectors=cce_operator(local,spec.operators,spec.spins);
-elseif isfield(model,'transition')
-    detectors=model.transition.alpha*model.transition.beta';
 else
-    error('cce_observation:detection','Declare a detector or select an observed transition.');
+    detectors=model.transition.alpha*model.transition.beta';
 end
 if ~iscell(detectors)
     detectors={detectors};
-end
-if isempty(detectors)||~isvector(detectors)||...
-   ~all(cellfun(@(x)isnumeric(x)&&isequal(size(x),[dc dc])&&...
-                   all(isfinite(x),'all'),detectors))
-    error('cce_observation:detection','Every detector must be a finite observed-spin matrix.');
 end
 for k=1:numel(detectors)
     detectors{k}=exp(1i*phase)*detectors{k};
@@ -120,12 +105,6 @@ if normalised&&any(abs(reference)<=cellfun(@(x)dc*eps*norm(x,'fro')*...
     error('cce_observation:reference','Cannot normalize by a vanishing detected reference.');
 end
 
-% Bound the requested state and detector allocations before tensor products
-if 16*cluster_system.dimension^2*(4+numel(detectors))>...
-   model.parameters.cce.numerics.max_memory_bytes
-    error('cce:memory','Observation construction exceeds max_memory_bytes.');
-end
-
 % Build the bath product in the exact retained order supplied by the subsystem
 bath=1;
 for k=1:numel(cluster_system.bath_rho)
@@ -133,9 +112,6 @@ for k=1:numel(cluster_system.bath_rho)
 end
 projected=strcmp(parameters.cce.approximation,'projected');
 if projected
-    if ~isfield(model,'transition')||numel(detectors)~=1
-        error('cce_observation:projected','Projected evolution requires one selected-transition detector.');
-    end
     alpha=model.transition.alpha;
     beta=model.transition.beta;
     basis_detector=alpha*beta';
@@ -228,6 +204,41 @@ if isfield(parameters,'receiver_phase')&&(~isnumeric(parameters.receiver_phase)|
 end
 if isfield(parameters,'normalized')&&(~islogical(parameters.normalized)||~isscalar(parameters.normalized))
     error('cce_observation:normalization','normalized must be an explicit logical scalar.');
+end
+dc=system.observed_dimension;
+if isfield(parameters,'rho0')
+    rho0=parameters.rho0;
+    if ~isnumeric(rho0)||~isequal(size(rho0),[dc dc])||...
+       any(~isfinite(rho0),'all')||norm(rho0-rho0','fro')>dc*eps||...
+       abs(trace(rho0)-1)>dc*eps||min(eig(full((rho0+rho0')/2)))<-dc*eps
+        error('cce_observation:density','An explicit preparation is a positive trace-one density matrix.');
+    end
+end
+if ~isfield(system.model,'transition')&&~any(isfield(parameters,{'rho0','preparation'}))
+    error('cce_observation:preparation','Declare a preparation or select an observed transition.');
+end
+if ~isfield(system.model,'transition')&&~any(isfield(parameters,{'coil','detection'}))
+    error('cce_observation:detection','Declare a detector or select an observed transition.');
+end
+count=1;
+if isfield(parameters,'coil')
+    coil=parameters.coil;
+    if ~iscell(coil)
+        coil={coil};
+    end
+    if isempty(coil)||~isvector(coil)||...
+       ~all(cellfun(@(x)isnumeric(x)&&isequal(size(x),[dc dc])&&...
+                       all(isfinite(x),'all'),coil))
+        error('cce_observation:detection','Every detector must be a finite observed-spin matrix.');
+    end
+    count=numel(coil);
+end
+if 16*system.dimension^2*(4+count)>system.model.parameters.cce.numerics.max_memory_bytes
+    error('cce:memory','Observation construction exceeds max_memory_bytes.');
+end
+if strcmp(parameters.cce.approximation,'projected')&&...
+   (~isfield(system.model,'transition')||count~=1)
+    error('cce_observation:projected','Projected evolution requires one selected-transition detector.');
 end
 end
 

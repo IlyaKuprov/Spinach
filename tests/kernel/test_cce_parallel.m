@@ -142,7 +142,7 @@ p.cce.basis.formalism='zeeman-liouv';
 p.bath_jumps=struct([]);
 p.cce.parallel.mode='clusters';
 model=cce_compile(spin_system,p,'labframe');
-model.cce.formalism='zeeman-liouv';
+model.bas.formalism='zeeman-liouv';
 metadata=whos('model','clusters','ensemble','p');
 resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
 workspace=construction+16*24*dimension^4;
@@ -184,11 +184,11 @@ for method={'cce','mecce','noise'}
 
     % Keep an independent high-budget reference for each physical evaluator
     large.cce.approximation='projected';
-    large_model.cce.formalism='zeeman-hilb';
+    large_model.bas.formalism='zeeman-hilb';
     pulse_sequence=@free_evolution;
     if strcmp(method{1},'mecce')
         large.bath_jumps=struct([]);
-        large_model.cce.formalism='zeeman-liouv';
+        large_model.bas.formalism='zeeman-liouv';
     end
     if strcmp(method{1},'noise')
         large=rmfield(large,'bath_jumps');
@@ -247,7 +247,7 @@ noise_request.cce.numerics.max_memory_bytes=2^28;
 noise_request.cce.basis.formalism='zeeman-liouv';
 noise_request.bath_jumps=struct('support',7,'operator',diag([1 -1])/2,'rate',1);
 noise_model=large_model;
-noise_model.cce.formalism='zeeman-liouv';
+noise_model.bas.formalism='zeeman-liouv';
 refused=false;
 try
     cce_schedule(noise_model,large_clusters,large_ensemble,large_schedule,...
@@ -264,7 +264,7 @@ liouville.cce.approximation='projected';
 liouville=rmfield(liouville,'noise');
 liouville.bath_jumps=struct('support',1,'operator',diag([1 -1])/2,'rate',1);
 liouville.cce.numerics.max_memory_bytes=2^28;
-large_model.cce.formalism='zeeman-liouv';
+large_model.bas.formalism='zeeman-liouv';
 large_model.cce.parameters=liouville;
 [subsystem,~]=cce_subsystem(large_model,7,struct(),[]);
 [H,~,~]=cce_generators(subsystem,liouville,[]);
@@ -337,7 +337,7 @@ for method={'mecce','megcce'}
     retained=cce_options(spin_system,retained,@free_evolution,'labframe');
     [~,retained_data]=clexpn(spin_system,@free_evolution,retained,'labframe');
     retained_model=cce_compile(spin_system,retained,'labframe');
-    retained_model.cce.formalism='zeeman-liouv';
+    retained_model.bas.formalism='zeeman-liouv';
     retained_clusters=retained_data.clusters;
     retained_states=retained_data.ensemble;
     retained_schedule=schedule;

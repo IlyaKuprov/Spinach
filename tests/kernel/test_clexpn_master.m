@@ -126,7 +126,7 @@ result=test_true(result,'Active exterior jump refused',rejected,...
 
 % Exercise the recursive and complete-bath conditioned paths
 model=cce_compile(s,df.parameters,'labframe');
-model.cce.formalism='zeeman-liouv';
+model.bas.formalism='zeeman-liouv';
 model.cce.clusters=df.clusters;
 local=df.parameters;
 local.cce.interlaced.reference_state=1;
@@ -165,7 +165,7 @@ request.drive(2).amplitude=3;
 [~,driven]=clexpn(s,@finite_drive,request,'labframe');
 request=driven.parameters;
 drive_model=cce_compile(s,request,'labframe');
-drive_model.cce.formalism='zeeman-liouv';
+drive_model.bas.formalism='zeeman-liouv';
 checks=cce_diagnostics(drive_model,driven.raw,driven.reduction,request);
 result=test_true(result,'Driven Liouville numerical budget is not exact',...
                  all(driven.raw{1}(end).abs_error_bound(2:end)>0)&&...

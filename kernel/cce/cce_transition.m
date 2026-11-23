@@ -61,7 +61,7 @@ else
     assumption_args=assumptions;
 end
 native=~isempty(model)&&isfield(parameters.transition,'ms')&&...
-       strcmp(model.cce.formalism,'zeeman-hilb')&&...
+       strcmp(model.bas.formalism,'zeeman-hilb')&&...
        strcmp(model.cce.parameters.cce.bath_state.mode,'mixed_product')&&...
        (~isfield(model.cce.parameters,'bath_jumps')||isempty(model.cce.parameters.bath_jumps));
 if ~native
@@ -95,7 +95,7 @@ else
 
     % Reuse the compiled observed subsystem without exterior mean fields
     model.cce.parameters.cce.meanfield='none';
-    model.cce.formalism='zeeman-hilb';
+    model.bas.formalism='zeeman-hilb';
     config=struct('configuration_id',1,'state_id',1,'weight',1);
     [system,~]=cce_subsystem(model,[],config,[]);
     p=model.cce.parameters;

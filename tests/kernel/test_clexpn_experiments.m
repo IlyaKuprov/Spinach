@@ -662,7 +662,7 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 q.normalized=normalised;
                 [~,d]=clexpn(invariant,sequence{1},q,'labframe');
                 model=cce_compile(invariant,d.parameters,'labframe');
-                model.cce.formalism=formalism{1};
+                model.bas.formalism=formalism{1};
                 checks=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
                 [retained,~]=cce_subsystem(model,2,struct(),[]);
                 [H,R,K,local]=cce_generators(retained,d.parameters,[]);
@@ -732,7 +732,7 @@ for approximation={'projected','generalized'}
     % Compare local errors against the analytic polarisation of an initially mixed bath
     q.cce.approximation=approximation{1};
     model=cce_compile(system,q,'labframe');
-    model.cce.formalism='zeeman-liouv';
+    model.bas.formalism='zeeman-liouv';
     [retained,~]=cce_subsystem(model,2,struct(),[]);
     [H,R,K,local]=cce_generators(retained,model.cce.parameters,[]);
     [~,aux]=bath_pumped_hahn(retained,local,H,R,K);

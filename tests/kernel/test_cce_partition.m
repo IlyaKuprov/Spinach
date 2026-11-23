@@ -331,7 +331,7 @@ result=test_true(result,'Fractional spatial ceiling rejected',...
                  'Spatial iteration budgets are whole counts.');
 invalid.cce.partition.max_rounds=2;
 bad_model=model;
-bad_model.cce.coordinates_A(2,1)=NaN;
+bad_model.inter.coordinates{2}=[];
 refused=false;
 try
     cce_partition(bad_model,graph,invalid);
@@ -373,7 +373,7 @@ for method={'gcce','megcce'}
     local_model=cce_compile(spin_system,q,'labframe');
     local_model.cce.pulse_sequence=@free_evolution;
     if strcmp(method{1},'megcce')
-        local_model.cce.formalism='zeeman-liouv';
+        local_model.bas.formalism='zeeman-liouv';
     end
     states=singletons_diag.ensemble;
     q.cce.partition=struct('mode','user','adaptive',true,'max_dimension',8,...
@@ -419,7 +419,7 @@ open.cce.partition.max_probes=2;
 open.bath_jumps=struct('support',2,'operator',diag([1 -1])/2,'rate',100);
 open=cce_options(spin_system,open,@hahn_echo,'labframe');
 open_model=model;
-open_model.cce.formalism='zeeman-liouv';
+open_model.bas.formalism='zeeman-liouv';
 open_partition=cce_partition(open_model,graph,open);
 result=test_true(result,'Master-equation adaptive evaluator',...
                  open_partition.complete&&open_partition.diagnostics.probes==2,...
@@ -447,7 +447,7 @@ for method={'gcce','megcce'}
     local_model=cce_compile(spin_system,q,'labframe');
     local_model.cce.pulse_sequence=@free_evolution;
     if strcmp(method{1},'megcce')
-        local_model.cce.formalism='zeeman-liouv';
+        local_model.bas.formalism='zeeman-liouv';
     end
     states=reference_diag.ensemble;
     q.cce.partition.adaptive=true;

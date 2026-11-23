@@ -50,7 +50,7 @@ spin_system=assume(spin_system,assumptions{:});
 
 % Copy immutable source metadata and stable physical identifiers
 spin_system.cce.parameters=parameters;
-spin_system.cce.formalism=formalism;
+spin_system.bas.formalism=formalism;
 spin_system.cce.groups={};
 if isfield(parameters.cce,'groups')
     spin_system.cce.groups=parameters.cce.groups;
@@ -67,16 +67,7 @@ end
 spin_system.cce.numerics=parameters.cce.numerics;
 spin_system.cce.backend=parameters.cce.backend;
 
-% Preserve absent coordinates rather than inventing spatial positions
 nspins=spin_system.comp.nspins;
-spin_system.cce.coordinates_A=nan(nspins,3);
-if isfield(spin_system.inter,'coordinates')
-    for n=1:nspins
-        if ~isempty(spin_system.inter.coordinates{n})
-            spin_system.cce.coordinates_A(n,:)=spin_system.inter.coordinates{n};
-        end
-    end
-end
 
 % Rotate canonical Cartesian tensors into the requested laboratory frame
 rotation=euler2dcm(parameters.orientation);
@@ -156,10 +147,10 @@ for p=1:numel(n_ids)
 
     % Apply only the explicitly requested physical distance cutoff
     if isfinite(spin_system.cce.interaction_cutoff)&&(norm(tensor,'fro')>0)
-        if any(~isfinite(spin_system.cce.coordinates_A([n k],:)),'all')
+        if isempty(spin_system.inter.coordinates{n})||isempty(spin_system.inter.coordinates{k})
             error('finite interaction_cutoff requires coordinates for every coupled pair.');
         end
-        if norm(spin_system.cce.coordinates_A(n,:)-spin_system.cce.coordinates_A(k,:))>spin_system.cce.interaction_cutoff
+        if norm(spin_system.inter.coordinates{n}-spin_system.inter.coordinates{k})>spin_system.cce.interaction_cutoff
             spin_system.cce.omitted_pairs(end+1,:)=[n k];
             rows=[index(n,k) index(k,n)];
             omit(rows(rows>0))=true;

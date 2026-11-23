@@ -289,15 +289,15 @@ end
 model=cce_compile(spin_system,parameters,assumptions);
 model.cce.pulse_sequence=pulse_sequence;
 if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
-    model.cce.formalism=parameters.cce.basis.formalism;
+    model.bas.formalism=parameters.cce.basis.formalism;
 elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
-    model.cce.formalism='zeeman-liouv';
+    model.bas.formalism='zeeman-liouv';
 end
 
 % Validate propagation choices here rather than in graph or reduction services
 if isfield(parameters.cce.numerics,'propagator')
     supported={'eig'};
-    if strcmp(model.cce.formalism,'zeeman-liouv')
+    if strcmp(model.bas.formalism,'zeeman-liouv')
         supported={'stock'};
     elseif isequal(pulse_sequence,@hahn_echo)&&strcmp(parameters.cce.approximation,'generalized')
         supported={'eig','expm'};

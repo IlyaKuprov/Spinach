@@ -120,7 +120,7 @@ switch parameters.graph.mode
     case 'complete'
         adjacency=~speye(n);
     case 'distance'
-        xyz=model.cce.coordinates_A(bath_pos,:);
+        xyz=vertcat(model.inter.coordinates{bath_pos});
         radius=parameters.graph.radius;
         if radius==0
 
@@ -172,8 +172,8 @@ keep=true(1,n);
 if isfield(parameters,'bath_radius')&&isfinite(parameters.bath_radius)
     distance=inf(n,1);
     for k=observed_pos
-        distance=min(distance,vecnorm(model.cce.coordinates_A(bath_pos,:)-...
-                                     model.cce.coordinates_A(k,:),2,2));
+        distance=min(distance,vecnorm(vertcat(model.inter.coordinates{bath_pos})-...
+                                      model.inter.coordinates{k},2,2));
     end
     keep=distance.'<=parameters.bath_radius;
 end
@@ -191,7 +191,7 @@ end
 % Validate shapes, physical IDs, graph semantics, and physical units
 function grumble(model,parameters)
 if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
-   ~all(isfield(model.cce,{'observed_ids','bath_ids','coordinates_A','pairs'}))
+   ~all(isfield(model.cce,{'observed_ids','bath_ids','pairs'}))
     error('cce_graph:model','incomplete scalar model structure.');
 end
 ids=1:model.comp.nspins;
@@ -205,10 +205,6 @@ for name={'observed_ids','bath_ids'}
 end
 if ~isempty(intersect(model.cce.observed_ids,model.cce.bath_ids))||isempty(model.cce.observed_ids)
     error('cce_graph:ids','observed IDs must be nonempty and disjoint from bath IDs.');
-end
-if ~isnumeric(model.cce.coordinates_A)||~isreal(model.cce.coordinates_A)||...
-   ~isequal(size(model.cce.coordinates_A),[numel(ids) 3])||any(isinf(model.cce.coordinates_A),'all')
-    error('cce_graph:coordinates','coordinates_A must be a physical-site by three array.');
 end
 if ~isstruct(model.cce.pairs)||(~isempty(model.cce.pairs)&&~all(isfield(model.cce.pairs,{'ids','tensor'})))
     error('cce_graph:pairs','pairs must be records ids,tensor.');
@@ -298,7 +294,7 @@ if isfield(parameters,'bath_radius')&&(~isnumeric(parameters.bath_radius)||...
     error('cce_graph:radius','bath_radius must be nonnegative.');
 end
 if (strcmp(g.mode,'distance')||(isfield(parameters,'bath_radius')&&...
-    isfinite(parameters.bath_radius)))&&any(~isfinite(model.cce.coordinates_A),'all')
+    isfinite(parameters.bath_radius)))&&any(cellfun(@isempty,model.inter.coordinates))
     error('cce_graph:coordinates','distance selection requires finite physical coordinates.');
 end
 end

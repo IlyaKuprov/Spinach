@@ -408,8 +408,8 @@ for method={'cce','gcce','mecce','megcce'}
     % Distinguish missing observed and exterior sites from irrelevant included sites
     for missing=[model.cce.observed_ids 3]
         partial=model;
-        partial.cce.coordinates_A=[0 0 0;1 0 0;3 0 0];
-        partial.cce.coordinates_A(missing,:)=NaN;
+        partial.inter.coordinates={[0 0 0];[1 0 0];[3 0 0]};
+        partial.inter.coordinates{missing}=[];
         rejected=false;
         try
             cce_evaluate(partial,cluster,spin_config,schedule,base);
@@ -421,7 +421,7 @@ for method={'cce','gcce','mecce','megcce'}
                          rejected,'Each observed and exterior site needs finite coordinates.');
     end
     spatial=model;
-    spatial.cce.coordinates_A=[0 0 0;NaN NaN NaN;3 0 0];
+    spatial.inter.coordinates={[0 0 0];[];[3 0 0]};
     accepted=true;
     try
         cce_evaluate(spatial,cluster,spin_config,schedule,base);
@@ -629,7 +629,7 @@ if isfield(parameters.cce,'meanfield_radius')
     parameters.cce=rmfield(parameters.cce,'meanfield_radius');
 end
 model.cce.parameters=parameters;
-model.cce.formalism='zeeman-hilb';
+model.bas.formalism='zeeman-hilb';
 [system,~]=cce_subsystem(model,model.cce.bath_ids,struct(),[]);
 [~,selected]=bath_pumped_hahn(system,parameters,zeros(system.dimension),0,0);
 

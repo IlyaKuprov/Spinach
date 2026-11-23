@@ -52,7 +52,7 @@ ids=[model.cce.observed_ids sites];
 dims=model.comp.mults(ids);
 cluster_system.kind='cce_subsystem';
 cluster_system.model=model;
-cluster_system.formalism=model.cce.formalism;
+cluster_system.formalism=model.bas.formalism;
 cluster_system.sites=sites;
 cluster_system.physical_ids=ids;
 cluster_system.local_to_physical=ids;
@@ -63,7 +63,6 @@ cluster_system.dimension=prod(dims);
 cluster_system.observed_dimension=prod(model.comp.mults(model.cce.observed_ids));
 cluster_system.bath_dimension=prod(model.comp.mults(sites));
 cluster_system.isotopes=model.comp.isotopes(ids);
-cluster_system.coordinates_A=model.cce.coordinates_A(ids,:);
 cluster_system.assumptions=model.cce.assumptions;
 cluster_system.groups=cellfun(@(group)group(ismember(group,ids)),...
                               model.cce.groups,'UniformOutput',false);
@@ -123,7 +122,7 @@ if strcmp(model.cce.parameters.cce.meanfield,'static')
        isfinite(model.cce.parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
         distance=inf(1,numel(exterior_ids));
         for id=model.cce.observed_ids
-            delta=model.cce.coordinates_A(exterior_ids,:)-model.cce.coordinates_A(id,:);
+            delta=vertcat(model.inter.coordinates{exterior_ids})-model.inter.coordinates{id};
             distance=min(distance,sqrt(sum(delta.^2,2)).');
         end
         keep=distance<=model.cce.parameters.cce.meanfield_radius;
@@ -223,7 +222,7 @@ if strcmp(model.cce.parameters.cce.meanfield,'static')&&...
    isfinite(model.cce.parameters.cce.meanfield_radius)
     exterior=setdiff(model.cce.bath_ids,sites);
     if ~isempty(exterior)&&...
-       any(~isfinite(model.cce.coordinates_A([model.cce.observed_ids exterior],:)),'all')
+       any(cellfun(@isempty,model.inter.coordinates([model.cce.observed_ids exterior])))
         error('cce:coordinates','cce.meanfield_radius requires finite observed and exterior coordinates.');
     end
 end

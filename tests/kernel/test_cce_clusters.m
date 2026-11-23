@@ -39,7 +39,8 @@ manual=fileread(fullfile(root,'interfaces','agents','spinach-knowledge',...
 result=test_true(result,'Documented engine bath radius',contains(manual,'| `bath_radius` |')&&...
                  ~contains(manual,'graph.bath_radius'),...
                  'The retained engine table must name the root field consumed by cce_graph.');
-radius_model.cce=struct('bath_ids',[2 3],'observed_ids',1,'coordinates_A',[0 0 0;1 0 0;3 0 0],'pairs',struct('ids',{},'tensor',{}));
+radius_model.cce=struct('bath_ids',[2 3],'observed_ids',1,'pairs',struct('ids',{},'tensor',{}));
+radius_model.inter.coordinates=num2cell([0 0 0;1 0 0;3 0 0],2);
 radius_model.comp.mults=[2 2 2];
 radius_model.comp.nspins=numel(radius_model.comp.mults);
 radius_parameters=struct('method','cce','order',1,'expansion','standard',...
@@ -64,7 +65,8 @@ for n=0:7
                 adjacency(b,a)=edge;
             end
         end
-        model.cce=struct('observed_ids',1,'bath_ids',2:n+1,'coordinates_A',[(0:n).' zeros(n+1,2)],'pairs',struct('ids',{},'tensor',{}));
+        model.cce=struct('observed_ids',1,'bath_ids',2:n+1,'pairs',struct('ids',{},'tensor',{}));
+        model.inter.coordinates=num2cell([(0:n).' zeros(n+1,2)],2);
         model.comp.mults=2*ones(1,n+1);
         model.comp.nspins=numel(model.comp.mults);
         parameters=struct('method','cce','order',0,'expansion','standard',...
@@ -196,7 +198,8 @@ for topology=1:3
 end
 
 % Check cap selection, mandatory closure, and physical composite dimensions
-model.cce=struct('observed_ids',10,'bath_ids',[20 30 40 50],'coordinates_A',zeros(50,3),'pairs',struct('ids',{},'tensor',{}));
+model.cce=struct('observed_ids',10,'bath_ids',[20 30 40 50],'pairs',struct('ids',{},'tensor',{}));
+model.inter.coordinates=num2cell(zeros(50,3),2);
 model.comp.mults=2*ones(1,50);
 model.comp.mults([10 30])=3;
 model.comp.nspins=50;
@@ -262,8 +265,9 @@ graph=cce_graph(model,parameters);
 result=test_close(result,'Explicit resonance score',graph.scores(1,3),0.8,8*eps,0,...
                   'operator norm divided by hypot(1,mismatch/scale)');
 parameters.graph=struct('mode','distance','radius',1);
-model.cce.coordinates_A=zeros(50,3);
-model.cce.coordinates_A([10 20 30 40 50],1)=0:4;
+xyz=zeros(50,3);
+xyz([10 20 30 40 50],1)=0:4;
+model.inter.coordinates=num2cell(xyz,2);
 parameters.bath_radius=2;
 graph=cce_graph(model,parameters);
 result=test_true(result,'Union-of-centres bath radius',isequal(graph.bath_ids,[20 30])&&...
@@ -271,7 +275,8 @@ result=test_true(result,'Union-of-centres bath radius',isequal(graph.bath_ids,[2
                  'bath filtering and the separate physical graph radius preserve ID ordering');
 
 % Supplied scores set deterministic cap selection before closure
-model.cce=struct('observed_ids',1,'bath_ids',2:5,'coordinates_A',zeros(5,3),'pairs',struct('ids',{},'tensor',{}));
+model.cce=struct('observed_ids',1,'bath_ids',2:5,'pairs',struct('ids',{},'tensor',{}));
+model.inter.coordinates=num2cell(zeros(5,3),2);
 model.comp.mults=2*ones(1,5);
 model.comp.nspins=numel(model.comp.mults);
 parameters=struct('method','cce','order',2,'expansion','standard',...

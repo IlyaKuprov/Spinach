@@ -99,7 +99,7 @@ end
 
 % Assign farthest-first spatial seeds subject to exact Hilbert capacities
 if strcmp(p.mode,'spatial')&&~isempty(ids)
-    xyz=model.cce.coordinates_A(positions,:);
+    xyz=vertcat(model.inter.coordinates{positions});
     seeds=1;
     for k=2:p.group_count
         distance=inf(numel(ids),1);
@@ -457,10 +457,7 @@ end
 if strcmp(p.mode,'spatial')
     if ~all(isfield(p,{'group_count','max_rounds'}))||~integer(p.group_count,0)||...
        p.group_count>numel(ids)||(~isempty(ids)&&p.group_count<1)||...
-       ~integer(p.max_rounds,1)||~isfield(model.cce,'coordinates_A')||...
-       ~isnumeric(model.cce.coordinates_A)||~isreal(model.cce.coordinates_A)||...
-       ~isequal(size(model.cce.coordinates_A),[model.comp.nspins 3])||...
-       any(~isfinite(model.cce.coordinates_A(index,:)),'all')
+       ~integer(p.max_rounds,1)||any(cellfun(@isempty,model.inter.coordinates(index)))
         error('Spatial grouping requires finite coordinates, group count, and round ceiling.');
     end
 end

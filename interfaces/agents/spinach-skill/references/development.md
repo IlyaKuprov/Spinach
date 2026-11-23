@@ -153,6 +153,18 @@ exercise a different regime from the unit tests. Capture assertions and
 observable comparisons, not only screenshots or log tails. Follow
 [execution and validation](validation.md) for runtime evidence.
 
+When replacing a handwritten generator by a model declared through `sys`,
+`inter`, and `bas`, confirm the assumption and frame conventions of the
+current implementation, and test the full-space generator before trusting
+a spectrum from a reduced sector: a projected Hamiltonian can match
+exactly while omitted off-sector couplings still give unphysical
+trajectories. Compare the commutators with the conserved quantities, and a
+propagated trajectory, against an independent small reference. For a
+relaxation migration, compare trace preservation, positivity, and a
+representative trajectory against an independently assembled small
+dissipative model. Keep export and testing machinery out of readable
+examples.
+
 Follow the distribution-root `AGENTS.md` for required skill and knowledge-base
 updates, content preservation, and documentation policy. It is the sole
 source of those instructions.

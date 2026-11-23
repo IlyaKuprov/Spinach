@@ -453,6 +453,39 @@ observable is symmetric under the corresponding reflections; antisymmetric
 interaction components or tensors that do not share principal axes need the
 full sphere.
 
+### Checking a reduced grid
+
+Establish a hemisphere or octant reduction for the signal itself, and test
+grid convergence separately; neither follows from the other.
+
+1. Write down the complete Hamiltonian, the tensor frames, the initial and
+   detection states, and the angles the grid integrates. Equal energy
+   levels at two orientations do not make the signals equal: the
+   transition intensities must agree as well.
+2. Find the symmetry operations. For one quadrupolar nucleus in a magnetic
+   field, with the tensor specified in its principal axis frame, each of
+   the three pi rotations about the principal axes reverses two components
+   of the field direction, and time reversal reverses all three. The eight
+   sign combinations are then equivalent and an octant suffices; an axial
+   tensor needs `betas` only. A second tensor with different principal
+   axes removes the octant equivalence. The `_oct` grids sample `betas`
+   and `gammas` within a quarter turn of zero, so the octant argument
+   holds only when the principal axes coincide with the frame in which
+   the interactions are specified.
+3. Test pointwise before averaging. Build a small Hilbert-space reference
+   from `pauli` and `eeqq2nqi`, keeping the non-secular terms, pick random
+   field directions, apply the sign combinations, and compare transition
+   frequencies and intensities. Sum the intensities over degenerate levels
+   before comparing them.
+4. Add a negative control: a deliberately non-coaxial tensor must make the
+   same test fail.
+5. Converge the reduced grid on its own by going to the next grid up.
+   Agreement between sphere and octant results shows the symmetry, not the
+   quality of the quadrature.
+6. Repeat the test on the full preparation, evolution, and detection
+   signal before carrying a reduction found for a weak-excitation spectrum
+   over to a finite-pulse experiment.
+
 For a quick check `rep_2ang_100pts_sph` shows whether a lineshape is roughly
 right; `rep_2ang_800pts_sph` is the commonest choice across the examples and
 a sensible default; `rep_2ang_6400pts_sph` and above are for converged

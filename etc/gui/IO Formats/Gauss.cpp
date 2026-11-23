@@ -12,6 +12,8 @@ namespace {
     typedef cli::array<String^> Lines;
     typedef SortedDictionary<int, Values^> AtomTable;
     typedef Dictionary<int, int> IsotopeTable;
+    typedef Tuple<int,int> Pair;
+    typedef Dictionary<Pair^,double> PairTable;
 
     Lines^ words(String^ line)
     {
@@ -201,9 +203,69 @@ namespace {
         return massMatch!=nullptr?massMatch:first;
     }
 
+    // Lower-triangular pair table printed in column batches; returns the last line consumed.
+    int pairs(Lines^ lines,int n,PairTable^ table)
+    {
+        table->Clear(); List<int>^ columns=gcnew List<int>();
+        for(int k=n+1;k<lines->Length;++k) {
+            Lines^ row=words(lines[k]); int id;
+            if(row->Length==0 || !Int32::TryParse(row[0],id)) break;
+            if(row->Length==1 || !row[1]->Contains(".") && row[1]->IndexOfAny(gcnew cli::array<Char>{'D','E','*'})<0) {
+                columns->Clear(); for each(String^ field in row) {int col; if(!Int32::TryParse(field,col)) break; columns->Add(col);}
+            } else {
+                for(int j=1;j<row->Length && j<=columns->Count;++j) {double v; if(columns[j-1]!=id && number(row[j],v)) table[Tuple::Create(id,columns[j-1])]=v;}
+            }
+            n=k;
+        }
+        return n;
+    }
+
     int massOf(IsotopeTable^ masses,int id)
     {
         int m; return masses->TryGetValue(id,m)?m:0;
+    }
+
+    // Mass numbers Gaussian 16 assigns when the input gives none: IAtWgt of single-atom jobs, Z=0..103.
+    const unsigned short gaussianMass[]={
+        0,1,4,7,9,11,12,14,16,19,20,23,24,27,28,31,32,35,40,39,40,45,48,51,52,55,
+        56,59,58,63,64,69,74,75,80,79,84,85,88,89,90,93,98,99,102,103,106,107,114,115,118,121,
+        130,127,132,133,138,139,140,141,142,145,152,153,158,159,164,165,166,169,174,175,180,181,184,187,190,193,
+        195,197,202,205,208,209,209,211,222,223,226,227,232,231,238,237,242,243,246,247,249,252,252,255,259,262};
+
+    // Gaussian prints reduced couplings K beside J: J/K=(hbar/mu_N)^2*gamma_i*gamma_j identifies
+    // the isotopes that the J values refer to, whatever the log says about masses.
+    IsotopeTable^ coupledIsotopes(AtomTable^ geometry,PairTable^ J,PairTable^ K,ArrayList^ library)
+    {
+        typedef List<Tuple<int,double>^> Partners; typedef List<Isotope^> Candidates;
+        Dictionary<int,Partners^>^ partners=gcnew Dictionary<int,Partners^>(); IsotopeTable^ found=gcnew IsotopeTable();
+        Dictionary<int,Candidates^>^ magnetic=gcnew Dictionary<int,Candidates^>();
+        for each(Isotope^ iso in library) if(iso->Magnetogyric!=0.0) {
+            if(!magnetic->ContainsKey(iso->AtomNumber)) magnetic[iso->AtomNumber]=gcnew Candidates();
+            magnetic[iso->AtomNumber]->Add(iso);
+        }
+        for each(Pair^ pair in J->Keys) {
+            double k; int a=pair->Item1, b=pair->Item2;
+            if(!K->TryGetValue(pair,k) || k==0.0 || J[pair]==0.0 || !geometry->ContainsKey(a) || !geometry->ContainsKey(b)) continue;
+            if(!magnetic->ContainsKey((int)geometry[a][0]) || !magnetic->ContainsKey((int)geometry[b][0])) continue;
+            double product=J[pair]/k/Math::Pow(1.054571817e-34/5.0507837461e-27,2);
+            if(!partners->ContainsKey(a)) partners[a]=gcnew Partners();
+            if(!partners->ContainsKey(b)) partners[b]=gcnew Partners();
+            partners[a]->Add(Tuple::Create(b,product)); partners[b]->Add(Tuple::Create(a,product));
+        }
+        for each(int id in partners->Keys) {
+            double best=Double::MaxValue;
+            for each(Isotope^ a in magnetic[(int)geometry[id][0]]) {
+                double misfit=0.0;
+                for each(Tuple<int,double>^ p in partners[id]) {
+                    double nearest=Double::MaxValue;
+                    for each(Isotope^ b in magnetic[(int)geometry[p->Item1][0]])
+                        nearest=Math::Min(nearest,Math::Abs(p->Item2/(a->Magnetogyric*b->Magnetogyric)-1.0));
+                    misfit+=nearest;
+                }
+                if(misfit<best) {best=misfit; found[id]=a->Mass;}
+            }
+        }
+        return found;
     }
 
     bool sameSites(AtomTable^ a,AtomTable^ b)
@@ -231,8 +293,7 @@ bool Gauss::LoadFile()
     IsotopeTable^ masses=gcnew IsotopeTable(); IsotopeTable^ hmass=gcnew IsotopeTable(); IsotopeTable^ qmass=gcnew IsotopeTable();
     AtomTable^ shielding=gcnew AtomTable(); AtomTable^ quadrupole=gcnew AtomTable();
     AtomTable^ dipolar=gcnew AtomTable(); Dictionary<int,double>^ contact=gcnew Dictionary<int,double>();
-    typedef Tuple<int,int> Pair;
-    Dictionary<Pair^,double>^ coupling=gcnew Dictionary<Pair^,double>();
+    PairTable^ coupling=gcnew PairTable(); PairTable^ reduced=gcnew PairTable(); IsotopeTable^ stated=gcnew IsotopeTable();
     Values^ g=nullptr; Values^ chi=nullptr; Values^ axes=nullptr; int multiplicity=0; bool readCharge=false;
     for(int n=0;n<lines->Length;++n) {
         String^ line=lines[n]->Trim();
@@ -261,7 +322,7 @@ bool Gauss::LoadFile()
             if(next->Count==0) continue;
             if(geometry->Count && !sameSites(geometry,next)) {
                 shielding->Clear(); quadrupole->Clear(); qmass->Clear(); dipolar->Clear(); contact->Clear(); hmass->Clear(); masses->Clear();
-                coupling->Clear(); compositeDipolar->Clear(); compositeContact->Clear(); input=nullptr; g=nullptr; chi=nullptr;
+                coupling->Clear(); reduced->Clear(); compositeDipolar->Clear(); compositeContact->Clear(); input=nullptr; g=nullptr; chi=nullptr;
             }
             if(line=="Input orientation:") input=next;
             geometry=next; principal=nullptr; axes=nullptr;
@@ -298,18 +359,28 @@ bool Gauss::LoadFile()
             int k=n+1; if(k<lines->Length && lines[k]->Contains("Isotropic")) ++k;
             chi=components(lines,k,'X');
         }
-        else if(line=="Total nuclear spin-spin coupling J (Hz):") {
-            coupling->Clear(); List<int>^ columns=gcnew List<int>();
+        else if(line=="Total nuclear spin-spin coupling J (Hz):") n=pairs(lines,n,coupling);
+        else if(line=="Total nuclear spin-spin coupling K (Hz):") n=pairs(lines,n,reduced);
+        else if(line=="Symbolic Z-matrix:") {
+            // Isotopes of the molecule specification, e.g. H(Iso=2). Jobs that take the
+            // geometry from the checkpoint print no such block and inherit these.
+            stated->Clear(); int centre=0;
             for(int k=n+1;k<lines->Length;++k) {
-                Lines^ row=words(lines[k]); int id;
-                if(row->Length==0 || !Int32::TryParse(row[0],id)) break;
-                if(row->Length==1 || !row[1]->Contains(".") && row[1]->IndexOfAny(gcnew cli::array<Char>{'D','E','*'})<0) {
-                    columns->Clear(); for each(String^ field in row) {int col; if(!Int32::TryParse(field,col)) break; columns->Add(col);}
-                } else {
-                    for(int j=1;j<row->Length && j<=columns->Count;++j) {double v; if(columns[j-1]!=id && number(row[j],v)) coupling[Tuple::Create(id,columns[j-1])]=v;}
-                }
-                n=k;
+                String^ row=lines[k]->Trim(); if(row->StartsWith("Charge =")) continue;
+                Match^ m=Regex::Match(row,"^([A-Za-z]{1,2}|-?\\d+)(?![A-Za-z])[^\\s(]*(?:\\(([^)]*)\\))?");
+                if(!m->Success) break;
+                String^ label=m->Groups[1]->Value; int z; bool numeric=Int32::TryParse(label,z);
+                if(!numeric) z=System::Array::IndexOf(elements,label->Substring(0,1)->ToUpper()+label->Substring(1)->ToLower());
+                if(numeric?z==-1:z==0) continue;    // dummy atoms have no centre number
+                ++centre; Match^ iso=Regex::Match(m->Groups[2]->Value,"iso\\s*=\\s*(\\d{1,3})",RegexOptions::IgnoreCase);
+                if(z>0 && iso->Success) stated[centre]=z*1000+Int32::Parse(iso->Groups[1]->Value);
             }
+        }
+        else if(line->StartsWith("Atom ") && line->Contains(" has atomic number ")) {
+            // Thermochemistry lists the isotopes in effect, including those set by Freq=ReadIsotopes.
+            Match^ m=Regex::Match(line,"^Atom\\s+(\\d+) has atomic number\\s+(\\d+) and mass\\s+(\\d+\\.\\d+)$");
+            if(m->Success) stated[Int32::Parse(m->Groups[1]->Value)]=Int32::Parse(m->Groups[2]->Value)*1000+
+                (int)Math::Round(Double::Parse(m->Groups[3]->Value,CultureInfo::InvariantCulture));
         }
         else if(line=="Isotropic Fermi Contact Couplings") {
             if(fullSystem) {contact->Clear(); hmass->Clear(); compositeDipolar->Clear(); compositeContact->Clear();}
@@ -397,9 +468,15 @@ bool Gauss::LoadFile()
     ArrayList^ library=Isotopes::getAllIsotopes(); Dictionary<int,Atom^>^ atoms=gcnew Dictionary<int,Atom^>();
     SystemModel->AtomCollection->Refreshing=false;
     try {
+        IsotopeTable^ coupled=coupledIsotopes(geometry,coupling,reduced,library);
         for each(int id in geometry->Keys) {
-            Values^ row=geometry[id]; Atom^ a=gcnew Atom(); int mass=massOf(hmass,id); if(!mass) mass=massOf(qmass,id);
-            a->isotope=isotope(library,(int)row[0],massOf(masses,id),mass);
+            Values^ row=geometry[id]; Atom^ a=gcnew Atom(); int z=(int)row[0];
+            int mass=massOf(coupled,id); if(!mass) mass=massOf(hmass,id); if(!mass) mass=massOf(qmass,id);
+            // A stated isotope applies only while its centre holds the same element.
+            int printed=massOf(masses,id), said;
+            if(!printed && stated->TryGetValue(id,said) && said/1000==z) printed=said%1000;
+            if(!printed && z>=0 && z<(int)(sizeof(gaussianMass)/sizeof(*gaussianMass))) printed=gaussianMass[z];
+            a->isotope=isotope(library,z,printed,mass);
             a->X=row[1]; a->Y=row[2]; a->Z=row[3]; atoms[id]=a; SystemModel->AtomCollection->Add(a);
             if(shielding->ContainsKey(id)) {addTensor(SystemModel,a,a,InteractionKind::CShielding,Units::ppm,shielding[id]); ToShift=true;}
             if(quadrupole->ContainsKey(id)) addTensor(SystemModel,a,a,InteractionKind::Quadrupolar,Units::MHz,quadrupole[id]);

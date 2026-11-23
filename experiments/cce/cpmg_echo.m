@@ -10,8 +10,8 @@
 %    parameters  - experiment structure; times is a real vector of
 %                  increasing nonnegative total durations in seconds
 %
-%    H,R,K       - conventional angular-frequency generators, or H
-%                  containing explicitly tagged projected branches
+%    H,R,K       - conventional angular-frequency generators, or the
+%                  projected branch pair in H
 %
 % transition selects the observed two-state transition. rho0/coil or
 % preparation may override the prepared density and detector. normalized
@@ -47,23 +47,22 @@ if ~iscell(coil)
 end
 
 % Allocate the signal and choose the propagation representation
-projected=isstruct(H);
+projected=iscell(H);
 E=complex(zeros(numel(parameters.times),numel(reference)));
 scale=cellfun(@(x)norm(x,'fro'),coil(:).')./abs(meta.normalization_divisor);
 aux.abs_error_bound=zeros(size(E));
 aux.error_bound_kind='floating_point_estimate';
 if projected
-    generator=H;
+    generator=[H {R}];
 else
     generator=H+1i*R+1i*K;
 end
 
 % Build ideal observed-spin transition pulses without a global bath basis
-model=spin_system.model;
-obs_dim=spin_system.observed_dimension;
-bath_dim=spin_system.bath_dimension;
-alpha=model.transition.alpha;
-beta=model.transition.beta;
+obs_dim=spin_system.cce.observed_dimension;
+bath_dim=spin_system.cce.bath_dimension;
+alpha=spin_system.cce.transition.alpha;
+beta=spin_system.cce.transition.beta;
 rotation=eye(obs_dim)-alpha*alpha'-beta*beta'-1i*(alpha*beta'+beta*alpha');
 rotation=kron(rotation,eye(bath_dim));
 fractions=((1:parameters.nloops)-0.5)/parameters.nloops;
@@ -82,8 +81,7 @@ for n=1:numel(parameters.times)
             % Evolve up to the next ideal inversion
             segment=generator;
             if projected&&swapped
-                segment.left=H.right;
-                segment.right=H.left;
+                segment=generator([2 1 3]);
             end
             duration=(fractions(j)-previous)*parameters.times(n);
             [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
@@ -95,7 +93,7 @@ for n=1:numel(parameters.times)
             else
                 rho=reshape(rho,obs_dim*bath_dim,obs_dim*bath_dim);
                 rho=rotation*rho*rotation';
-                if strcmp(spin_system.formalism,'zeeman-liouv')
+                if strcmp(spin_system.bas.formalism,'zeeman-liouv')
                     rho=rho(:);
                 end
             end
@@ -107,8 +105,7 @@ for n=1:numel(parameters.times)
     % Propagate from the final pulse to the detection time
     segment=generator;
     if projected&&swapped
-        segment.left=H.right;
-        segment.right=H.left;
+        segment=generator([2 1 3]);
     end
     duration=(1-previous)*parameters.times(n);
     [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
@@ -136,10 +133,10 @@ end
 
 end
 
-% Validate the registered sequence contract before preparation
+% Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
-if ~isstruct(spin_system)||~isfield(spin_system,'kind')||...
-   ~strcmp(spin_system.kind,'cce_subsystem')||~isstruct(parameters)||...
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||...
+   ~isfield(spin_system.cce,'sites')||~isstruct(parameters)||...
    ~isfield(parameters,'times')||~isnumeric(parameters.times)||...
    ~isreal(parameters.times)||~isvector(parameters.times)||...
    any(~isfinite(parameters.times))||any(parameters.times<0)||any(diff(parameters.times)<0)
@@ -153,14 +150,17 @@ end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     error('cpmg_echo:density','This experiment returns detected signal or observables.');
 end
-if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
+if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
+    error('cpmg_echo:dissipation','This experiment is closed-system only.');
+end
+if ~(isnumeric(H)||iscell(H))||~isnumeric(R)||~isnumeric(K)
     error('cpmg_echo:generators','Supply conventional or tagged projected generators.');
 end
 if ~isfield(parameters,'nloops')||~isscalar(parameters.nloops)||...
    parameters.nloops<1||parameters.nloops~=fix(parameters.nloops)
     error('cpmg_echo:nloops','nloops must be a positive integer.');
 end
-if ~isfield(spin_system.model,'transition')
+if ~isfield(spin_system.cce,'transition')
     error('cpmg_echo:transition',...
           'An explicit transition is required for ideal refocusing.');
 end

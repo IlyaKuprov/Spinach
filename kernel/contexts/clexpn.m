@@ -1,10 +1,10 @@
-% Cluster-expansion context for registered magnetic resonance experiments.
+% Cluster-expansion context for magnetic resonance experiments.
 % Syntax:
 %
 % [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)
 %
 % spin_system is create output; no full-bath basis is required. pulse_sequence
-% is a registered experiment with signature (spin_system,parameters,H,R,K).
+% is an experiment with signature (spin_system,parameters,H,R,K).
 % parameters.observed contains physical spin IDs; times contains elapsed
 % sequence times in seconds. transition or explicit rho0/coil defines the
 % observed transition or observable. Algorithm controls belong to cce.
@@ -12,15 +12,15 @@
 %
 % answer is the experiment's natural numeric output, without a legacy result
 % wrapper. diagnostics includes raw cluster responses, reduction, resolved
-% policy, physical ordering, and elapsed time. This closed-system stage uses
-% multiplicative reduction; density and additive noise are separate contracts.
+% parameters, physical ordering, and elapsed time. Echo experiments use
+% multiplicative reduction; noise_correlation uses additive reduction.
 % For noise_correlation, parameters.spectrum requests cce_spectrum after the
 % completed ensemble reduction; the result is diagnostics.spectrum.
 %
 % Parameters:
 %
 %   spin_system    - native Spinach system returned by create
-%   pulse_sequence - registered five-argument experiment function handle
+%   pulse_sequence - five-argument experiment function handle
 %   parameters     - experiment parameters and nested cce algorithm controls
 %   assumptions    - explicit Spinach Hamiltonian assumption string
 %
@@ -49,7 +49,7 @@
 %
 %   answer      - experiment output on its declared time/observable axes
 %   diagnostics - physical ordering, cluster records, reduction, resolved
-%                 policy, ensemble, and elapsed execution time. Grid output
+%                 parameters, ensemble, and elapsed execution time. Grid output
 %                 has grid (evaluated nodes and normalised weights), grid_indices
 %                 (original one-based indices), and matching column cells values
 %                 and orientations. Only a summed grid has a combined reduction.
@@ -58,10 +58,9 @@
 
 function [answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)
 
-% Resolve the experiment contract and the parameter defaults
+% Resolve the parameter defaults
 started=tic;
-contract=cce_capabilities(pulse_sequence);
-[parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions);
+parameters=cce_options(spin_system,parameters,pulse_sequence,assumptions);
 
 % Check consistency
 grumble(spin_system,pulse_sequence,parameters,assumptions);
@@ -70,16 +69,13 @@ grumble(spin_system,pulse_sequence,parameters,assumptions);
 numerics=parameters.cce.numerics;
 if ~isfield(numerics,'atol')
     numerics.atol=sqrt(eps);
-    policy.defaults{end+1}='parameters.cce.numerics.atol';
 end
 if ~isfield(numerics,'rtol')
     numerics.rtol=sqrt(eps);
-    policy.defaults{end+1}='parameters.cce.numerics.rtol';
 end
 if ~isfield(numerics,'max_memory_bytes')
     [~,host_memory]=memory();
     numerics.max_memory_bytes=floor(host_memory.PhysicalMemory.Available/2);
-    policy.defaults{end+1}='parameters.cce.numerics.max_memory_bytes';
 end
 parameters.cce.numerics=numerics;
 
@@ -103,7 +99,6 @@ end
 % Use the supplied finite bath when no expansion order was declared
 if isempty(parameters.cce.order)
     parameters.cce.order=numel(parameters.cce.bath_spins);
-    policy.defaults{end+1}='parameters.cce.order';
 end
 
 % Disjoint families retain single groups or all inter-group pairs
@@ -172,15 +167,13 @@ for n=1:count
 end
 ensemble=struct('spin_config',configs,'weights',[configs.weight],...
                 'bases',{bases},'probabilities',{probabilities});
-schedule.pulse_sequence=pulse_sequence;
-schedule.contract=contract;
 
 % A single crystal returns the experiment's natural numeric output
 if ~isfield(parameters,'grid')
     if isfield(parameters,'sum_up')
         parameters=rmfield(parameters,'sum_up');
     end
-    diagnostics=crystallite(spin_system,schedule,parameters,assumptions,policy,ensemble);
+    diagnostics=crystallite(spin_system,pulse_sequence,parameters,assumptions,ensemble);
     answer=diagnostics.reduction.value;
     diagnostics.elapsed_seconds=toc(started);
     return;
@@ -193,7 +186,7 @@ orientations=cell(count,1);
 values=cell(count,1);
 for n=1:count
     local.orientation=[grid.alphas(n) grid.betas(n) grid.gammas(n)];
-    orientations{n}=crystallite(spin_system,schedule,local,assumptions,policy,ensemble);
+    orientations{n}=crystallite(spin_system,pulse_sequence,local,assumptions,ensemble);
     values{n}=orientations{n}.reduction.value;
 end
 
@@ -276,18 +269,14 @@ diagnostics.elapsed_seconds=toc(started);
 end
 
 % Evaluate the experiment using only this crystallite's retained cluster generators
-function diagnostics=crystallite(spin_system,schedule,parameters,assumptions,policy,ensemble)
+function diagnostics=crystallite(spin_system,pulse_sequence,parameters,assumptions,ensemble)
 
-% Use the registered experiment and its validated output contract
+% Start the timer
 started=tic;
-pulse_sequence=schedule.pulse_sequence;
-contract=schedule.contract;
 
 % Reduce an implicit complete family under the analytical Hahn assumptions
 if strcmp(parameters.cce.backend,'analytical_hahn')
     diagnostics.reduction=cce_analytical_hahn(spin_system,parameters,pulse_sequence,assumptions);
-    diagnostics.policy=policy;
-    diagnostics.policy.backend='analytical_hahn';
     diagnostics.parameters=parameters;
     diagnostics.physical_ids=1:spin_system.comp.nspins;
     diagnostics.observed_ids=parameters.observed;
@@ -297,26 +286,17 @@ if strcmp(parameters.cce.backend,'analytical_hahn')
 end
 
 % Compile immutable physical data, not a full-bath basis
-model=cce_compile(spin_system,parameters,assumptions);
-model.pulse_sequence=pulse_sequence;
-if isfield(model,'transition')
-    policy.transition=model.transition;
-    policy.transition_meta=model.transition_meta;
-end
+spin_system=cce_compile(spin_system,parameters,assumptions);
 if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
-    model.formalism=parameters.cce.basis.formalism;
+    spin_system.bas.formalism=parameters.cce.basis.formalism;
 elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
-    model.formalism='zeeman-liouv';
-    policy.defaults{end+1}='parameters.cce.basis.formalism';
-end
-if ~ismember(model.formalism,contract.formalisms)
-    error('clexpn:formalism','The experiment does not support the requested representation.');
+    spin_system.bas.formalism='zeeman-liouv';
 end
 
 % Validate propagation choices here rather than in graph or reduction services
 if isfield(parameters.cce.numerics,'propagator')
     supported={'eig'};
-    if strcmp(model.formalism,'zeeman-liouv')
+    if strcmp(spin_system.bas.formalism,'zeeman-liouv')
         supported={'stock'};
     elseif isequal(pulse_sequence,@hahn_echo)&&strcmp(parameters.cce.approximation,'generalized')
         supported={'eig','expm'};
@@ -328,48 +308,21 @@ if isfield(parameters.cce.numerics,'propagator')
 end
 
 % Build the physical connectivity and downward-closed cluster family
-options=parameters.cce;
-selection=struct('graph',options.graph,'order',options.order,'numerics',options.numerics);
-if isfield(selection.numerics,'propagator')
-    selection.numerics=rmfield(selection.numerics,'propagator');
-end
-selection.method='gcce';
-selection.expansion=options.expansion;
-if strcmp(options.approximation,'projected')
-    selection.method='cce';
-end
-if isequal(pulse_sequence,@noise_correlation)
-    selection.method='noise';
-    selection.noise=parameters.noise;
-    selection.bath_state=options.bath_state;
-end
-if strcmp(options.approximation,'projected')
-    selection.second_order=options.second_order;
-end
-for field={'groups','selection','bath_radius'}
-    if isfield(options,field{1})
-        selection.(field{1})=options.(field{1});
-    end
-end
-graph=cce_graph(model,selection);
-if isfield(options,'partition')
-    partition=cce_partition(model,graph,parameters);
+graph=cce_graph(spin_system,parameters);
+if isfield(parameters.cce,'partition')
+    partition=cce_partition(spin_system,graph,parameters,pulse_sequence);
     if ~partition.complete
         error('clexpn:partition','Partition adaptation is incomplete: %s.',partition.diagnostics.reason);
     end
-    selection.groups=partition.groups;
     if ~isempty(partition.groups)
         parameters.cce.groups=partition.groups;
     end
-    model.parameters=parameters;
-    model.groups=partition.groups;
-    policy.partition=partition;
+    diagnostics.partition=partition;
 end
-clusters=cce_clusters(model,graph,selection);
-model.parameters=parameters;
+clusters=cce_clusters(spin_system,graph,parameters);
 
-% Scheduler calls the registered evaluator, which calls the five-argument experiment
-raw=cce_schedule(model,clusters,ensemble,schedule,parameters,contract.evaluator);
+% Evaluate every cluster through the scheduler
+raw=cce_schedule(spin_system,clusters,ensemble,pulse_sequence,parameters);
 
 % Test completeness on the graph domain without trimming the exterior state
 request=parameters;
@@ -381,12 +334,10 @@ diagnostics.raw=raw;
 diagnostics.clusters=clusters;
 diagnostics.graph=graph;
 diagnostics.reduction=reduced;
-diagnostics.policy=policy;
 diagnostics.parameters=parameters;
-diagnostics.contract=contract;
-diagnostics.physical_ids=model.physical_ids;
-diagnostics.observed_ids=model.observed_ids;
-diagnostics.bath_ids=model.bath_ids;
+diagnostics.physical_ids=1:spin_system.comp.nspins;
+diagnostics.observed_ids=parameters.observed;
+diagnostics.bath_ids=parameters.cce.bath_spins;
 diagnostics.ensemble=ensemble;
 if isfield(parameters,'spectrum')
     diagnostics.spectrum=cce_spectrum(parameters.times,reduced.value,...
@@ -428,22 +379,12 @@ if ~isa(pulse_sequence,'function_handle')||~isstruct(parameters)||...
    ~isscalar(parameters)||~ischar(assumptions)||~isrow(assumptions)
     error('clexpn:input','Supply an experiment handle, parameter structure and assumptions string.');
 end
-contract=cce_capabilities(pulse_sequence);
-if strcmp(parameters.cce.approximation,'projected')&&~contract.projected
-    error('clexpn:projection','This experiment requires generalized evolution.');
-end
 if any(isfield(parameters,{'noise','spectrum'}))&&~isequal(pulse_sequence,@noise_correlation)
     error('clexpn:noise','Noise and spectrum parameters belong to the noise_correlation experiment.');
 end
 if isequal(pulse_sequence,@noise_correlation)&&...
    strcmp(parameters.cce.bath_state.mode,'interlaced')
     error('clexpn:noise','Connected noise uses ordinary ensemble moment averaging, not interlaced factors.');
-end
-if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)&&~contract.dissipative
-    error('clexpn:dissipation','This experiment contract is closed-system only.');
-end
-if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&~contract.density_reduction
-    error('clexpn:density','Density requires a registered density output contract.');
 end
 if isfield(parameters.cce,'selection')&&isfield(parameters.cce.selection,'adaptive')
     error('clexpn:adaptive','Adaptive convergence policy is not yet available.');

@@ -124,7 +124,8 @@ for ordering={'ordered','symmetrized'}
                       'The nonunital map amplifies its source; the two orderings have distinct source norms.');
 
     % Raw and connected deterministic records separately retain their strict-budget decisions
-    model=cce_compile(s,connected.parameters,'labframe');
+    model_p=cce_options(s,connected.parameters,@cce_compile,'labframe');
+    model=cce_compile(s,model_p,'labframe');
     first=cce_diagnostics(model,unconnected.raw,unconnected.reduction,unconnected.parameters);
     second=cce_diagnostics(model,connected.raw,connected.reduction,connected.parameters);
     result=test_true(result,['Dissipative budgets ' ordering{1}],...
@@ -186,35 +187,6 @@ result=test_close(result,'Symmetrized real correlation',imag(sym),zeros(size(sym
                   'Hermitian anticommutator expectation is real.');
 result=test_true(result,'Ordering metadata',isfield(dc.raw{1},'mean_time')&&...
                  isfield(dc.raw{1},'mean_zero'),'First moments survive scheduling.');
-
-% Direct noise evaluation enforces experiment ownership before construction
-foreign=dc.parameters;
-foreign.rho0=ones(2)/2;
-model=cce_compile(s,foreign,'labframe');
-model.formalism='zeeman-liouv';
-contract=cce_capabilities(@noise_correlation);
-schedule=struct('pulse_sequence',@free_evolution,'contract',cce_capabilities(@free_evolution));
-cluster=struct('id',uint64(1),'sites',2);
-rejected=false;
-try
-    contract.evaluator(model,cluster,dc.ensemble.spin_config(1),schedule,foreign);
-catch exception
-    rejected=strcmp(exception.identifier,'clexpn:noise');
-end
-result=test_true(result,'Direct noise foreign experiment refused',rejected,...
-                 'Noise inputs cannot be routed through a foreign experiment evaluator.');
-
-% The evaluator remains noise-owned even without a noise parameter field
-foreign=rmfield(foreign,'noise');
-foreign.output='signal';
-rejected=false;
-try
-    contract.evaluator(model,cluster,dc.ensemble.spin_config(1),schedule,foreign);
-catch exception
-    rejected=strcmp(exception.identifier,'clexpn:noise');
-end
-result=test_true(result,'Noise evaluator identity retained',rejected,...
-                 'Removing property parameters does not turn the noise evaluator into another experiment.');
 
 % Hermiticity is relative to operator units rather than an absolute floor
 scaled=p;

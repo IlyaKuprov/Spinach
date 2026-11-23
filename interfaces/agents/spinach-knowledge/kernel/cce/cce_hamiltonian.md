@@ -6,7 +6,7 @@ Expert retained-Hilbert Hamiltonian assembly service. The native context generat
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `[H,meta]=cce_hamiltonian(model,sites,spin_config)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `[H,meta]=cce_hamiltonian(spin_system,parameters,sites,spin_config)`. Engine records are not public experiment parameter structures.
 
 [MATLAB source](../../../../../kernel/cce/cce_hamiltonian.m)
 
@@ -24,9 +24,10 @@ Build one cluster Hamiltonian in observed-spin system-then-bath tensor order.
 
 **Inputs**
 
-- `model` — output of `cce_compile`.
+- `spin_system` — output of `cce_compile`.
+- `parameters` — parameters resolved by `cce_options`.
 - `sites` — physical bath IDs; `[]` selects the observed baseline.
-- `spin_config` — scalar structure with optional backend override, exterior_ids, and exterior_expectations (one real Ix/Iy/Iz row per exterior ID). Exterior fields use retained model pair interactions.
+- `spin_config` — scalar structure with optional backend override, exterior_ids, and exterior_expectations (one real Ix/Iy/Iz row per exterior ID). Exterior fields use retained pair interactions.
 
 **Outputs**
 
@@ -39,4 +40,4 @@ Build one cluster Hamiltonian in observed-spin system-then-bath tensor order.
 
 The retained service uses the native compilation/input boundary: physical models come from cce_compile, and generated baths enter canonical sys/inter through spin_bath.
 
-Each unordered model pair supplies its retained tensor in ascending site order and its transpose in reverse order. Missing pairs contribute no field.
+Each unordered pair supplies its retained tensor in ascending site order and its transpose in reverse order. Missing pairs contribute no field.

@@ -1,11 +1,11 @@
 % Index the retained Cartesian pair tensors in both physical directions.
 % Syntax:
 %
-%              [index,tensors]=cce_pair_index(model)
+%              [index,tensors]=cce_pair_index(spin_system)
 %
 % Parameters:
 %
-%    model - CCE model returned by cce_compile
+%    spin_system - spin system returned by cce_compile
 %
 % Outputs:
 %
@@ -16,25 +16,25 @@
 %
 % talos@spindynamics.org
 
-function [index,tensors]=cce_pair_index(model)
+function [index,tensors]=cce_pair_index(spin_system)
 
 % Check consistency
-grumble(model);
+grumble(spin_system);
 
 % Index the reverse direction after the forward records
-ids=reshape([model.pairs.ids],2,[]);
-n=numel(model.physical_ids);
+ids=reshape([spin_system.cce.pairs.ids],2,[]);
+n=spin_system.comp.nspins;
 count=size(ids,2);
 index=sparse([ids(1,:) ids(2,:)],[ids(2,:) ids(1,:)],1:2*count,n,n);
-forward={model.pairs.retained};
+forward={spin_system.cce.pairs.retained};
 tensors=[{zeros(3)} forward cellfun(@transpose,forward,'UniformOutput',false)];
 
 end
 
 % Consistency enforcement
-function grumble(model)
-if ~isstruct(model)||~all(isfield(model,{'physical_ids','pairs'}))
-    error('a compiled CCE model is required.');
+function grumble(spin_system)
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||~isfield(spin_system.cce,'pairs')
+    error('a compiled CCE spin_system is required.');
 end
 end
 

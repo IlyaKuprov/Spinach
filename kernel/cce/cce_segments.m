@@ -42,11 +42,10 @@ schedule=struct('events',events,'positions',positions,'times',parameters.times);
 segments=struct('schedule',schedule);
 
 % Bound retained segment matrices and exterior values before allocating operators
-model=system.model;
-sites=system.sites;
-spin_config=system.configuration;
-ids=system.physical_ids;
-dimension=system.dimension;
+sites=system.cce.sites;
+spin_config=system.cce.configuration;
+ids=system.cce.ids;
+dimension=system.cce.dimension;
 events=schedule.events;
 segment_count=0;
 for k=1:numel(schedule.times)
@@ -65,8 +64,8 @@ for k=1:numel(schedule.times)
 end
 
 % Reserve sparse complex Hamiltonians, dense pulses, and exterior expectations
-retained=segment_count*(48*dimension^2+24*numel(model.bath_ids)+8);
-dc=prod(model.multiplicities(model.observed_ids));
+retained=segment_count*(48*dimension^2+24*numel(parameters.cce.bath_spins)+8);
+dc=prod(system.comp.mults(parameters.observed));
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=dc^2;
@@ -122,7 +121,7 @@ for t=1:numel(schedule.times)
                     ham_config=rmfield(ham_config,field{1});
                 end
             end
-            [current,~]=cce_subsystem(model,sites,ham_config,[]);
+            [current,~]=cce_subsystem(system,parameters,sites,ham_config,[]);
             [H,~,~]=cce_generators(current,parameters,[]);
         else
             H=drift;
@@ -166,7 +165,7 @@ for t=1:numel(schedule.times)
                     slots=arrayfun(@(id) find(ids==id),event.target);
                     rest=setdiff(1:numel(ids),slots,'stable');
                     order=[slots rest];
-                    dims=model.multiplicities(ids);
+                    dims=system.comp.mults(ids);
                     d=prod(dims);
                     base=kron(event.operator,eye(prod(dims(rest))));
                     map=zeros(d,1);
@@ -200,7 +199,7 @@ for t=1:numel(schedule.times)
                     pulse=expm(-1i*event.angle*generator)*pulse;
                     for id=reshape(exterior,1,[])
                         pos=find(spin_config.bath_ids==id);
-                        spin=pauli(model.multiplicities(id));
+                        spin=pauli(system.comp.mults(id));
                         x=spin.x;
                         y=spin.y;
                         z=spin.z;
@@ -247,7 +246,7 @@ function grumble(system,parameters,drift,events)
 if isfield(parameters,'sequence')
     error('cce_segments:sequence','Use finite_drive or refocusing_train native controls, not parameters.sequence.');
 end
-if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')||...
+if ~isstruct(system)||~isfield(system,'cce')||~isfield(system.cce,'sites')||...
    ~isstruct(parameters)||~isfield(parameters,'times')||~isnumeric(drift)
     error('cce_segments:input','Supply a native subsystem, parameters, and numeric drift.');
 end
@@ -259,7 +258,7 @@ for event=events
        ~ismember(event.type,{'ideal','finite'})||...
        ~isnumeric(event.target)||~isrow(event.target)||isempty(event.target)||...
        numel(unique(event.target))~=numel(event.target)||...
-       any(~ismember(event.target,system.model.physical_ids))||...
+       any(~ismember(event.target,1:system.comp.nspins))||...
        ~ismember(event.placement,{'absolute','fraction'})||...
        ~isnumeric(event.at)||~isreal(event.at)||~isscalar(event.at)||...
        ~isfinite(event.at)||event.at<0||...
@@ -275,23 +274,23 @@ for event=events
             error('cce_segments:finite','Finite pulses require positive duration and finite rad/s amplitudes.');
         end
         if strcmp(parameters.cce.meanfield,'static')&&...
-           any(~ismember(event.target,system.physical_ids))
+           any(~ismember(event.target,system.cce.ids))
             error('cce_segments:exterior_finite','Finite exterior pulses require dynamical exterior spins.');
         end
         if strcmp(parameters.cce.approximation,'projected')&&...
-           any(ismember(event.target,system.model.observed_ids))
+           any(ismember(event.target,parameters.observed))
             error('cce_segments:manifold_drive','Finite observed drives require gCCE.');
         end
     elseif isfield(event,'operator')&&~isempty(event.operator)
-        d=prod(system.model.multiplicities(event.target));
+        d=prod(system.comp.mults(event.target));
         if ~isnumeric(event.operator)||~isequal(size(event.operator),[d d])||...
            any(~isfinite(event.operator),'all')||...
            norm(event.operator-event.operator','fro')>d*eps*norm(event.operator,'fro')
             error('cce_segments:operator','Pulse generators must be finite and Hermitian.');
         end
-        outside=~ismember(event.target,system.physical_ids);
+        outside=~ismember(event.target,system.cce.ids);
         if any(outside)&&~(isscalar(event.target)&&strcmp(parameters.cce.meanfield,'none'))
-            if any(ismember(event.target(outside),system.configuration.bath_ids))
+            if any(ismember(event.target(outside),system.cce.configuration.bath_ids))
                 error('cce_segments:exterior_correlations','Exterior operator pulses require explicit dynamical sites.');
             end
             error('Selective operator targets must be retained.');

@@ -1,11 +1,11 @@
 % Projects an observed-spin system onto two explicit states. Syntax:
 %
-%                   manifolds=cce_project(model,parameters)
+%                   manifolds=cce_project(spin_system,parameters)
 %
 % parameters.transition.alpha and beta are normalised orthogonal vectors in
-% model.observed_ids product order. Optional second_order.enabled defaults
-% to false; when true, gap_tolerance (rad/s) and overlap_tolerance (0..1)
-% are mandatory. Only cce/mecce admit the projected second-order model.
+% parameters.observed product order. When parameters.cce.second_order.enabled
+% is true, gap_tolerance (rad/s) and overlap_tolerance (0..1) are mandatory,
+% and parameters.cce.approximation must be projected.
 %
 % manifolds.alpha/beta contain vector, projector, energy, expectations, and
 % susceptibility. For bath operators B_j coupled to observed operator S_j,
@@ -16,11 +16,9 @@
 %
 % Parameters:
 %
-%   model - prepared observed-spin system model.
-%   parameters.transition.alpha, .beta - normalised orthogonal state vectors.
-%   Optional parameters.second_order.enabled; when true,
-%   parameters.second_order.gap_tolerance in rad/s and overlap_tolerance are
-%   mandatory.
+%   spin_system - spin system returned by cce_compile.
+%   parameters - resolved clexpn parameters with transition.alpha and
+%   transition.beta, normalised orthogonal state vectors.
 %
 % Outputs:
 %
@@ -31,23 +29,23 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function manifolds=cce_project(model,parameters)
+function manifolds=cce_project(spin_system,parameters)
 
 % Validate explicit observed vectors and perturbation controls
-grumble(model,parameters);
+grumble(spin_system,parameters);
 
 % Obtain the isolated observed Hamiltonian in the declared physical ordering
-[H_obs,meta]=cce_hamiltonian(model,[],struct());
+[H_obs,meta]=cce_hamiltonian(spin_system,parameters,[],struct());
 [eigenvectors,eigenvalues]=eig(full(H_obs),'vector');
 operators=reshape(meta.operators.',1,[]);
 
 % Resolve the explicitly optional second-order approximation
-enabled=isfield(parameters,'second_order')&&parameters.second_order.enabled;
+enabled=parameters.cce.second_order.enabled;
 manifolds.second_order_enabled=enabled;
 manifolds.observed_hamiltonian=H_obs;
-manifolds.observed_ids=model.observed_ids;
+manifolds.observed_ids=parameters.observed;
 manifolds.eigenvalues=eigenvalues;
-manifolds.source_hash=model.source_hash;
+manifolds.source_hash=spin_system.cce.source_hash;
 
 % Project both user-supplied vectors without selecting arbitrary eigenindices
 for name={'alpha','beta'}
@@ -57,8 +55,8 @@ for name={'alpha','beta'}
     manifold.vector=state;
     manifold.projector=state*state';
     manifold.energy=real(state'*H_obs*state);
-    manifold.expectations=zeros(numel(model.observed_ids),3);
-    for n=1:numel(model.observed_ids)
+    manifold.expectations=zeros(numel(parameters.observed),3);
+    for n=1:numel(parameters.observed)
         for a=1:3
             manifold.expectations(n,a)=real(state'*meta.operators{n,a}*state);
         end
@@ -74,7 +72,7 @@ for name={'alpha','beta'}
 
     % Sum virtual observed transitions only when their denominators are resolved
     if enabled
-        tolerance=parameters.second_order;
+        tolerance=parameters.cce.second_order;
         if manifold.state_overlap<1-tolerance.overlap_tolerance
             error('transition.%s is not an isolated observed eigenstate within overlap_tolerance.',name{1});
         end
@@ -103,15 +101,15 @@ end
 end
 
 % Reject invalid state vectors and unresolved perturbation settings
-function grumble(model,parameters)
-if ~isstruct(model)||~all(isfield(model,{'observed_ids','multiplicities','source_hash'}))
+function grumble(spin_system,parameters)
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||~isfield(spin_system.cce,'source_hash')
     error('model must be returned by cce_compile.');
 end
-if ~isstruct(parameters)||~isfield(parameters,'transition')||...
+if ~isstruct(parameters)||~all(isfield(parameters,{'observed','cce','transition'}))||...
    ~isstruct(parameters.transition)||~all(isfield(parameters.transition,{'alpha','beta'}))
     error('transition.alpha and transition.beta must be explicitly supplied.');
 end
-dimension=prod(model.multiplicities(model.observed_ids));
+dimension=prod(spin_system.comp.mults(parameters.observed));
 for name={'alpha','beta'}
     state=parameters.transition.(name{1});
     if ~isa(state,'double')||~isequal(size(state),[dimension 1])||any(~isfinite(state))
@@ -124,16 +122,16 @@ end
 if abs(parameters.transition.alpha'*parameters.transition.beta)>dimension*eps
     error('transition.alpha and transition.beta must be orthogonal.');
 end
-if isfield(parameters,'second_order')
-    control=parameters.second_order;
+if isfield(parameters.cce,'second_order')
+    control=parameters.cce.second_order;
     if ~isstruct(control)||~isscalar(control)||~isfield(control,'enabled')||...
        ~islogical(control.enabled)||~isscalar(control.enabled)||...
        ~all(ismember(fieldnames(control),{'enabled','gap_tolerance','overlap_tolerance'}))
         error('second_order requires a scalar logical enabled field.');
     end
     if control.enabled
-        if ~isfield(parameters,'method')||~ismember(parameters.method,{'cce','mecce'})
-            error('second-order projection is defined only for cce and mecce.');
+        if ~strcmp(parameters.cce.approximation,'projected')
+            error('second-order projection is defined only for the projected approximation.');
         end
         if ~all(isfield(control,{'gap_tolerance','overlap_tolerance'}))
             error('second-order gap and overlap tolerances must be explicit.');

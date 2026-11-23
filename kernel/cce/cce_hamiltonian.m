@@ -1,21 +1,22 @@
 % Builds a cluster Hamiltonian in rad/s. Syntax:
 %
-%                [H,meta]=cce_hamiltonian(model,sites,spin_config)
+%                [H,meta]=cce_hamiltonian(spin_system,parameters,sites,spin_config)
 %
-% model is returned by cce_compile; sites are physical bath spin IDs.
-% Ordering is model.observed_ids followed by sites, in the supplied order.
+% spin_system is returned by cce_compile; sites are physical bath spin IDs.
+% Ordering is parameters.observed followed by sites, in the supplied order.
 % spin_config is a scalar struct with optional backend (auto/direct/stock),
 % exterior_ids and exterior_expectations (one real [Ix Iy Iz] row per ID).
-% Exterior fields use exactly the model's retained pair interactions.
+% Exterior fields use exactly the retained pair interactions.
 % meta reports IDs, dimensions, operators, backend, and roundoff residuals.
 %
 % Parameters:
 %
-%   model - output of cce_compile.
+%   spin_system - output of cce_compile.
+%   parameters - parameters resolved by cce_options.
 %   sites - physical bath IDs; [] selects the observed baseline.
 %   spin_config - scalar structure with optional backend override, exterior_ids
 %                 and exterior_expectations (one real Ix/Iy/Iz row per exterior ID).
-%                 Exterior fields use retained model pair interactions.
+%                 Exterior fields use retained pair interactions.
 %
 % Outputs:
 %
@@ -27,18 +28,18 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [H,meta]=cce_hamiltonian(model,sites,spin_config)
+function [H,meta]=cce_hamiltonian(spin_system,parameters,sites,spin_config)
 
 % Check cluster membership, spin_config, and the requested backend
-grumble(model,sites,spin_config);
+grumble(spin_system,parameters,sites,spin_config);
 
 % Resolve the validated construction path
-backend=model.backend;
+backend=parameters.cce.backend;
 if isfield(spin_config,'backend')
     backend=spin_config.backend;
 end
 if strcmp(backend,'auto')
-    if model.direct_supported
+    if spin_system.cce.direct_supported
         backend='direct';
     else
         backend='stock';
@@ -46,23 +47,23 @@ if strcmp(backend,'auto')
 end
 
 % Bound simultaneous dense matrices before allocating cluster operators
-ids=[model.observed_ids sites];
-dims=model.multiplicities(ids);
+ids=[parameters.observed sites];
+dims=spin_system.comp.mults(ids);
 dimension=prod(dims);
 copies=4+3*numel(ids);
 if strcmp(backend,'stock')
 
     % Reserve every stock spherical component as a dense worst case
-    ranks=max([2 cellfun(@numel,model.spin_system.inter.giant.coeff).']);
+    ranks=max([2 cellfun(@numel,spin_system.inter.giant.coeff).']);
     copies=copies+sum((2*(1:ranks)+1).^2);
 
 end
-if ~isfinite(dimension)||16*dimension^2*copies>model.numerics.max_memory_bytes
+if ~isfinite(dimension)||16*dimension^2*copies>parameters.cce.numerics.max_memory_bytes
     error('cluster Hamiltonian exceeds numerics.max_memory_bytes.');
 end
 
 % Resolve both directions of each retained pair
-[pair_index,tensors]=cce_pair_index(model);
+[pair_index,tensors]=cce_pair_index(spin_system);
 
 % Construct angular momentum operators in canonical product ordering
 ops=cell(numel(ids),3);
@@ -93,25 +94,25 @@ if strcmp(backend,'direct')
 
         % Select Zeeman components and rotating-frame carrier convention
         id=ids(n);
-        tensor=model.zeeman{id};
-        strength=model.spin_system.inter.zeeman.strength{id};
+        tensor=spin_system.cce.zeeman{id};
+        strength=spin_system.inter.zeeman.strength{id};
         field=zeros(1,3);
-        isotropic=trace(model.spin_system.inter.zeeman.matrix{id})/3;
+        isotropic=trace(spin_system.inter.zeeman.matrix{id})/3;
         anisotropic=tensor-isotropic*eye(3);
-        [~,rank_one,rank_two]=mat2sphten(model.spin_system.inter.zeeman.matrix{id});
-        if norm(rank_one,2)<=model.spin_system.tols.liouv_zero&&...
-           norm(rank_two,2)<=model.spin_system.tols.liouv_zero
+        [~,rank_one,rank_two]=mat2sphten(spin_system.inter.zeeman.matrix{id});
+        if norm(rank_one,2)<=spin_system.tols.liouv_zero&&...
+           norm(rank_two,2)<=spin_system.tols.liouv_zero
             anisotropic=zeros(3);
         end
         switch strength
             case 'full'
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                if abs(isotropic)<=spin_system.tols.liouv_zero
                     isotropic=0;
                 end
                 field=anisotropic(3,:)+[0 0 isotropic];
             case 'secular'
-                isotropic=isotropic-model.spin_system.inter.basefrqs(id);
-                if abs(isotropic)<=model.spin_system.tols.liouv_zero
+                isotropic=isotropic-spin_system.inter.basefrqs(id);
+                if abs(isotropic)<=spin_system.tols.liouv_zero
                     isotropic=0;
                 end
                 field(3)=anisotropic(3,3)+isotropic;
@@ -129,8 +130,8 @@ if strcmp(backend,'direct')
         end
 
         % Apply the stock on-site quadratic retention convention
-        tensor=model.quadratic{id};
-        strength=model.quadratic_strength{id};
+        tensor=spin_system.cce.quadratic{id};
+        strength=spin_system.cce.quadratic_strength{id};
         switch strength
             case 'strong'
 
@@ -138,7 +139,7 @@ if strcmp(backend,'direct')
             case 'secular'
                 tensor=diag([-tensor(3,3)/2 -tensor(3,3)/2 tensor(3,3)]);
             case 'zz'
-                if norm(tensor,2)>2*pi*model.spin_system.tols.inter_cutoff
+                if norm(tensor,2)>2*pi*spin_system.tols.inter_cutoff
                     error('zz on-site quadratic retention is undefined by Spinach.');
                 end
                 tensor=zeros(3);
@@ -173,21 +174,21 @@ if strcmp(backend,'direct')
 else
 
     % Remove an inherited basis before slicing immutable physical metadata
-    system=model.spin_system;
+    system=spin_system;
     if isfield(system,'bas')
         system=rmfield(system,'bas');
     end
-    system=kill_spin(system,setdiff(model.physical_ids,ids));
+    system=kill_spin(system,setdiff(1:spin_system.comp.nspins,ids));
     basis_parameters.formalism='zeeman-hilb';
     basis_parameters.approximation={'none'};
     system=basis(system,basis_parameters);
-    system=assume(system,model.assumptions{:});
+    system=assume(system,spin_system.cce.assumptions{:});
     [H,Q]=hamiltonian(system);
-    H=H+orientation(Q,model.orientation);
+    H=H+orientation(Q,parameters.orientation);
 
     % Reorder the stock ascending physical indices into observed-first order
     sorted_ids=sort(ids);
-    sorted_dims=model.multiplicities(sorted_ids);
+    sorted_dims=spin_system.comp.mults(sorted_ids);
     [~,order]=ismember(ids,sorted_ids);
     if numel(ids)>1
         indices=reshape(1:dimension,fliplr(sorted_dims));
@@ -220,7 +221,7 @@ end
 meta.antihermitian_residual=norm(H-H','fro');
 roundoff=operations*eps/(1-operations*eps);
 meta.roundoff_bound=roundoff*max(sum_norm,realmin)+...
-                    dimension*model.canonical_roundoff;
+                    dimension*spin_system.cce.canonical_roundoff;
 if meta.antihermitian_residual>2*meta.roundoff_bound
     error('Hamiltonian has a non-roundoff anti-Hermitian residual.');
 end
@@ -230,27 +231,27 @@ H=(H+H')/2;
 meta.physical_ids=ids;
 meta.dimensions=dims;
 meta.dimension=dimension;
-meta.observed_dimension=prod(model.multiplicities(model.observed_ids));
-meta.bath_dimension=prod(model.multiplicities(sites));
+meta.observed_dimension=prod(spin_system.comp.mults(parameters.observed));
+meta.bath_dimension=prod(spin_system.comp.mults(sites));
 meta.operators=ops;
 meta.backend=backend;
-meta.fallback_reason=model.fallback_reason;
-meta.source_hash=model.source_hash;
-meta.omitted_pairs=model.omitted_pairs;
-meta.observable_budget=model.numerics.atol+model.numerics.rtol*norm(H,'fro');
+meta.fallback_reason=spin_system.cce.fallback_reason;
+meta.source_hash=spin_system.cce.source_hash;
+meta.omitted_pairs=spin_system.cce.omitted_pairs;
+meta.observable_budget=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(H,'fro');
 
 end
 
 % Validate structure, IDs, and explicitly supplied exterior expectations
-function grumble(model,sites,spin_config)
-if ~isstruct(model)||~all(isfield(model,{'source_hash','observed_ids',...
-   'bath_ids','multiplicities','pairs','spin_system','numerics','backend'}))
+function grumble(spin_system,parameters,sites,spin_config)
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||...
+   ~all(isfield(spin_system.cce,{'source_hash','pairs'}))
     error('model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
    any(~isfinite(sites))||any(sites~=fix(sites))||...
-   numel(unique(sites))~=numel(sites)||~all(ismember(sites,model.bath_ids))
-    error('sites must be a row of unique model bath spin IDs.');
+   numel(unique(sites))~=numel(sites)||~all(ismember(sites,parameters.cce.bath_spins))
+    error('sites must be a row of unique spin_system bath spin IDs.');
 end
 if ~isstruct(spin_config)||~isscalar(spin_config)||...
    ~all(ismember(fieldnames(spin_config),{'backend','exterior_ids','exterior_expectations'}))
@@ -259,10 +260,10 @@ end
 if isfield(spin_config,'backend')&&~ismember(spin_config.backend,{'auto','direct','stock'})
     error('spin_config.backend must be auto, direct, or stock.');
 end
-if ~model.direct_supported&&...
+if ~spin_system.cce.direct_supported&&...
    ((isfield(spin_config,'backend')&&strcmp(spin_config.backend,'direct'))||...
-    (~isfield(spin_config,'backend')&&strcmp(model.backend,'direct')))
-    error('direct Hamiltonian is not validated for %s.',model.fallback_reason);
+    (~isfield(spin_config,'backend')&&strcmp(parameters.cce.backend,'direct')))
+    error('direct Hamiltonian is not validated for %s.',spin_system.cce.fallback_reason);
 end
 if xor(isfield(spin_config,'exterior_ids'),isfield(spin_config,'exterior_expectations'))
     error('exterior_ids and exterior_expectations must be supplied together.');
@@ -272,15 +273,15 @@ if isfield(spin_config,'exterior_ids')
     values=spin_config.exterior_expectations;
     if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
        any(~isfinite(ids))||numel(unique(ids))~=numel(ids)||...
-       ~all(ismember(ids,setdiff(model.physical_ids,[model.observed_ids sites])))||...
+       ~all(ismember(ids,setdiff(1:spin_system.comp.nspins,[parameters.observed sites])))||...
        ~isnumeric(values)||~isreal(values)||~isequal(size(values),[numel(ids) 3])||...
        any(~isfinite(values),'all')
         error('invalid exterior IDs or expectation rows.');
     end
-    if any(vecnorm(values,2,2)>(model.multiplicities(ids).'-1)/2+eps)
+    if any(vecnorm(values,2,2)>(spin_system.comp.mults(ids).'-1)/2+eps)
         error('exterior expectation exceeds the physical spin length.');
     end
-    if ~model.direct_supported&&~isempty(ids)
+    if ~spin_system.cce.direct_supported&&~isempty(ids)
         error('exterior mean fields require validated pair-retention semantics.');
     end
 end

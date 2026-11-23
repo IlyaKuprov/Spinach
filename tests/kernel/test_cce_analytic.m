@@ -86,7 +86,8 @@ for normalised=[false true]
         factor=1;
     end
     [signal,d]=clexpn(spin_system,@free_evolution,q,'labframe');
-    model=cce_compile(spin_system,d.parameters,'labframe');
+    model_p=cce_options(spin_system,d.parameters,@cce_compile,'labframe');
+    model=cce_compile(spin_system,model_p,'labframe');
     check=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
     expected=16*2^3*abs(factor)*((q.times(:)>0)+q.times(:)*frequency);
     result=test_close(result,'Projected explicit receiver FID',signal,...

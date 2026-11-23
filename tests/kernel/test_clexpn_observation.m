@@ -27,9 +27,10 @@ p.cce.order=1;
 p.cce.numerics.max_memory_bytes=2^26;
 p.cce.numerics.atol=1e-12;
 p.cce.numerics.rtol=1e-10;
-[p,~]=cce_options(spin_system,p,@sin,{'labframe'});
-model=cce_compile(spin_system,p,{'labframe'});
-[cluster,~]=cce_subsystem(model,2,struct(),[]);
+p=cce_options(spin_system,p,@sin,{'labframe'});
+model_p=cce_options(spin_system,p,@cce_compile,{'labframe'});
+model=cce_compile(spin_system,model_p,{'labframe'});
+[cluster,~]=cce_subsystem(model,model_p,2,struct(),[]);
 p.rho0=[0.5,0.2+0.1i;0.2-0.1i,0.5];
 p.coil=[0 1;0 0];
 p.receiver_phase=0.37;
@@ -68,7 +69,7 @@ result=test_close(result,'Non-Hermitian descriptor',coil,kron([0 1;0 0],eye(2)),
 result=test_close(result,'Descriptor reference',reference,0.5,0,0,...
                   'The actual initial signal supplies the normalization reference.');
 liouv=cluster;
-liouv.formalism='zeeman-liouv';
+liouv.bas.formalism='zeeman-liouv';
 [vector,detector,~,~]=cce_observation(liouv,spec);
 result=test_close(result,'Liouville preparation vectorisation',vector,rho(:),0,0,...
                   'Preparation is vectorised column-major.');
@@ -94,9 +95,10 @@ selected.observed=2;
 selected.transition.spins=2;
 selected.cce.bath_spins=1;
 selected.preparation=struct('states','Lx','spins','E');
-[selected,~]=cce_options(same,selected,@free_evolution,'labframe');
-same_model=cce_compile(same,selected,'labframe');
-[same_cluster,~]=cce_subsystem(same_model,1,struct(),[]);
+selected=cce_options(same,selected,@free_evolution,'labframe');
+same_model_p=cce_options(same,selected,@cce_compile,'labframe');
+same_model=cce_compile(same,same_model_p,'labframe');
+[same_cluster,~]=cce_subsystem(same_model,same_model_p,1,struct(),[]);
 [rho,~,~]=cce_observation(same_cluster,selected);
 result=test_close(result,'Observed-only isotope preparation',rho,...
                   kron([0 1;1 0]/2,eye(2)/2),0,0,...

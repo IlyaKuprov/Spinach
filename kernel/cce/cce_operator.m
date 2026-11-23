@@ -1,8 +1,8 @@
 % Construct canonical spin operators on a retained cluster. Syntax:
 %
-%                 A=cce_operator(cluster_system,operators,spins)
+%                 A=cce_operator(spin_system,operators,spins)
 %
-% cluster_system is cce_subsystem output. operators is Lx, Ly, Lz, L+, L-
+% spin_system is cce_subsystem output. operators is Lx, Ly, Lz, L+, L-
 % or E. spins is a physical-ID row, isotope label, or 'all'; a row selects
 % a sum. Cell rows of operators and spins select an ordered product of sums,
 % as in the stock operator service. E is the dimensionless unit operator.
@@ -12,7 +12,7 @@
 %
 % Parameters:
 %
-%   cluster_system - retained subsystem returned by cce_subsystem
+%   spin_system - retained subsystem returned by cce_subsystem
 %   operators      - character label or cell row of canonical operator labels
 %   spins          - physical-ID row, isotope label, 'all', or matching cell row
 %
@@ -22,17 +22,17 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function A=cce_operator(cluster_system,operators,spins)
+function A=cce_operator(spin_system,operators,spins)
 
 % Check the view, descriptor shape, and explicit tensor-product selections
-grumble(cluster_system,operators,spins);
+grumble(spin_system,operators,spins);
 if ischar(operators)
     operators={operators};
     spins={spins};
 end
 
 % Start from the unit operator on the retained space
-d=cluster_system.dimension;
+d=spin_system.cce.dimension;
 A=speye(d);
 labels={'E','Lx','Ly','Lz','L+','L-'};
 fields={'u','x','y','z','p','m'};
@@ -42,9 +42,9 @@ for n=1:numel(operators)
     ids=spins{n};
     if ischar(ids)
         if strcmp(ids,'all')
-            ids=cluster_system.physical_ids;
+            ids=spin_system.cce.ids;
         else
-            ids=cluster_system.physical_ids(strcmp(cluster_system.isotopes,ids));
+            ids=spin_system.cce.ids(strcmp(spin_system.comp.isotopes(spin_system.cce.ids),ids));
         end
     end
     position=find(strcmp(labels,operators{n}),1);
@@ -52,9 +52,9 @@ for n=1:numel(operators)
     for id=ids
 
         % Embed only the requested canonical local matrix
-        local=cluster_system.physical_to_local(id);
-        dims=cluster_system.multiplicities;
-        matrix=cluster_system.local_operators{local}.(fields{position});
+        local=spin_system.cce.physical_to_local(id);
+        dims=spin_system.comp.mults(spin_system.cce.ids);
+        matrix=spin_system.cce.local_operators{local}.(fields{position});
         term=term+kron(kron(speye(prod(dims(1:local-1))),matrix),...
                        speye(prod(dims(local+1:end))));
 
@@ -64,7 +64,7 @@ for n=1:numel(operators)
 end
 
 % Stock commutator convention for column-major density vectors
-if strcmp(cluster_system.formalism,'zeeman-liouv')
+if strcmp(spin_system.bas.formalism,'zeeman-liouv')
     A=kron(speye(d),A)-kron(A.',speye(d));
 end
 
@@ -72,9 +72,9 @@ end
 
 % Validate supported descriptors without constructing any operator
 function grumble(system,operators,spins)
-if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
-   ~strcmp(system.kind,'cce_subsystem')||...
-   ~ismember(system.formalism,{'zeeman-hilb','zeeman-liouv'})
+if ~isstruct(system)||~isscalar(system)||~isfield(system,'cce')||...
+   ~isfield(system.cce,'sites')||...
+   ~ismember(system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
     error('cce_operator:system','Use a supported cce_subsystem view.');
 end
 if ischar(operators)&&isrow(operators)
@@ -90,28 +90,21 @@ for n=1:numel(operators)
     ids=spins{n};
     if ischar(ids)
         if strcmp(ids,'all')
-            ids=system.physical_ids;
+            ids=system.cce.ids;
         else
-            ids=system.physical_ids(strcmp(system.isotopes,ids));
+            ids=system.cce.ids(strcmp(system.comp.isotopes(system.cce.ids),ids));
             if isempty(ids)
                 error('cce_operator:spins','No retained spin has this isotope.');
             end
         end
     end
     if ~isnumeric(ids)||~isreal(ids)||isempty(ids)||~isrow(ids)||...
-       numel(unique(ids))~=numel(ids)||any(~ismember(ids,system.physical_ids))
+       numel(unique(ids))~=numel(ids)||any(~ismember(ids,system.cce.ids))
         error('cce_operator:spins','Select distinct retained physical IDs.');
     end
     if ~ismember(operators{n},{'E','Lx','Ly','Lz','L+','L-'})
         error('cce_operator:label','Unsupported operator descriptor.');
     end
-end
-power=2;
-if strcmp(system.formalism,'zeeman-liouv')
-    power=4;
-end
-if 16*system.dimension^power>system.model.numerics.max_memory_bytes
-    error('cce_operator:memory','Requested representation exceeds the memory budget.');
 end
 end
 

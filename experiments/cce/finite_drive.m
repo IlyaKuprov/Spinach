@@ -57,7 +57,7 @@ if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'times')||.
    any(~isfinite(parameters.times))||any(parameters.times<0)||any(diff(parameters.times)<0)
     error('finite_drive:times','Supply finite nonnegative increasing elapsed times.');
 end
-if ~isstruct(spin_system)||~isfield(spin_system,'model')||...
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'drive')
     error('finite_drive:input','Supply a retained subsystem and drive parameters.');
 end
@@ -110,7 +110,7 @@ end
 for k=1:numel(parameters.drive)
     ids=parameters.drive(k).spins;
     if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
-       numel(unique(ids))~=numel(ids)||any(~ismember(ids,spin_system.model.observed_ids))
+       numel(unique(ids))~=numel(ids)||any(~ismember(ids,parameters.observed))
         error('finite_drive:spins',...
               'Finite drives address unique observed-spin identifiers.');
     end

@@ -42,8 +42,9 @@ q=struct('observed',1,'times',0,'output','observable',...
          'coil',{{diag([1 0]),1e-20*diag([1 0]),1e20*diag([1 0])}});
 q.cce=struct('bath_spins',[],'order',0,'approximation','generalized',...
              'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^29));
-model=cce_compile(spin_system,q,'labframe');
-observed_system=cce_subsystem(model,[],struct(),[]);
+model_p=cce_options(spin_system,q,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+observed_system=cce_subsystem(model,model_p,[],struct(),[]);
 scaled=NaN(1,3);
 accepted=true;
 try
@@ -326,9 +327,9 @@ request=observe;
 request.cce.numerics.propagator='expm';
 for projected=[true false]
     restricted=observed_system;
-    generator=struct('left',0,'right',0);
+    generator={0,0};
     if ~projected
-        restricted.formalism='zeeman-liouv';
+        restricted.bas.formalism='zeeman-liouv';
         generator=zeros(4);
     end
     unsupported=false;
@@ -358,15 +359,15 @@ if ~strcmp(parameters.cce.bath_state.mode,'interlaced')
 end
 
 % Evaluate the same raw conditional average using the registered callback
-[parameters,~]=cce_options(spin_system,parameters,pulse_sequence,'labframe');
-model=cce_compile(spin_system,parameters,'labframe');
-model.formalism=parameters.cce.basis.formalism;
-model.clusters=diagnostics.clusters;
-schedule=struct('pulse_sequence',pulse_sequence,'contract',diagnostics.contract);
+parameters=cce_options(spin_system,parameters,pulse_sequence,'labframe');
+model_p=cce_options(spin_system,parameters,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+model.bas.formalism=parameters.cce.basis.formalism;
+model_clusters=diagnostics.clusters;
 parameters.cce.interlaced.raw_only=true;
 parameters.cce.interlaced.reference_state=1;
 cluster=struct('id',uint64(1),'sites',parameters.cce.bath_spins(1:parameters.cce.order));
-raw=cce_interlace(model,cluster,diagnostics.ensemble,schedule,parameters,diagnostics.contract.evaluator);
+raw=cce_interlace(model,cluster,model_clusters,diagnostics.ensemble,pulse_sequence,parameters);
 value=raw.value;
 bound=raw.abs_error_bound;
 

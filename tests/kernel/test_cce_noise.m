@@ -49,7 +49,8 @@ result=test_close(result,'C7 numerical check',r,reference,1e-12,1e-12,'Full-orde
 exact_error=max(abs(r-reference));
 
 % Honour an explicitly supplied bath state independently of parameter defaults
-model=cce_compile(s,p,'labframe');
+model_p=cce_options(s,p,@cce_compile,'labframe');
+model=cce_compile(s,model_p,'labframe');
 state_parameters=diagnostics.parameters;
 state_parameters.rho0=eye(2)/2;
 ensemble=diagnostics.ensemble;
@@ -57,8 +58,7 @@ spin_config=rmfield(ensemble.spin_config(1),'assignment');
 observed_state=diag([0 1]);
 spin_config.bath_rho={diag([0.8 0.2]),[1 1;1 1]/2};
 spin_config.expectations=[0 0 0.3;0.5 0 0];
-contract=cce_capabilities(@noise_correlation);
-schedule=struct('pulse_sequence',@noise_correlation,'contract',contract);
+schedule=@noise_correlation;
 cluster=struct('id',1,'sites',[2 3]);
 rho=kron(spin_config.bath_rho{1},spin_config.bath_rho{2});
 
@@ -66,7 +66,7 @@ rho=kron(spin_config.bath_rho{1},spin_config.bath_rho{2});
 q=state_parameters;
 q.rho0=observed_state;
 q.times=linspace(0,1,128);
-local=cce_subsystem(model,cluster.sites,spin_config,[]);
+local=cce_subsystem(model,model_p,cluster.sites,spin_config,[]);
 [ham,R,K,q]=cce_generators(local,q,[]);
 q.cce.numerics.max_memory_bytes=4096;
 refused=false;
@@ -82,7 +82,7 @@ for ordering={'ordered','symmetrized'}
     q.rho0=observed_state;
     q.noise.ordering=ordering{1};
     q.noise.connected=true;
-    raw=contract.evaluator(model,cluster,spin_config,schedule,q);
+    raw=cce_evaluate(model,cluster,spin_config,schedule,q);
     supplied_reference=zeros(numel(p.times),1);
     for k=1:numel(p.times)
         U=expm(-1i*H*p.times(k));
@@ -175,29 +175,6 @@ fprintf('R1236 sampled covariance %.16g; empirical variance %.16g.\n',...
 
 fprintf('Noise full-order error %.3g; quantum ordering error %.3g\n',...
         exact_error,max(abs(ordered-reference)));
-
-% Refuse routing a master-equation request through the noise evaluator
-q=p;
-q.rho0=ones(2)/2;
-q.cce.basis=struct('formalism','zeeman-liouv');
-clean=rmfield(q,'noise');
-clean.output='signal';
-model=cce_compile(s,clean,'labframe');
-model.formalism='zeeman-liouv';
-q.cce=model.parameters.cce;
-contract=cce_capabilities(@noise_correlation);
-schedule=struct('pulse_sequence',@free_evolution,'contract',cce_capabilities(@free_evolution));
-cluster=struct('id',uint64(1),'sites',[2 3]);
-foreign_config=struct('bath_ids',[2 3],'bath_rho',{p.cce.bath_state.rho},'weight',1);
-rejected=false;
-try
-    contract.evaluator(model,cluster,foreign_config,schedule,q);
-catch exception
-    rejected=strcmp(exception.identifier,'clexpn:noise');
-    fprintf('Foreign experiment validation: %s: %s\n',exception.identifier,exception.message);
-end
-result=test_true(result,'Noise evaluator rejects foreign method',rejected,...
-                 'Direct evaluator calls must not silently use Hamiltonian noise dynamics for a master-equation method.');
 
 % Reject non-Hermitian bath operators independently of their physical units
 q=p;

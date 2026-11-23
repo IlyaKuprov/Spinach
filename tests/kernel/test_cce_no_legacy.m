@@ -130,9 +130,10 @@ for n=1:numel(paths)
 end
 
 % Direct native experiments also reject raw controls, including empty arrays
-[p,~]=cce_options(spin_system,p,@free_evolution,'labframe');
-model=cce_compile(spin_system,p,'labframe');
-[cluster,~]=cce_subsystem(model,2,struct(),[]);
+p=cce_options(spin_system,p,@free_evolution,'labframe');
+model_p=cce_options(spin_system,p,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+[cluster,~]=cce_subsystem(model,model_p,2,struct(),[]);
 [H,R,K,p]=cce_generators(cluster,p,[]);
 p.nloops=1;
 p.drive=struct('spins',1,'axis','x','amplitude',1,'detuning',0,'duration',0.1);

@@ -57,9 +57,10 @@ small.inter.zeeman.matrix{1}=zeros(3);
 small.bas.formalism='zeeman-liouv';
 small.tols.small_matrix=1;
 small.tols.prop_chop=1e-4;
-weak_model=cce_compile(small,weak,'labframe');
-[weak_system,~]=cce_subsystem(weak_model,[],struct(),[]);
-[H,R,K,weak]=cce_generators(weak_system,weak_model.parameters,[]);
+weak_model_p=cce_options(small,weak,@cce_compile,'labframe');
+weak_model=cce_compile(small,weak_model_p,'labframe');
+[weak_system,~]=cce_subsystem(weak_model,weak_model_p,[],struct(),[]);
+[H,R,K,weak]=cce_generators(weak_system,weak_model_p,[]);
 [clean,clean_details]=free_evolution(weak_system,weak,H,R,K);
 population_error=abs(clean(end,1)-exp(-1e-5));
 result=test_true(result,'Stock ME clean-up error covered',...
@@ -82,9 +83,10 @@ result=test_close(result,'C7 numerical check',projected,2*expected(:),1e-12,1e-1
 % Refuse nonclosed projected jump blocks and negative rates
 p.bath_jumps.operator=[0 1;0 0];
 s.bas.formalism='zeeman-liouv';
-m=cce_compile(s,p,'labframe');
-p=m.parameters;
-[subsystem,~]=cce_subsystem(m,[],struct(),[]);
+m_p=cce_options(s,p,@cce_compile,'labframe');
+m=cce_compile(s,m_p,'labframe');
+p=m_p;
+[subsystem,~]=cce_subsystem(m,m_p,[],struct(),[]);
 refused=false;
 try
     cce_generators(subsystem,p,[]);
@@ -118,19 +120,17 @@ result=test_true(result,'C7 contract check',refused,'Negative native dissipative
 
 % Require a zero-rate nonclosed jump to disappear rather than change the model
 p.bath_jumps.rate=0;
-zero_rate=cce_generators(subsystem,p,[]);
+[zero_rate,zero_loss]=cce_generators(subsystem,p,[]);
 p.bath_jumps=struct('support',{},'operator',{},'rate',{});
-no_jump=cce_generators(subsystem,p,[]);
-zero_loss=0;
-no_loss=0;
-if ~isempty(zero_rate.dissipator)
-    zero_loss=zero_rate.dissipator;
+[no_jump,no_loss]=cce_generators(subsystem,p,[]);
+if isempty(zero_loss)
+    zero_loss=0;
 end
-if ~isempty(no_jump.dissipator)
-    no_loss=no_jump.dissipator;
+if isempty(no_loss)
+    no_loss=0;
 end
-zero_rate=-1i*(zero_rate.left-zero_rate.right)+zero_loss;
-no_jump=-1i*(no_jump.left-no_jump.right)+no_loss;
+zero_rate=-1i*(zero_rate{1}-zero_rate{2})+zero_loss;
+no_jump=-1i*(no_jump{1}-no_jump{2})+no_loss;
 result=test_close(result,'Zero-rate limit',zero_rate,no_jump,0,0,...
                   'A vanishing coefficient contributes no dissipator or manifold leakage.');
 
@@ -141,14 +141,15 @@ bath_system=create(sys,inter);
 p.cce.bath_spins=2;
 p.bath_jumps=struct('support',2,'operator',[0 1;0 0],'rate',1);
 p.cce.order=1;
-model=cce_compile(bath_system,p,'labframe');
-model.parameters.cce.meanfield='static';
+model_p=cce_options(bath_system,p,@cce_compile,'labframe');
+model=cce_compile(bath_system,model_p,'labframe');
+model_p.cce.meanfield='static';
 refused=false;
 try
     configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},...
                          'exterior_ids',2,'exterior_expectations',[0 0 0.5]);
-    [exterior_system,~]=cce_subsystem(model,[],configuration,[]);
-    cce_generators(exterior_system,model.parameters,[]);
+    [exterior_system,~]=cce_subsystem(model,model_p,[],configuration,[]);
+    cce_generators(exterior_system,model_p,[]);
 catch err
     refused=strcmp(err.identifier,'cce:exteriorJump');
 end

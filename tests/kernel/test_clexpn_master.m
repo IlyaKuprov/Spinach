@@ -93,14 +93,15 @@ zero=relax;
 zero.cce.approximation='projected';
 zero.output='signal';
 zero.bath_jumps=struct('support',1,'operator',[0 1;0 0],'rate',0);
-zero_model=cce_compile(s,zero,'labframe');
-[zero_system,~]=cce_subsystem(zero_model,[],struct(),[]);
-zero_parameters=zero_model.parameters;
-[with_zero,~,~]=cce_generators(zero_system,zero_parameters,[]);
+zero_model_p=cce_options(s,zero,@cce_compile,'labframe');
+zero_model=cce_compile(s,zero_model_p,'labframe');
+[zero_system,~]=cce_subsystem(zero_model,zero_model_p,[],struct(),[]);
+zero_parameters=zero_model_p;
+[with_zero,zero_loss,~]=cce_generators(zero_system,zero_parameters,[]);
 zero_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
 [without_jump,~,~]=cce_generators(zero_system,zero_parameters,[]);
-zero_generator=-1i*(with_zero.left-with_zero.right)+with_zero.dissipator;
-no_generator=-1i*(without_jump.left-without_jump.right);
+zero_generator=-1i*(with_zero{1}-with_zero{2})+zero_loss;
+no_generator=-1i*(without_jump{1}-without_jump{2});
 result=test_close(result,'Zero-rate projected jump omitted',zero_generator,no_generator,0,0,...
                   'A zero coefficient contributes neither dissipation nor manifold leakage.');
 
@@ -111,39 +112,33 @@ exterior.cce.order=1;
 exterior.cce.meanfield='static';
 exterior.bath_jumps.support=2;
 exterior.bath_jumps.rate=1;
-exterior_model=cce_compile(s,exterior,'labframe');
+exterior_model_p=cce_options(s,exterior,@cce_compile,'labframe');
+exterior_model=cce_compile(s,exterior_model_p,'labframe');
 configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},...
                      'exterior_ids',2,'exterior_expectations',[0 0 0.5]);
-[exterior_system,~]=cce_subsystem(exterior_model,[],configuration,[]);
+[exterior_system,~]=cce_subsystem(exterior_model,exterior_model_p,[],configuration,[]);
 rejected=false;
 try
-    cce_generators(exterior_system,exterior_model.parameters,[]);
+    cce_generators(exterior_system,exterior_model_p,[]);
 catch exception
     rejected=strcmp(exception.identifier,'cce:exteriorJump');
 end
 result=test_true(result,'Active exterior jump refused',rejected,...
                  'An evolving exterior population cannot silently become a static field.');
 
-% Instrument the supplied evaluator on recursive and complete-bath paths
-model=cce_compile(s,df.parameters,'labframe');
-model.formalism='zeeman-liouv';
-model.clusters=df.clusters;
-calls=[];
-events={};
+% Exercise the recursive and complete-bath conditioned paths
+model_p=cce_options(s,df.parameters,@cce_compile,'labframe');
+model=cce_compile(s,model_p,'labframe');
+model.bas.formalism='zeeman-liouv';
+model_clusters=df.clusters;
 local=df.parameters;
 local.cce.interlaced.reference_state=1;
-schedule.pulse_sequence=@free_evolution;
-schedule.contract=cce_capabilities(@free_evolution);
-callback=schedule.contract.evaluator;
-cce_interlace(model,df.clusters(1),df.ensemble,schedule,local,@counted);
-result=test_true(result,'Recursive evaluator callback',any(calls==0)&&any(calls==df.clusters(1).id),...
-                 'The empty reference and denominator subsets invoke the supplied evaluator.');
-calls=[];
-cce_interlace(model,df.clusters(end),df.ensemble,schedule,local,@counted);
-result=test_true(result,'Full-bath evaluator callback',numel(calls)==4&&all(calls==df.clusters(end).id),...
-                 'The complete-bath shortcut never substitutes a closed-system evaluator.');
-result=test_true(result,'Conditioned physical assignments',~isempty(events),...
-                 'Callbacks receive explicit parent-conditioned bath densities.');
+raw=cce_interlace(model,df.clusters(1),model_clusters,df.ensemble,@free_evolution,local);
+result=test_true(result,'Recursive conditioned factor',strcmp(raw.kind,'irreducible'),...
+                 'The empty reference and denominator subsets enter the irreducible factor.');
+raw=cce_interlace(model,df.clusters(end),model_clusters,df.ensemble,@free_evolution,local);
+result=test_true(result,'Full-bath conditioned factor',raw.full_bath&&raw.assignment_count==4,...
+                 'The complete-bath shortcut evaluates every physical assignment.');
 
 % Checkpoint payload retains contract version, moments, masks, and uncertainties
 file=[tempname '.mat'];
@@ -172,8 +167,9 @@ request.drive(2).axis='y';
 request.drive(2).amplitude=3;
 [~,driven]=clexpn(s,@finite_drive,request,'labframe');
 request=driven.parameters;
-drive_model=cce_compile(s,request,'labframe');
-drive_model.formalism='zeeman-liouv';
+drive_model_p=cce_options(s,request,@cce_compile,'labframe');
+drive_model=cce_compile(s,drive_model_p,'labframe');
+drive_model.bas.formalism='zeeman-liouv';
 checks=cce_diagnostics(drive_model,driven.raw,driven.reduction,request);
 result=test_true(result,'Driven Liouville numerical budget is not exact',...
                  all(driven.raw{1}(end).abs_error_bound(2:end)>0)&&...
@@ -181,16 +177,16 @@ result=test_true(result,'Driven Liouville numerical budget is not exact',...
                  'Full-bath reductions propagate nonzero segment estimates into budget diagnostics.');
 
 % Independently sum the declared arithmetic estimate over all finite intervals
-[retained,~]=cce_subsystem(drive_model,drive_model.bath_ids,struct(),[]);
+[retained,~]=cce_subsystem(drive_model,drive_model_p,drive_model_p.cce.bath_spins,struct(),[]);
 [H,R,K,local]=cce_generators(retained,request,[]);
 L=H+1i*R+1i*K;
 [~,aux]=finite_drive(retained,local,H,R,K);
 hilbert=retained;
-hilbert.formalism='zeeman-hilb';
+hilbert.bas.formalism='zeeman-hilb';
 x=cce_operator(hilbert,'Lx',1);
 y=cce_operator(hilbert,'Ly',1);
 z=cce_operator(hilbert,'Lz',1);
-identity=speye(retained.dimension);
+identity=speye(retained.cce.dimension);
 controls={7*x+2*z,3*y+2*z};
 for k=1:2
     controls{k}=kron(identity,controls{k})-kron(controls{k}.',identity);
@@ -232,16 +228,6 @@ local.output='density';
 result=test_close(result,'Driven Liouville density scaling',densities.abs_error_bound,...
                   repmat(estimates,1,4),16*eps*norm(estimates),0,...
                   'Density entries retain the unscaled segment estimate.');
-
-% Capture physical conditioning, not just callback counts
-function raw=counted(model,cluster,configuration,schedule,parameters)
-
-% Record the retained cluster and conditioned bath state
-calls(end+1)=cluster.id;
-events{end+1}=configuration.bath_rho;
-raw=callback(model,cluster,configuration,schedule,parameters);
-
-end
 
 end
 

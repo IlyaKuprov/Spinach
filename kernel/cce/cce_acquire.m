@@ -19,8 +19,8 @@
 % Drift and relaxation remain active during drives; overlapping drives add.
 % Ideal and static-exterior Hilbert segments use cce_segments; pure finite
 % drives retain streamed propagation. Projected drives are unsupported.
-% H,R,K are conventional angular-frequency generators or explicitly tagged
-% projected branches from cce_generators. No pulse or receiver is implicit.
+% H,R,K are conventional angular-frequency generators, or the projected
+% branch pair and dissipator from cce_generators. No pulse or receiver is implicit.
 %
 % GKSL relaxation uses stock exponential action and its floating-point
 % estimate 64*eps*n*(1+norm(L,1)*time), scaled by the detector/reference.
@@ -33,8 +33,8 @@
 %
 %   spin_system - retained subsystem returned by cce_subsystem
 %   parameters  - experiment options with elapsed times in seconds,
-%                 preparation, detection, output, and resolved CCE policy
-%   H,R,K       - angular-frequency generators, or a tagged projected H
+%                 preparation, detection, output, and resolved CCE options
+%   H,R,K       - angular-frequency generators, or a projected branch pair H
 %
 % Outputs:
 %
@@ -52,7 +52,7 @@ end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     parameters.normalized=false;
     if ~isfield(parameters,'coil')
-        parameters.coil=eye(spin_system.observed_dimension);
+        parameters.coil=eye(spin_system.cce.observed_dimension);
     end
 end
 
@@ -63,23 +63,23 @@ events=cce_pulse_events(parameters);
 selected=~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&isfield(meta,'transition');
 
 % Preserve the projected spectral action for a selected-transition FID
-if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-liouv')&&...
+if iscell(H)&&isempty(R)&&~strcmp(spin_system.bas.formalism,'zeeman-liouv')&&...
    ~(isfield(parameters,'output')&&strcmp(parameters.output,'density'))&&isempty(events)&&...
    ~isfield(parameters,'coil')&&~isfield(parameters,'detection')&&...
    ~isfield(parameters,'bath_operator')
 
     % Diagonalise each bath Hamiltonian once in its original numerical convention
-    [va,ea]=eig(full((H.left+H.left')/2),'vector');
-    [vb,eb]=eig(full((H.right+H.right')/2),'vector');
-    ra=norm(H.left*va-va.*ea.','fro');
-    rb=norm(H.right*vb-vb.*eb.','fro');
-    oa=norm(va'*va-eye(size(H.left)),'fro');
-    ob=norm(vb'*vb-eye(size(H.right)),'fro');
+    [va,ea]=eig(full((H{1}+H{1}')/2),'vector');
+    [vb,eb]=eig(full((H{2}+H{2}')/2),'vector');
+    ra=norm(H{1}*va-va.*ea.','fro');
+    rb=norm(H{2}*vb-vb.*eb.','fro');
+    oa=norm(va'*va-eye(size(H{1})),'fro');
+    ob=norm(vb'*vb-eye(size(H{2})),'fro');
     residual=max(ra,rb);
     orthogonality=max(oa,ob);
     rho=1;
-    for k=1:numel(spin_system.bath_rho)
-        rho=kron(rho,spin_system.bath_rho{k});
+    for k=1:numel(spin_system.cce.bath_rho)
+        rho=kron(rho,spin_system.cce.bath_rho{k});
     end
     answer=complex(zeros(numel(parameters.times),1));
     bounds=zeros(size(answer));
@@ -87,17 +87,17 @@ if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-lio
     % Keep the branch multiplication order and forward bound of the reference
     for n=1:numel(parameters.times)
         time=parameters.times(n);
-        ua=eye(spin_system.bath_dimension);
+        ua=eye(spin_system.cce.bath_dimension);
         ub=ua;
         if time~=0
             ua=((va.*exp(-1i*time*ea).')*va')*ua;
             ub=((vb.*exp(-1i*time*eb).')*vb')*ub;
         end
         answer(n)=trace(ua*rho*ub');
-        operations=12*spin_system.bath_dimension^3;
+        operations=12*spin_system.cce.bath_dimension^3;
         gamma=operations*eps/(1-operations*eps);
-        bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+4*orthogonality+...
-                  gamma*(1+time*H.hamiltonian_norm);
+        bounds(n)=2*time*(residual+parameters.cce_aux.roundoff_bound)+4*orthogonality+...
+                  gamma*(1+time*parameters.cce_aux.hamiltonian_norm);
     end
     if ~meta.normalized
         answer=answer*reference;
@@ -105,7 +105,7 @@ if isstruct(H)&&isempty(H.dissipator)&&~strcmp(spin_system.formalism,'zeeman-lio
     end
     aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
                'orthogonality_residual',orthogonality,...
-               'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
+               'hamiltonian_bound',parameters.cce_aux.roundoff_bound,...
                'backend',parameters.cce_aux.backend);
     return
 
@@ -117,14 +117,14 @@ if ~iscell(coil)
 else
     detectors=coil;
 end
-if isstruct(H)
-    generator=H;
+if iscell(H)
+    generator=[H {R}];
 else
     generator=H+1i*R+1i*K;
 end
 density=isfield(parameters,'output')&&strcmp(parameters.output,'density');
 if density
-    answer=complex(zeros(numel(parameters.times),spin_system.observed_dimension^2));
+    answer=complex(zeros(numel(parameters.times),spin_system.cce.observed_dimension^2));
 else
     answer=complex(zeros(numel(parameters.times),numel(reference)));
 end
@@ -133,9 +133,9 @@ end
 segments=struct();
 segmented=false;
 if ~isempty(events)
-    segmented=strcmp(spin_system.formalism,'zeeman-hilb')&&...
+    segmented=strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
               (any(strcmp({events.type},'ideal'))||strcmp(parameters.cce.meanfield,'static')||...
-               any(~ismember([events.target],spin_system.physical_ids)));
+               any(~ismember([events.target],spin_system.cce.ids)));
     if segmented
         segments=cce_segments(spin_system,parameters,H,events);
     else
@@ -144,7 +144,7 @@ if ~isempty(events)
         starts=zeros(numel(events),numel(parameters.times));
         drives=cell(1,numel(events));
         local=spin_system;
-        local.formalism='zeeman-hilb';
+        local.bas.formalism='zeeman-hilb';
         for k=1:numel(events)
 
             % Build each retained target drive in its declared Cartesian direction
@@ -154,7 +154,7 @@ if ~isempty(events)
                 axis=double('xyz'==axis);
             end
             detuning=e.detuning;
-            drive=sparse(spin_system.dimension,spin_system.dimension);
+            drive=sparse(spin_system.cce.dimension,spin_system.cce.dimension);
             for target=e.target
                 for a=1:3
                     names={'Lx','Ly','Lz'};
@@ -167,8 +167,8 @@ if ~isempty(events)
                     end
                 end
             end
-            if strcmp(spin_system.formalism,'zeeman-liouv')
-                drive=kron(speye(spin_system.dimension),drive)-kron(drive.',speye(spin_system.dimension));
+            if strcmp(spin_system.bas.formalism,'zeeman-liouv')
+                drive=kron(speye(spin_system.cce.dimension),drive)-kron(drive.',speye(spin_system.cce.dimension));
             end
             drives{k}=drive;
             if strcmp(e.placement,'fraction'), starts(k,:)=e.at*parameters.times;
@@ -183,24 +183,24 @@ end
 
 % Reuse the coherent spectrum and retain its measured numerical diagnostics
 aux=struct();
-controlled=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
+controlled=~isempty(events)&&~iscell(H)&&strcmp(spin_system.bas.formalism,'zeeman-hilb');
 if controlled
     aux.abs_error_bound=zeros(size(answer));
     if segmented
         aux.segments=segments;
     end
-    aux.density=complex(zeros(spin_system.observed_dimension,spin_system.observed_dimension,numel(parameters.times)));
+    aux.density=complex(zeros(spin_system.cce.observed_dimension,spin_system.cce.observed_dimension,numel(parameters.times)));
 end
-coherent=isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-hilb');
-projected_me=isstruct(H)&&strcmp(spin_system.formalism,'zeeman-liouv');
-driven_liouville=~isempty(events)&&~isstruct(H)&&strcmp(spin_system.formalism,'zeeman-liouv');
-liouville=isempty(events)&&(projected_me||(~isstruct(H)&&...
-          strcmp(spin_system.formalism,'zeeman-liouv')));
+coherent=isempty(events)&&~iscell(H)&&strcmp(spin_system.bas.formalism,'zeeman-hilb');
+projected_me=iscell(H)&&strcmp(spin_system.bas.formalism,'zeeman-liouv');
+driven_liouville=~isempty(events)&&~iscell(H)&&strcmp(spin_system.bas.formalism,'zeeman-liouv');
+liouville=isempty(events)&&(projected_me||(~iscell(H)&&...
+          strcmp(spin_system.bas.formalism,'zeeman-liouv')));
 if projected_me
-    db=spin_system.bath_dimension;
-    generator=kron(eye(db),H.left)-kron(H.right.',eye(db));
-    if ~isempty(H.dissipator)
-        generator=generator+1i*H.dissipator;
+    db=spin_system.cce.bath_dimension;
+    generator=kron(eye(db),H{1})-kron(H{2}.',eye(db));
+    if ~isempty(R)
+        generator=generator+1i*R;
     end
     if meta.normalized
         rho0=rho0/meta.initial_signal;
@@ -209,7 +209,7 @@ if projected_me
 end
 
 % Convert projected bath-coherence errors to trace-detector units
-if isstruct(H)&&~projected_me
+if iscell(H)&&~projected_me
     scale=norm(coil,'fro')/abs(meta.normalization_divisor);
     aux.abs_error_bound=zeros(size(answer));
     aux.error_bound_kind='floating_point_estimate';
@@ -218,20 +218,20 @@ end
 % Preserve the stock density action and its arithmetic estimate
 if liouville||driven_liouville
     if liouville
-        engine=spin_system.model.spin_system;
+        engine=spin_system;
         engine.bas.formalism='sphten-liouv';
         engine.tols.prop_chop=0;
     end
     scale=ones(1,size(answer,2));
     if projected_me
-        scale=norm(reshape(full(coil),spin_system.bath_dimension,[]),2);
+        scale=norm(reshape(full(coil),spin_system.cce.bath_dimension,[]),2);
         if ~meta.normalized
             scale=scale*abs(meta.initial_signal);
         end
     elseif ~density
         if ~selected
-            db=spin_system.bath_dimension;
-            dc=spin_system.observed_dimension;
+            db=spin_system.cce.bath_dimension;
+            dc=spin_system.cce.observed_dimension;
             for k=1:numel(detectors)
                 detector=reshape(detectors{k},dc*db,dc*db);
                 scale(k)=norm(detector(1:db:end,1:db:end),2);
@@ -267,7 +267,7 @@ if coherent
            4*aux.orthogonality_residual+...
            gamma*(1+parameters.times(:)*norm(generator,'fro'));
     if density
-        scale=ones(1,spin_system.observed_dimension^2);
+        scale=ones(1,spin_system.cce.observed_dimension^2);
     else
         scale=cellfun(@(op)norm(op,2),detectors(:).');
         if meta.normalized
@@ -313,7 +313,7 @@ for n=1:numel(parameters.times)
                 rho=pulse_prop*rho*pulse_prop';
                 scale=scale+1+abs(dt)*norm(full(ham),2);
             end
-            bound=16*spin_system.dimension^3*eps*scale;
+            bound=16*spin_system.cce.dimension^3*eps*scale;
         else
             [rho,bound]=driven_evolution(spin_system,generator,rho0,parameters.times(n),...
                                         events,starts(:,n),drives);
@@ -334,9 +334,9 @@ for n=1:numel(parameters.times)
     end
 
     % Trace out the bath before applying observed-spin detection
-    if density||~isstruct(H)
-        dc=spin_system.observed_dimension;
-        db=spin_system.bath_dimension;
+    if density||~iscell(H)
+        dc=spin_system.cce.observed_dimension;
+        db=spin_system.cce.bath_dimension;
         blocks=reshape(full(rho),[db dc db dc]);
         blocks=reshape(permute(blocks,[1 3 2 4]),[db*db dc*dc]);
         observed=reshape(sum(blocks(1:db+1:db*db,:),1),[dc dc]);
@@ -362,7 +362,7 @@ for n=1:numel(parameters.times)
         end
     else
         for k=1:numel(detectors)
-            value=conj(detectors{k}(1))*trace(reshape(rho,spin_system.bath_dimension,[]));
+            value=conj(detectors{k}(1))*trace(reshape(rho,spin_system.cce.bath_dimension,[]));
             if meta.normalized
                 value=value/reference(k);
             end
@@ -380,7 +380,7 @@ function [rho,bound]=driven_evolution(system,L,rho,total,events,starts,drives)
 % Include every drive boundary inside this observation interval
 stops=starts+reshape([events.duration],[],1);
 scale=0;
-coherent=strcmp(system.formalism,'zeeman-hilb');
+coherent=strcmp(system.bas.formalism,'zeeman-hilb');
 boundaries=unique([0;total;starts(starts>0&starts<total);stops(stops>0&stops<total)]);
 if coherent
     boundaries=[0;boundaries];
@@ -407,7 +407,7 @@ for k=1:numel(boundaries)-1
 
 end
 if coherent
-    bound=16*system.dimension^3*eps*scale;
+    bound=16*system.cce.dimension^3*eps*scale;
 else
     bound=64*eps*size(L,1)*scale;
 end
@@ -416,8 +416,8 @@ end
 
 % Validate the experiment-owned time axis and retained subsystem
 function grumble(spin_system,parameters,H,R,K)
-if ~isstruct(spin_system)||~isfield(spin_system,'kind')||...
-   ~strcmp(spin_system.kind,'cce_subsystem')||~isstruct(parameters)||...
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||...
+   ~isfield(spin_system.cce,'sites')||~isstruct(parameters)||...
    ~isfield(parameters,'times')||~isnumeric(parameters.times)||...
    ~isreal(parameters.times)||~isvector(parameters.times)||...
    any(~isfinite(parameters.times))||any(parameters.times<0)||any(diff(parameters.times)<0)
@@ -426,21 +426,21 @@ end
 if isfield(parameters,'sequence')
     error('cce_acquire:sequence','Use finite_drive, refocusing_train, or hahn_echo, not parameters.sequence.');
 end
-if any(isfield(parameters,{'refocusing','train'}))&&~strcmp(spin_system.formalism,'zeeman-hilb')
+if any(isfield(parameters,{'refocusing','train'}))&&~strcmp(spin_system.bas.formalism,'zeeman-hilb')
     error('cce_acquire:controls','Ideal refocusing requires generalized Hilbert dynamics.');
 end
-if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
+if ~(isnumeric(H)||iscell(H))||~isnumeric(R)||~isnumeric(K)
     error('cce_acquire:generators','Supply conventional or tagged projected generators.');
 end
-if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&isstruct(H)
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&iscell(H)
     error('cce_acquire:density','Projected branches do not return a density matrix.');
 end
 events=cce_pulse_events(parameters);
-if ~isempty(events)&&isstruct(H)
+if ~isempty(events)&&iscell(H)
     error('cce_acquire:projection','Finite controls require generalized dynamics.');
 end
-if ~strcmp(spin_system.formalism,'zeeman-hilb')&&...
-   any(~ismember([events.target],spin_system.physical_ids))
+if ~strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
+   any(~ismember([events.target],spin_system.cce.ids))
     error('cce_acquire:exterior','Finite drives require retained target spins.');
 end
 end

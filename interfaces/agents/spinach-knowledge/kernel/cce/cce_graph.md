@@ -2,11 +2,11 @@
 
 ## Native role and invocation
 
-Internal physical bath connectivity and deterministic cluster-selection scoring service. clexpn supplies resolved engine selection options.
+Internal physical bath connectivity and deterministic cluster-selection scoring service. clexpn supplies the resolved parameters.
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `graph=cce_graph(model,parameters)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `graph=cce_graph(spin_system,parameters)`. Engine records are not public experiment parameter structures.
 
 [MATLAB source](../../../../../kernel/cce/cce_graph.m)
 
@@ -24,7 +24,7 @@ Construct physical bath connectivity and deterministic cluster-selection scores.
 
 **Inputs**
 
-- `model` — physical IDs, observed/bath IDs, multiplicities, coordinates in Angstrom, and pair records (`ids`, real Cartesian `tensor` in rad/s).
+- `spin_system` — compiled spin system with coordinates in Angstrom and pair records (`ids`, real Cartesian `tensor` in rad/s).
 - `parameters.graph` — `mode`; mode-specific `radius` (Angstrom), `threshold` (rad/s), or `adjacency`; `score` is `coupling_norm` (default), `resonance` (mismatch matrix and positive mismatch_scale, both rad/s), or `supplied` (scores matrix).
 
 **Outputs**

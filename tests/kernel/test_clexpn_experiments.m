@@ -31,9 +31,10 @@ p.transition.alpha=[1;0];
 p.transition.beta=[0;1];
 p.cce.numerics=struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e8);
 p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])}});
-[p,~]=cce_options(spin_system,p,@free_evolution,'labframe');
-model=cce_compile(spin_system,p,'labframe');
-[cluster,~]=cce_subsystem(model,2,struct(),[]);
+p=cce_options(spin_system,p,@free_evolution,'labframe');
+model_p=cce_options(spin_system,p,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+[cluster,~]=cce_subsystem(model,model_p,2,struct(),[]);
 [H,R,K,p]=cce_generators(cluster,p,[]);
 [rho0,coil,reference]=cce_observation(cluster,p);
 pulse=kron([0 -1i;-1i 0],eye(2));
@@ -77,8 +78,9 @@ invariant=spin_system;
 invariant=cce_test_write(invariant,[1 2],[0 0 5;0 0 0;0 0 7]);
 invariant=cce_test_write(invariant,[2 1],zeros(3));
 invariant.inter.zeeman.matrix{2}=diag([0 0 11]);
-phase_model=cce_compile(invariant,rmfield(phased,'cce_aux'),'labframe');
-[phase_cluster,~]=cce_subsystem(phase_model,2,struct(),[]);
+phase_model_p=cce_options(invariant,rmfield(phased,'cce_aux'),@cce_compile,'labframe');
+phase_model=cce_compile(invariant,phase_model_p,'labframe');
+[phase_cluster,~]=cce_subsystem(phase_model,phase_model_p,2,struct(),[]);
 for sequence={@cpmg_echo,@cce_eseem}
 
     % Select the refocusing experiment
@@ -90,7 +92,7 @@ for sequence={@cpmg_echo,@cce_eseem}
 
             % Compare Hilbert and Liouville representations
             full_cluster=phase_cluster;
-            full_cluster.formalism=formalism{1};
+            full_cluster.bas.formalism=formalism{1};
             phased.cce.approximation='generalized';
             [hf,rf,kf,full_p]=cce_generators(full_cluster,phased,[]);
             expected=sequence{1}(full_cluster,full_p,hf,rf,kf);
@@ -115,14 +117,14 @@ end
 for sites={[],2}
 
     % Accumulate the retained physical-spin contribution
-    [retained,~]=cce_subsystem(phase_model,sites{1},struct(),[]);
+    [retained,~]=cce_subsystem(phase_model,phase_model_p,sites{1},struct(),[]);
     for sequence={@hahn_echo,@bath_pumped_hahn}
 
         % Select the fixed-receiver experiment
         for formalism={'zeeman-hilb','zeeman-liouv'}
 
             % Compare Hilbert and Liouville representations
-            retained.formalism=formalism{1};
+            retained.bas.formalism=formalism{1};
             for normalised=[false true]
 
                 % Compare normalised and unnormalised detection
@@ -141,8 +143,9 @@ for sites={[],2}
                 result=test_close(result,'Hahn physical fixed receiver',actual,expected,...
                                   3e-13,3e-13,'Complex preparation and detector match full-space evolution.');
                 if isequal(sequence{1},@hahn_echo)&&strcmp(formalism{1},'zeeman-hilb')
-                    plain=rmfield(hp,{'hamiltonian_abs_error_bound','hamiltonian_norm'});
-                    fallback=hahn_echo(retained,proj_p,plain,rp,kp);
+                    plain=proj_p;
+                    plain.cce_aux=rmfield(plain.cce_aux,'hamiltonian_norm');
+                    fallback=hahn_echo(retained,plain,hp,rp,kp);
                     result=test_close(result,'Hahn non-spectral fixed receiver',fallback,expected,...
                                       3e-13,3e-13,'The interval fallback detects the same physical coherence.');
                 end
@@ -156,8 +159,8 @@ for sites={[],2}
 end
 
 % Nonzero dissipation and manifold-preserving rotations retain the fixed receiver
-[retained,~]=cce_subsystem(phase_model,2,struct(),[]);
-retained.formalism='zeeman-liouv';
+[retained,~]=cce_subsystem(phase_model,phase_model_p,2,struct(),[]);
+retained.bas.formalism='zeeman-liouv';
 q=phased;
 q.bath_jumps=struct('support',2,'operator','L+','rate',2);
 for angle=[pi 2*pi]
@@ -180,7 +183,7 @@ q=rmfield(phased,{'rho0','coil'});
 q.normalized=true;
 q.pump=struct('center',11,'halfwidth',0,'units','rad/s',...
               'fraction',0.25,'allow_empty',false);
-retained.formalism='zeeman-hilb';
+retained.bas.formalism='zeeman-hilb';
 q.cce.approximation='generalized';
 [hf,rf,kf,full_p]=cce_generators(retained,q,[]);
 expected=bath_pumped_hahn(retained,full_p,hf,rf,kf);
@@ -226,9 +229,9 @@ phase=0.37;
 phased=p;
 phased.output='observable';
 phased.normalized=false;
-phased.coil=exp(1i*phase)*model.transition.alpha*model.transition.beta';
+phased.coil=exp(1i*phase)*model.cce.transition.alpha*model.cce.transition.beta';
 unphased=phased;
-unphased.coil=model.transition.alpha*model.transition.beta';
+unphased.coil=model.cce.transition.alpha*model.cce.transition.beta';
 actual=free_evolution(cluster,phased,H,R,K);
 expected=exp(-1i*phase)*free_evolution(cluster,unphased,H,R,K);
 result=test_close(result,'Complex receiver phase',actual,expected,3e-13,3e-13,...
@@ -236,7 +239,7 @@ result=test_close(result,'Complex receiver phase',actual,expected,3e-13,3e-13,..
 
 % Inclusive spectral-window boundaries select the same physical bath pulse
 p.output='signal';
-p.pump.center=model.zeeman{2}(3,3);
+p.pump.center=model.cce.zeeman{2}(3,3);
 p.pump.units='rad/s';
 p.pump.halfwidth=0;
 p.pump.allow_empty=false;
@@ -479,7 +482,7 @@ failed=false;
 try
     clexpn(system,@finite_drive,p,'labframe');
 catch err
-    failed=strcmp(err.identifier,'clexpn:projection');
+    failed=strcmp(err.identifier,'finite_drive:generators');
 end
 result=test_true(result,'Projected finite drives rejected',failed,...
                  'A finite observed drive requires generalized propagation.');
@@ -531,17 +534,18 @@ p.output='density';
 p.cce.approximation='generalized';
 p.cce.numerics=struct('atol',1e-20,'rtol',1e-20,'max_memory_bytes',2^28);
 [~,d]=clexpn(system,@free_evolution,p,'labframe');
-model=cce_compile(system,d.parameters,'labframe');
+model_p=cce_options(system,d.parameters,@cce_compile,'labframe');
+model=cce_compile(system,model_p,'labframe');
 [stock_transition,stock_meta]=cce_transition(system,d.parameters,'labframe');
 result=test_close(result,'Compiled observed transition matches stock',...
-                  model.transition.alpha,stock_transition.alpha,0,0,...
+                  model.cce.transition.alpha,stock_transition.alpha,0,0,...
                   'Native observed-only preparation uses the same ordered physical state.');
 result=test_close(result,'Compiled observed energies match stock',...
-                  model.transition_meta.energies,stock_meta.energies,1e-13,1e-13,...
+                  model.cce.transition_meta.energies,stock_meta.energies,1e-13,1e-13,...
                   'Independent stock Hamiltonian assembly validates the observed generator.');
 configuration=d.ensemble.spin_config;
 configuration=rmfield(configuration,'assignment');
-[retained,~]=cce_subsystem(model,2,configuration,[]);
+[retained,~]=cce_subsystem(model,model_p,2,configuration,[]);
 [H,R,K,pseq]=cce_generators(retained,d.parameters,[]);
 [~,aux]=free_evolution(retained,pseq,H,R,K);
 [v,e]=eig(full((H+H')/2),'vector');
@@ -578,13 +582,15 @@ p.preparation=struct('states',{{[1 -2i;2i 4]/5}},'spins',1);
 p.coil=exp(0.37i)*[0 1;0 0];
 p.normalized=false;
 [~,diagnostics]=clexpn(system,@hahn_echo,p,'labframe');
-model=cce_compile(system,diagnostics.parameters,'labframe');
+model_p=cce_options(system,diagnostics.parameters,@cce_compile,'labframe');
+model=cce_compile(system,model_p,'labframe');
 config=rmfield(diagnostics.ensemble.spin_config,'assignment');
-[cluster,~]=cce_subsystem(model,2,config,[]);
+[cluster,~]=cce_subsystem(model,model_p,2,config,[]);
 [H,R,K,p]=cce_generators(cluster,diagnostics.parameters,[]);
 [actual,aux]=hahn_echo(cluster,p,H,R,K);
-plain=rmfield(H,{'hamiltonian_abs_error_bound','hamiltonian_norm'});
-expected=hahn_echo(cluster,p,plain,R,K);
+plain=p;
+plain.cce_aux=rmfield(plain.cce_aux,'hamiltonian_norm');
+expected=hahn_echo(cluster,plain,H,R,K);
 result=test_close(result,'Projected unnormalised spectral pulse products',...
                   actual,expected,2e-14,2e-14,...
                   'Arbitrary coherent preparation and receiver phase retain their scale.');
@@ -661,24 +667,25 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 % Exercise the production dispatch, exact reduction, and budget decision
                 q.normalized=normalised;
                 [~,d]=clexpn(invariant,sequence{1},q,'labframe');
-                model=cce_compile(invariant,d.parameters,'labframe');
-                model.formalism=formalism{1};
+                model_p=cce_options(invariant,d.parameters,@cce_compile,'labframe');
+                model=cce_compile(invariant,model_p,'labframe');
+                model.bas.formalism=formalism{1};
                 checks=cce_diagnostics(model,d.raw,d.reduction,d.parameters);
-                [retained,~]=cce_subsystem(model,2,struct(),[]);
+                [retained,~]=cce_subsystem(model,model_p,2,struct(),[]);
                 [H,R,K,local]=cce_generators(retained,d.parameters,[]);
                 [rho,coils,reference]=cce_observation(retained,local);
                 if ~iscell(coils)
                     coils={coils};
                 end
-                if isstruct(H)&&~isempty(H.dissipator)
-                    db=retained.bath_dimension;
+                if iscell(H)&&~isempty(R)
+                    db=retained.cce.bath_dimension;
                     scale=64*eps*db^2;
-                    frequency=norm(-1i*(kron(eye(db),H.left)-kron(H.right.',eye(db)))+H.dissipator,1);
-                elseif isstruct(H)
-                    scale=16*eps*retained.bath_dimension^3;
-                    frequency=norm(H.left,1)+norm(H.right,1);
+                    frequency=norm(-1i*(kron(eye(db),H{1})-kron(H{2}.',eye(db)))+R,1);
+                elseif iscell(H)
+                    scale=16*eps*retained.cce.bath_dimension^3;
+                    frequency=norm(H{1},1)+norm(H{2},1);
                 elseif strcmp(formalism{1},'zeeman-hilb')
-                    scale=16*eps*retained.dimension^3;
+                    scale=16*eps*retained.cce.dimension^3;
                     frequency=2*norm(H,1);
                 else
                     scale=64*eps*size(H,1);
@@ -690,10 +697,10 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 end
                 pulse_cost=0;
                 if hahn||pumped
-                    dim=retained.dimension;
+                    dim=retained.cce.dimension;
                     products=1+pumped;
-                    if isstruct(H)
-                        dim=retained.bath_dimension;
+                    if iscell(H)
+                        dim=retained.cce.bath_dimension;
                         products=pumped;
                     end
                     pulse_cost=products*16*dim^3*eps;
@@ -731,10 +738,11 @@ for approximation={'projected','generalized'}
 
     % Compare local errors against the analytic polarisation of an initially mixed bath
     q.cce.approximation=approximation{1};
-    model=cce_compile(system,q,'labframe');
-    model.formalism='zeeman-liouv';
-    [retained,~]=cce_subsystem(model,2,struct(),[]);
-    [H,R,K,local]=cce_generators(retained,model.parameters,[]);
+    model_p=cce_options(system,q,@cce_compile,'labframe');
+    model=cce_compile(system,model_p,'labframe');
+    model.bas.formalism='zeeman-liouv';
+    [retained,~]=cce_subsystem(model,model_p,2,struct(),[]);
+    [H,R,K,local]=cce_generators(retained,model_p,[]);
     [~,aux]=bath_pumped_hahn(retained,local,H,R,K);
     if strcmp(approximation{1},'projected')
         dim=2;

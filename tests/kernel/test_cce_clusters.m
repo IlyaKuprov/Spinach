@@ -16,12 +16,13 @@ result=new_test_result('kernel/cce_clusters','CCE graphs and subsets',...
                        'Check frontier enumeration, closure, powers and physical group costs.');
 
 % Check count-scaled cluster metadata before constructing the family
-budget_model=struct('physical_ids',1:7,'bath_ids',2:7,'observed_ids',1,...
-                    'multiplicities',2*ones(1,7));
+budget_model.cce=struct();
+budget_model.comp.mults=2*ones(1,7);
+budget_model.comp.nspins=numel(budget_model.comp.mults);
 budget_graph=struct('bath_ids',2:7,'adjacency',logical(ones(6)-eye(6)),...
                     'scores',ones(6));
-budget_parameters=struct('order',6,'expansion','standard',...
-                         'numerics',struct('max_memory_bytes',1024));
+budget_parameters=struct('observed',1,...
+                         'cce',struct('bath_spins',2:7,'order',6,'expansion','standard','numerics',struct('max_memory_bytes',1024)));
 refused=false;
 try
     cce_clusters(budget_model,budget_graph,budget_parameters);
@@ -38,11 +39,12 @@ manual=fileread(fullfile(root,'interfaces','agents','spinach-knowledge',...
 result=test_true(result,'Documented engine bath radius',contains(manual,'| `bath_radius` |')&&...
                  ~contains(manual,'graph.bath_radius'),...
                  'The retained engine table must name the root field consumed by cce_graph.');
-radius_model=struct('physical_ids',[1 2 3],'bath_ids',[2 3],'observed_ids',1,...
-                    'multiplicities',[2 2 2],'coordinates_A',[0 0 0;1 0 0;3 0 0],...
-                    'pairs',struct('ids',{},'tensor',{}));
-radius_parameters=struct('method','cce','order',1,'expansion','standard',...
-                         'bath_radius',2,'graph',struct('mode','complete','score','coupling_norm'));
+radius_model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+radius_model.inter.coordinates=num2cell([0 0 0;1 0 0;3 0 0],2);
+radius_model.comp.mults=[2 2 2];
+radius_model.comp.nspins=numel(radius_model.comp.mults);
+radius_parameters=struct('observed',1,...
+                         'cce',struct('bath_spins',[2 3],'approximation','projected','second_order',struct('enabled',false),'order',1,'expansion','standard','bath_radius',2,'graph',struct('mode','complete','score','coupling_norm')));
 radius_graph=cce_graph(radius_model,radius_parameters);
 result=test_true(result,'Root bath radius selects sites',isequal(radius_graph.bath_ids,2),...
                  'A radius of two Angstrom must exclude the site three Angstrom from the centre.');
@@ -63,16 +65,17 @@ for n=0:7
                 adjacency(b,a)=edge;
             end
         end
-        model=struct('physical_ids',1:n+1,'observed_ids',1,'bath_ids',2:n+1,...
-                     'multiplicities',2*ones(1,n+1),'coordinates_A',[(0:n).' zeros(n+1,2)],...
-                     'pairs',struct('ids',{},'tensor',{}));
-        parameters=struct('method','cce','order',0,'expansion','standard',...
-                          'graph',struct('mode','explicit','adjacency',sparse(adjacency)));
+        model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+        model.inter.coordinates=num2cell([(0:n).' zeros(n+1,2)],2);
+        model.comp.mults=2*ones(1,n+1);
+        model.comp.nspins=numel(model.comp.mults);
+        parameters=struct('observed',1,...
+                          'cce',struct('bath_spins',2:n+1,'approximation','projected','second_order',struct('enabled',false),'order',0,'expansion','standard','graph',struct('mode','explicit','adjacency',sparse(adjacency))));
         graph=cce_graph(model,parameters);
         for order=0:n
 
             % Exhaust all subsets independently, then close connected seeds
-            parameters.order=order;
+            parameters.cce.order=order;
             clusters=cce_clusters(model,graph,parameters);
             reference=false(1,2^n-1);
             for mask=1:2^n-1
@@ -134,12 +137,14 @@ for n=1:4
                 adjacency(edges(edge,2),edges(edge,1))=true;
             end
         end
-        model=struct('physical_ids',1:n+1,'observed_ids',1,'bath_ids',2:n+1,...
-                     'multiplicities',2*ones(1,n+1));
+        model.cce=struct();
+        model.comp.mults=2*ones(1,n+1);
+        model.comp.nspins=numel(model.comp.mults);
         graph=struct('bath_ids',2:n+1,'adjacency',sparse(adjacency),'scores',double(adjacency));
-        parameters=struct('order',0,'expansion','standard');
+        parameters=struct('observed',1,...
+                          'cce',struct('bath_spins',2:n+1,'order',0,'expansion','standard'));
         for order=0:n
-            parameters.order=order;
+            parameters.cce.order=order;
             clusters=cce_clusters(model,graph,parameters);
             reference=false(1,2^n-1);
             for mask=1:2^n-1
@@ -172,9 +177,11 @@ result=test_true(result,'Every labelled graph through four vertices',all_graph_c
                  '360 graph/order cases exactly equal independent Boolean-transitive-closure enumeration');
 
 % Check named families against explicit signed coefficient references
-model=struct('physical_ids',1:4,'observed_ids',1,'bath_ids',2:4,...
-             'multiplicities',[2 2 2 2]);
-parameters=struct('order',2,'expansion','standard');
+model.cce=struct();
+model.comp.mults=[2 2 2 2];
+model.comp.nspins=numel(model.comp.mults);
+parameters=struct('observed',1,...
+                  'cce',struct('bath_spins',2:4,'order',2,'expansion','standard'));
 expected={int64([0 -1 0 1 1]),int64([-1 -1 -1 1 1 1]),int64([0 0 1 1])};
 for topology=1:3
     adjacency=logical([0 1 0;1 0 1;0 1 0]);
@@ -193,12 +200,13 @@ for topology=1:3
 end
 
 % Check cap selection, mandatory closure, and physical composite dimensions
-model=struct('physical_ids',[10 20 30 40 50],'observed_ids',10,'bath_ids',[20 30 40 50],...
-             'multiplicities',[3 2 3 2 2],'coordinates_A',zeros(5,3),...
-             'pairs',struct('ids',{},'tensor',{}));
-parameters=struct('method','cce','order',3,'expansion','partition',...
-                  'groups',{{[20 30],40,50}},'clusters',{{[1 2 3]}},...
-                  'cluster_cap',[0 0 1],'graph',struct('mode','complete'));
+model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+model.inter.coordinates=num2cell(zeros(50,3),2);
+model.comp.mults=2*ones(1,50);
+model.comp.mults([10 30])=3;
+model.comp.nspins=50;
+parameters=struct('observed',10,...
+                  'cce',struct('bath_spins',[20 30 40 50],'approximation','projected','second_order',struct('enabled',false),'order',3,'expansion','partition','groups',{{[20 30],40,50}},'clusters',{{[1 2 3]}},'cluster_cap',[0 0 1],'graph',struct('mode','complete')));
 graph=cce_graph(model,parameters);
 clusters=cce_clusters(model,graph,parameters);
 result=test_true(result,'Explicit closure and cap overrun',numel(clusters)==7&&...
@@ -209,14 +217,14 @@ result=test_close(result,'Composite physical Hilbert dimension',clusters(end).di
                   'observed spin one and bath multiplicities 2*3*2*2 are retained exactly');
 
 % Measure observed-mediated edges without bath-bath interactions
-model.pairs=struct('ids',{[10 20],[10 40]},'tensor',{eye(3),2*eye(3)});
-parameters=struct('method','gcce','order',2,'expansion','standard',...
-                  'graph',struct('mode','coupling','threshold',Inf));
+model.cce.pairs=struct('ids',{[10 20],[10 40]},'tensor',{eye(3),2*eye(3)});
+parameters=struct('observed',10,...
+                  'cce',struct('bath_spins',[20 30 40 50],'approximation','generalized','order',2,'expansion','standard','graph',struct('mode','coupling','threshold',Inf)));
 graph=cce_graph(model,parameters);
 result=test_true(result,'Conservative observed-mediated edge',graph.adjacency(1,3)&&...
                  nnz(graph.adjacency)==2&&nnz(graph.pair_norm)==0,...
                  'gCCE retains bath correlation paths through the observed-spin system at J12=0');
-parameters.graph.approximate=true;
+parameters.cce.graph.approximate=true;
 approximate=cce_graph(model,parameters);
 result=test_true(result,'Explicit approximate graph',nnz(approximate.adjacency)==0&&approximate.approximate,...
                  'dropping observed-mediated correlations requires an explicit approximation');
@@ -241,51 +249,54 @@ result=test_true(result,'Observed-spin mediation is not disconnected factorisati
                  sprintf('exact %.12f versus disconnected-singleton %.12f',exact,pairwise));
 
 % Independently check the actual two-spin interaction norm and distance cutoffs
-model.pairs=struct('ids',[20 40],'tensor',4*diag([0 0 1]));
-parameters.method='cce';
-parameters.graph=struct('mode','coupling','threshold',1);
+model.cce.pairs=struct('ids',[20 40],'tensor',4*diag([0 0 1]));
+parameters.cce.approximation='projected';
+parameters.cce.second_order=struct('enabled',false);
+parameters.cce.graph=struct('mode','coupling','threshold',1);
 graph=cce_graph(model,parameters);
 result=test_close(result,'Physical operator norm',graph.pair_norm(1,3),1,8*eps,0,...
                   '4*Iz*Iz has spectral norm one for two physical spin halves');
-parameters.interaction_cutoff=0;
+parameters.cce.interaction_cutoff=0;
 other=cce_graph(model,parameters);
 result=test_true(result,'Hamiltonian cutoff independence',isequal(graph,other),...
                  'graph selection never reads the physical Hamiltonian cutoff');
-parameters.graph.score='resonance';
-parameters.graph.mismatch=3*ones(4);
-parameters.graph.mismatch_scale=4;
+parameters.cce.graph.score='resonance';
+parameters.cce.graph.mismatch=3*ones(4);
+parameters.cce.graph.mismatch_scale=4;
 graph=cce_graph(model,parameters);
 result=test_close(result,'Explicit resonance score',graph.scores(1,3),0.8,8*eps,0,...
                   'operator norm divided by hypot(1,mismatch/scale)');
-parameters.graph=struct('mode','distance','radius',1);
-model.coordinates_A=[0 0 0;1 0 0;2 0 0;3 0 0;4 0 0];
-parameters.bath_radius=2;
+parameters.cce.graph=struct('mode','distance','radius',1);
+xyz=zeros(50,3);
+xyz([10 20 30 40 50],1)=0:4;
+model.inter.coordinates=num2cell(xyz,2);
+parameters.cce.bath_radius=2;
 graph=cce_graph(model,parameters);
 result=test_true(result,'Union-of-centres bath radius',isequal(graph.bath_ids,[20 30])&&...
                  isequal(graph.omitted_bath_ids,[40 50])&&nnz(graph.adjacency)==2,...
                  'bath filtering and the separate physical graph radius preserve ID ordering');
 
 % Supplied scores set deterministic cap selection before closure
-model=struct('physical_ids',1:5,'observed_ids',1,'bath_ids',2:5,...
-             'multiplicities',2*ones(1,5),'coordinates_A',zeros(5,3),...
-             'pairs',struct('ids',{},'tensor',{}));
-parameters=struct('method','cce','order',2,'expansion','standard',...
-                  'cluster_cap',[0 1],'graph',struct('mode','complete',...
-                                                     'score','supplied','scores',[0 1 1 1;1 0 7 1;1 7 0 1;1 1 1 0]));
+model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+model.inter.coordinates=num2cell(zeros(5,3),2);
+model.comp.mults=2*ones(1,5);
+model.comp.nspins=numel(model.comp.mults);
+parameters=struct('observed',1,...
+                  'cce',struct('bath_spins',2:5,'approximation','projected','second_order',struct('enabled',false),'order',2,'expansion','standard','cluster_cap',[0 1],'graph',struct('mode','complete','score','supplied','scores',[0 1 1 1;1 0 7 1;1 7 0 1;1 1 1 0])));
 graph=cce_graph(model,parameters);
 capped=cce_clusters(model,graph,parameters);
 result=test_true(result,'Deterministic score cap',isequal(capped(end).groups,[2 3])&&...
                  isequal(capped(1).cap_overrun,[2 0]),...
                  'highest supplied edge wins and its two singleton closure additions are reported');
-parameters.graph.scores=ones(4)-eye(4);
+parameters.cce.graph.scores=ones(4)-eye(4);
 graph=cce_graph(model,parameters);
 capped=cce_clusters(model,graph,parameters);
 result=test_true(result,'Lexicographic score ties',isequal(capped(end).groups,[1 2]),...
                  'equal scores produce a unique group-ID tie order');
 
 % A single composite group remains exact without replacing it by a pseudo-spin
-parameters=struct('method','cce','order',1,'expansion','disjoint',...
-                  'groups',{{2:5}},'graph',struct('mode','complete'));
+parameters=struct('observed',1,...
+                  'cce',struct('bath_spins',2:5,'approximation','projected','second_order',struct('enabled',false),'order',1,'expansion','disjoint','groups',{{2:5}},'graph',struct('mode','complete')));
 graph=cce_graph(model,parameters);
 grouped=cce_clusters(model,graph,parameters);
 result=test_true(result,'One-group exact physical cost',isscalar(grouped)&&...
@@ -295,25 +306,28 @@ result=test_true(result,'One-group exact physical cost',isscalar(grouped)&&...
 
 % One hundred sparse bath vertices do not trigger a global powerset
 large=100;
-model=struct('physical_ids',1:large+1,'observed_ids',1,...
-             'bath_ids',2:large+1,'multiplicities',2*ones(1,large+1));
+model.cce=struct();
+model.comp.mults=2*ones(1,large+1);
+model.comp.nspins=numel(model.comp.mults);
 graph=struct('bath_ids',2:large+1,'adjacency',sparse(false(large)),...
              'scores',sparse(large,large));
-parameters=struct('order',1,'expansion','standard','cluster_cap',1);
+parameters=struct('observed',1,...
+                  'cce',struct('bath_spins',2:large+1,'order',1,'expansion','standard','cluster_cap',1));
 large_family=cce_clusters(model,graph,parameters);
 result=test_true(result,'Sparse large-bath capped enumeration',isscalar(large_family)&&...
                  isequal(large_family.sites,2),...
                  'frontier generation selects one singleton without allocating 2^N subsets');
 
 % Restore a small physical graph for input-refusal tests
-model=struct('physical_ids',1:3,'observed_ids',1,'bath_ids',2:3,...
-             'multiplicities',[2 2 2]);
+model.cce=struct();
+model.comp.mults=[2 2 2];
+model.comp.nspins=numel(model.comp.mults);
 graph=struct('bath_ids',2:3,'adjacency',sparse(logical([0 1;1 0])),...
              'scores',[0 1;1 0]);
 
 % Reject duplicate explicit cluster declarations rather than silently deduplicating
-parameters=struct('method','cce','order',2,'expansion','standard',...
-                  'clusters',{{[1 2],[1 2]}});
+parameters=struct('observed',1,...
+                  'cce',struct('bath_spins',2:3,'approximation','projected','second_order',struct('enabled',false),'order',2,'expansion','standard','clusters',{{[1 2],[1 2]}}));
 rejected=false;
 try
     cce_clusters(model,graph,parameters);

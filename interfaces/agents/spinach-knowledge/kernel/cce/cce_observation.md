@@ -8,7 +8,7 @@ Internal preparation/detection compiler used by the registered experiments; its 
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `[rho0,coil,reference,meta]=cce_observation(cluster_system,parameters)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `[rho0,coil,reference,meta]=cce_observation(spin_system,parameters)`. Engine records are not public experiment parameter structures.
 
 Expert rho0 is a positive trace-one Hermitian observed-spin density matrix; coil is an observed detector or a cell vector. Otherwise preparation is transition or a structure with states/spins for cce_state; detection is transition or a structure with operators/spins for cce_operator. IDs are physical. A selected transition supplies equal-superposition preparation and alpha*beta' detection unless explicitly overridden. Without transition or preparation/detection, missing physical choices are errors, not guessed polarisation.
 

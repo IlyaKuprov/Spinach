@@ -1,10 +1,10 @@
-% Propagate a retained cluster using conventional or tagged branch generators.
+% Propagate a retained cluster using conventional or projected branch generators.
 % Syntax:
 %
-%   [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
+%   [answer,state_error]=cce_evolution(spin_system,L,coil,rho,timestep,nsteps,output)
 %
-% L is H+1i*R+1i*K for conventional generators, or cce_generators projected
-% output. timestep is seconds; nsteps is a nonnegative integer. 'final'
+% L is H+1i*R+1i*K for conventional generators, or the projected cell
+% {left,right,dissipator}. timestep is seconds; nsteps is a nonnegative integer. 'final'
 % returns the state after nsteps intervals; 'trajectory' includes t=0 in
 % its columns (Liouville/projected) or pages (Hilbert); 'observable' returns
 % a column per detector, including t=0, with Hilbert-Schmidt detection.
@@ -15,13 +15,13 @@
 %
 % Parameters:
 %
-%   cluster_system - retained subsystem returned by cce_subsystem
-%   L              - angular-frequency generator or tagged projected pair
-%   coil           - detector matrix/vector or cell of detectors
-%   rho            - initial Hilbert matrix or column-major state vector
-%   timestep       - finite time step in seconds
-%   nsteps         - nonnegative integer number of intervals
-%   output         - 'final', 'trajectory', 'observable', or 'total'
+%   spin_system - retained subsystem returned by cce_subsystem
+%   L           - angular-frequency generator or projected cell
+%   coil        - detector matrix/vector or cell of detectors
+%   rho         - initial Hilbert matrix or column-major state vector
+%   timestep    - finite time step in seconds
+%   nsteps      - nonnegative integer number of intervals
+%   output      - 'final', 'trajectory', 'observable', or 'total'
 %
 % Outputs:
 %
@@ -34,16 +34,16 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
+function [answer,state_error]=cce_evolution(spin_system,L,coil,rho,timestep,nsteps,output)
 
 % Reject unsupported representation/output pairs before propagation
-grumble(cluster_system,L,coil,rho,timestep,nsteps,output);
-projected=isstruct(L);
-hilbert=~projected&&strcmp(cluster_system.formalism,'zeeman-hilb');
+grumble(spin_system,L,coil,rho,timestep,nsteps,output);
+projected=iscell(L);
+hilbert=~projected&&strcmp(spin_system.bas.formalism,'zeeman-hilb');
 if projected
-    d=cluster_system.bath_dimension;
+    d=spin_system.cce.bath_dimension;
 else
-    d=cluster_system.dimension;
+    d=spin_system.cce.dimension;
 end
 if iscell(coil)
     coils=coil;
@@ -56,10 +56,10 @@ if ~projected&&~hilbert
     L=full(L);
 end
 if projected
-    [va,ea]=eig(full((L.left+L.left')/2),'vector');
-    [vb,eb]=eig(full((L.right+L.right')/2),'vector');
-    if ~isempty(L.dissipator)
-        generator=-1i*(kron(eye(d),L.left)-kron(L.right.',eye(d)))+L.dissipator;
+    [va,ea]=eig(full((L{1}+L{1}')/2),'vector');
+    [vb,eb]=eig(full((L{2}+L{2}')/2),'vector');
+    if ~isempty(L{3})
+        generator=-1i*(kron(eye(d),L{1})-kron(L{2}.',eye(d)))+L{3};
     end
 elseif hilbert
     [vectors,energies]=eig(full((L+L')/2),'vector');
@@ -88,8 +88,8 @@ end
 % Estimate state roundoff using the CCE segment arithmetic models
 if nargout>1
     elapsed=abs(timestep)*steps(:);
-    if projected&&isempty(L.dissipator)
-        frequency=norm(L.left,1)+norm(L.right,1);
+    if projected&&isempty(L{3})
+        frequency=norm(L{1},1)+norm(L{2},1);
         roundoff=16*d^3*eps;
     elseif hilbert
         frequency=2*norm(L,1);
@@ -113,7 +113,7 @@ for step=steps
     if time==0
         state=rho;
     elseif projected
-        if isempty(L.dissipator)
+        if isempty(L{3})
             ua=va*diag(exp(-1i*ea*time))*va';
             ub=vb*diag(exp(-1i*eb*time))*vb';
             state=ua*reshape(rho,d,d)*ub';
@@ -152,7 +152,7 @@ end
 
 % Validate dimensions and explicit evolution semantics
 function grumble(system,L,coil,rho,timestep,nsteps,output)
-if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')
+if ~isstruct(system)||~isfield(system,'cce')||~isfield(system.cce,'sites')
     error('cce_evolution:system','A native retained subsystem is required.');
 end
 if ~isnumeric(timestep)||~isreal(timestep)||~isscalar(timestep)||~isfinite(timestep)||...
@@ -164,25 +164,23 @@ end
 if ~isnumeric(rho)||any(~isfinite(rho),'all')
     error('cce_evolution:state','The initial state must be finite numeric data.');
 end
-if isstruct(L)
-    if ~isscalar(L)||~all(isfield(L,{'kind','left','right','dissipator','physical_ids','formalism'}))||...
-       ~strcmp(L.kind,'cce_projected')||~isequal(L.physical_ids,system.physical_ids)||...
-       ~strcmp(L.formalism,system.formalism)
-        error('cce_evolution:branches','Use the explicitly tagged generator for this subsystem.');
+if iscell(L)
+    if numel(L)~=3
+        error('cce_evolution:branches','Supply the two branch Hamiltonians and the dissipator.');
     end
-    d=system.bath_dimension;
-    if ~isequal(size(rho),[d^2 1])||~isequal(size(L.left),[d d])||...
-       ~isequal(size(L.right),[d d])||any(~isfinite(L.left),'all')||...
-       any(~isfinite(L.right),'all')||(~isempty(L.dissipator)&&...
-       (~isequal(size(L.dissipator),[d^2 d^2])||any(~isfinite(L.dissipator),'all')))
+    d=system.cce.bath_dimension;
+    if ~isequal(size(rho),[d^2 1])||~isequal(size(L{1}),[d d])||...
+       ~isequal(size(L{2}),[d d])||any(~isfinite(L{1}),'all')||...
+       any(~isfinite(L{2}),'all')||(~isempty(L{3})&&...
+       (~isequal(size(L{3}),[d^2 d^2])||any(~isfinite(L{3}),'all')))
         error('cce_evolution:branches','Projected branch dimensions must match the bath block.');
     end
-    if norm(L.left-L.left','fro')>d*eps(max(1,norm(L.left,'fro')))||...
-       norm(L.right-L.right','fro')>d*eps(max(1,norm(L.right,'fro')))
+    if norm(L{1}-L{1}','fro')>d*eps(max(1,norm(L{1},'fro')))||...
+       norm(L{2}-L{2}','fro')>d*eps(max(1,norm(L{2},'fro')))
         error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
     end
-elseif strcmp(system.formalism,'zeeman-hilb')
-    d=system.dimension;
+elseif strcmp(system.bas.formalism,'zeeman-hilb')
+    d=system.cce.dimension;
     if ~isnumeric(L)||any(~isfinite(L),'all')||~isequal(size(L),[d d])||...
        ~isequal(size(rho),[d d])
         error('cce_evolution:hilbert','Hilbert generators and states must be square retained matrices.');
@@ -190,8 +188,8 @@ elseif strcmp(system.formalism,'zeeman-hilb')
     if norm(L-L','fro')>d*eps(max(1,norm(L,'fro')))
         error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
     end
-elseif strcmp(system.formalism,'zeeman-liouv')
-    d=system.dimension;
+elseif strcmp(system.bas.formalism,'zeeman-liouv')
+    d=system.cce.dimension;
     if ~isnumeric(L)||any(~isfinite(L),'all')||~isequal(size(L),[d^2 d^2])||...
        ~isequal(size(rho),[d^2 1])
         error('cce_evolution:liouville','Liouville generators act on column-major density vectors.');
@@ -207,21 +205,6 @@ if strcmp(output,'observable')
                                  all(isfinite(x),'all'),coil))
         error('cce_evolution:coil','Every detector must match the propagated state.');
     end
-end
-elements=numel(rho);
-if strcmp(output,'trajectory')
-    elements=elements*(nsteps+1);
-end
-if strcmp(output,'observable')
-    elements=numel(coil)*(nsteps+1);
-end
-bytes=16*(12*d^2+elements);
-if (isstruct(L)&&~isempty(L.dissipator))||...
-   (~isstruct(L)&&strcmp(system.formalism,'zeeman-liouv'))
-    bytes=bytes+16*4*d^4;
-end
-if bytes>system.model.parameters.cce.numerics.max_memory_bytes
-    error('cce:memory','Propagation exceeds max_memory_bytes.');
 end
 end
 

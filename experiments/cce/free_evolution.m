@@ -21,8 +21,8 @@
 % This experiment has no controls. Use finite_drive for finite pulses,
 % refocusing_train for ideal trains, or hahn_echo for a Hahn experiment.
 % Caller-supplied sequence fields are rejected even when empty.
-% H,R,K are conventional angular-frequency generators or tagged projected
-% branches from cce_generators. L=H+1i*R+1i*K.
+% H,R,K are conventional angular-frequency generators, or the projected
+% branch pair and dissipator from cce_generators. L=H+1i*R+1i*K.
 %
 % Outputs:
 %
@@ -51,7 +51,7 @@ if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'times')||.
     error('free_evolution:times','Supply finite nonnegative increasing elapsed times.');
 end
 if ~isstruct(spin_system)||~isstruct(parameters)||~isscalar(parameters)||...
-   ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
+   ~(isnumeric(H)||iscell(H))||~isnumeric(R)||~isnumeric(K)
     error('free_evolution:input',...
           'Supply a native subsystem, parameters, and generators.');
 end

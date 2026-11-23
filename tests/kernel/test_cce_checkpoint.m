@@ -146,10 +146,12 @@ q=p;
 q.cce=rmfield(q.cce,'checkpoint');
 [fresh,~]=clexpn(changed_system,@free_evolution,q,'labframe');
 tolerance_difference=max(abs(uninterrupted(:)-fresh(:)));
-original_model=cce_compile(spin_system,q,'labframe');
-changed_model=cce_compile(changed_system,q,'labframe');
+original_model_p=cce_options(spin_system,q,@cce_compile,'labframe');
+original_model=cce_compile(spin_system,original_model_p,'labframe');
+changed_model_p=cce_options(changed_system,q,@cce_compile,'labframe');
+changed_model=cce_compile(changed_system,changed_model_p,'labframe');
 result=test_true(result,'Spinach tolerance result fingerprint',...
-                 ~strcmp(original_model.source_hash,changed_model.source_hash),...
+                 ~strcmp(original_model.cce.source_hash,changed_model.cce.source_hash),...
                  'The public model fingerprint must distinguish tolerance-dependent Hamiltonians.');
 result=test_true(result,'Interaction cutoff changes propagation',tolerance_difference>1e-4,...
                  'The fixture must independently demonstrate that the changed tolerance affects results.');
@@ -278,7 +280,8 @@ fprintf('CCE checkpoint: %d tasks, 4 preserved, 12 resumed; discrepancy %.3g.\n'
 plain=p;
 plain.cce=rmfield(plain.cce,{'checkpoint','parallel'});
 plain.cce.bath_state=struct('mode','mixed_product');
-model=cce_compile(spin_system,plain,'labframe');
+model_p=cce_options(spin_system,plain,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
 ensemble=uninterrupted_data.ensemble;
 cluster=struct('id',1,'sites',2);
 for method={'cce','gcce','mecce','megcce','noise'}
@@ -298,12 +301,10 @@ for method={'cce','gcce','mecce','megcce','noise'}
         direct.noise=struct('ordering','ordered','connected',false,'manifold','bath_only',...
                             'descriptors',struct('spins',2,'operators','Lz','coefficient',1));
     end
-    schedule=struct('pulse_sequence',pulse_sequence,'contract',cce_capabilities(pulse_sequence));
-    evaluator=schedule.contract.evaluator;
     direct.cce.checkpoint=struct('file',fullfile(folder,'direct.mat'),'resume',true);
     refused=false;
     try
-        evaluator(model,cluster,ensemble.spin_config(1),schedule,direct);
+        cce_evaluate(model,cluster,ensemble.spin_config(1),pulse_sequence,direct);
     catch exception
         refused=strcmp(exception.identifier,'cce_options:checkpoint');
     end
@@ -315,16 +316,16 @@ end
 interlaced=p;
 interlaced.cce.bath_state.mode='interlaced';
 interlaced.cce.interlaced=struct('max_states',16,'reference_state',1);
-model=cce_compile(spin_system,plain,'labframe');
+model_p=cce_options(spin_system,plain,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
 ensemble=uninterrupted_data.ensemble;
-schedule=struct('pulse_sequence',@free_evolution,'contract',cce_capabilities(@free_evolution));
 for resume=[false true]
     interlaced.cce.checkpoint=struct('file',fullfile(folder,'interlaced.mat'),'resume',resume);
     for direct=[false true]
         refused=false;
         try
             if direct
-                cce_interlace(model,cluster,ensemble,schedule,interlaced,schedule.contract.evaluator);
+                cce_interlace(model,cluster,[],ensemble,@free_evolution,interlaced);
             else
                 clexpn(spin_system,@free_evolution,interlaced,'labframe');
             end
@@ -469,10 +470,12 @@ for method={'cce','mecce','noise','controls'}
     cold=clexpn(changed_system,pulse_sequence,request,'labframe');
     result=test_close(result,[method{1} ' successive cleared-function identity'],warm,cold,0,0,...
                       'Changing the physical model must not reuse any previous physical result.');
-    before_model=cce_compile(spin_system,request,'labframe');
-    after_model=cce_compile(changed_system,request,'labframe');
+    before_model_p=cce_options(spin_system,request,@cce_compile,'labframe');
+    before_model=cce_compile(spin_system,before_model_p,'labframe');
+    after_model_p=cce_options(changed_system,request,@cce_compile,'labframe');
+    after_model=cce_compile(changed_system,after_model_p,'labframe');
     result=test_true(result,[method{1} ' physical model fingerprint'],...
-                     ~strcmp(before_model.source_hash,after_model.source_hash),...
+                     ~strcmp(before_model.cce.source_hash,after_model.cce.source_hash),...
                      'Different physical interactions require distinct model fingerprints.');
 end
 

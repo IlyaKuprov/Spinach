@@ -53,10 +53,11 @@ result=test_close(result,'Selective operator ME pulse matches closed evolution',
                   'Zero-jump master evolution must use the same retained-site dimensions as the Hamiltonian.');
 q.cce.approximation='generalized';
 q.cce.basis.formalism='zeeman-hilb';
-model=cce_compile(s,q,'labframe');
-model.formalism=q.cce.basis.formalism;
-local=cce_subsystem(model,[2 3],struct(),[]);
-[H,~,~]=cce_generators(local,model.parameters,[]);
+model_p=cce_options(s,q,@cce_compile,'labframe');
+model=cce_compile(s,model_p,'labframe');
+model.bas.formalism=q.cce.basis.formalism;
+local=cce_subsystem(model,model_p,[2 3],struct(),[]);
+[H,~,~]=cce_generators(local,model_p,[]);
 spin=pauli(2);
 pulse=kron(eye(2),kron(expm(-1i*pi*spin.x),eye(2)));
 initial=kron(q.rho0,eye(4)/4);
@@ -242,19 +243,19 @@ budget.cce.approximation='generalized';
 budget.output='density';
 budget.cce.basis.formalism='zeeman-liouv';
 budget.rho0=ones(2)/2;
-model=cce_compile(s,budget,'labframe');
-model.formalism=budget.cce.basis.formalism;
-local=cce_subsystem(model,[],struct(),[]);
-ensemble.spin_config=local.configuration;
+model_p=cce_options(s,budget,@cce_compile,'labframe');
+model=cce_compile(s,model_p,'labframe');
+model.bas.formalism=budget.cce.basis.formalism;
+local=cce_subsystem(model,model_p,[],struct(),[]);
+ensemble.spin_config=local.cce.configuration;
 ensemble.spin_config.weight=1;
-contract=cce_capabilities(@free_evolution);
-schedule=struct('pulse_sequence',@free_evolution);
-budget=model.parameters;
+schedule=@free_evolution;
+budget=model_p;
 budget.times=linspace(0,1,128);
 budget.cce.numerics.max_memory_bytes=4096;
 refused=false;
 try
-    contract.evaluator(model,struct('id',0,'sites',[]),ensemble.spin_config(1),schedule,budget);
+    cce_evaluate(model,struct('id',0,'sites',[]),ensemble.spin_config(1),schedule,budget);
 catch exception
     refused=strcmp(exception.identifier,'clexpn:memory');
 end
@@ -275,10 +276,11 @@ for method={'mecce','megcce'}
         budget.cce.approximation='projected';
         budget.output='signal';
     end
-    model=cce_compile(s,budget,'labframe');
-    model.formalism=budget.cce.basis.formalism;
-    local=cce_subsystem(model,[],struct(),[]);
-    ensemble.spin_config=local.configuration;
+    model_p=cce_options(s,budget,@cce_compile,'labframe');
+    model=cce_compile(s,model_p,'labframe');
+    model.bas.formalism=budget.cce.basis.formalism;
+    local=cce_subsystem(model,model_p,[],struct(),[]);
+    ensemble.spin_config=local.cce.configuration;
     ensemble.spin_config.weight=1;
     cluster=struct('id',1,'sites',2);
     dimension=4;
@@ -287,11 +289,11 @@ for method={'mecce','megcce'}
     end
     workspace=16*(18*4^2+8*dimension^4);
     payload=16*2*128*dimension^2;
-    budget=model.parameters;
+    budget=model_p;
     budget.cce.numerics.max_memory_bytes=workspace+payload/2;
     refused=false;
     try
-        contract.evaluator(model,cluster,ensemble.spin_config,schedule,budget);
+        cce_evaluate(model,cluster,ensemble.spin_config,schedule,budget);
     catch exception
         refused=strcmp(exception.identifier,'cce:memory');
     end
@@ -319,18 +321,18 @@ config_parameters.cce.order=1;
 config_parameters.times=[0 0.1];
 config_parameters.rho0=[1 1;1 1]/2;
 config_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
-config_model=cce_compile(config_system,config_parameters,'labframe');
-config_model.formalism=config_parameters.cce.basis.formalism;
-config_local=cce_subsystem(config_model,[],struct(),[]);
-config_ensemble.spin_config=config_local.configuration;
+config_model_p=cce_options(config_system,config_parameters,@cce_compile,'labframe');
+config_model=cce_compile(config_system,config_model_p,'labframe');
+config_model.bas.formalism=config_parameters.cce.basis.formalism;
+config_local=cce_subsystem(config_model,config_model_p,[],struct(),[]);
+config_ensemble.spin_config=config_local.cce.configuration;
 config_ensemble.spin_config.weight=1;
 config_state=config_ensemble.spin_config(1);
 config_initial=[0.25 0.2i;-0.2i 0.75];
 config_state.bath_rho={diag([0 1])};
 config_state.expectations=[0 0 -0.5];
 config_cluster=struct('id',1,'sites',2);
-config_schedule=struct('pulse_sequence',@free_evolution);
-config_contract=cce_capabilities(@free_evolution);
+config_schedule=@free_evolution;
 
 % Check every generalised observable and its explicitly bound initial reference
 maximum=0;
@@ -353,9 +355,10 @@ for method={'gcce','megcce'}
             config_parameters.normalized=normalized;
             observe=config_parameters;
             observe.rho0=config_initial;
-            config_model=cce_compile(config_system,observe,'labframe');
-            config_model.formalism=observe.cce.basis.formalism;
-            config_raw=config_contract.evaluator(config_model,config_cluster,config_state,config_schedule,config_model.parameters);
+            config_model_p=cce_options(config_system,observe,@cce_compile,'labframe');
+            config_model=cce_compile(config_system,config_model_p,'labframe');
+            config_model.bas.formalism=observe.cce.basis.formalism;
+            config_raw=cce_evaluate(config_model,config_cluster,config_state,config_schedule,config_model_p);
             config_expected=zeros(2,size(config_raw.value,2));
             for k=1:2
                 config_propagator=expm(1i*diag([1 -1])*config_parameters.times(k));
@@ -376,9 +379,9 @@ for method={'gcce','megcce'}
             end
 
             % Rebinding the same preparation must not change uncertainty scaling
-            config_rebound=config_model.parameters;
+            config_rebound=config_model_p;
             config_rebound.rho0=config_initial;
-            config_matched=config_contract.evaluator(config_model,config_cluster,config_state,config_schedule,config_rebound);
+            config_matched=cce_evaluate(config_model,config_cluster,config_state,config_schedule,config_rebound);
             result=test_close(result,[method{1} ' spin_config bound ' config_parameters.output ' ' num2str(normalized)],...
                               config_raw.abs_error_bound,config_matched.abs_error_bound,0,0,...
                               'The normalization error bound must use the same supplied initial reference.');
@@ -416,17 +419,17 @@ for method={'cce','gcce','mecce','megcce','noise'}
         config_trial.noise=struct('ordering','ordered','connected',false,...
                                  'terms',struct('support',2,'operator',diag([0.5 -0.5])));
     end
-    config_model=cce_compile(config_system,config_trial,'labframe');
-    config_model.formalism=config_trial.cce.basis.formalism;
-    config_contract=cce_capabilities(config_sequence);
-    config_schedule=struct('pulse_sequence',config_sequence);
+    config_model_p=cce_options(config_system,config_trial,@cce_compile,'labframe');
+    config_model=cce_compile(config_system,config_model_p,'labframe');
+    config_model.bas.formalism=config_trial.cce.basis.formalism;
+    config_schedule=config_sequence;
     for field={'initial_rho','projection','reference'}
         config_supplied=config_state;
         config_supplied.(field{1})=eye(2)/2;
         caught=false;
         attempted=attempted+1;
         try
-            config_contract.evaluator(config_model,config_cluster,config_supplied,config_schedule,config_model.parameters);
+            cce_evaluate(config_model,config_cluster,config_supplied,config_schedule,config_model_p);
         catch exception
             caught=strcmp(exception.identifier,'cce_subsystem:configuration');
         end
@@ -443,7 +446,7 @@ config_trial.cce.approximation='generalized';
 config_trial.initial_rho=config_initial;
 config_rejected=false(1,2);
 try
-    cce_compile(config_system,config_trial,'labframe');
+    cce_options(config_system,config_trial,@cce_compile,'labframe');
 catch exception
     config_rejected(1)=strcmp(exception.identifier,'cce_options:unknown');
 end
@@ -465,11 +468,11 @@ for method={'cce','mecce'}
     if strcmp(method{1},'mecce')
         config_parameters.cce.basis.formalism='zeeman-liouv';
     end
-    config_model=cce_compile(config_system,config_parameters,'labframe');
-    config_model.formalism=config_parameters.cce.basis.formalism;
-    config_contract=cce_capabilities(@free_evolution);
-    config_schedule=struct('pulse_sequence',@free_evolution);
-    config_raw=config_contract.evaluator(config_model,config_cluster,config_state,config_schedule,config_model.parameters);
+    config_model_p=cce_options(config_system,config_parameters,@cce_compile,'labframe');
+    config_model=cce_compile(config_system,config_model_p,'labframe');
+    config_model.bas.formalism=config_parameters.cce.basis.formalism;
+    config_schedule=@free_evolution;
+    config_raw=cce_evaluate(config_model,config_cluster,config_state,config_schedule,config_model_p);
     result=test_close(result,[method{1} ' spin_config bath phase'],config_raw.value,exp(2i*config_parameters.times(:)),...
                       2e-12,2e-12,'Projected methods return normalized manifold traces for the supplied bath state.');
 
@@ -477,27 +480,29 @@ for method={'cce','mecce'}
     config_swapped=config_parameters;
     config_swapped.transition.alpha=config_parameters.transition.beta;
     config_swapped.transition.beta=config_parameters.transition.alpha;
-    config_model=cce_compile(config_system,config_swapped,'labframe');
-    config_model.formalism=config_swapped.cce.basis.formalism;
-    config_raw=config_contract.evaluator(config_model,config_cluster,config_state,config_schedule,config_model.parameters);
+    config_model_p=cce_options(config_system,config_swapped,@cce_compile,'labframe');
+    config_model=cce_compile(config_system,config_model_p,'labframe');
+    config_model.bas.formalism=config_swapped.cce.basis.formalism;
+    config_raw=cce_evaluate(config_model,config_cluster,config_state,config_schedule,config_model_p);
     result=test_close(result,[method{1} ' supplied projection'],config_raw.value,exp(-2i*config_parameters.times(:)),...
                       2e-12,2e-12,'Swapped user manifold vectors reverse the projected phase.');
 end
 
 % Refuse a split correlated jump and accept its complete ordered support
 p.bath_jumps=struct('support',[3 2],'operator',kron(j,z),'rate',rate);
-m=cce_compile(s,p,'labframe');
-m.formalism=p.cce.basis.formalism;
+m_p=cce_options(s,p,@cce_compile,'labframe');
+m=cce_compile(s,m_p,'labframe');
+m.bas.formalism=p.cce.basis.formalism;
 refused=false;
 try
-    local=cce_subsystem(m,2,struct(),[]);
-    cce_generators(local,m.parameters,[]);
+    local=cce_subsystem(m,m_p,2,struct(),[]);
+    cce_generators(local,m_p,[]);
 catch err
     refused=strcmp(err.identifier,'cce:jumpSupport');
 end
 result=test_true(result,'C7 contract check',refused,'Split correlated jump is refused.');
-local=cce_subsystem(m,[2 3],struct(),[]);
-[H_native,R,K]=cce_generators(local,m.parameters,[]);
+local=cce_subsystem(m,m_p,[2 3],struct(),[]);
+[H_native,R,K]=cce_generators(local,m_p,[]);
 G=-1i*(H_native+1i*R+1i*K);
 L=kron(e,kron(z,j));
 independent=-1i*(kron(eye(8),H)-kron(H.',eye(8)))+...

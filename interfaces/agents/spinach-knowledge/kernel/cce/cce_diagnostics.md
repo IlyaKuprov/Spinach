@@ -6,7 +6,7 @@ Internal validity and uncertainty diagnostics for completed cluster reduction. C
 
 Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
 
-Internal/expert signature: `diagnostics=cce_diagnostics(model,raw,result,parameters)`. Engine records are not public experiment parameter structures.
+Internal/expert signature: `diagnostics=cce_diagnostics(spin_system,raw,result,parameters)`. Engine records are not public experiment parameter structures.
 
 [MATLAB source](../../../../../kernel/cce/cce_diagnostics.m)
 
@@ -25,7 +25,7 @@ Report validity, conditioning, sampling, and observed-density diagnostics.
 
 **Inputs**
 
-- `model` — prepared physical model; `raw` — cell of cluster-record arrays.
+- `spin_system` — compiled spin system; `raw` — cell of cluster-record arrays.
 - `result` — CCE value, valid mask, abs_error_bound, and optional density/sampling_standard_error.
 - `parameters` — numerical tolerances and observable declarations.
 

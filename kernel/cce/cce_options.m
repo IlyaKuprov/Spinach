@@ -2,7 +2,7 @@
 %
 % Syntax:
 %
-% [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions)
+% parameters=cce_options(spin_system,parameters,pulse_sequence,assumptions)
 %
 % Parameters:
 %
@@ -21,10 +21,8 @@
 %
 % Outputs:
 %
-%   parameters - resolved new-contract values, never translated old fields
-%   policy     - declared defaults, units, and deferred resource/convergence
-%                decisions. Missing order is [] and requires the context's
-%                convergence policy; it never means a converged full bath.
+%   parameters - resolved values, never translated old fields. A missing
+%                order is returned as [] for the context to resolve.
 %
 % Defaults: generalised evolution, the complete supplied finite bath graph,
 % mixed product bath density, no mean field, power-counting reduction, and
@@ -42,77 +40,84 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [parameters,policy]=cce_options(spin_system,parameters,pulse_sequence,assumptions)
+function parameters=cce_options(spin_system,parameters,pulse_sequence,assumptions)
 
-% Record only explicitly declared default-policy decisions
-policy.defaults={};
-policy.tensor_units='rad/s';
-policy.time_units='s';
-policy.native_input_frequency_units='Hz';
-policy.jump_rate_units='s^-1';
-policy.experiment=func2str(pulse_sequence);
-policy.assumptions=assumptions;
-policy.physical_tensor_conversion=false;
-
-% Resolve frame and algorithm containers without changing supplied values
+% Default to a weighted grid sum or to the reference orientation
 if isfield(parameters,'grid')
-    [parameters,policy]=default(parameters,'sum_up',true,policy,'parameters');
+    if ~isfield(parameters,'sum_up')
+        parameters.sum_up=true;
+    end
     if ischar(parameters.grid)&&isrow(parameters.grid)&&~isempty(parameters.grid)&&...
        ~isfield(parameters,'orientation')
         parameters.grid=load(fullfile(spin_system.sys.root_dir,'kernel','grids',parameters.grid),...
                              'alphas','betas','gammas','weights');
     end
-else
-    [parameters,policy]=default(parameters,'orientation',[0 0 0],policy,'parameters');
+elseif ~isfield(parameters,'orientation')
+    parameters.orientation=[0 0 0];
 end
-[parameters,policy]=default(parameters,'cce',struct(),policy,'parameters');
-c=parameters.cce;
-[c,policy]=default(c,'approximation','generalized',policy,'parameters.cce');
-[c,policy]=default(c,'bath_spins',setdiff(1:spin_system.comp.nspins,parameters.observed),policy,'parameters.cce');
-[c,policy]=default(c,'order',[],policy,'parameters.cce');
-[c,policy]=default(c,'graph',struct('mode','complete'),policy,'parameters.cce');
-[c,policy]=default(c,'bath_state',struct('mode','mixed_product'),policy,'parameters.cce');
-[c,policy]=default(c,'meanfield','none',policy,'parameters.cce');
-[c,policy]=default(c,'averaging','after_expansion',policy,'parameters.cce');
-[c,policy]=default(c,'reducer','powers',policy,'parameters.cce');
-[c,policy]=default(c,'backend','auto',policy,'parameters.cce');
-if isfield(c,'groups')
-    expansion='partition';
-else
-    expansion='standard';
-end
-[c,policy]=default(c,'expansion',expansion,policy,'parameters.cce');
-[c,policy]=default(c,'retain_raw',false,policy,'parameters.cce');
-[c,policy]=default(c,'second_order',struct('enabled',false),policy,'parameters.cce');
-[c,policy]=default(c,'numerics',struct(),policy,'parameters.cce');
-[c.numerics,policy]=default(c.numerics,'zero_policy','mask',policy,'parameters.cce.numerics');
-[c.numerics,policy]=default(c.numerics,'precision','double',policy,'parameters.cce.numerics');
-parameters.cce=c;
 
-% Validate resolved values and physical state ownership
+% Default to generalised evolution of the complete supplied bath
+if ~isfield(parameters,'cce')
+    parameters.cce=struct();
+end
+if ~isfield(parameters.cce,'approximation')
+    parameters.cce.approximation='generalized';
+end
+if ~isfield(parameters.cce,'bath_spins')
+    parameters.cce.bath_spins=setdiff(1:spin_system.comp.nspins,parameters.observed);
+end
+if ~isfield(parameters.cce,'order')
+    parameters.cce.order=[];
+end
+if ~isfield(parameters.cce,'graph')
+    parameters.cce.graph=struct('mode','complete');
+end
+
+% Default to a mixed product bath without mean fields
+if ~isfield(parameters.cce,'bath_state')
+    parameters.cce.bath_state=struct('mode','mixed_product');
+end
+if ~isfield(parameters.cce,'meanfield')
+    parameters.cce.meanfield='none';
+end
+
+% Default to power-counting reduction of completed expansions
+if ~isfield(parameters.cce,'averaging')
+    parameters.cce.averaging='after_expansion';
+end
+if ~isfield(parameters.cce,'reducer')
+    parameters.cce.reducer='powers';
+end
+if ~isfield(parameters.cce,'backend')
+    parameters.cce.backend='auto';
+end
+if ~isfield(parameters.cce,'expansion')&&isfield(parameters.cce,'groups')
+    parameters.cce.expansion='partition';
+end
+if ~isfield(parameters.cce,'expansion')
+    parameters.cce.expansion='standard';
+end
+if ~isfield(parameters.cce,'retain_raw')
+    parameters.cce.retain_raw=false;
+end
+if ~isfield(parameters.cce,'second_order')
+    parameters.cce.second_order=struct('enabled',false);
+end
+
+% Default to masked unresolved elements in double precision
+if ~isfield(parameters.cce,'numerics')
+    parameters.cce.numerics=struct();
+end
+if ~isfield(parameters.cce.numerics,'zero_policy')
+    parameters.cce.numerics.zero_policy='mask';
+end
+if ~isfield(parameters.cce.numerics,'precision')
+    parameters.cce.numerics.precision='double';
+end
+
+% Check consistency
 grumble(spin_system,parameters,pulse_sequence,assumptions);
-policy.order_requires_convergence=isempty(c.order);
-policy.resources_require_resolution=~isfield(c.numerics,'max_memory_bytes');
-policy.accuracy_requires_resolution=~all(isfield(c.numerics,{'atol','rtol'}));
-policy.bath_state=c.bath_state.mode;
-policy.meanfield=c.meanfield;
-policy.approximation=c.approximation;
-policy.averaging=c.averaging;
-policy.reducer=c.reducer;
-policy.reduction_algebra_requires_experiment=true;
-policy.experiment_validation_required=true;
-if isfield(parameters,'pump')
-    policy.pump_frequency_units=parameters.pump.units;
-end
 
-end
-
-% Insert only a declared default and record its ownership
-function [s,policy]=default(s,name,value,policy,prefix)
-if ~isfield(s,name)
-    s.(name)=value;
-    policy.defaults{end+1}=[prefix '.' name];
-end
 end
 
 % Reject unknown fields at a new-contract ownership boundary

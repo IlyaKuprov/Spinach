@@ -6,8 +6,8 @@
 % state contains version=1, identity (model/parameter/cluster/schedule/
 % sample hashes), payload, task_ids, completed, records, and checksum.
 % Read requires the expected identity and task_ids in state.
-% Native payloads also bind the registered experiment contract version and
-% retain noise moments, uncertainty, and validity masks without reduction.
+% Native payloads retain noise moments, uncertainty, and validity masks
+% without reduction.
 % Validation checks the full schema and checksum without modifying the file. Write
 % closes a same-directory temporary before atomic POSIX replacement;
 % an existing file with different identity is never overwritten.
@@ -48,7 +48,6 @@ if strcmp(action,'read')
         names=fieldnames(state.payload.parameters);
         if isequal(sort(names),sort(fieldnames(physical.parameters)))
             physical.parameters=orderfields(physical.parameters,names);
-            physical.model.parameters=orderfields(physical.model.parameters,names);
             expected.identity.parameters=md5_hash(physical.parameters);
             expected.identity.model=md5_hash(physical.model);
         end
@@ -124,18 +123,13 @@ end
 if strcmp(action,'read')&&~all(isfield(state,{'identity','task_ids'}))
     error('cce_checkpoint:input','Read requires expected identity and task_ids.');
 end
-if isfield(state,'identity')&&isfield(state.identity,'experiment')&&...
-   (~isfield(state.identity,'capability_version')||...
-    ~ischar(state.identity.experiment)||~isscalar(state.identity.capability_version))
-    error('cce_checkpoint:experiment','Native identity requires experiment and capability_version.');
-end
 if strcmp(action,'read')
     return;
 end
 fields={'version','identity','payload','task_ids','completed','records'};
 if ~all(isfield(state,fields))||~isequal(state.version,1)||...
    ~isstruct(state.identity)||~isscalar(state.identity)||...
-   ~all(isfield(state.identity,{'model','parameters','clusters','schedule','samples','code'}))||...
+   ~all(isfield(state.identity,{'model','parameters','clusters','schedule','samples'}))||...
    ~isstruct(state.payload)||~isscalar(state.payload)||...
    ~isnumeric(state.task_ids)||size(state.task_ids,2)~=3||...
    any(~isfinite(state.task_ids),'all')||...

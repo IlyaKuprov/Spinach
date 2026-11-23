@@ -36,11 +36,10 @@ function [transition,meta]=cce_transition(spin_system,parameters,assumptions)
 % Check the selection before constructing the observed subsystem
 grumble(spin_system,parameters,assumptions);
 
-% A compiled model reuses the retained generator; ordinary callers use stock
+% A compiled spin system reuses the retained generator; ordinary callers use stock
 model=[];
-if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
+if isfield(spin_system,'cce')
     model=spin_system;
-    spin_system=model.spin_system;
 end
 
 % Preserve the caller's random stream across stock subsystem construction
@@ -62,9 +61,9 @@ else
     assumption_args=assumptions;
 end
 native=~isempty(model)&&isfield(parameters.transition,'ms')&&...
-       strcmp(model.formalism,'zeeman-hilb')&&...
-       strcmp(model.parameters.cce.bath_state.mode,'mixed_product')&&...
-       (~isfield(model.parameters,'bath_jumps')||isempty(model.parameters.bath_jumps));
+       strcmp(model.bas.formalism,'zeeman-hilb')&&...
+       strcmp(parameters.cce.bath_state.mode,'mixed_product')&&...
+       (~isfield(parameters,'bath_jumps')||isempty(parameters.bath_jumps));
 if ~native
     system=spin_system;
     if isfield(system,'bas')
@@ -95,12 +94,12 @@ if ~native
 else
 
     % Reuse the compiled observed subsystem without exterior mean fields
-    model.parameters.cce.meanfield='none';
-    model.formalism='zeeman-hilb';
-    config=struct('configuration_id',1,'state_id',1,'weight',1);
-    [system,~]=cce_subsystem(model,[],config,[]);
-    p=model.parameters;
+    p=parameters;
+    p.cce.meanfield='none';
     p.cce.approximation='generalized';
+    model.bas.formalism='zeeman-hilb';
+    config=struct('configuration_id',1,'state_id',1,'weight',1);
+    [system,~]=cce_subsystem(model,p,[],config,[]);
     [H,~,~,~]=cce_generators(system,p,[]);
     H=full(H);
 end
@@ -169,9 +168,6 @@ end
 
 % Validate physical spin IDs and exactly one descriptive transition selector
 function grumble(spin_system,p,assumptions)
-if isfield(spin_system,'kind')&&strcmp(spin_system.kind,'cce_model')
-    spin_system=spin_system.spin_system;
-end
 if ~isstruct(p)||~isscalar(p)||~all(isfield(p,{'observed','transition'}))
     error('cce_transition:inputs','parameters.observed and transition are required.');
 end

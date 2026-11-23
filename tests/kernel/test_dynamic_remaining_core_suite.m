@@ -87,7 +87,7 @@ result=test_close(result,'dipolar coupling tensor',...
 result=test_true(result,'dipolar proximity matrix',isequal(cell2mat(dip_system.inter.proximity(:,1:2)),[2 1;1 2]),...
                  'both directed spin-pair proximities must be detected below the distance cutoff');
 
-% Check isotope swapping rescales spin-pair couplings and wipes quadratic terms
+% Check isotope swapping rescales spin-pair couplings and wipes untransferable quadratic terms
 [sys,inter]=local_isoswap_inputs();
 [sys_out,inter_out]=isoswap(sys,inter,1,'2H');
 gamma_ratio=spin('2H')/spin('1H');
@@ -98,9 +98,25 @@ result=test_close(result,'isoswap coupling scaling',...
                   'bilinear couplings involving the replaced spin must scale by the gyromagnetic ratio');
 result=test_true(result,'isoswap quadratic wipe',...
                  isempty(inter_out.coupling.matrix{1,1}),...
-                 'quadratic self-couplings are not transferable and must be wiped');
+                 'a proton has no quadrupole moment, its quadratic self-coupling is not transferable and must be wiped');
 result=test_close(result,'isoswap scalar scaling',[inter_out.coupling.scalar{1,2} inter_out.coupling.scalar{2,1}],...
                   gamma_ratio*[3 5],0,1e-14,'both directed scalar couplings scale by the gamma ratio');
+
+% Quadrupolar couplings follow the quadrupole moment and the spin of the new isotope
+quad_sys.isotopes={'35Cl','11B'};
+quad_inter.coupling.matrix={diag([1 1 -2]),[];[],diag([1 1 -2])};
+quad_inter.coupling.eigs={[1 1 -2],[];[],[]};
+quad_inter.coupling.euler={[0.1 0.2 0.3],[];[],[]};
+[quad_sys,quad_inter]=isoswap(quad_sys,quad_inter,1,'37Cl');
+[quad_sys,quad_inter]=isoswap(quad_sys,quad_inter,2,'10B');
+result=test_close(result,'isoswap chlorine quadrupole',quad_inter.coupling.matrix{1,1},0.788122*diag([1 1 -2]),0,1e-4,...
+                  'separate Gaussian 16 calculations on LiCl give a 37Cl to 35Cl coupling ratio of 0.788122');
+result=test_close(result,'isoswap boron quadrupole',quad_inter.coupling.matrix{2,2},0.416804*diag([1 1 -2]),0,1e-4,...
+                  'separate Gaussian 16 calculations on BH3 give a 10B (spin 3) to 11B (spin 3/2) coupling ratio of 0.416804');
+result=test_close(result,'isoswap quadrupole eigenvalues',quad_inter.coupling.eigs{1,1},0.788122*[1 1 -2],0,1e-4,...
+                  'eigenvalues scale by the same ratio as the matrix');
+result=test_true(result,'isoswap quadrupole frame',isequal(quad_inter.coupling.euler{1,1},[0.1 0.2 0.3])&&...
+                 isequal(quad_sys.isotopes,{'37Cl','10B'}),'Euler angles are kept and both isotopes are replaced');
 
 % Substitution needs no coupling specification when the system has none
 [sys_out,inter_out]=isoswap(sys,struct(),1,'2H');

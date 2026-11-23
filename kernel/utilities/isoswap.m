@@ -17,8 +17,10 @@
 %
 %   sys, inter  - Spinach input data structures
 %
-% Note: quadratic and higher order couplings are wiped and a warning
-%       is printed - those are not transferable.
+% Note: nuclear quadrupolar couplings are rescaled using the quadrupole
+%       moments and the spin quantum numbers of the two isotopes. Other
+%       quadratic couplings and higher order couplings are wiped and a
+%       warning is printed - those are not transferable.
 %
 % ilya.kuprov@weizmann.ac.il
 %
@@ -28,28 +30,6 @@ function [sys,inter]=isoswap(sys,inter,spins,new_iso)
 
 % Grumbler missing
 grumble(sys,inter,spins,new_iso);
-
-% Wipe quadratic couplings - eigensystem representation
-if isfield(inter,'coupling')&&isfield(inter.coupling,'eigs')
-    for n=spins(:)'
-        if ~isempty(inter.coupling.eigs{n,n})
-            inter.coupling.eigs{n,n}=[]; inter.coupling.euler{n,n}=[];
-            disp(['WARNING: quadratic coupling for spin ' int2str(n) ...
-                  ' wiped (not transferable).']);
-        end
-    end
-end
-
-% Wipe quadratic couplings - matrix representation
-if isfield(inter,'coupling')&&isfield(inter.coupling,'matrix')
-    for n=spins(:)'
-        if ~isempty(inter.coupling.matrix{n,n})
-            inter.coupling.matrix{n,n}=[];
-            disp(['WARNING: quadratic coupling for spin ' int2str(n) ...
-                  ' wiped (not transferable).']);
-        end
-    end
-end
 
 % Wipe high-rank couplings
 if isfield(inter,'giant')
@@ -67,6 +47,34 @@ for n=spins(:)'
 
     % Get the gamma ratio
     gamma_ratio=spin(new_iso)/spin(sys.isotopes{n});
+
+    % Get the ratio of quadrupolar coupling prefactors, Q/(2I(2I-1))
+    [~,old_mult,old_data]=spin(sys.isotopes{n}); [~,new_mult,new_data]=spin(new_iso);
+    quad_ratio=(new_data.quad_moment/((new_mult-1)*(new_mult-2)))/...
+               (old_data.quad_moment/((old_mult-1)*(old_mult-2)));
+    transferable=isscalar(quad_ratio)&&isfinite(quad_ratio)&&(quad_ratio~=0);
+
+    % Scale or wipe quadratic couplings - eigensystem representation
+    if isfield(inter,'coupling')&&isfield(inter.coupling,'eigs')&&(~isempty(inter.coupling.eigs{n,n}))
+        if transferable
+            inter.coupling.eigs{n,n}=quad_ratio*inter.coupling.eigs{n,n};
+        else
+            inter.coupling.eigs{n,n}=[]; inter.coupling.euler{n,n}=[];
+            disp(['WARNING: quadratic coupling for spin ' int2str(n) ...
+                  ' wiped (not transferable).']);
+        end
+    end
+
+    % Scale or wipe quadratic couplings - matrix representation
+    if isfield(inter,'coupling')&&isfield(inter.coupling,'matrix')&&(~isempty(inter.coupling.matrix{n,n}))
+        if transferable
+            inter.coupling.matrix{n,n}=quad_ratio*inter.coupling.matrix{n,n};
+        else
+            inter.coupling.matrix{n,n}=[];
+            disp(['WARNING: quadratic coupling for spin ' int2str(n) ...
+                  ' wiped (not transferable).']);
+        end
+    end
 
     % Loop over coupling partners
     for k=setdiff(1:numel(sys.isotopes),n)

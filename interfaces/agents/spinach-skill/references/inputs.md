@@ -101,9 +101,11 @@ are retained. Alternative environmental lifetimes do not override this cutoff.
 
 `iselectron` and `isnucleus` test a specification string. `isoswap(sys,inter,
 spins,new_iso)` replaces the selected isotopes. It scales bilinear matrix,
-eigensystem, and scalar couplings by the new-to-old magnetogyric ratio, wipes
-the selected spins' quadratic and higher-order couplings with a warning, and
-refuses a source isotope with zero magnetogyric ratio.
+eigensystem, and scalar couplings by the new-to-old magnetogyric ratio and
+nuclear quadrupolar couplings by the ratio of `Q/(2I(2I-1))`. It wipes, with a
+warning, quadratic couplings that cannot be transferred (an isotope without a
+tabulated quadrupole moment, electron zero-field splitting) and higher-order
+couplings, and refuses a source isotope with zero magnetogyric ratio.
 
 `isot2elem({'1H','13C','35Cl'})` returns `{'H','C','Cl'}`, retaining the input
 cell-array shape and order. It strips digits only, without an isotope lookup;
@@ -424,6 +426,15 @@ hyperfine isotope label takes precedence, followed by a stated mass isotope
 default for the element's magnetic properties. Examples are `1H`, `13C`, `14N`, `17O`, `19F`, `29Si`,
 `31P`, `33S`, and `35Cl`; selenium falls back to spin-zero `80Se`. Inspect
 `sys.isotopes` after import before deciding whether a substitution is needed.
+
+`g2spinach` proceeds when the parser output is unambiguous and otherwise stops
+with an error naming the field of `props` to edit: a missing or empty
+`props.isotopes` entry (always the case for `c2spinach` output), a non-magnetic
+isotope such as `80Se`, a nonzero `props.nqi` tensor on an isotope without a
+quadrupole moment in NMR mode (ORCA hydrogens are labelled `1H` and carry
+deuterium tensors), and printed J-couplings that K-couplings and the stated
+isotopes do not reproduce to 0.3% (remove `props.j_couplings` to accept the
+stated isotopes). Data ignored by a mode only produce warnings.
 Options `'g_nosymm'`, `'cst_nosymm'`, and `'hfc_nosymm'` disable tensor symmetrisation.
 
 `oparse(file_name)` reads ORCA 2.6–6.1 text output: `std_geom` in angstrom,

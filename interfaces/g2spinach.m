@@ -10,6 +10,13 @@
 %                 what the log specifies or assumes for each
 %                 atom; interaction tensors are imported as
 %                 the log reports them for those isotopes.
+%                 When the data cannot be interpreted without
+%                 a guess (no isotope or a non-magnetic one
+%                 for a requested atom, a quadrupolar tensor
+%                 on an isotope without a quadrupole moment,
+%                 printed J-couplings that K-couplings and
+%                 the isotopes do not reproduce), an error
+%                 names the field of props to be edited.
 %                 Use isoswap() to replace isotopes after the
 %                 import.
 %
@@ -112,6 +119,11 @@ index=find(selected); ref_index=ref_index(selected);
 sys.isotopes=reshape(props.isotopes(index),1,[]);
 nspins=numel(index);
 
+% Warn about zero-field splitting
+if isfield(props,'zfs')
+    disp('WARNING: zero-field splitting in the log has not been imported.');
+end
+
 % Decide whether to include coordinates
 if nargin<4
     include_xyz=true();
@@ -156,6 +168,17 @@ switch ismember('E',elements)
             inter.coupling.matrix{end,n}=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
         end
         
+        % Warn about nuclear interactions that are ignored in EPR mode
+        if isfield(props,'nqi')&&any(cellfun(@(x)any(x,'all'),props.nqi(index)))
+            disp('WARNING: nuclear quadrupolar couplings in the log have been ignored.');
+        end
+        if isfield(props,'k_couplings')||isfield(props,'j_couplings')
+            disp('WARNING: scalar couplings in the log have been ignored.');
+        end
+        if isfield(props,'srt')
+            disp('WARNING: spin-rotation couplings in the log have been ignored.');
+        end
+        
         % Remove small hyperfine couplings
         if (nargin==4)&&isfield(options,'min_hfc')
             for n=1:nspins
@@ -182,6 +205,11 @@ switch ismember('E',elements)
         
         % Reference to bare nuclei if the user did not supply any reference values
         if (nargin<3)||(~any(references)), references=zeros(size(elements)); end
+        
+        % Warn about electron interactions that are ignored in NMR mode
+        if isfield(props,'hfc')||isfield(props,'g_tensor')
+            disp('WARNING: hyperfine couplings and g-tensor in the log have been ignored.');
+        end
         
         % Absorb Zeeman tensors
         if isfield(props,'cst')
@@ -235,6 +263,17 @@ switch ismember('E',elements)
                 
             end
             
+            % Refuse printed J-couplings that differ by more than the scatter of gamma tables (0.14%)
+            if isfield(props,'j_couplings')
+                printed=props.j_couplings(index,index)/2; rebuilt=inter.coupling.scalar;
+                stated=(printed~=0)&(rebuilt~=0);
+                if any(abs(printed(stated)-rebuilt(stated))>3e-3*abs(printed(stated)))
+                    error(['J-couplings printed in the log do not follow from its K-couplings for the isotopes in ' ...
+                           'props.isotopes: set props.isotopes to the isotopes of the calculation, or remove ' ...
+                           'props.j_couplings to rebuild J-couplings for the isotopes in props.isotopes.']);
+                end
+            end
+            
             % Drop insignificant J-couplings
             if (nargin==4)&&isfield(options,'min_j')
                 inter.coupling.scalar=inter.coupling.scalar.*(abs(inter.coupling.scalar)>options.min_j);
@@ -271,8 +310,28 @@ end
 if (~isnumeric(references))||(numel(elements)~=numel(references))
     error('references must be a numerical array with the same number of entries as elements.');
 end
-if any(cellfun(@isempty,props.isotopes(ismember(props.symbols,elements))))
-    error('props.isotopes must state an isotope for every atom of the requested elements.');
+if (~isfield(props,'isotopes'))||(~iscell(props.isotopes))||(numel(props.isotopes)~=numel(props.symbols))
+    error('props.isotopes must be a cell array of isotope strings, e.g. ''13C'', with one entry per atom of props.symbols.');
+end
+selected=find(ismember(props.symbols,elements));
+unknown=selected(cellfun(@isempty,props.isotopes(selected)));
+if ~isempty(unknown)
+    error(['the log does not identify the isotope of atom ' int2str(unknown(1)) ' (' props.symbols{unknown(1)} '): set props.isotopes{' ...
+           int2str(unknown(1)) '}, e.g. to ''13C'', for every such atom.']);
+end
+silent=selected(cellfun(@spin,props.isotopes(selected))==0);
+if ~isempty(silent)
+    error(['the isotope of atom ' int2str(silent(1)) ' (' props.isotopes{silent(1)} ') is non-magnetic: set props.isotopes{' ...
+           int2str(silent(1)) '} to the magnetic isotope to be imported, for every such atom.']);
+end
+if (~ismember('E',elements))&&isfield(props,'nqi')
+    for n=selected(:)'
+        [~,mult]=spin(props.isotopes{n});
+        if (mult<3)&&any(props.nqi{n},'all')
+            error(['atom ' int2str(n) ' has a quadrupolar tensor in props.nqi, but ' props.isotopes{n} ' has no quadrupole moment: set ' ...
+                   'props.isotopes{' int2str(n) '} to the isotope of that tensor, or empty props.nqi{' int2str(n) '}.']);
+        end
+    end
 end
 end
 

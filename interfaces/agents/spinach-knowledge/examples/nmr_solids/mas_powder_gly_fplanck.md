@@ -8,7 +8,7 @@
 
 This example constructs a computed 13C MAS spectrum for glycine powder. Its header describes Fokker–Planck MAS formalism and assumes 1H decoupling; the implementation actually calls `singlerot(spin_system,@acquire,parameters,'nmr')`. The script itself does not add a 1H isotope to the imported system or set a decoupling parameter, so the header's decoupling assumption is not an explicit decoupler setting here. The source comment estimates a seconds-scale calculation time; this is not a measured runtime.
 
-`gparse` reads `../standard_systems/glycine.log`, and `g2spinach` imports `13C` and `15N` with reference arguments `[182.1 264.5]` in that isotope order. `g2spinach` documents `references` as absolute shielding values for zero-ppm reference substances; these are calibration inputs, not reported experimental peak positions. The model field is `14.1 T`. The basis uses `sphten-liouv`, no approximation, projection `+1`, and a longitudinal `15N` subspace; interaction and proximity cutoffs are set to `5.0` and `4.0` respectively.
+`gparse` reads `../standard_systems/glycine.log`, and `g2spinach` selects C and N with reference arguments `[182.1 264.5]` in element order. It imports `13C` and `14N`; `isoswap` replaces `14N` with `15N`. `g2spinach` documents `references` as absolute shielding values for zero-ppm reference substances; these are calibration inputs, not reported experimental peak positions. The model field is `14.1 T`. The basis uses `sphten-liouv`, no approximation, projection `+1`, and a longitudinal `15N` subspace; interaction and proximity cutoffs are set to `5.0` and `4.0` respectively.
 
 ## MAS acquisition and spectrum
 

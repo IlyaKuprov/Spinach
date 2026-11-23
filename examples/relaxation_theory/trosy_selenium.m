@@ -9,8 +9,13 @@
 function trosy_selenium()
 
 % Read 3-fluorotyrosine DFT calculation
-[~,inter_dft]=g2spinach(gparse('../standard_systems/ethylselenol.out'),...
-                            {{'C','13C'},{'Se','77Se'}},[186.38 0.0]);
+props=gparse('../standard_systems/ethylselenol.out');
+
+% Name the selenium isotope, Gaussian has no magnetic one
+props.isotopes(strcmp(props.symbols,'Se'))={'77Se'};
+
+% Convert into Spinach data structures
+[~,inter_dft]=g2spinach(props,{'C','Se'},[186.38 0.0]);
                                  
 % Extract coordinates and CSAs
 sys.isotopes={'77Se','13C'};

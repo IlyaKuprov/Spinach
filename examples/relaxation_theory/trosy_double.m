@@ -11,7 +11,7 @@ sys.magnet=14.1;
 
 % Read 3-fluorotyrosine DFT calculation
 [~,inter_dft]=g2spinach(gparse('../standard_systems/4_fluoro_phe.out'),...
-              {{'H','1H'},{'C','13C'},{'F','19F'}},[32.07 186.38 192.97]);
+                        {'H','C','F'},[32.07 186.38 192.97]);
                                  
 % Extract coordinates and CSAs
 sys.isotopes={'1H','1H','19F','13C'};

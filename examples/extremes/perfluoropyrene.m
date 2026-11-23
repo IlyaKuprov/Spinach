@@ -17,7 +17,7 @@ options.no_xyz=1;
 
 % Read the spin system properties (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/perfluoropyrene_cation.log'),...
-                                        {{'E','E'},{'F','19F'}},[0 0],options);
+                      {'E','F'},[0 0],options);
 % Magnet induction
 sys.magnet=0.33;
 

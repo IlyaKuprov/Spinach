@@ -12,7 +12,7 @@ function hmbc_camphor()
 % Spin system properties (vacuum DFT calculation)
 options.min_j=3.0; options.no_xyz=0;
 [sys,inter]=g2spinach(gparse('../standard_systems/camphor.log'),...
-            {{'H','1H'},{'C','13C'}},[31.8-0.35 182.1+7.14],options); 
+                      {'H','C'},[31.8-0.35 182.1+7.14],options);
          
 % Magnet field
 sys.magnet=14.1;

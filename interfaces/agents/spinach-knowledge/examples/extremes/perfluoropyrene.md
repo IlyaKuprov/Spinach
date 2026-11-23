@@ -7,7 +7,7 @@
 
 ## Intent and spin-system construction
 
-The source describes this as an X-band pulsed ESR spectrum of the perfluoropyrene cation radical. It reads the molecular data from the linked log using `gparse` and `g2spinach`, with the supplied electron/`19F` isotope mapping; `options.no_xyz=1` tells the conversion to ignore coordinate information. The explicit input and conversion settings, rather than a hand-written isotope list, define the spin system. The magnetic-induction parameter is `0.33` (unit not written in the script).
+The source describes this as an X-band pulsed ESR spectrum of the perfluoropyrene cation radical. It reads the molecular data from the linked log using `gparse` and `g2spinach`, selecting the electron and fluorine (`19F` in the log); `options.no_xyz=1` tells the conversion to ignore coordinate information. The explicit input and conversion settings, rather than a hand-written isotope list, define the spin system. The magnetic-induction parameter is `0.33` (unit not written in the script).
 
 Relaxation is configured as `{'damp'}`, with diagonal relaxation operators, zero equilibrium state and `damp_rate=2e6`. The basis is `sphten-liouv` with `approximation='none'`. The source comment calls this brute-force operator algebra in the full 4,194,304-dimensional Liouville space and notes that a restricted basis would be faster; it also identifies trajectory-level state-space restriction as the performance technique of interest.
 

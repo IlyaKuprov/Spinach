@@ -8,7 +8,7 @@
 
 ## Input and imported system
 
-The function expects `gaussian_methyl_radical.out` to be accessible to `gparse`. It passes the parsed output to `g2spinach` with isotope mapping `{{'E','E'},{'H','1H'}}`, the `[0 0]` argument, and `options.no_xyz=1`. It then sets `sys.magnet=0.339`; the source does not state a unit for this setting.
+The function expects `gaussian_methyl_radical.out` to be accessible to `gparse`. It passes the parsed output to `g2spinach` with the element list `{'E','H'}` (the log supplies `1H`), the `[0 0]` argument, and `options.no_xyz=1`. It then sets `sys.magnet=0.339`; the source does not state a unit for this setting.
 
 ## ESR model and acquisition
 

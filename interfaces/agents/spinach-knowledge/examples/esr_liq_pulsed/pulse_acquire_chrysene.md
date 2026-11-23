@@ -8,7 +8,7 @@ Call **pulse_acquire_chrysene()** with no arguments. It returns no variables: th
 
 ## Spin system, symmetry, and relaxation
 
-The example is described as W-band pulse-acquire FFT ESR of a chrysene cation radical in a non-viscous liquid. It imports **../standard_systems/chrysene_cation.log** with **gparse** and **g2spinach**, using label mapping **{{'E','E'},{'H','1H'}}** and passing **[0 0]**. **options.no_xyz=1** ignores coordinate information; the source comment says hyperfine couplings are provided. The magnetic-induction parameter is **3.5**.
+The example is described as W-band pulse-acquire FFT ESR of a chrysene cation radical in a non-viscous liquid. It imports **../standard_systems/chrysene_cation.log** with **gparse** and **g2spinach**, selecting the electron and hydrogen (`1H` in the log) and passing **[0 0]**. **options.no_xyz=1** ignores coordinate information; the source comment says hyperfine couplings are provided. The magnetic-induction parameter is **3.5**.
 
 Common-linewidth damping uses **'damp'**, diagonal retention, zero equilibrium, and damping value **1e6**. The **sphten-liouv** basis has no approximation, longitudinal **1H**, projection **+1**, and six **S2** symmetry pairs: **[1 7]**, **[2 8]**, **[3 9]**, **[4 10]**, **[5 11]**, and **[6 12]**.
 

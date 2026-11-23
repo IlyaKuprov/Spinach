@@ -2,7 +2,7 @@
 
 ## Experiment and spin system
 
-This example calculates the two-pulse X-band ESEEM response of a phenyl radical at a single crystal orientation. It imports the vacuum-DFT magnetic parameters from `examples/standard_systems/phenyl.log` through `g2spinach`, mapping the electron to `E` and proton nuclei to `1H`. The Gaussian log contains eleven atoms, corresponding to the phenyl framework and its five hydrogens; the imported interaction tensors are not entered as literal values in this example. The script sets the field to 0.33 T and assumes ideal hard pulses.
+This example calculates the two-pulse X-band ESEEM response of a phenyl radical at a single crystal orientation. It imports the vacuum-DFT magnetic parameters from `examples/standard_systems/phenyl.log` through `g2spinach`, selecting the electron and hydrogen (`1H` in the log). The Gaussian log contains eleven atoms, corresponding to the phenyl framework and its five hydrogens; the imported interaction tensors are not entered as literal values in this example. The script sets the field to 0.33 T and assumes ideal hard pulses.
 
 ## Sequence and sampling
 

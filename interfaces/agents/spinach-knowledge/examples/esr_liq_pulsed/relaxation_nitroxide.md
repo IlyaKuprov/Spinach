@@ -6,7 +6,7 @@
 
 ## What it models
 
-A W-band nitroxide pulse-acquire ESR spectrum. The source imports a DFT-derived system from <code>../standard_systems/nitroxide.log</code> with <code>gparse</code> and <code>g2spinach</code>, maps an electron (<code>E</code>) and <code>14N</code>, and sets <code>options.no_xyz=1</code> because hyperfine couplings are provided. It sets <code>sys.magnet=3.5</code>; the example labels this magnet induction but does not state its unit.
+A W-band nitroxide pulse-acquire ESR spectrum. The source imports a DFT-derived system from <code>../standard_systems/nitroxide.log</code> with <code>gparse</code> and <code>g2spinach</code>, selects the electron and nitrogen (<code>14N</code> in the log), and sets <code>options.no_xyz=1</code> because hyperfine couplings are provided. It sets <code>sys.magnet=3.5</code>; the example labels this magnet induction but does not state its unit.
 
 The basis is <code>sphten-liouv</code> with <code>approximation='none'</code>. Relaxation is <code>redfield</code>, with <code>equilibrium='zero'</code>, <code>rlx_keep='secular'</code>, and <code>tau_c={5e-11}</code>. These are the model choices encoded by the example, not a claim of validation against measurement.
 

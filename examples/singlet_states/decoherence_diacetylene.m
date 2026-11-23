@@ -13,7 +13,7 @@ function decoherence_diacetylene()
 % Read the spin system (coordinates, chemical shifts,
 % J-couplings and CSAs) from a vacuum DFT calculation
 [sys,inter]=g2spinach(gparse('../standard_systems/diacetylene.log'),...
-                          {{'H','1H'},{'C','13C'}},[31.8 182.4],[]);
+                      {'H','C'},[31.8 182.4],[]);
 
 % Set magnet field to 1.0 Tesla
 sys.magnet=14.1;

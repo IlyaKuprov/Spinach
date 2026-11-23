@@ -9,7 +9,7 @@ A two-channel PANSY-COSY simulation for camphor with natural 13C content, as ide
 
 ## Spin system
 
-The DFT data are passed to `g2spinach` with the isotope mapping H to 1H and C to 13C, positional values [31.5, 189.2], and options `min_j=3.0` and `no_xyz=1`. The wrapper does not name or unit-label the two positional values. It sets the field to 14.1 (unit not stated) and uses a spherical-tensor Liouville basis, IK-2 approximation, scalar-coupling connectivity and proximity level 1. `dilute(spin_system,'13C')` supplies the set of isotopomer subsystems; the wrapper simulates each in a parallel loop and accumulates the resulting channels. It does not state an experimental abundance measurement.
+The DFT data are passed to `g2spinach` with H and C selected (1H and 13C in this log), positional values [31.5, 189.2], and options `min_j=3.0` and `no_xyz=1`. The wrapper does not name or unit-label the two positional values. It sets the field to 14.1 (unit not stated) and uses a spherical-tensor Liouville basis, IK-2 approximation, scalar-coupling connectivity and proximity level 1. `dilute(spin_system,'13C')` supplies the set of isotopomer subsystems; the wrapper simulates each in a parallel loop and accumulates the resulting channels. It does not state an experimental abundance measurement.
 
 ## Acquisition and processing
 

@@ -8,7 +8,7 @@ Source: [examples/nmr_solids/mas_powder_trp_fplanck.m](../../../../../examples/n
 
 ## Model and data
 
-This example calculates the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling, using the Fokker-Planck MAS formalism. It imports tryptophan data from `trp_xray.out`, maps C and N to `13C` and `15N`, and sets 9.4 T. The source identifies X-ray coordinates and DFT-estimated chemical-shift anisotropies; its indexed isotropic shifts are described as experimental inputs, not simulated output.
+This example calculates the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling, using the Fokker-Planck MAS formalism. It imports C and N from `trp_xray.out` as `13C` and `14N`, replaces `14N` with `15N` using `isoswap`, and sets 9.4 T. The source identifies X-ray coordinates and DFT-estimated chemical-shift anisotropies; its indexed isotropic shifts are described as experimental inputs, not simulated output.
 
 For the two unit-cell molecules, the first eight indexed shift values are 124.2, 110.1, 114.7, 118.0, 119.3, 107.5, 134.9, and 125.0 ppm. The first molecule uses 26.8, 54.6, and 174.4 ppm for the final three; the second uses 28.0, 52.1, and 173.3 ppm. These are Zeeman-tensor inputs, not reported spectrum positions.
 

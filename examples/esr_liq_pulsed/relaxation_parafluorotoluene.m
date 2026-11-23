@@ -14,7 +14,7 @@ options.no_xyz=1;
 
 % Read the spin system (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/parafluorotoluene.log'),...
-                      {{'E','E'},{'H','1H'},{'F','19F'}},[0 0 0],options);
+                      {'E','H','F'},[0 0 0],options);
 
 % Magnet field
 sys.magnet=0.33;

@@ -15,7 +15,7 @@ function mas_powder_suc_gridfree()
 
 % Spin system properties (PCM DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/sucrose.log'),...
-                                        {{'C','13C'}},182.1,[]);        
+                      {'C'},182.1,[]);
 % Magnet field
 sys.magnet=14.1;
 

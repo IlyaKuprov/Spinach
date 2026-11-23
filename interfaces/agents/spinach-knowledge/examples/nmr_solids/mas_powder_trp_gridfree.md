@@ -8,7 +8,7 @@ Source: [examples/nmr_solids/mas_powder_trp_gridfree.m](../../../../../examples/
 
 ## Model and data
 
-This example calculates the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling. It imports tryptophan data from `trp_xray.out`, mapping C and N to `13C` and `15N`, and sets 9.4 T. The source describes the coordinates as X-ray data, chemical-shift anisotropies as DFT estimates, and isotropic shifts as experimental inputs. These assigned shifts are model inputs, not calculated peak positions.
+This example calculates the `13C` MAS spectrum of tryptophan powder assuming `1H` decoupling. It imports C and N from `trp_xray.out` as `13C` and `14N`, replaces `14N` with `15N` using `isoswap`, and sets 9.4 T. The source describes the coordinates as X-ray data, chemical-shift anisotropies as DFT estimates, and isotropic shifts as experimental inputs. These assigned shifts are model inputs, not calculated peak positions.
 
 For the two unit-cell molecules, the first eight indexed shift values are 124.2, 110.1, 114.7, 118.0, 119.3, 107.5, 134.9, and 125.0 ppm. The final three are 26.8, 54.6, and 174.4 ppm for the first molecule, and 28.0, 52.1, and 173.3 ppm for the second. The source cites [the paper at DOI 10.1126/sciadv.aaw8962](https://doi.org/10.1126/sciadv.aaw8962) for further particulars on the polyadic representation.
 

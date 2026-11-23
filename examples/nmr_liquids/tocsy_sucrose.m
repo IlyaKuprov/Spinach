@@ -9,7 +9,7 @@ function tocsy_sucrose()
 % Spin system properties (vacuum DFT calculation)
 options.min_j=1.0;
 [sys,inter]=g2spinach(gparse('../standard_systems/sucrose.log'),...
-                                     {{'H','1H'}},31.8,options);
+                      {'H'},31.8,options);
 % Magnet field
 sys.magnet=5.9;
 

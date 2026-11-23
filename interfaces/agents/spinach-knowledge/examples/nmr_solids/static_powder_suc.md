@@ -5,7 +5,7 @@
 
 ## Purpose and model
 
-Calculates a static powder 13C NMR spectrum of sucrose; the source assumes proton decoupling and estimates hours of runtime. The spin system and interactions are generated from `../standard_systems/sucrose.log` with `gparse` and `g2spinach` (the source labels the input as PCM DFT data), selecting C/13C, at field parameter 14.1. The basis is `sphten-liouv` with IK-0 approximation, projection +1, and inter-level 3. The source sets interaction and proximity cutoffs to 5.0 and 4.0 and disables trajectory-level algorithms.
+Calculates a static powder 13C NMR spectrum of sucrose; the source assumes proton decoupling and estimates hours of runtime. The spin system and interactions are generated from `../standard_systems/sucrose.log` with `gparse` and `g2spinach` (the source labels the input as PCM DFT data), selecting carbon, imported as 13C, at field parameter 14.1. The basis is `sphten-liouv` with IK-0 approximation, projection +1, and inter-level 3. The source sets interaction and proximity cutoffs to 5.0 and 4.0 and disables trajectory-level algorithms.
 
 ## Powder acquisition and processing
 

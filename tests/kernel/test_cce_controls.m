@@ -90,18 +90,19 @@ fprintf('operator representation error %.3g\n',optional_error);
 for method={'gcce','megcce'}
     q=rmfield(p,'drive');
     q.refocusing=ideal;
+    variant=model;
     if strcmp(method{1},'megcce')
-        q.cce.basis.formalism='zeeman-liouv';
+        variant.bas.formalism='zeeman-liouv';
         q.bath_jumps=struct([]);
     end
     values=cell(1,3);
-    for variant=1:3
-        if variant==2
+    for index=1:3
+        if index==2
             q.refocusing=struct('spins',1,'time',0.15,'axis','z','angle',0.3);
         else
             q.refocusing=ideal;
         end
-        values{variant}=clexpn(model,@hahn_echo,q,'labframe');
+        values{index}=clexpn(variant,@hahn_echo,q,'labframe');
     end
     result=test_close(result,[method{1} ' omitted ideal operator angle'],...
                       values{1},values{3},1e-12,1e-12,...
@@ -120,8 +121,9 @@ for method={'gcce','megcce'}
         q=p;
         q.output='observable';
         q.normalized=true;
+        variant=model;
         if strcmp(method{1},'megcce')
-            q.cce.basis.formalism='zeeman-liouv';
+            variant.bas.formalism='zeeman-liouv';
             q.bath_jumps=struct([]);
         end
         q.coil={1e-20*eye(2),eye(2),1e20*eye(2)};
@@ -130,7 +132,7 @@ for method={'gcce','megcce'}
             q=rmfield(q,'drive');
             sequence=@free_evolution;
         end
-        scaled=clexpn(model,sequence,q,'labframe');
+        scaled=clexpn(variant,sequence,q,'labframe');
         result=test_close(result,[method{1} ' scaled observable driver ' num2str(driven)],...
                           scaled,ones(numel(q.times),3),1e-11,1e-11,...
                           'Operator units must not change normalized signal through any propagation path.');
@@ -216,7 +218,7 @@ q=rmfield(q,'drive');
 q.refocusing=struct('spins',1,'fraction',0.5,'operator',pi*x);
 explicit_echo=clexpn(ss,@hahn_echo,q,'labframe');
 q=rmfield(q,'refocusing');
-q.cce.numerics.propagator='expm';
+q.cce.propagator='expm';
 named_echo=clexpn(ss,@hahn_echo,q,'labframe');
 result=test_close(result,'Named and explicit Hahn normalization',...
                   named_echo,explicit_echo,1e-12,1e-12,...
@@ -291,10 +293,11 @@ result=test_true(result,'Piecewise midpoint refinement is second order',all(wave
 q=rmfield(p,'drive');
 q.times=linspace(0,0.1,100);
 q.train=struct('name','xy8','count',8,'axis','x','spins',1);
-q.cce.numerics.max_memory_bytes=1e5;
+tight=model;
+tight.tols.cce_mem=1e5;
 rejected=false;
 try
-    controlled(model,2,spin_config,q,@refocusing_train);
+    controlled(tight,2,spin_config,q,@refocusing_train);
 catch err
     rejected=strcmp(err.identifier,'cce_segments:memory');
 end
@@ -302,10 +305,10 @@ result=test_true(result,'Retained control segment memory cap',rejected,...
                  'The memory cap must cover all retained Hamiltonians and pulses across requested times.');
 
 % Apply the same retained-control bound through the public scheduled driver
-q.cce.numerics.max_memory_bytes=5e5;
+tight.tols.cce_mem=5e5;
 rejected=false;
 try
-    clexpn(model,@refocusing_train,q,'labframe');
+    clexpn(tight,@refocusing_train,q,'labframe');
 catch err
     rejected=strcmp(err.identifier,'cce_schedule:memory');
 end
@@ -366,6 +369,9 @@ result=test_close(result,'Selective observed-spin system operator ordering',s_au
 
 % Distinguish a physical spin-one rotation from a selective two-level pulse
 sys.isotopes={'14N'};
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
+sys.tols.cce_mem=2^26;
 sys.magnet=0;
 sys.disable={'hygiene'};
 sys.parallel={'processes',1};
@@ -375,9 +381,9 @@ spin_system=create(sys,inter);
 q=rmfield(p,'transition');
 q.observed=1;
 q.cce.bath_spins=[];
+q=rmfield(q,'bath_state');
 q.rho0=diag([1 0 0]);
 q.cce.order=0;
-q.cce.bath_state=struct('mode','mixed_product');
 q.refocusing={struct('spins',1,'time',0,'axis','x','angle',pi)};
 q=cce_options(spin_system,q,@refocusing_train,'labframe');
 spin_one_p=cce_options(spin_system,q,@cce_compile,'labframe');
@@ -403,6 +409,9 @@ sys.disable={'hygiene'};
 sys.parallel={'processes',1};
 inter=struct();
 inter.zeeman.matrix={zeros(3)};
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
+sys.tols.cce_mem=2^26;
 spin_system=create(sys,inter);
 stat.observed=1;
 stat.cce.bath_spins=[];
@@ -414,11 +423,8 @@ stat.rho0=diag([1 0]);
 stat.transition=struct('spins',1,'ms',[0.5 -0.5]);
 stat.orientation=[0 0 0];
 stat.cce.interaction_cutoff=Inf;
-stat.cce.graph=struct('mode','complete');
 stat.cce.meanfield='none';
 stat.times=[0 1];
-stat.cce.bath_state=struct('mode','mixed_product');
-stat.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 stat.refocusing=struct('spins',1,'fraction',0.5,'operator',pi*[0 1;1 0]/2);
 rotated=clexpn(spin_system,@hahn_echo,stat,'labframe');
 stat.refocusing.operator=zeros(2);
@@ -497,6 +503,9 @@ sys.parallel={'processes',1};
 sys.output='hush';
 inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=diag([2 3 5])/(2*pi);
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
+sys.tols.cce_mem=2^26;
 spin_system=create(sys,inter);
 p.observed=1;
 p.cce.bath_spins=2;
@@ -510,10 +519,8 @@ p.orientation=[0 0 0];
 p.normalized=false;
 p.transition=struct('spins',1,'ms',[0.5 -0.5]);
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
-p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([1 0])}});
+p.bath_state={diag([1 0])};
 p.cce.meanfield='none';
-p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 p.drive=struct('spins',1,'duration',0.1,'axis','x','amplitude',7,'detuning',3);
 p=cce_options(spin_system,p,@finite_drive,'labframe');
 model_p=cce_options(spin_system,p,@cce_compile,'labframe');

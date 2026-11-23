@@ -76,8 +76,8 @@ if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&...
 end
 retained=retained+3*numel(schedule.times)*(25*components+16*dc^2);
 metadata=whos('system','schedule','parameters');
-if retained+sum([metadata.bytes])+16*24*dimension^2>parameters.cce.numerics.max_memory_bytes
-    error('cce_segments:memory','Retained control segments exceed numerics.max_memory_bytes.');
+if retained+sum([metadata.bytes])+16*24*dimension^2>system.tols.cce_mem
+    error('cce_segments:memory','Retained control segments exceed sys.tols.cce_mem.');
 end
 
 % Build the Hamiltonian metadata only after the retained-storage check

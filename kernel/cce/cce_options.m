@@ -69,14 +69,11 @@ end
 if ~isfield(parameters.cce,'order')
     parameters.cce.order=[];
 end
-if ~isfield(parameters.cce,'graph')
-    parameters.cce.graph=struct('mode','complete');
+if ~isfield(parameters.cce,'mediated')
+    parameters.cce.mediated=true;
 end
 
-% Default to a mixed product bath without mean fields
-if ~isfield(parameters.cce,'bath_state')
-    parameters.cce.bath_state=struct('mode','mixed_product');
-end
+% Default to no mean fields
 if ~isfield(parameters.cce,'meanfield')
     parameters.cce.meanfield='none';
 end
@@ -104,15 +101,9 @@ if ~isfield(parameters.cce,'second_order')
     parameters.cce.second_order=struct('enabled',false);
 end
 
-% Default to masked unresolved elements in double precision
-if ~isfield(parameters.cce,'numerics')
-    parameters.cce.numerics=struct();
-end
-if ~isfield(parameters.cce.numerics,'zero_policy')
-    parameters.cce.numerics.zero_policy='mask';
-end
-if ~isfield(parameters.cce.numerics,'precision')
-    parameters.cce.numerics.precision='double';
+% Default to masked unresolved elements
+if ~isfield(parameters.cce,'zero_policy')
+    parameters.cce.zero_policy='mask';
 end
 
 % Check consistency
@@ -193,6 +184,7 @@ if isfield(p,'drive')&&~isequal(experiment,@finite_drive)&&...
 end
 fields(p,{'observed','transition','spins','times','nloops','preparation','rho0',...
           'drive','coil','output','normalized','orientation','grid','sum_up','cce','pump',...
+          'bath_state','bath_samples','bath_seed','bath_basis','bath_probs',...
           'bath_jumps','noise','spectrum','refocusing','train'},'parameters');
 if ~isa(experiment,'function_handle')
     error('cce_options:experiment','pulse_sequence must be a function handle.');
@@ -267,20 +259,15 @@ if ~isfield(p,'cce')
     return;
 end
 fields(p.cce,{'approximation','projection','bath_spins','order','expansion','groups','partition',...
-              'graph','interaction_cutoff','bath_radius','bath_state',...
+              'mediated','interaction_cutoff','bath_radius',...
               'meanfield','meanfield_radius','interlaced','averaging','reducer',...
-              'numerics','backend','basis','second_order','convergence','parallel',...
+              'zero_policy','propagator','backend','second_order','convergence',...
               'checkpoint','retain_raw'},'cce');
-contracts={'graph',{'mode','score','radius','threshold','adjacency','scores','mismatch','mismatch_scale','approximate'};...
-           'bath_state',{'mode','rho','basis','probabilities','samples','seed','configuration_id'};...
-           'numerics',{'atol','rtol','max_memory_bytes','precision','zero_policy','propagator'};...
-           'second_order',{'enabled','gap_tolerance','overlap_tolerance'};...
+contracts={'second_order',{'enabled','gap_tolerance','overlap_tolerance'};...
            'partition',{'mode','max_dimension','group_count','adaptive','patches','patch_atol','patch_rtol','pilot_configs','heldout_configs','max_rounds','max_probes'};...
            'interlaced',{'condition_sites','reference_state','max_states','raw_only'};...
-           'parallel',{'mode','batch_size','max_tasks'};...
            'checkpoint',{'file','resume'};...
-           'convergence',{'ladders','atol','rtol','max_work','checks','require_independent'};...
-           'basis',{'formalism','approximation'}};
+           'convergence',{'ladders','atol','rtol','max_work','checks','require_independent'}};
 for k=1:size(contracts,1)
     name=contracts{k,1};
     if isfield(p.cce,name)
@@ -298,7 +285,7 @@ if isfield(c,'checkpoint')
         (~islogical(c.checkpoint.resume)||~isscalar(c.checkpoint.resume)))
         error('cce_options:checkpoint','Checkpoint requests require a nonempty filename and logical resume flag.');
     end
-    if strcmp(c.bath_state.mode,'interlaced')||isfield(c,'convergence')
+    if isfield(c,'interlaced')||isfield(c,'convergence')
         error('cce_options:checkpoint','Interlacing and independent convergence runs cannot share a checkpoint ledger.');
     end
 end
@@ -312,8 +299,7 @@ choice(c.averaging,{'after_expansion','internal_then_expansion'},'cce.averaging'
 choice(c.reducer,{'powers','direct'},'cce.reducer');
 choice(c.backend,{'auto','direct','stock','analytical_hahn'},'cce.backend');
 choice(c.meanfield,{'none','static'},'cce.meanfield');
-choice(c.numerics.zero_policy,{'mask','error'},'cce.numerics.zero_policy');
-choice(c.numerics.precision,{'double'},'cce.numerics.precision');
+choice(c.zero_policy,{'mask','error'},'cce.zero_policy');
 if ~isempty(c.order)&&(~isnumeric(c.order)||~isreal(c.order)||~isscalar(c.order)||...
    ~isfinite(c.order)||c.order<0||c.order~=fix(c.order)||c.order>numel(bath))
     error('cce_options:order','Order must be an integer within the supplied bath or empty for convergence selection.');
@@ -322,14 +308,6 @@ for name={'interaction_cutoff','bath_radius','meanfield_radius'}
     if isfield(c,name{1})
         nonnegative(c.(name{1}),['cce.' name{1}],true);
     end
-end
-for name={'atol','rtol','max_memory_bytes'}
-    if isfield(c.numerics,name{1})
-        nonnegative(c.numerics.(name{1}),['cce.numerics.' name{1}],false);
-    end
-end
-if isfield(c.numerics,'max_memory_bytes')&&c.numerics.max_memory_bytes==0
-    error('cce_options:memory','The explicit memory budget must be positive.');
 end
 if ~islogical(c.retain_raw)||~isscalar(c.retain_raw)
     error('cce_options:retain_raw','retain_raw must be a logical scalar.');
@@ -348,7 +326,6 @@ if isfield(c,'projection')
        (~strcmp(c.approximation,'projected')||c.second_order.enabled||...
         ~isfield(p,'transition')||~isfield(p.transition,'levels')||isfield(p,'refocusing')||...
         (isfield(p,'bath_jumps')&&~isempty(p.bath_jumps))||...
-        (isfield(c,'basis')&&isfield(c.basis,'formalism')&&~strcmp(c.basis.formalism,'zeeman-hilb'))||...
         (isfield(system,'bas')&&~strcmp(system.bas.formalism,'zeeman-hilb'))||...
         ~(isequal(experiment,@hahn_echo)||isequal(experiment,@cce_compile)))
         error('cce_options:projection','Conditional projection requires a closed-system Hilbert Hahn echo with energy-level selection, an ideal midpoint pulse, and no second-order correction.');
@@ -374,7 +351,7 @@ end
 if strcmp(c.expansion,'periodic_segments')
     if (~isequal(experiment,@free_evolution)&&~isequal(experiment,@cce_compile))||...
        ~strcmp(c.approximation,'projected')||~strcmp(c.meanfield,'static')||...
-       ~strcmp(c.bath_state.mode,'explicit_product')||~strcmp(c.reducer,'powers')||...
+       ~isfield(p,'bath_state')||~strcmp(c.reducer,'powers')||...
        isempty(c.order)||c.order<1||c.order>=numel(bath)||...
        any(isfield(c,{'groups','partition','convergence','meanfield_radius'}))||...
        (isfield(p,'output')&&~strcmp(p.output,'signal'))
@@ -384,84 +361,57 @@ if strcmp(c.expansion,'periodic_segments')
 elseif ~strcmp(c.expansion,'standard')&&~isfield(c,'groups')&&~isfield(c,'partition')
     error('cce_options:partition','Partitioned expansion needs groups or an explicit partition policy.');
 end
-if ~isfield(c.graph,'mode')
-    error('cce_options:graph','A graph mode is required.');
+if ~islogical(c.mediated)||~isscalar(c.mediated)
+    error('cce_options:mediated','cce.mediated must be a logical scalar.');
 end
-choice(c.graph.mode,{'complete','distance','coupling','explicit'},'cce.graph.mode');
-if strcmp(c.graph.mode,'distance')
-    if ~isfield(c.graph,'radius')
-        error('cce_options:graph','Distance graphs require an explicit radius.');
+if isfield(p,'bath_state')
+    if isfield(p,'bath_samples')
+        error('cce_options:state','Supply bath_state density matrices or bath_samples, not both.');
     end
-    nonnegative(c.graph.radius,'cce.graph.radius',true);
-elseif strcmp(c.graph.mode,'coupling')
-    if ~isfield(c.graph,'threshold')
-        error('cce_options:graph','Coupling graphs require an explicit threshold.');
-    end
-    nonnegative(c.graph.threshold,'cce.graph.threshold',true);
-elseif strcmp(c.graph.mode,'explicit')
-    if ~isfield(c.graph,'adjacency')||~islogical(c.graph.adjacency)||...
-       ~issparse(c.graph.adjacency)||~isequal(size(c.graph.adjacency),[numel(bath) numel(bath)])||...
-       ~isequal(c.graph.adjacency,c.graph.adjacency.')||any(diag(c.graph.adjacency))
-        error('cce_options:graph','Explicit adjacency must be sparse logical, symmetric and have zero diagonal.');
-    end
-end
-state=c.bath_state;
-if ~isfield(state,'mode')
-    error('cce_options:state','A bath-state mode is required.');
-end
-choice(state.mode,{'mixed_product','explicit_product','sampled','interlaced'},'cce.bath_state.mode');
-if strcmp(state.mode,'explicit_product')
-    if ~isfield(state,'rho')||~iscell(state.rho)||~isequal(size(state.rho),[1 numel(bath)])
-        error('cce_options:state','Explicit bath states require one density matrix per ordered bath ID.');
+    if ~iscell(p.bath_state)||~isequal(size(p.bath_state),[1 numel(bath)])
+        error('cce_options:state','bath_state requires one density matrix per ordered bath ID.');
     end
     for k=1:numel(bath)
-        density(state.rho{k},system.comp.mults(bath(k)));
+        density(p.bath_state{k},system.comp.mults(bath(k)));
     end
-elseif isfield(state,'rho')
-    error('cce_options:state','rho belongs to explicit_product bath states.');
 end
-if ismember(state.mode,{'sampled','interlaced'})
-    if ~all(isfield(state,{'basis','probabilities','samples','seed'}))
-        error('cce_options:state','Sampled states require explicit basis, probabilities, samples and seed.');
+if isfield(p,'bath_samples')
+    if ~isfield(p,'bath_seed')
+        error('cce_options:state','Sampled bath states require bath_samples and bath_seed.');
     end
-    integer(state.seed,'seed',0);
-    if state.seed>2^32-1
+    integer(p.bath_seed,'bath_seed',0);
+    if p.bath_seed>2^32-1
         error('cce_options:seed','The seed exceeds the mt19937ar range.');
     end
-    integer(state.samples,'bath_state.samples',1);
-    basis_uniform=ischar(state.basis)&&strcmp(state.basis,'uniform');
-    uniform_populations=ischar(state.probabilities)&&strcmp(state.probabilities,'uniform');
-    if (~basis_uniform&&(~iscell(state.basis)||~isequal(size(state.basis),[1 numel(bath)])))||...
-       (~uniform_populations&&(~iscell(state.probabilities)||~isequal(size(state.probabilities),[1 numel(bath)])))
-        error('cce_options:state','Sampled-state tables must follow the bath IDs or explicitly specify uniform.');
+    integer(p.bath_samples,'bath_samples',1);
+    for name={'bath_basis','bath_probs'}
+        if isfield(p,name{1})&&(~iscell(p.(name{1}))||~isequal(size(p.(name{1})),[1 numel(bath)]))
+            error('cce_options:state','Sampled-state tables must follow the bath IDs.');
+        end
     end
     for k=1:numel(bath)
         d=system.comp.mults(bath(k));
-        if basis_uniform
-            U=eye(d);
-        else
-            U=state.basis{k};
+        if isfield(p,'bath_basis')
+            U=p.bath_basis{k};
+            if ~isnumeric(U)||~isequal(size(U),[d d])||any(~isfinite(U),'all')||...
+               norm(U'*U-eye(d),'fro')>d*eps*max(1,norm(U,'fro')^2)
+                error('cce_options:state','Each sampled basis must be orthonormal.');
+            end
         end
-        if uniform_populations
-            probabilities=ones(1,d)/d;
-        else
-            probabilities=state.probabilities{k};
-        end
-        if ~isnumeric(U)||~isequal(size(U),[d d])||any(~isfinite(U),'all')||...
-           norm(U'*U-eye(d),'fro')>d*eps*max(1,norm(U,'fro')^2)
-            error('cce_options:state','Each sampled basis must be orthonormal.');
-        end
-        if ~isnumeric(probabilities)||~isreal(probabilities)||...
-           ~isequal(size(probabilities),[1 d])||any(~isfinite(probabilities))||...
-           any(probabilities<0)||abs(sum(probabilities)-1)>d*eps
-            error('cce_options:population','Explicit probabilities must be normalized nonnegative rows.');
+        if isfield(p,'bath_probs')
+            probabilities=p.bath_probs{k};
+            if ~isnumeric(probabilities)||~isreal(probabilities)||...
+               ~isequal(size(probabilities),[1 d])||any(~isfinite(probabilities))||...
+               any(probabilities<0)||abs(sum(probabilities)-1)>d*eps
+                error('cce_options:population','Explicit probabilities must be normalized nonnegative rows.');
+            end
         end
     end
-elseif isfield(state,'seed')||isfield(state,'samples')||isfield(state,'probabilities')||isfield(state,'basis')
-    error('cce_options:state','Sampling fields require sampled or interlaced bath states.');
+elseif any(isfield(p,{'bath_seed','bath_basis','bath_probs'}))
+    error('cce_options:state','Sampling fields require bath_samples.');
 end
-if isfield(state,'configuration_id')
-    integer(state.configuration_id,'bath_state.configuration_id',1);
+if isfield(c,'interlaced')&&~isfield(p,'bath_samples')
+    error('cce_options:state','Interlaced expansion requires sampled bath states.');
 end
 if isfield(c,'meanfield_radius')&&~strcmp(c.meanfield,'static')
     error('cce_options:meanfield','meanfield_radius requires static mean fields.');

@@ -20,6 +20,9 @@ sys.isotopes={'1H','1H','1H','1H'};
 sys.magnet=0;
 sys.disable={'hygiene'};
 sys.parallel={'processes',1};
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
+sys.tols.cce_mem=2^26;
 sys.output='hush';
 inter.coupling.matrix=cell(4);
 inter.coupling.matrix{1,2}=diag([2 1 5])/(2*pi);
@@ -40,12 +43,11 @@ p.transition.alpha=[1;0];
 p.transition.beta=[0;1];
 p.orientation=[0 0 0];
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
-p.cce.bath_state=struct('mode','interlaced','samples',1,'seed',31,'basis','uniform',...
-                        'probabilities',{{[0.7 0.3],[0.2 0.8],[0.6 0.4]}});
+p.bath_samples=1;
+p.bath_seed=31;
+p.bath_probs={[0.7 0.3],[0.2 0.8],[0.6 0.4]};
 p.cce.meanfield='static';
 p.cce.interlaced=struct('max_states',16,'reference_state',1);
-p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 [~,details]=clexpn(spin_system,@free_evolution,p,'labframe');
 p=details.parameters;
 model_p=cce_options(spin_system,p,@cce_compile,'labframe');
@@ -61,13 +63,14 @@ q=p;
 q.times=0;
 q.cce.approximation='projected';
 q.normalized=true;
-q.cce.numerics.max_memory_bytes=1000;
+tight=model;
+tight.tols.cce_mem=1000;
 q.cce.interlaced=struct('max_states',8,'reference_state',1,...
                         'condition_sites',{{[2 3 4]}},'raw_only',true);
 probe=struct('id',uint64(0),'sites',[],'groups',[]);
 refused=false;
 try
-    cce_interlace(model,probe,model_clusters,ensemble,schedule,q);
+    cce_interlace(tight,probe,model_clusters,ensemble,schedule,q);
 catch exception
     refused=strcmp(exception.identifier,'cce_interlace:memory');
 end
@@ -77,11 +80,12 @@ result=test_true(result,'Conditioning union memory preflight',refused,...
 % Sampling is bounded before allocating configuration records or assignments
 q=p;
 q.cce.order=0;
-q.cce.bath_state.samples=1024;
-q.cce.numerics.max_memory_bytes=4096;
+q.bath_samples=1024;
+tight=model;
+tight.tols.cce_mem=4096;
 refused=false;
 try
-    clexpn(model,@free_evolution,q,'labframe');
+    clexpn(tight,@free_evolution,q,'labframe');
 catch exception
     refused=strcmp(exception.identifier,'clexpn:memory');
 end
@@ -91,10 +95,11 @@ result=test_true(result,'Sampled configuration memory preflight',refused,...
 % Direct propagation has the same output-storage contract as the scheduler
 q=p;
 q.times=linspace(0,1,1024);
-q.cce.numerics.max_memory_bytes=4096;
+tight=model;
+tight.tols.cce_mem=4096;
 refused=false;
 try
-    cce_evaluate(model,probe,ensemble.spin_config(1),schedule,q);
+    cce_evaluate(tight,probe,ensemble.spin_config(1),schedule,q);
 catch exception
     refused=strcmp(exception.identifier,'clexpn:memory');
 end
@@ -187,9 +192,9 @@ for method={'cce','gcce','mecce','megcce'}
         q.cce.approximation='generalized';
         q.normalized=false;
     end
-    q.cce.basis.formalism='zeeman-hilb';
+    driver_model=model;
     if ismember(method{1},{'mecce','megcce'})
-        q.cce.basis.formalism='zeeman-liouv';
+        driver_model.bas.formalism='zeeman-liouv';
     end
     q.bath_jumps=struct([]);
     if strcmp(q.cce.approximation,'generalized')
@@ -198,7 +203,7 @@ for method={'cce','gcce','mecce','megcce'}
         q=rmfield(q,'rho0');
     end
     try
-        [driver,~]=clexpn(model,pulse_sequence,q,'labframe');
+        [driver,~]=clexpn(driver_model,pulse_sequence,q,'labframe');
         driver_ok=all(isfinite(driver(:)));
     catch exception
         driver_ok=false;
@@ -236,7 +241,7 @@ for a=1:2
                 rho=zeros(2);
                 rho(assignment(j),assignment(j))=1;
                 spin_config.bath_rho{j}=rho;
-                weight=weight*p.cce.bath_state.probabilities{j}(assignment(j));
+                weight=weight*p.bath_probs{j}(assignment(j));
             end
             item=cce_evaluate(model,cluster,spin_config,schedule,p);
             value=value+weight*item.value;
@@ -256,7 +261,7 @@ result=test_true(result,'Duplicate-occurrence weighting gives a detectably diffe
 probe=p;
 probe.cce.interlaced.raw_only=true;
 probe.cce.interlaced.condition_sites={[2 3 4]};
-probe.cce.bath_state.basis={eye(2),[0 1;1 0],eye(2)};
+probe.bath_basis={eye(2),[0 1;1 0],eye(2)};
 probe_model=model;
 probe_model_p=model_p;
 probe_model.cce.zeeman{2}(3,:)=[0.731 0.473 0.122];
@@ -270,7 +275,7 @@ orthogonality=0;
 for k=1:size(measured.assignments,1)
     spin_config=probe_ensemble.spin_config(1);
     for j=1:3
-        vector=probe.cce.bath_state.basis{j}(:,measured.assignments(k,j));
+        vector=probe.bath_basis{j}(:,measured.assignments(k,j));
         spin_config.bath_rho{j}=vector*vector';
     end
     item=cce_evaluate(probe_model,cluster,spin_config,schedule,probe);
@@ -305,9 +310,8 @@ result=test_true(result,'Included-supercluster family generates the same K autom
 p.cce.order=3;
 p.cce.interlaced.max_states=32;
 [integrated,~]=clexpn(model,pulse_sequence,p,'labframe');
-mixture=p;
-mixture.cce.bath_state=struct('mode','explicit_product',...
-                              'rho',{{diag([0.7 0.3]),diag([0.2 0.8]),diag([0.6 0.4])}});
+mixture=rmfield(p,{'bath_samples','bath_seed','bath_probs'});
+mixture.bath_state={diag([0.7 0.3]),diag([0.2 0.8]),diag([0.6 0.4])};
 mixture.cce.meanfield='none';
 mixture.cce=rmfield(mixture.cce,'interlaced');
 [exact,~]=clexpn(model,pulse_sequence,mixture,'labframe');
@@ -336,9 +340,8 @@ q=rmfield(q,'rho0');
 q.cce.bath_spins=[2 3];
 q.cce.order=2;
 q.times=[0 pi/2];
-q.cce.bath_state.probabilities='uniform';
-reference=q;
-reference.cce.bath_state=struct('mode','mixed_product');
+q=rmfield(q,'bath_probs');
+reference=rmfield(q,{'bath_samples','bath_seed'});
 reference.cce=rmfield(reference.cce,'interlaced');
 reference.cce.meanfield='none';
 [exact,~]=clexpn(spin_system,pulse_sequence,reference,'labframe');
@@ -368,8 +371,7 @@ result=test_close(result,'Generalized interlaced full-bath zero baseline',genera
 fprintf('R1242 interlaced %.16g; exact %.16g.\n',real(full_bath(end)),real(exact(end)));
 
 % Require the common result schema and diagnostics on the interlaced path
-reference=q;
-reference.cce.bath_state=struct('mode','mixed_product');
+reference=rmfield(q,{'bath_samples','bath_seed'});
 reference.cce=rmfield(reference.cce,'interlaced');
 [standard,standard_details]=clexpn(spin_system,pulse_sequence,reference,'labframe');
 result=test_true(result,'Interlaced common result fields',...
@@ -406,7 +408,7 @@ q=p;
 q.cce.bath_spins=[2 3];
 q.times=[0 0.3 0.8];
 q.cce.meanfield='none';
-q.cce.bath_state.probabilities='uniform';
+q=rmfield(q,'bath_probs');
 q.cce.interlaced=struct('max_states',4);
 q.bath_jumps=struct('support',1,'operator',diag([1 -1]),'rate',0.7);
 for method={'mecce','megcce'}
@@ -419,11 +421,9 @@ for method={'mecce','megcce'}
     elseif isfield(q,'rho0')
         q=rmfield(q,'rho0');
     end
-    q.cce.basis.formalism='zeeman-liouv';
     for order=1:2
         q.cce.order=order;
-        reference=q;
-        reference.cce.bath_state=struct('mode','mixed_product');
+        reference=rmfield(q,{'bath_samples','bath_seed'});
         reference.cce=rmfield(reference.cce,'interlaced');
         [expected,~]=clexpn(spin_system,pulse_sequence,reference,'labframe');
         matched=false;
@@ -466,7 +466,7 @@ q.cce.approximation='generalized';
 q.normalized=false;
 q.cce.bath_spins=[2 3];
 q.cce.meanfield='none';
-q.cce.bath_state.probabilities='uniform';
+q=rmfield(q,'bath_probs');
 q.times=[0 0.2 0.5];
 q.cce.interlaced=struct('max_states',4);
 driven_ok=true;
@@ -477,14 +477,13 @@ for sequence={@hahn_echo,@finite_drive}
     pulse_sequence=sequence{1};
     if isequal(pulse_sequence,@finite_drive)
         q.drive=finite;
-        q.cce.numerics=rmfield(q.cce.numerics,'propagator');
+        q.cce=rmfield(q.cce,'propagator');
     else
-        q.cce.numerics.propagator='expm';
+        q.cce.propagator='expm';
     end
     for order=1:2
         q.cce.order=order;
-        reference=q;
-        reference.cce.bath_state=struct('mode','mixed_product');
+        reference=rmfield(q,{'bath_samples','bath_seed'});
         reference.cce=rmfield(reference.cce,'interlaced');
         [expected,~]=clexpn(spin_system,pulse_sequence,reference,'labframe');
         try

@@ -17,6 +17,9 @@ sys.magnet=0.01;
 sys.isotopes={'E3','13C'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
+sys.tols.cce_mem=2^28;
 
 % Nuclear Zeeman frequency and projected hyperfine components, rad/s
 omega=-spin('13C')*sys.magnet;
@@ -27,10 +30,6 @@ aper=0.6*abs(omega);
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=[0 0 aper;0 0 0;0 0 apar]/(2*pi);
-
-% Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -43,11 +42,6 @@ parameters.transition.ms=[0 1];
 parameters.times=linspace(0,8*pi/abs(omega),101);
 parameters.cce.order=1;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,...
-                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn experiment through the cluster context
 [answer,diagnostics]=clexpn(spin_system,@hahn_echo,parameters,'labframe');

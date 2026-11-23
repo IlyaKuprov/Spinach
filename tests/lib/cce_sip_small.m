@@ -15,6 +15,9 @@ sys.magnet=0.01;
 sys.isotopes={'E','29Si','29Si'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 
 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
 inter.coordinates={[0 0 0];[8 4 0];[12 2 4]};
@@ -42,10 +45,6 @@ inter.coupling.matrix{2,3}=diag([200 200 -400]);
 % Coordinates define the toy geometry; all couplings above are explicit
 inter=rmfield(inter,'coordinates');
 
-% Basis policy for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
-
 % Projected transition and total echo times in seconds
 parameters.observed=1;
 parameters.cce.bath_spins=2:3;
@@ -54,11 +53,6 @@ parameters.transition.ms=[1/2 -1/2];
 parameters.times=linspace(0,200e-6,41);
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
 
 % Execute the named Hahn echo through the cluster-expansion context
 spin_system=create(sys,inter);

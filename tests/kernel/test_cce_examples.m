@@ -121,11 +121,7 @@ for n=1:size(cases,1)
                 ref_params.orientation=[0 0 0];
                 ref_params.interaction_cutoff=Inf;
                 ref_params.meanfield='none';
-                ref_params.graph=struct('mode','complete');
                 ref_params.times=linspace(0,8*pi/abs(omega),101);
-
-                ref_params.bath_state=struct('mode','mixed_product');
-                ref_params.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^28);
 
                 % Run CCE and calculate an independent analytic echo
                 ref_result=struct('value',answer,'times',ref_params.times(:),'valid',true(size(answer)));
@@ -219,7 +215,6 @@ for n=1:size(cases,1)
                 ref_params.orientation=[0 0 0];
                 ref_params.interaction_cutoff=Inf;
                 ref_params.meanfield='none';
-                ref_params.graph=struct('mode','complete');
                 ref_params.times=1e-3*[0 0.012500000000000001 0.025000000000000001 0.037500000000000006 0.050000000000000003 0.0625 ...
                                        0.075000000000000011 0.087500000000000008 0.10000000000000001 0.1125 0.125 ...
                                        0.13750000000000001 0.15000000000000002 0.16250000000000001 0.17500000000000002 0.1875 ...
@@ -230,9 +225,6 @@ for n=1:size(cases,1)
                                        0.45000000000000001 0.46250000000000002 0.47500000000000003 0.48750000000000004 0.5];
                 a=ref_params.transition.alpha;
                 b=ref_params.transition.beta;
-
-                ref_params.bath_state=struct('mode','mixed_product');
-                ref_params.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
 
                 % The projected PyCCE signal uses the same fixed physical receiver
                 ref_result=struct('value',answer,'times',ref_params.times(:),'valid',true(size(answer)));
@@ -307,7 +299,7 @@ for n=1:size(cases,1)
                 % Compile physical metadata without a full-bath basis
                 spin_system=create(sys,inter);
 
-                % Projected observed-spin Hahn signal and a complete small-bath graph
+                % Projected observed-spin Hahn signal for the small bath
                 ref_params.observed_spins=1;
                 ref_params.bath_spins=2:3;
                 ref_params.expansion='standard';
@@ -320,11 +312,7 @@ for n=1:size(cases,1)
                 ref_params.orientation=[0 0 0];
                 ref_params.interaction_cutoff=Inf;
                 ref_params.meanfield='none';
-                ref_params.graph=struct('mode','complete');
                 ref_params.times=linspace(0,200e-6,41);
-
-                ref_params.bath_state=struct('mode','mixed_product');
-                ref_params.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',2^28);
 
                 % Keep the electron and its nitrogen in the same physical group
                 ref_params.expansion='partition';
@@ -443,6 +431,9 @@ for n=1:size(cases,1)
                 sys.isotopes={'E','E','E','E'};
                 sys.output='hush';
                 sys.parallel={'local',1};
+                sys.tols.cce_atol=1e-5;
+                sys.tols.cce_rtol=1e-5;
+                sys.tols.cce_mem=2^28;
 
                 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
                 inter.coordinates={[0 0 0];[20 0 0];[21 0 0];[0 30 0]};
@@ -469,7 +460,7 @@ for n=1:size(cases,1)
                 % Compile physical metadata without a full-bath basis
                 spin_system=create(sys,inter);
 
-                % Projected observed-spin Hahn signal and a complete small-bath graph
+                % Projected observed-spin Hahn signal for the small bath
                 ref_params.observed_spins=1;
                 ref_params.bath_spins=2:4;
                 ref_params.expansion='standard';
@@ -482,11 +473,7 @@ for n=1:size(cases,1)
                 ref_params.orientation=[0 0 0];
                 ref_params.interaction_cutoff=Inf;
                 ref_params.meanfield='none';
-                ref_params.graph=struct('mode','complete');
                 ref_params.times=linspace(0,200e-6,41);
-
-                ref_params.bath_state=struct('mode','mixed_product');
-                ref_params.numerics=struct('atol',1e-5,'rtol',1e-5,'max_memory_bytes',2^28);
 
                 % Freeze the strongly coupled pair as one partition
                 ref_params.expansion='partition';
@@ -505,8 +492,7 @@ for n=1:size(cases,1)
                 full_parameters.order=3;
                 native_parameters=struct('observed',1,'times',ref_params.times,...
                                          'transition',struct('spins',1,'ms',[1/2 -1/2]),...
-                                         'cce',struct('bath_spins',2:4,'order',3,'approximation','projected',...
-                                                      'graph',ref_params.graph,'numerics',ref_params.numerics));
+                                         'cce',struct('bath_spins',2:4,'order',3,'approximation','projected'));
                 [full_result.value,full_diagnostics]=clexpn(spin_system,@hahn_echo,native_parameters,'labframe');
                 ref_result.reference_error=max(abs(ref_result.value-full_result.value));
                 fprintf('Partition/full-order maximum difference: %.3g (same Hamiltonian).\n',...
@@ -1617,10 +1603,7 @@ for n=1:size(cases,1)
                 ref_params.orientation=[0 0 0];
                 ref_params.interaction_cutoff=Inf;
                 ref_params.meanfield='none';
-                ref_params.graph=struct('mode','complete');
                 ref_params.times=linspace(0,200e-6,31);
-                ref_params.bath_state=struct('mode','mixed_product');
-                ref_params.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
                 % Run full order for the small bath, retaining all observed density-matrix off-diagonal elements
                 ref_result=diagnostics.reduction;
@@ -1757,10 +1740,7 @@ for n=1:size(cases,1)
                 ref_params.orientation=[0 0 0];
                 ref_params.interaction_cutoff=Inf;
                 ref_params.meanfield='none';
-                ref_params.graph=struct('mode','complete');
                 ref_params.times=linspace(0,200e-6,31);
-                ref_params.bath_state=struct('mode','mixed_product');
-                ref_params.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
                 jump=[0 1;0 0];
                 rate=3000;
                 ref_params.jumps=struct('support',2,'operator',jump,'rate',rate);
@@ -1980,6 +1960,9 @@ for n=1:size(cases,1)
         sys.isotopes={'E','1H','1H'};
         sys.output='hush';
         sys.parallel={'local',1};
+        sys.tols.cce_atol=1e-8;
+        sys.tols.cce_rtol=1e-8;
+        sys.tols.cce_mem=2^28;
         inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
         inter.coupling.matrix=cell(3);
         inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
@@ -1988,10 +1971,9 @@ for n=1:size(cases,1)
         spin_system=create(sys,inter);
 
         % The same physical populations, averaged exhaustively rather than sampled
-        ref_params=diagnostics.parameters;
+        ref_params=rmfield(diagnostics.parameters,{'bath_samples','bath_seed','bath_probs'});
         population=[0.8;0.2];
-        ref_params.cce.bath_state=struct('mode','explicit_product',...
-                                         'rho',{{diag(population),diag(population)}});
+        ref_params.bath_state={diag(population),diag(population)};
         [exact,exact_diagnostics]=clexpn(spin_system,@hahn_echo,ref_params,'labframe');
         sampling_error=max(abs(answer-exact));
         snapshot=struct('population',population,'exact',exact,...

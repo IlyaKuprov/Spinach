@@ -24,7 +24,6 @@ parameters.times=(0:60)*1e-3;
 parameters.cce.approximation='projected';
 parameters.cce.order=2;
 parameters.cce.backend='analytical_hahn';
-parameters.cce.numerics=struct('atol',1e-4,'max_memory_bytes',2^27);
 n_configs=50;
 
 % Four W sites relative to a Ca site in the authors' conventional cell
@@ -42,9 +41,11 @@ lattice=lattice(vecnorm(lattice,2,2)<=radius,:);
 n_amorphous=10346;
 
 % Effective electron g factor is specified for each physical bath below
-sys.tols.prox_cutoff=0;
 sys.magnet=0.067;
 sys.output='hush';
+sys.tols.prox_cutoff=0;
+sys.tols.cce_atol=1e-4;
+sys.tols.cce_mem=2^27;
 
 % Prepare independent isotope occupancies and continuum configurations
 occupied=cell(n_configs,1);

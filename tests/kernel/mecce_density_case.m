@@ -17,12 +17,12 @@ sys.magnet=0;
 sys.isotopes={'E','13C'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
 inter.coupling.matrix{1,2}=diag([1100 900 2200]);
-
-% Basis formalism for retained clusters
-bas.formalism='zeeman-liouv';
 
 % Experiment parameters
 parameters.observed=1;
@@ -32,9 +32,6 @@ parameters.times=linspace(0,200e-6,31);
 parameters.bath_jumps=struct('support',2,'operator','L+','rate',3000);
 parameters.cce.approximation='generalized';
 parameters.cce.order=1;
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
 
 % Run the named experiment in the cluster-expansion context
 spin_system=create(sys,inter);

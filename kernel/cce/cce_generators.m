@@ -81,7 +81,7 @@ if ~isempty(jumps)||(projected&&strcmp(spin_system.bas.formalism,'zeeman-liouv')
             included=included+1;
         end
     end
-    memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*n^4+2*included*d^2));
+    memory_guard(spin_system,16*((12+3*numel(ids))*d^2+8*n^4+2*included*d^2));
 end
 
 % Preserve the canonical direct and independent stock construction paths
@@ -196,7 +196,7 @@ if projected
 elseif strcmp(spin_system.bas.formalism,'zeeman-liouv')
 
     % Column-major vectorisation fixes the transposes and the relaxation sign
-    memory_guard(parameters,16*((12+3*numel(ids))*d^2+8*d^4));
+    memory_guard(spin_system,16*((12+3*numel(ids))*d^2+8*d^4));
     H=kron(eye(d),ham)-kron(ham.',eye(d));
     [R,jump_records]=dissipator(spin_system,jumps,[],[]);
     K=zeros(size(H));
@@ -254,7 +254,7 @@ observed=ismember(ids,parameters.observed);
 locals=~(conditional&observed);
 dims=system.comp.mults(system.cce.ids);
 dimension=system.cce.dimension;
-memory_guard(parameters,16*dimension^2*(12+3*numel(ids)));
+memory_guard(system,16*dimension^2*(12+3*numel(ids)));
 
 % Resolve both directions of each retained pair
 [pair_index,tensors]=cce_pair_index(system);
@@ -462,7 +462,7 @@ meta.backend=backend;
 meta.fallback_reason=system.cce.fallback_reason;
 meta.source_hash=system.cce.source_hash;
 meta.omitted_pairs=system.cce.omitted_pairs;
-meta.observable_budget=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(H,'fro');
+meta.observable_budget=system.tols.cce_atol+system.tols.cce_rtol*norm(H,'fro');
 
 end
 
@@ -569,9 +569,9 @@ op=local.(axis);
 end
 
 % Reject allocations exceeding the declared retained-space budget
-function memory_guard(parameters,bytes)
-if bytes>parameters.cce.numerics.max_memory_bytes
-    error('cce:memory','Generator construction exceeds max_memory_bytes.');
+function memory_guard(spin_system,bytes)
+if bytes>spin_system.tols.cce_mem
+    error('cce:memory','Generator construction exceeds sys.tols.cce_mem.');
 end
 end
 
@@ -582,7 +582,7 @@ if isfield(parameters,'sequence')
 end
 if ~isstruct(system)||~isscalar(system)||~isfield(system,'cce')||...
    ~isfield(system.cce,'sites')||~isstruct(parameters)||~isscalar(parameters)||...
-   ~isfield(parameters,'cce')||~all(isfield(parameters.cce,{'approximation','numerics','second_order','backend'}))
+   ~isfield(parameters,'cce')||~all(isfield(parameters.cce,{'approximation','second_order','backend'}))
     error('cce_generators:input','A native retained subsystem and resolved parameters are required.');
 end
 if ~ischar(parameters.cce.approximation)||...

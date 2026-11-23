@@ -206,6 +206,21 @@ if strcmp(output,'observable')
         error('cce_evolution:coil','Every detector must match the propagated state.');
     end
 end
+elements=numel(rho);
+if strcmp(output,'trajectory')
+    elements=elements*(nsteps+1);
+end
+if strcmp(output,'observable')
+    elements=numel(coil)*(nsteps+1);
+end
+bytes=16*(12*d^2+elements);
+if (iscell(L)&&~isempty(L{3}))||...
+   (~iscell(L)&&strcmp(system.bas.formalism,'zeeman-liouv'))
+    bytes=bytes+16*4*d^4;
+end
+if bytes>system.tols.cce_mem
+    error('cce:memory','Propagation exceeds sys.tols.cce_mem.');
+end
 end
 
 

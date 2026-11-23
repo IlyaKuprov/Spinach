@@ -18,14 +18,14 @@ sys.magnet=0.01;
 sys.isotopes={'E','1H','1H'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=[0 0 0;0 0 0;15000 0 8000].';
 inter.coupling.matrix{1,3}=[0 0 0;0 0 0;9000 0 12000].';
 inter.coupling.matrix{2,3}=diag([400 400 -800]);
-
-% Basis formalism for retained clusters
-bas.formalism='zeeman-hilb';
 
 % Experiment parameters
 parameters.observed=1;
@@ -33,12 +33,10 @@ parameters.transition=struct('spins',1,'ms',[0.5 -0.5]);
 parameters.times=linspace(0,200e-6,21);
 parameters.cce.approximation='projected';
 parameters.cce.order=2;
-parameters.cce.bath_state=struct('mode','sampled','basis','uniform',...
-                                 'probabilities',{{[0.8 0.2],[0.8 0.2]}},'samples',64,'seed',8800);
+parameters.bath_probs={[0.8 0.2],[0.8 0.2]};
+parameters.bath_samples=64;
+parameters.bath_seed=8800;
 parameters.cce.averaging='after_expansion';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
 
 % Run the named experiment in the cluster-expansion context
 spin_system=create(sys,inter);

@@ -17,6 +17,9 @@ result=new_test_result('kernel/cce_noise','Additive bath noise',...
 sys.isotopes={'1H','1H','1H'};
 sys.magnet=0;
 sys.output='hush';
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=1e8;
 inter.zeeman.scalar={0,0,0};
 inter.coupling.scalar=cell(3);
 s=create(sys,inter);
@@ -27,10 +30,7 @@ p=struct('observed',1,'output','correlation','times',linspace(0,2,31),...
          'orientation',[0 0 0]);
 p.cce=struct('bath_spins',[2 3],'expansion','standard','order',2,...
              'interaction_cutoff',Inf,'meanfield','none');
-p.cce.graph=struct('mode','complete');
-p.cce.bath_state=struct('mode','mixed_product');
 p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',1e8);
 x=[0 1;1 0]/2;
 y=[0 -1i;1i 0]/2;
 z=diag([1 -1])/2;
@@ -68,7 +68,7 @@ q.rho0=observed_state;
 q.times=linspace(0,1,128);
 local=cce_subsystem(model,model_p,cluster.sites,spin_config,[]);
 [ham,R,K,q]=cce_generators(local,q,[]);
-q.cce.numerics.max_memory_bytes=4096;
+local.tols.cce_mem=4096;
 refused=false;
 try
     noise_correlation(local,q,ham,R,K);
@@ -111,7 +111,7 @@ result=test_close(result,'C7 numerical check',first,reference,1e-12,1e-12,'Disco
 result=test_close(result,'C7 numerical check',second,first,1e-12,1e-12,'Disconnected pair cumulant vanishes.');
 
 % Exercise unequal-time quantum ordering in a polarised bath
-p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2]),eye(2)/2}});
+p.bath_state={diag([0.8 0.2]),eye(2)/2};
 p.noise.terms=struct('support',2,'operator',x);
 ordered=clexpn(s,@noise_correlation,p,'labframe');
 reference=(cos(1.3*p.times(:))+0.6i*sin(1.3*p.times(:)))/4;
@@ -128,8 +128,9 @@ result=test_close(result,'C7 numerical check',classical,repmat(0.16,numel(p.time
 
 % Retain classical ensemble variance in a sampled connected correlation
 q=p;
-q.cce.bath_state=struct('mode','sampled','samples',64,'seed',31,...
-                        'basis','uniform','probabilities','uniform');
+q=rmfield(q,'bath_state');
+q.bath_samples=64;
+q.bath_seed=31;
 q.rho0=eye(2)/2;
 [~,diagnostics]=clexpn(s,@noise_correlation,q,'labframe');
 ensemble=diagnostics.ensemble;
@@ -178,7 +179,6 @@ fprintf('Noise full-order error %.3g; quantum ordering error %.3g\n',...
 
 % Reject non-Hermitian bath operators independently of their physical units
 q=p;
-q.cce.graph=struct('mode','complete');
 q.noise.terms(1).operator=1e-20*[0 1;0 0];
 rejected=false;
 try
@@ -195,8 +195,7 @@ fprintf('R6 scaled noise rejection %d\n',rejected);
 s=create(sys,inter);
 p.cce.order=2;
 p.times=[0 0.3 0.8];
-p.cce.graph=struct('mode','coupling','threshold',0);
-p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([1 0]),diag([1 0])}});
+p.bath_state={diag([1 0]),diag([1 0])};
 p.noise=struct('ordering','ordered','connected',false,'manifold','bath_only',...
                'terms',struct('support',{2,3},'operator',{z,z}));
 uncoupled=clexpn(s,@noise_correlation,p,'labframe');
@@ -234,8 +233,9 @@ for ordering={'ordered','symmetrized'}
 end
 
 % Preserve cross-site covariance of the actual finite sampled mixture
-p.cce.bath_state=struct('mode','sampled','samples',16,'seed',31,...
-                        'basis','uniform','probabilities','uniform');
+p=rmfield(p,'bath_state');
+p.bath_samples=16;
+p.bath_seed=31;
 p.noise.connected=true;
 p.rho0=eye(2)/2;
 [~,diagnostics]=clexpn(s,@noise_correlation,p,'labframe');

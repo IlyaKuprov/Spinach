@@ -39,14 +39,13 @@ if isfield(parameters,'cce')
         dimension=prod(spin_system.comp.mults(parameters.observed));
         result.density=reshape(result.value.',dimension,dimension,numel(parameters.times));
     end
-    parameters=struct('times',parameters.times,'numerics',parameters.cce.numerics);
 end
 
 % Combine numerical validity and time coverage
 value=result.value;
 valid=result.valid&isfinite(value)&...
       isfinite(result.abs_error_bound)&result.abs_error_bound>=0;
-tolerance=parameters.numerics.atol+parameters.numerics.rtol*abs(value);
+tolerance=spin_system.tols.cce_atol+spin_system.tols.cce_rtol*abs(value);
 nt=size(value,1);
 diagnostics=struct();
 diagnostics.valid=valid;
@@ -134,7 +133,7 @@ if isfield(result,'density')&&~isempty(result.density)
             continue;
         end
         bound=norm(result.abs_error_bound(k,:));
-        threshold=parameters.numerics.atol+parameters.numerics.rtol*norm(rho,'fro');
+        threshold=spin_system.tols.cce_atol+spin_system.tols.cce_rtol*norm(rho,'fro');
         diagnostics.trace_error(k)=abs(trace(rho)-1);
         diagnostics.hermiticity_error(k)=norm(rho-rho','fro');
         diagnostics.minimum_eigenvalue(k)=min(real(eig((rho+rho')/2)));
@@ -165,34 +164,9 @@ if ~isstruct(spin_system)||~iscell(raw)||~isstruct(result)||...
    size(result.value,1)~=numel(parameters.times)
     error('cce_diagnostics:input','Result arrays must match the requested time mesh.');
 end
-if isfield(parameters,'cce')
-    if ~isstruct(parameters.cce)||~isscalar(parameters.cce)||~isfield(parameters.cce,'numerics')
-        error('cce_diagnostics:input','Supply the declared numerical tolerances.');
-    end
-    if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-        if ~isfield(spin_system,'comp')||...
-           size(result.value,2)~=prod(spin_system.comp.mults(parameters.observed))^2
-            error('cce_diagnostics:input','Density values must match the observed Hilbert dimension.');
-        end
-    end
-    numerics=parameters.cce.numerics;
-else
-    if ~isfield(parameters,'numerics')
-        error('cce_diagnostics:input','Supply the declared numerical tolerances.');
-    end
-    numerics=parameters.numerics;
-end
-if ~isstruct(numerics)||~isscalar(numerics)||~all(isfield(numerics,{'atol','rtol'}))
-    error('cce_diagnostics:input','Supply the declared numerical tolerances.');
-end
-for field={'atol','rtol'}
-    value=numerics.(field{1});
-    if ~isnumeric(value)||~isscalar(value)||~isreal(value)||~isfinite(value)||value<0
-        error('cce_diagnostics:input','Numerical tolerances must be finite nonnegative scalars.');
-    end
-end
-if numerics.atol+numerics.rtol==0
-    error('cce_diagnostics:input','At least one numerical tolerance must be positive.');
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&...
+   size(result.value,2)~=prod(spin_system.comp.mults(parameters.observed))^2
+    error('cce_diagnostics:input','Density values must match the observed Hilbert dimension.');
 end
 if isfield(result,'density')&&~isempty(result.density)&&...
    (size(result.density,1)~=size(result.density,2)||size(result.density,3)~=numel(parameters.times))

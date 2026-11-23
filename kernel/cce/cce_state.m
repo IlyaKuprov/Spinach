@@ -1,6 +1,6 @@
 % Construct a state in the declared retained-cluster representation. Syntax:
 %
-%                  rho=cce_state(spin_system,parameters,states,spins)
+%                  rho=cce_state(spin_system,states,spins)
 %
 % Character descriptors and cell rows of character descriptors follow
 % cce_operator, with conventional unnormalised spin-density operators.
@@ -16,7 +16,6 @@
 % Parameters:
 %
 %   spin_system - retained subsystem returned by cce_subsystem
-%   parameters  - parameters resolved by cce_options
 %   states      - operator descriptors or a cell row of local physical
 %                 density matrices/population vectors
 %   spins       - matching operator selections or a physical-ID row
@@ -27,10 +26,10 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function rho=cce_state(spin_system,parameters,states,spins)
+function rho=cce_state(spin_system,states,spins)
 
 % Validate descriptors before changing the local representation
-grumble(spin_system,parameters,states,spins);
+grumble(spin_system,states,spins);
 formalism=spin_system.bas.formalism;
 spin_system.bas.formalism='zeeman-hilb';
 if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
@@ -62,7 +61,7 @@ end
 end
 
 % Keep operator descriptors separate from explicit physical populations
-function grumble(system,parameters,states,spins)
+function grumble(system,states,spins)
 if ~isstruct(system)||~isscalar(system)||~isfield(system,'cce')||...
    ~isfield(system.cce,'sites')||...
    ~ismember(system.bas.formalism,{'zeeman-hilb','zeeman-liouv'})
@@ -100,14 +99,13 @@ if ~iscell(states)||~isrow(states)||~isnumeric(spins)||~isrow(spins)||...
     error('cce_state:descriptor','Explicit states must specify every retained physical spin once.');
 end
 [~,order]=ismember(system.cce.ids,spins);
-numerics=parameters.cce.numerics;
 for n=1:numel(system.cce.ids)
     d=system.comp.mults(system.cce.ids(n));
     local=states{order(n)};
     if isvector(local)&&numel(local)==d
         local=diag(local);
     end
-    tolerance=numerics.atol+numerics.rtol*norm(local,'fro');
+    tolerance=system.tols.cce_atol+system.tols.cce_rtol*norm(local,'fro');
     if ~isnumeric(local)||~isequal(size(local),[d d])||...
        any(~isfinite(local),'all')||norm(local-local','fro')>tolerance||...
        abs(trace(local)-1)>tolerance||...
@@ -115,7 +113,7 @@ for n=1:numel(system.cce.ids)
         error('cce_state:density','Supply positive, Hermitian, trace-one local density matrices.');
     end
 end
-if 16*prod(system.comp.mults(system.cce.ids))^2>numerics.max_memory_bytes
+if 16*prod(system.comp.mults(system.cce.ids))^2>system.tols.cce_mem
     error('cce_state:memory','Requested density exceeds the memory budget.');
 end
 end

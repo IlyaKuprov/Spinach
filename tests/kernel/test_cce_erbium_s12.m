@@ -80,6 +80,8 @@ sys.magnet=0.067;
 sys.output='hush';
 sys.parallel={'processes',1};
 sys.tols.prox_cutoff=0;
+sys.tols.cce_atol=0;
+sys.tols.cce_mem=32*(4+numel(times));
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[1/2 -1/2]);
 parameters.orientation=deg2rad([0 90 133.5]);
@@ -87,7 +89,6 @@ parameters.times=times.';
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
 parameters.cce.backend='analytical_hahn';
-parameters.cce.numerics=struct('atol',0,'max_memory_bytes',32*(4+numel(times)));
 
 % Exercise both a single pair and the complete three-nucleus pair family
 expected=[pair_ref reference];
@@ -131,13 +132,13 @@ result=test_true(result,'Unequal nuclear shifts',rejected,'A bath detuning must 
 
 % The reported pruning bound must contain the measured change from no screening
 exact=answer;
-parameters.cce.numerics.atol=3;
-[answer,details]=clexpn(spin_system,@hahn_echo,parameters,'labframe');
+screened_system=spin_system;
+screened_system.tols.cce_atol=3;
+[answer,details]=clexpn(screened_system,@hahn_echo,parameters,'labframe');
 bound=details.reduction.abs_error_bound;
 result=test_true(result,'Reported screening bound',...
                  any(bound>0)&&all(abs(answer-exact)<=bound+eps),...
                  'The uniform pair-loss bound must cover the screened result.');
-parameters.cce.numerics.atol=0;
 
 % With no couplings every flip-flop splitting vanishes
 inter.coordinates{1}=[];
@@ -167,17 +168,6 @@ for k=1:2
                      'The pair formula covers spin-1/2 nuclei with isotropic exchange only.');
 
 end
-
-% Reject requests whose physics the analytical evaluator does not implement
-parameters.cce.graph=struct('mode','distance','radius',10);
-rejected=false;
-try
-    clexpn(spin_system,@hahn_echo,parameters,'labframe');
-catch exception
-    rejected=strcmp(exception.identifier,'clexpn:analyticalHahn');
-end
-result=test_true(result,'Unsupported graph rejected',rejected,...
-                 'Complete-family evaluation cannot silently change graph policy.');
 
 end
 

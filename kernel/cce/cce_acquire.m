@@ -289,8 +289,8 @@ for n=1:numel(parameters.times)
             rho=u*rho0*u';
         end
     elseif liouville
-        if isfield(parameters.cce.numerics,'propagator')&&...
-           strcmp(parameters.cce.numerics.propagator,'stock')
+        if isfield(parameters.cce,'propagator')&&...
+           strcmp(parameters.cce.propagator,'stock')
             rho=propagator(engine,generator,parameters.times(n))*rho0;
         else
             action=generator;

@@ -44,6 +44,9 @@ for f=1:numel(data)
     sys.output='hush';
     sys.disable={'hygiene'};
     sys.parallel={'local',1};
+    sys.tols.cce_atol=1e-7;
+    sys.tols.cce_rtol=1e-7;
+    sys.tols.cce_mem=2^29;
     inter.zeeman.matrix=repmat({zeros(3)},1,nb+1);
     inter.coupling.matrix=cell(nb+1);
     inter.coordinates=mat2cell([center;xyz],ones(1,nb+1),3).';
@@ -62,7 +65,9 @@ for f=1:numel(data)
         spin_system=cce_test_write(spin_system,[1 j+1],tensor_value);
         for k=j+1:nb
             r=xyz(j,:)-xyz(k,:);
-            spin_system=cce_test_write(spin_system,[j+1 k+1],dipolar(r,gamma_n,gamma_n));
+            if norm(r)<=fixture.rdip
+                spin_system=cce_test_write(spin_system,[j+1 k+1],dipolar(r,gamma_n,gamma_n));
+            end
         end
     end
 
@@ -75,13 +80,9 @@ for f=1:numel(data)
     p.transition.beta=[0;1;0];
     p.orientation=[0 0 0];
     p.cce.interaction_cutoff=Inf;
-    p.cce.graph=struct('mode','distance','radius',fixture.rdip,...
-                       'score','coupling_norm');
     p.cce.meanfield='none';
     p.times=fixture.times_ms(:).'/1000;
-    p.cce.bath_state=struct('mode','mixed_product');
     pulse_sequence=@free_evolution;
-    p.cce.numerics=struct('atol',1e-7,'rtol',1e-7,'max_memory_bytes',2^29);
     if fixture.pulses==1
         pulse_sequence=@hahn_echo;
     end

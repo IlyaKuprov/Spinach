@@ -17,12 +17,11 @@ sys.magnet=0.01;
 sys.isotopes={'E','13C'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
-
-% Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
 
 % Spinach housekeeping
 spin_system=create(sys,inter);
@@ -31,16 +30,12 @@ spin_system=create(sys,inter);
 omega=-spin('13C')*sys.magnet;
 parameters.observed=1;
 parameters.cce.order=1;
-parameters.cce.basis=bas;
-parameters.cce.graph=struct('mode','complete');
 parameters.preparation.state='mixed';
 parameters.times=linspace(0,10*2*pi/abs(omega),401);
 parameters.noise.descriptors=struct('operators','Lx','spins',2,'coefficient',1);
 parameters.noise.ordering='ordered';
 parameters.noise.connected=true;
 parameters.noise.manifold='bath_only';
-parameters.cce.numerics=struct('atol',1e-9,'rtol',1e-9,...
-                               'max_memory_bytes',2^28);
 
 % Extend the stationary mixed-state correlation without a Markov assumption
 parameters.spectrum=struct('frequency_grid',...

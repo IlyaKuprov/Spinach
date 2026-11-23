@@ -159,9 +159,9 @@ if adaptive&&complete
     metadata=whos('pilot','heldout');
     count=min(numel(p.patches)*(numel(pilot)+numel(heldout)),p.max_probes);
     bytes=sum([metadata.bytes])+3*8*count;
-    if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
+    if ~isfinite(bytes)||bytes>spin_system.tols.cce_mem
         error('cce_partition:memory',...
-              'Pilot and held-out configurations exceed numerics.max_memory_bytes.');
+              'Pilot and held-out configurations exceed sys.tols.cce_mem.');
     end
     [objective,errors,used,valid]=patches(groups,p.pilot_configs,0);
     diagnostics.probes=used;
@@ -267,15 +267,6 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         local.cce.bath_spins=sites;
         local.cce.groups=cellfun(@(g)intersect(g,sites),candidate,'UniformOutput',false);
         local.cce.groups=local.cce.groups(~cellfun(@isempty,local.cce.groups));
-
-        % Restrict bath-indexed graph data in the declared physical patch order
-        [~,indices]=ismember(sites,parameters.cce.bath_spins);
-        for field={'adjacency','scores','mismatch'}
-            if isfield(local.cce.graph,field{1})
-                matrix=local.cce.graph.(field{1});
-                local.cce.graph.(field{1})=matrix(indices,indices);
-            end
-        end
         local_graph=cce_graph(spin_system,local);
         family=cce_clusters(spin_system,local_graph,local);
         dc=prod(spin_system.comp.mults(parameters.observed));
@@ -288,9 +279,9 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         times=parameters.times;
         bytes=3*(numel(family)+2)*...
               (numel(times)*(25*components+16*dc^2)+1024);
-        if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
+        if ~isfinite(bytes)||bytes>spin_system.tols.cce_mem
             error('cce_partition:memory',...
-                  'Patch cluster records exceed numerics.max_memory_bytes.');
+                  'Patch cluster records exceed sys.tols.cce_mem.');
         end
         empty=struct('id',0,'sites',[]);
         whole=struct('id',1,'sites',sort(sites));
@@ -320,7 +311,7 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
                 request=evaluation;
                 request.cce.groups=local.cce.groups;
                 request.cce.bath_spins=sites;
-                reduced=cce_reduce({[baseline records]},family,request);
+                reduced=cce_reduce(spin_system,{[baseline records]},family,request);
             end
             difference=abs(reduced.value-exact.value);
             tolerance=p.patch_atol+p.patch_rtol*abs(exact.value);
@@ -377,21 +368,13 @@ if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'cce')||
    ~isa(pulse_sequence,'function_handle')||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
    ~isstruct(parameters.cce)||~isscalar(parameters.cce)||...
-   ~all(isfield(parameters.cce,{'partition','graph','order','numerics','expansion','approximation'}))||...
+   ~all(isfield(parameters.cce,{'partition','order','expansion','approximation'}))||...
    ~isstruct(parameters.cce.partition)||~isscalar(parameters.cce.partition)
     error('Canonical spin_system, graph, and scalar partition parameters are required.');
 end
 parameters=parameters.cce;
 p=parameters.partition;
 ids=graph.bath_ids;
-if ~isstruct(parameters.numerics)||~isscalar(parameters.numerics)||...
-   ~isfield(parameters.numerics,'max_memory_bytes')||...
-   ~isnumeric(parameters.numerics.max_memory_bytes)||...
-   ~isreal(parameters.numerics.max_memory_bytes)||...
-   ~isscalar(parameters.numerics.max_memory_bytes)||...
-   ~isfinite(parameters.numerics.max_memory_bytes)||parameters.numerics.max_memory_bytes<=0
-    error('A finite positive partition memory budget is required.');
-end
 if ~all(isfield(p,{'mode','max_dimension'}))||~ischar(p.mode)||...
    ~ismember(p.mode,{'user','coupling','spatial','adaptive'})||~integer(p.max_dimension,1)
     error('A recognised partition mode and finite positive integer dimension are required.');
@@ -412,9 +395,9 @@ if ~isnumeric(graph.pair_norm)||~isreal(graph.pair_norm)||...
    any(~isfinite(nonzeros(graph.pair_norm)))||any(graph.pair_norm<0,'all')
     error('Physical pair norms must be a finite nonnegative square array.');
 end
-if 3*(32*nnz(graph.pair_norm)+16*numel(ids))>parameters.numerics.max_memory_bytes
+if 3*(32*nnz(graph.pair_norm)+16*numel(ids))>spin_system.tols.cce_mem
     error('cce_partition:memory',...
-          'Partition graph and candidate storage exceed numerics.max_memory_bytes.');
+          'Partition graph and candidate storage exceed sys.tols.cce_mem.');
 end
 if isfield(parameters,'groups')&&~isempty(parameters.groups)
     groups=parameters.groups;

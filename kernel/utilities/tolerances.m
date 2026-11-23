@@ -333,6 +333,39 @@ else
                         pad(num2str(spin_system.tols.dd_ncells),20) ' (safe default)']);
 end
 
+% Absolute tolerance for cluster expansion signals
+if isfield(sys,'tols')&&isfield(sys.tols,'cce_atol')
+    spin_system.tols.cce_atol=sys.tols.cce_atol; sys.tols=rmfield(sys.tols,'cce_atol');
+    report(spin_system,[pad('Absolute tolerance on cluster expansion signals',65) ...
+                        pad(num2str(spin_system.tols.cce_atol,'%0.8e'),20) ' (user-specified)']);
+else
+    spin_system.tols.cce_atol=sqrt(eps);
+    report(spin_system,[pad('Absolute tolerance on cluster expansion signals',65) ...
+                        pad(num2str(spin_system.tols.cce_atol,'%0.8e'),20) ' (safe default)']);
+end
+
+% Relative tolerance for cluster expansion signals
+if isfield(sys,'tols')&&isfield(sys.tols,'cce_rtol')
+    spin_system.tols.cce_rtol=sys.tols.cce_rtol; sys.tols=rmfield(sys.tols,'cce_rtol');
+    report(spin_system,[pad('Relative tolerance on cluster expansion signals',65) ...
+                        pad(num2str(spin_system.tols.cce_rtol,'%0.8e'),20) ' (user-specified)']);
+else
+    spin_system.tols.cce_rtol=sqrt(eps);
+    report(spin_system,[pad('Relative tolerance on cluster expansion signals',65) ...
+                        pad(num2str(spin_system.tols.cce_rtol,'%0.8e'),20) ' (safe default)']);
+end
+
+% Memory budget for cluster expansions
+if isfield(sys,'tols')&&isfield(sys.tols,'cce_mem')
+    spin_system.tols.cce_mem=sys.tols.cce_mem; sys.tols=rmfield(sys.tols,'cce_mem');
+    report(spin_system,[pad('Memory budget for cluster expansions (bytes)',65) ...
+                        pad(num2str(spin_system.tols.cce_mem),20) ' (user-specified)']);
+else
+    spin_system.tols.cce_mem=inf();
+    report(spin_system,[pad('Memory budget for cluster expansions (bytes)',65) ...
+                        pad(num2str(spin_system.tols.cce_mem),20) ' (safe default)']);
+end
+
 % Cache storage timeout
 if isfield(sys,'tols')&&isfield(sys.tols,'cache_mem')
     spin_system.tols.cache_mem=sys.tols.cache_mem; sys.tols=rmfield(sys.tols,'cache_mem');
@@ -504,6 +537,24 @@ end
 if isfield(sys,'tols')&&isfield(sys.tols,'dP_method')
     if ~ischar(sys.tols.dP_method)
         error('sys.tols.dP_method must be a character string.');
+    end
+end
+if isfield(sys,'tols')&&isfield(sys.tols,'cce_atol')
+    if (~isnumeric(sys.tols.cce_atol))||(~isreal(sys.tols.cce_atol))||...
+       (~isscalar(sys.tols.cce_atol))||(~isfinite(sys.tols.cce_atol))||(sys.tols.cce_atol<0)
+        error('sys.tols.cce_atol must be a non-negative real number.');
+    end
+end
+if isfield(sys,'tols')&&isfield(sys.tols,'cce_rtol')
+    if (~isnumeric(sys.tols.cce_rtol))||(~isreal(sys.tols.cce_rtol))||...
+       (~isscalar(sys.tols.cce_rtol))||(~isfinite(sys.tols.cce_rtol))||(sys.tols.cce_rtol<0)
+        error('sys.tols.cce_rtol must be a non-negative real number.');
+    end
+end
+if isfield(sys,'tols')&&isfield(sys.tols,'cce_mem')
+    if (~isnumeric(sys.tols.cce_mem))||(~isreal(sys.tols.cce_mem))||...
+       (~isscalar(sys.tols.cce_mem))||isnan(sys.tols.cce_mem)||(sys.tols.cce_mem<=0)
+        error('sys.tols.cce_mem must be a positive real number.');
     end
 end
 end

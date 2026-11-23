@@ -69,7 +69,7 @@ elseif isfield(parameters,'preparation')&&isequal(parameters.preparation,'transv
     observed=(eye(dc)+2*cce_operator(local,'Lx',ids))/2;
 elseif isfield(parameters,'preparation')&&isstruct(parameters.preparation)
     spec=parameters.preparation;
-    observed=cce_state(local,parameters,spec.states,spec.spins);
+    observed=cce_state(local,spec.states,spec.spins);
 else
     vector=(spin_system.cce.transition.alpha+spin_system.cce.transition.beta)/sqrt(2);
     observed=vector*vector';
@@ -230,8 +230,8 @@ if isfield(parameters,'coil')
     end
     count=numel(coil);
 end
-if 16*system.cce.dimension^2*(4+count)>parameters.cce.numerics.max_memory_bytes
-    error('cce:memory','Observation construction exceeds max_memory_bytes.');
+if 16*system.cce.dimension^2*(4+count)>system.tols.cce_mem
+    error('cce:memory','Observation construction exceeds sys.tols.cce_mem.');
 end
 if strcmp(parameters.cce.approximation,'projected')&&...
    (~isfield(system.cce,'transition')||count~=1)

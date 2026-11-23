@@ -14,6 +14,7 @@ function gcce_two_centres()
 sys.isotopes={'E','E','1H','1H'};
 sys.magnet=0.01;
 sys.output='hush';
+sys.tols.cce_mem=2^24;
 inter.zeeman.scalar={0,0,hz2ppm(5000,sys.magnet,'1H'),0};
 inter.coupling.matrix=cell(4);
 
@@ -22,11 +23,10 @@ parameters.observed=[1 2];
 parameters.transition=struct('spins',[1 2],'ms',[0.5 -0.5;0.5 -0.5]);
 parameters.times=40e-6;
 parameters.cce.order=2;
-parameters.cce.numerics.max_memory_bytes=2^24;
 parameters.cce.approximation='generalized';
-parameters.cce.basis.formalism='zeeman-hilb';
-parameters.cce.bath_state=struct('mode','explicit_product',...
-                                 'rho',{{diag([1 0]),diag([0 1])}});
+
+% Antiparallel proton pair
+parameters.bath_state={diag([1 0]),diag([0 1])};
 
 % Sweep the independent quadrant of the pair-correlation surface
 flip=0:500:4000;

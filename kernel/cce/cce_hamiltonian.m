@@ -58,8 +58,8 @@ if strcmp(backend,'stock')
     copies=copies+sum((2*(1:ranks)+1).^2);
 
 end
-if ~isfinite(dimension)||16*dimension^2*copies>parameters.cce.numerics.max_memory_bytes
-    error('cluster Hamiltonian exceeds numerics.max_memory_bytes.');
+if ~isfinite(dimension)||16*dimension^2*copies>spin_system.tols.cce_mem
+    error('cluster Hamiltonian exceeds sys.tols.cce_mem.');
 end
 
 % Resolve both directions of each retained pair
@@ -238,7 +238,7 @@ meta.backend=backend;
 meta.fallback_reason=spin_system.cce.fallback_reason;
 meta.source_hash=spin_system.cce.source_hash;
 meta.omitted_pairs=spin_system.cce.omitted_pairs;
-meta.observable_budget=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(H,'fro');
+meta.observable_budget=spin_system.tols.cce_atol+spin_system.tols.cce_rtol*norm(H,'fro');
 
 end
 

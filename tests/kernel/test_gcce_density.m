@@ -19,6 +19,9 @@ sys.magnet=0;
 sys.output='hush';
 sys.disable={'hygiene'};
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix={zeros(3),zeros(3)};
 inter.coupling.matrix=cell(2);
 spin_system=create(sys,inter);
@@ -32,11 +35,8 @@ p.output='density';
 p.rho0=[1 0;0 0];
 p.orientation=[0 0 0];
 p.cce.interaction_cutoff=Inf;
-p.cce.graph=struct('mode','complete','score','coupling_norm');
 p.cce.meanfield='none';
 p.times=[0 pi/200 pi/100];
-p.cce.bath_state=struct('mode','mixed_product');
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^28);
 
 % Exact full-bath density must stay finite at zero observed-spin-only elements
 p.cce.order=1;
@@ -74,7 +74,7 @@ records=actual_diagnostics.raw;
 ratio_parameters=p;
 ratio_parameters.cce.order=2;
 ratio_parameters.cce.bath_spins=[2 3];
-ratio_reduced=cce_reduce(records,clusters,ratio_parameters);
+ratio_reduced=cce_reduce(spin_system,records,clusters,ratio_parameters);
 result=test_true(result,'elementwise baseline zeros masked',any(~ratio_reduced.valid,'all'),...
                  'The reducer alone must not replace undefined ratios by one.');
 result=test_true(result,'raw density retained',all(isfinite(records{1}(2).value),'all'),...
@@ -91,12 +91,12 @@ spatial=cce_test_write(spatial,[1 3],[0 0 0;0 0 0;14 0 0]);
 radius=p;
 radius.cce.bath_spins=[2 3];
 radius.cce.bath_radius=2;
-radius.cce.bath_state=struct('mode','explicit_product','rho',{{eye(2)/2,diag([1 0])}});
+radius.bath_state={eye(2)/2,diag([1 0])};
 radius.cce.meanfield='static';
 [up,retained]=clexpn(spatial,@free_evolution,radius,'labframe');
 result=test_close(result,'Complete radius-selected density',up,retained.raw{1}(2).value,0,0,...
                   'Every element, including exact initial zeros, comes from the retained cluster.');
-radius.cce.bath_state.rho{2}=diag([0 1]);
+radius.bath_state{2}=diag([0 1]);
 down=clexpn(spatial,@free_evolution,radius,'labframe');
 result=test_true(result,'Radius-excluded exterior field',imag(up(end,2))*imag(down(end,2))<0,...
                  'Reversing only the excluded spin reverses the observed transverse coherence.');
@@ -133,8 +133,9 @@ result=test_true(result,'zero normalization rejected',caught,...
 
 % Reproduce fixed and sampled product states without changing the global stream
 sample=p;
-sample.cce.bath_state=struct('mode','sampled','samples',5,'seed',17,...
-                             'basis','uniform','probabilities',{{[1 0]}});
+sample.bath_samples=5;
+sample.bath_seed=17;
+sample.bath_probs={[1 0]};
 sample.cce.averaging='after_expansion';
 before=rng;
 [~,ensemble]=clexpn(spin_system,@free_evolution,sample,'labframe');
@@ -147,15 +148,14 @@ result=test_true(result,'fixed probability state',all(cellfun(@(rho)isequal(rho,
                  'Probability-one states are not resampled into forbidden levels.');
 result=test_true(result,'reproducible assignments',isequal(ensemble.ensemble.spin_config,again.ensemble.spin_config),...
                  'Explicit state IDs determine the stream independently of workers.');
-sample.cce.bath_state.probabilities={[0.5 0.5]};
+sample.bath_probs={[0.5 0.5]};
 sample.cce.meanfield='static';
 [~,sample_diagnostics]=clexpn(spin_system,@free_evolution,sample,'labframe');
 spin_config=sample_diagnostics.ensemble.spin_config(1);
 model_p=cce_options(spin_system,sample,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
-local=sample;
-local.cce.bath_state=struct('mode','explicit_product',...
-                            'rho',{spin_config.bath_rho});
+local=rmfield(sample,{'bath_samples','bath_seed','bath_probs'});
+local.bath_state=spin_config.bath_rho;
 local.cce.order=0;
 small=clexpn(spin_system,@free_evolution,local,'labframe');
 spin=pauli(2);
@@ -192,8 +192,7 @@ result=test_true(result,'sample errors finite',all(isfinite(after_diagnostics.re
 
 % Distinguish selective selected two-level transition pulses from full spin-one rotations
 
-echo=sample;
-echo.cce.bath_state=struct('mode','mixed_product');
+echo=rmfield(sample,{'bath_samples','bath_seed','bath_probs'});
 echo.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 [observed,echo_diagnostics]=clexpn(spin_system,@hahn_echo,echo,'labframe');
 model_p=cce_options(spin_system,echo_diagnostics.parameters,@cce_compile,'labframe');

@@ -106,6 +106,13 @@ for n=1:numel(operators)
         error('cce_operator:label','Unsupported operator descriptor.');
     end
 end
+power=2;
+if strcmp(system.bas.formalism,'zeeman-liouv')
+    power=4;
+end
+if 16*system.cce.dimension^power>system.tols.cce_mem
+    error('cce_operator:memory','Requested representation exceeds the memory budget.');
+end
 end
 
 

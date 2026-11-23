@@ -25,21 +25,19 @@ inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([0 0 17]);
 inter.coupling.matrix{1,3}=diag([0 0 29]);
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^26;
 spin_system=create(sys,inter);
 p=struct('observed',1,'times',[0 0.001 0.004],...
          'transition',struct('spins',1,'alpha',[1;0],'beta',[0;1]),'orientation',[0 0 0]);
 p.cce=struct('bath_spins',[2 3],'approximation','generalized',...
              'expansion','standard','order',2,'interaction_cutoff',Inf,...
-             'graph',struct('mode','complete','score','coupling_norm'),...
-             'meanfield','none','averaging','after_expansion',...
-             'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
-                                 'samples',4,'seed',193),...
-             'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^26));
+             'meanfield','none','averaging','after_expansion');
 
 % Check physical full-order density against an independent analytic matrix
 p.rho0=ones(2)/2;
 p.output='density';
-p.cce.bath_state=struct('mode','mixed_product');
 [physical,physical_info]=clexpn(spin_system,@free_evolution,p,'labframe');
 model_p=cce_options(spin_system,p,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
@@ -63,12 +61,12 @@ for method={'cce','gcce','mecce','megcce','noise'}
     q.normalized=ismember(method{1},{'cce','mecce'});
     sequence=@free_evolution;
     q.cce.approximation='projected';
-    q.cce.basis.formalism='zeeman-hilb';
+    variant=spin_system;
     if ismember(method{1},{'gcce','megcce','noise'})
         q.cce.approximation='generalized';
     end
     if ismember(method{1},{'mecce','megcce'})
-        q.cce.basis.formalism='zeeman-liouv';
+        variant.bas.formalism='zeeman-liouv';
     end
     if strcmp(q.cce.approximation,'projected')
         q=rmfield(q,'rho0');
@@ -83,7 +81,7 @@ for method={'cce','gcce','mecce','megcce','noise'}
         q.cce.expansion=expansion{1};
         q.cce.groups={2,3};
         q.cce.partition=struct('mode','user','max_dimension',4);
-        [checked,checked_info]=clexpn(spin_system,sequence,q,'labframe');
+        [checked,checked_info]=clexpn(variant,sequence,q,'labframe');
         checked_checks=cce_diagnostics(model,checked_info.raw,checked_info.reduction,q);
         result=test_true(result,['Common schema: ' method{1} ' ' expansion{1}],...
                          isnumeric(checked)&&isnumeric(physical)&&size(checked,1)==size(physical,1),...
@@ -102,14 +100,14 @@ end
 
 % Retain all sampled prefix means rather than the first sampled trajectory
 q=p;
-q.cce.bath_state=struct('mode','sampled','basis','uniform',...
-                        'probabilities','uniform','samples',4,'seed',193);
+q.bath_samples=4;
+q.bath_seed=193;
 [sampled,sampled_info]=clexpn(spin_system,@free_evolution,q,'labframe');
 prefixes=zeros(size(sampled_info.reduction.by_order));
 for k=1:numel(sampled_info.raw)
     records=sampled_info.raw{k};
     [records.weight]=deal(1);
-    reduced=cce_reduce({records},sampled_info.clusters,sampled_info.parameters);
+    reduced=cce_reduce(model,{records},sampled_info.clusters,sampled_info.parameters);
     reduced.by_order(:,:,end)=sampled_info.raw{k}(end).value;
     prefixes=prefixes+sampled_info.ensemble.weights(k)*reduced.by_order;
 end

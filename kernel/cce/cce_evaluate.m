@@ -107,8 +107,8 @@ if isfield(parameters,'output')&&strcmp(parameters.output,'observable')&&...
    isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
-if 3*numel(parameters.times)*(25*components+16*dc^2)>parameters.cce.numerics.max_memory_bytes
-    error('clexpn:memory','Retained time records exceed cce.numerics.max_memory_bytes.');
+if 3*numel(parameters.times)*(25*components+16*dc^2)>spin_system.tols.cce_mem
+    error('clexpn:memory','Retained time records exceed sys.tols.cce_mem.');
 end
 end
 

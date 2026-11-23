@@ -69,15 +69,14 @@ spin_system.cce.local_operators=cellfun(@pauli,num2cell(dims),'UniformOutput',fa
 
 % Bind a declared product bath density, never an inferred population
 bath_ids=parameters.cce.bath_spins;
-state=parameters.cce.bath_state;
 if isfield(configuration,'bath_rho')
     bath_ids=configuration.bath_ids;
     densities=configuration.bath_rho;
-elseif strcmp(state.mode,'mixed_product')
+elseif isfield(parameters,'bath_state')
+    densities=parameters.bath_state;
+else
     densities=arrayfun(@(id)speye(spin_system.comp.mults(id))/spin_system.comp.mults(id),...
                        bath_ids,'UniformOutput',false);
-else
-    densities=state.rho;
 end
 expectations=zeros(numel(bath_ids),3);
 for n=1:numel(bath_ids)
@@ -91,7 +90,7 @@ for n=1:numel(bath_ids)
 
 end
 if isfield(configuration,'expectations')&&...
-   ~close_values(configuration.expectations,expectations,parameters.cce.numerics)
+   ~close_values(configuration.expectations,expectations,spin_system.tols)
     error('cce_subsystem:expectations','Spin expectations disagree with the supplied density.');
 end
 
@@ -106,7 +105,7 @@ if isfield(configuration,'exterior_ids')
     [present,indices]=ismember(supplied,exterior_ids);
     if ~all(present)||numel(indices)~=numel(exterior_ids)||...
        ~close_values(configuration.exterior_expectations,...
-                     exterior_values(indices,:),parameters.cce.numerics)
+                     exterior_values(indices,:),spin_system.tols)
         error('cce_subsystem:exterior','Exterior fields must match the common bath configuration.');
     end
 end
@@ -145,10 +144,10 @@ cache=struct('signature',signature,'spin_system',spin_system,...
 end
 
 % Compare finite physical expectations with the declared numerical tolerance
-function answer=close_values(left,right,numerics)
+function answer=close_values(left,right,tols)
 answer=isnumeric(left)&&isequal(size(left),size(right))&&...
        all(isfinite(left),'all')&&...
-       norm(left-right,'fro')<=numerics.atol+numerics.rtol*norm(right,'fro');
+       norm(left-right,'fro')<=tols.cce_atol+tols.cce_rtol*norm(right,'fro');
 end
 
 % Validate the complete public service boundary
@@ -199,14 +198,14 @@ if isfield(configuration,'bath_rho')
     for n=1:numel(bath_ids)
         d=spin_system.comp.mults(bath_ids(n));
         rho=densities{n};
-        tolerance=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(rho,'fro');
+        tolerance=spin_system.tols.cce_atol+spin_system.tols.cce_rtol*norm(rho,'fro');
         if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...
            norm(rho-rho','fro')>tolerance||abs(trace(rho)-1)>tolerance||...
            min(real(eig(full((rho+rho')/2))))<-tolerance
             error('cce_subsystem:density','Bath densities must be positive, Hermitian and trace one.');
         end
     end
-elseif ismember(parameters.cce.bath_state.mode,{'sampled','interlaced'})
+elseif isfield(parameters,'bath_samples')
     error('cce_subsystem:configuration','Sampling requires explicit bath density matrices.');
 end
 if isfield(configuration,'exterior_ids')

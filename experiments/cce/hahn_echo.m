@@ -33,7 +33,7 @@
 % output=density returns column-vectorised generalised observed density.
 % It requires a physical initial density and does not normalise a receiver.
 %
-% cce.numerics.propagator='expm' selects direct segment exponentials for
+% cce.propagator='expm' selects direct segment exponentials for
 % generalised Hilbert evolution, retaining the segment arithmetic bound.
 % The default reuses a Hermitian eigensystem across the time grid.
 % Optional refocusing is a scalar descriptor with spins, operator (a
@@ -121,7 +121,7 @@ if isfield(parameters,'refocusing')
     end
     if isfield(pulse,'axis')
         if strcmp(parameters.cce.meanfield,'static')&&any(ismember(pulse.spins,parameters.cce.bath_spins))
-            parameters.cce.numerics.propagator='expm';
+            parameters.cce.propagator='expm';
         end
         axis=pulse.axis;
         if ischar(axis)
@@ -157,7 +157,7 @@ if isfield(parameters,'refocusing')
             end
             [after,~]=cce_subsystem(spin_system,parameters,spin_system.cce.sites,configuration,[]);
             [h_after,~,~]=cce_generators(after,parameters,[]);
-            parameters.cce.numerics.propagator='expm';
+            parameters.cce.propagator='expm';
         end
     elseif isequal(pulse.spins,parameters.observed)
         generator=kron(pulse.operator,eye(db));
@@ -357,7 +357,7 @@ if strcmp(spin_system.bas.formalism,'zeeman-liouv')||(projected&&~isempty(R))
         previous=0;
         if time>0&&positions(n)<=time
             previous=positions(n);
-            if isfield(parameters.cce.numerics,'propagator')&&strcmp(parameters.cce.numerics.propagator,'stock')
+            if isfield(parameters.cce,'propagator')&&strcmp(parameters.cce.propagator,'stock')
                 vector=propagator(engine,1i*G,previous)*vector;
             else
                 vector=step(engine,1i*G,vector,previous);
@@ -374,7 +374,7 @@ if strcmp(spin_system.bas.formalism,'zeeman-liouv')||(projected&&~isempty(R))
             end
             vector=rho(:);
         end
-        if isfield(parameters.cce.numerics,'propagator')&&strcmp(parameters.cce.numerics.propagator,'stock')
+        if isfield(parameters.cce,'propagator')&&strcmp(parameters.cce.propagator,'stock')
             vector=propagator(engine,1i*generator,time-previous)*vector;
         else
             vector=step(engine,1i*generator,vector,time-previous);
@@ -451,8 +451,8 @@ if ~projected&&strcmp(spin_system.bas.formalism,'zeeman-hilb')&&...
    isfield(parameters,'cce_aux')
 
     % Select direct segments or reuse one Hermitian eigensystem
-    direct=isfield(parameters.cce.numerics,'propagator')&&...
-           strcmp(parameters.cce.numerics.propagator,'expm');
+    direct=isfield(parameters.cce,'propagator')&&...
+           strcmp(parameters.cce.propagator,'expm');
     if ~direct
         H=(H+H')/2;
         [vectors,energies]=eig(full(H),'vector');
@@ -745,8 +745,8 @@ if isfield(parameters,'refocusing')
         error('hahn_echo:refocusing','Use a fraction in [0,1] or nonnegative time in seconds.');
     end
 end
-if isfield(parameters.cce.numerics,'propagator')&&...
-   strcmp(parameters.cce.numerics.propagator,'expm')&&...
+if isfield(parameters.cce,'propagator')&&...
+   strcmp(parameters.cce.propagator,'expm')&&...
    (iscell(H)||~strcmp(spin_system.bas.formalism,'zeeman-hilb')||...
     any(R(:))||any(K(:))||isfield(parameters,'pump'))
     error('hahn_echo:propagator','Direct segment exponentials require closed generalized Hilbert dynamics.');

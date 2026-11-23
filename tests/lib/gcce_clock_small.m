@@ -17,6 +17,9 @@ sys.magnet=0;
 sys.isotopes={'E3','13C','29Si'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^28;
 inter.zeeman.matrix=repmat({zeros(3)},1,3);
 inter.coupling.matrix=cell(3);
 
@@ -26,9 +29,6 @@ inter.coupling.matrix{1,2}=diag([2200 1800 3000]);
 inter.coupling.matrix{1,3}=diag([900 1200 1700]);
 inter.coupling.matrix{2,3}=diag([120 120 -240]);
 
-% Basis formalism for retained clusters
-bas.formalism='zeeman-hilb';
-
 % Experiment parameters
 parameters.observed=1;
 parameters.transition=struct('spins',1,'ms',[-1 1]);
@@ -36,9 +36,6 @@ parameters.output='density';
 parameters.times=linspace(0,200e-6,31);
 parameters.cce.approximation='generalized';
 parameters.cce.order=2;
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-8,'rtol',1e-8,...
-                               'max_memory_bytes',2^28);
 
 % Spin system and free evolution
 spin_system=create(sys,inter);

@@ -21,6 +21,9 @@ sys.magnet=0;
 sys.output='hush';
 sys.disable={'hygiene'};
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=2^26;
 inter.zeeman.matrix={zeros(3),zeros(3),zeros(3)};
 inter.coupling.matrix=cell(3);
 inter.coupling.matrix{1,2}=diag([0 0 17]);
@@ -32,14 +35,9 @@ p.orientation=[0 0 0];
 p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 p.cce=struct('bath_spins',[2 3],'approximation','projected','expansion','standard',...
              'order',2,'interaction_cutoff',Inf,...
-             'graph',struct('mode','complete','score','coupling_norm'),...
-             'meanfield','none','averaging','after_expansion',...
-             'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
-                                 'samples',4,'seed',193),...
-             'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^26));
+             'meanfield','none','averaging','after_expansion');
 
 % Compare product-factorised Ising order one against the exact order two
-p.cce.bath_state=struct('mode','mixed_product');
 p.cce.order=1;
 order=struct('field','cce.order','values',{{1,2}});
 time=struct('field','times','values',{{p.times,[0 0.001 0.002 0.004]}});
@@ -60,7 +58,6 @@ coupled=create(sys,inter);
 q=p;
 q.cce.order=1;
 q.times=[0 0.01 0.04];
-q.cce.bath_state=struct('mode','mixed_product');
 q.cce.convergence.ladders=struct('field','cce.order','values',{{1,2,3}});
 q.cce.convergence.max_work=3;
 [ladder,ladder_details]=cce_converge(coupled,q,@free_evolution,'labframe');
@@ -91,8 +88,9 @@ result=test_true(result,'missing times refusal',refused,...
                  'No interpolation or discarded requested time may manufacture convergence.');
 
 % Require independent held-out samples rather than a common-seed pilot alone
-p.cce.convergence.ladders=struct('field','cce.bath_state.samples','values',{{4,8}});
-p.cce.bath_state=struct('mode','sampled','basis','uniform','probabilities','uniform','samples',4,'seed',193);
+p.cce.convergence.ladders=struct('field','bath_samples','values',{{4,8}});
+p.bath_samples=4;
+p.bath_seed=193;
 refused=false;
 try
     cce_converge(spin_system,p,@free_evolution,'labframe');
@@ -101,8 +99,7 @@ catch exception
 end
 result=test_true(result,'held-out sampling requirement',refused,...
                  'A common-random-number ladder is not an independent uncertainty check.');
-p.cce.convergence.checks={struct('cce',struct('bath_state',p.cce.bath_state))};
-p.cce.convergence.checks{1}.cce.bath_state.seed=194;
+p.cce.convergence.checks={struct('bath_seed',194)};
 p.cce.convergence.atol=2;
 p.cce.convergence.rtol=0;
 [~,held_out_details]=cce_converge(spin_system,p,@free_evolution,'labframe');
@@ -111,11 +108,12 @@ result=test_true(result,'held-out check execution',held_out_details.convergence_
                  'The explicit independent seed check consumes its own work unit.');
 
 % Refuse numerical budgets too strict for a purported converged output
-p.cce.bath_state=struct('mode','mixed_product');
-p.cce.numerics.atol=realmin;
-p.cce.numerics.rtol=0;
+p=rmfield(p,{'bath_samples','bath_seed'});
+tight=spin_system;
+tight.tols.cce_atol=realmin;
+tight.tols.cce_rtol=0;
 p.cce.convergence=struct('ladders',order,'atol',1e-8,'rtol',0,'max_work',2);
-[~,invalid_details]=cce_converge(spin_system,p,@free_evolution,'labframe');
+[~,invalid_details]=cce_converge(tight,p,@free_evolution,'labframe');
 result=test_true(result,'invalid coverage cannot converge',~strcmp(invalid_details.convergence,'converged'),...
                  'Identical approximations with failed numerical validity are not convergence.');
 
@@ -124,13 +122,14 @@ request=converged_details.input_parameters;
 request.cce=rmfield(request.cce,'convergence');
 request.normalized=true;
 request.times=[0 0.001 0.01];
-request.cce.bath_state=struct('mode','sampled','samples',4,'seed',193,...
-                              'basis','uniform','probabilities','uniform');
+request.bath_samples=4;
+request.bath_seed=193;
 [~,available]=clexpn(spin_system,@free_evolution,request,'labframe');
-request.cce.numerics.atol=mean(available.reduction.abs_error_bound([1 end]));
-request.cce.numerics.rtol=0;
+tight=spin_system;
+tight.tols.cce_atol=mean(available.reduction.abs_error_bound([1 end]));
+tight.tols.cce_rtol=0;
 request.cce.convergence=struct('ladders',order,'atol',1,'rtol',0,'max_work',2);
-[~,unavailable]=cce_converge(spin_system,request,@free_evolution,'labframe');
+[~,unavailable]=cce_converge(tight,request,@free_evolution,'labframe');
 errors=unavailable.reduction.sampling_standard_error;
 result=test_true(result,'Unavailable convergence sampling aggregate',...
                  any(isfinite(errors))&&any(isnan(errors))&&...

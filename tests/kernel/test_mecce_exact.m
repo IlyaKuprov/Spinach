@@ -23,12 +23,17 @@ sys.isotopes={'1H','1H','1H'};
 sys.magnet=0;
 sys.output='hush';
 sys.parallel={'processes',1};
+sys.tols.cce_atol=1e-8;
+sys.tols.cce_rtol=1e-8;
+sys.tols.cce_mem=1e9;
 inter.zeeman.scalar={0,0,0};
 inter.coupling.scalar=cell(3);
 s=create(sys,inter);
 s.inter.zeeman.matrix{2}(3,3)=3;
 s=cce_test_write(s,[1 2],diag([0.7 0.4 1.1]));
 s=cce_test_write(s,[2 3],diag([0.3 0.5 0.9]));
+liouville=s;
+liouville.bas.formalism='zeeman-liouv';
 pulse_sequence=@free_evolution;
 p=parameters();
 p.times=linspace(0,0.8,15);
@@ -40,22 +45,18 @@ p.bath_jumps=struct('support',{},'operator',{},'rate',{});
 q=p;
 spin=pauli(2);
 q.cce.approximation='generalized';
-q.cce.basis.formalism='zeeman-hilb';
 q.output='density';
 q.times=[0 0.07 0.2];
 q.refocusing=struct('spins',2,'fraction',0.4,'operator',pi*spin.x);
 closed_pulse=clexpn(s,@hahn_echo,q,'labframe');
 q.cce.approximation='generalized';
-q.cce.basis.formalism='zeeman-liouv';
-opened_pulse=clexpn(s,@hahn_echo,q,'labframe');
+opened_pulse=clexpn(liouville,@hahn_echo,q,'labframe');
 result=test_close(result,'Selective operator ME pulse matches closed evolution',...
                   reshape(opened_pulse.',2,2,[]),reshape(closed_pulse.',2,2,[]),2e-11,2e-11,...
                   'Zero-jump master evolution must use the same retained-site dimensions as the Hamiltonian.');
 q.cce.approximation='generalized';
-q.cce.basis.formalism='zeeman-hilb';
 model_p=cce_options(s,q,@cce_compile,'labframe');
 model=cce_compile(s,model_p,'labframe');
-model.bas.formalism=q.cce.basis.formalism;
 local=cce_subsystem(model,model_p,[2 3],struct(),[]);
 [H,~,~]=cce_generators(local,model_p,[]);
 spin=pauli(2);
@@ -85,20 +86,18 @@ fprintf('Selective ME pulse dense discrepancy %.3g.\n',pulse_error);
 % Require zero-jump trajectories to retain complex closed-system phases
 projected_system=s;
 projected_system=cce_test_write(projected_system,[1 2],diag([0 0 1.1]));
+projected_liouville=projected_system;
+projected_liouville.bas.formalism='zeeman-liouv';
 p.cce.approximation='projected';
-p.cce.basis.formalism='zeeman-hilb';
 closed=clexpn(projected_system,pulse_sequence,p,'labframe');
 p.cce.approximation='projected';
-p.cce.basis.formalism='zeeman-liouv';
-opened=clexpn(projected_system,pulse_sequence,p,'labframe');
+opened=clexpn(projected_liouville,pulse_sequence,p,'labframe');
 result=test_close(result,'C7 numerical check',opened,closed,2e-11,2e-11,'Projected zero jumps.');
 p.cce.approximation='generalized';
-p.cce.basis.formalism='zeeman-hilb';
 p.output='density';
 closed=clexpn(s,pulse_sequence,p,'labframe');
 p.cce.approximation='generalized';
-p.cce.basis.formalism='zeeman-liouv';
-opened=clexpn(s,pulse_sequence,p,'labframe');
+opened=clexpn(liouville,pulse_sequence,p,'labframe');
 result=test_close(result,'C7 numerical check',reshape(opened.',2,2,[]),reshape(closed.',2,2,[]),2e-11,2e-11,...
                   'Generalized zero jumps.');
 
@@ -109,19 +108,17 @@ q.normalized=false;
 q.transition.alpha=[1;0];
 q.transition.beta=[0;1];
 q.cce.approximation='generalized';
-q.cce.basis.formalism='zeeman-hilb';
 closed_signal=clexpn(s,pulse_sequence,q,'labframe');
 q.cce.approximation='generalized';
-q.cce.basis.formalism='zeeman-liouv';
-raw_signal=clexpn(s,pulse_sequence,q,'labframe');
+raw_signal=clexpn(liouville,pulse_sequence,q,'labframe');
 result=test_close(result,'ME raw signal default',raw_signal,closed_signal,...
                   2e-11,2e-11,'An explicit raw detector must remain unnormalised with an empty jump array.');
 q.normalized=false;
-explicit_raw=clexpn(s,pulse_sequence,q,'labframe');
+explicit_raw=clexpn(liouville,pulse_sequence,q,'labframe');
 result=test_close(result,'ME explicit raw signal',explicit_raw,closed_signal,...
                   2e-11,2e-11,'Repeated explicit raw detection requests must agree.');
 q.normalized=true;
-normalised_signal=clexpn(s,pulse_sequence,q,'labframe');
+normalised_signal=clexpn(liouville,pulse_sequence,q,'labframe');
 result=test_close(result,'ME explicit normalized signal',normalised_signal,...
                   2*closed_signal,2e-11,2e-11,...
                   'Explicit normalization divides by the balanced initial signal of one half.');
@@ -131,14 +128,13 @@ fprintf('R1230 closed %.16g; ME default %.16g.\n',...
 % Refuse a multi-site operator instead of silently applying identity
 q=p;
 q.cce.approximation='generalized';
-q.cce.basis.formalism='zeeman-liouv';
 q.output='density';
 q.rho0=diag([1 0]);
 q.refocusing=struct('spins',[1 2],'fraction',0.5,...
                     'operator',pi*kron([0 1;1 0]/2,eye(2)));
 rejected=false;
 try
-    clexpn(s,@hahn_echo,q,'labframe');
+    clexpn(liouville,@hahn_echo,q,'labframe');
 catch err
     rejected=strcmp(err.identifier,'hahn_echo:operator_target');
 end
@@ -148,24 +144,19 @@ result=test_true(result,'ME multi-site operator rejection',rejected,...
 % Validate whole-sequence Hahn timing and a zero-duration initial state
 pulse_sequence=@hahn_echo;
 p.cce.approximation='generalized';
-p.cce.basis.formalism='zeeman-hilb';
 closed_echo=clexpn(s,pulse_sequence,p,'labframe');
 p.cce.approximation='generalized';
-p.cce.basis.formalism='zeeman-liouv';
-opened_echo=clexpn(s,pulse_sequence,p,'labframe');
+opened_echo=clexpn(liouville,pulse_sequence,p,'labframe');
 result=test_close(result,'ME-gCCE Hahn zero jumps',reshape(opened_echo.',2,2,[]),reshape(closed_echo.',2,2,[]),...
                   2e-11,2e-11,'Physical pulse, whole-sequence clock and zero-time identity.');
 p.cce.approximation='projected';
-p.cce.basis.formalism='zeeman-hilb';
 p.output='signal';
 closed_echo=clexpn(projected_system,pulse_sequence,p,'labframe');
 p.cce.approximation='projected';
-p.cce.basis.formalism='zeeman-liouv';
-opened_echo=clexpn(projected_system,pulse_sequence,p,'labframe');
+opened_echo=clexpn(projected_liouville,pulse_sequence,p,'labframe');
 result=test_close(result,'ME-CCE Hahn zero jumps',opened_echo,closed_echo,...
                   2e-11,2e-11,'Projected manifold swapping retains the complex trajectory.');
 p.cce.approximation='generalized';
-p.cce.basis.formalism='zeeman-liouv';
 p.output='density';
 pulse_sequence=@free_evolution;
 
@@ -204,7 +195,6 @@ lb=kron(j,eye(2));
 generator=-1i*(kron(eye(4),ha)-kron(hb.',eye(4)))+...
           rate*(kron(conj(lb),lb)-(kron(eye(4),lb'*lb)+kron((lb'*lb).',eye(4)))/2);
 p.cce.approximation='projected';
-p.cce.basis.formalism='zeeman-liouv';
 p.output='signal';
 projected=clexpn(projected_system,pulse_sequence,p,'labframe');
 rb=eye(4)/4;
@@ -215,7 +205,6 @@ end
 result=test_close(result,'Full-bath projected ME reference',projected,projected_reference,...
                   2e-11,2e-11,'Independent column-vectorized left/right Lindblad blocks.');
 p.cce.approximation='generalized';
-p.cce.basis.formalism='zeeman-liouv';
 p.output='density';
 
 % Compare a dissipative echo directly with independently exponentiated blocks
@@ -241,18 +230,16 @@ end
 budget=parameters();
 budget.cce.approximation='generalized';
 budget.output='density';
-budget.cce.basis.formalism='zeeman-liouv';
 budget.rho0=ones(2)/2;
-model_p=cce_options(s,budget,@cce_compile,'labframe');
-model=cce_compile(s,model_p,'labframe');
-model.bas.formalism=budget.cce.basis.formalism;
+model_p=cce_options(liouville,budget,@cce_compile,'labframe');
+model=cce_compile(liouville,model_p,'labframe');
 local=cce_subsystem(model,model_p,[],struct(),[]);
 ensemble.spin_config=local.cce.configuration;
 ensemble.spin_config.weight=1;
 schedule=@free_evolution;
 budget=model_p;
 budget.times=linspace(0,1,128);
-budget.cce.numerics.max_memory_bytes=4096;
+model.tols.cce_mem=4096;
 refused=false;
 try
     cce_evaluate(model,struct('id',0,'sites',[]),ensemble.spin_config(1),schedule,budget);
@@ -270,7 +257,6 @@ for method={'mecce','megcce'}
     budget.rho0=ones(2)/2;
     budget.output='density';
     budget.cce.approximation='generalized';
-    budget.cce.basis.formalism='zeeman-liouv';
     budget.bath_jumps=repmat(struct('support',2,'operator',[0 1;0 0],'rate',2),1,128);
     if strcmp(method{1},'mecce')
         budget.cce.approximation='projected';
@@ -278,7 +264,6 @@ for method={'mecce','megcce'}
     end
     model_p=cce_options(s,budget,@cce_compile,'labframe');
     model=cce_compile(s,model_p,'labframe');
-    model.bas.formalism=budget.cce.basis.formalism;
     local=cce_subsystem(model,model_p,[],struct(),[]);
     ensemble.spin_config=local.cce.configuration;
     ensemble.spin_config.weight=1;
@@ -290,7 +275,7 @@ for method={'mecce','megcce'}
     workspace=16*(18*4^2+8*dimension^4);
     payload=16*2*128*dimension^2;
     budget=model_p;
-    budget.cce.numerics.max_memory_bytes=workspace+payload/2;
+    model.tols.cce_mem=workspace+payload/2;
     refused=false;
     try
         cce_evaluate(model,cluster,ensemble.spin_config,schedule,budget);
@@ -300,7 +285,7 @@ for method={'mecce','megcce'}
     result=test_true(result,[method{1} ' direct retained jump cache'],refused,...
                      'The growing embedded jump cache must fit alongside Liouvillian construction.');
     fprintf('%s direct jump cache %.0f bytes; cap %.0f; refused %d.\n',...
-            method{1},payload,budget.cce.numerics.max_memory_bytes,refused);
+            method{1},payload,model.tols.cce_mem,refused);
 end
 
 % Compare supplied spin configurations in an independent diagonal Ising fixture
@@ -310,6 +295,9 @@ config_sys.isotopes={'1H','1H'};
 config_sys.magnet=0;
 config_sys.output='hush';
 config_sys.parallel={'processes',1};
+config_sys.tols.cce_atol=1e-8;
+config_sys.tols.cce_rtol=1e-8;
+config_sys.tols.cce_mem=1e9;
 config_sys.disable={'hygiene'};
 config_inter.zeeman.scalar={0,0};
 config_inter.coupling.scalar=cell(2);
@@ -323,7 +311,6 @@ config_parameters.rho0=[1 1;1 1]/2;
 config_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
 config_model_p=cce_options(config_system,config_parameters,@cce_compile,'labframe');
 config_model=cce_compile(config_system,config_model_p,'labframe');
-config_model.bas.formalism=config_parameters.cce.basis.formalism;
 config_local=cce_subsystem(config_model,config_model_p,[],struct(),[]);
 config_ensemble.spin_config=config_local.cce.configuration;
 config_ensemble.spin_config.weight=1;
@@ -338,9 +325,9 @@ config_schedule=@free_evolution;
 maximum=0;
 for method={'gcce','megcce'}
     config_parameters.cce.approximation='generalized';
-    config_parameters.cce.basis.formalism='zeeman-hilb';
+    config_system.bas.formalism='zeeman-hilb';
     if strcmp(method{1},'megcce')
-        config_parameters.cce.basis.formalism='zeeman-liouv';
+        config_system.bas.formalism='zeeman-liouv';
     end
     for quantity={'density','signal','observable'}
         config_parameters.output=quantity{1};
@@ -357,7 +344,6 @@ for method={'gcce','megcce'}
             observe.rho0=config_initial;
             config_model_p=cce_options(config_system,observe,@cce_compile,'labframe');
             config_model=cce_compile(config_system,config_model_p,'labframe');
-            config_model.bas.formalism=observe.cce.basis.formalism;
             config_raw=cce_evaluate(config_model,config_cluster,config_state,config_schedule,config_model_p);
             config_expected=zeros(2,size(config_raw.value,2));
             for k=1:2
@@ -405,12 +391,12 @@ for method={'cce','gcce','mecce','megcce','noise'}
     config_trial=rmfield(config_trial,{'coil','normalized'});
     config_trial.output='signal';
     config_trial.cce.approximation='generalized';
-    config_trial.cce.basis.formalism='zeeman-hilb';
+    config_system.bas.formalism='zeeman-hilb';
     if ismember(method{1},{'cce','mecce'})
         config_trial.cce.approximation='projected';
     end
     if startsWith(method{1},'me')
-        config_trial.cce.basis.formalism='zeeman-liouv';
+        config_system.bas.formalism='zeeman-liouv';
     end
     config_sequence=@free_evolution;
     if strcmp(method{1},'noise')
@@ -421,7 +407,6 @@ for method={'cce','gcce','mecce','megcce','noise'}
     end
     config_model_p=cce_options(config_system,config_trial,@cce_compile,'labframe');
     config_model=cce_compile(config_system,config_model_p,'labframe');
-    config_model.bas.formalism=config_trial.cce.basis.formalism;
     config_schedule=config_sequence;
     for field={'initial_rho','projection','reference'}
         config_supplied=config_state;
@@ -464,13 +449,12 @@ config_parameters.output='signal';
 config_parameters.rho0=config_initial;
 for method={'cce','mecce'}
     config_parameters.cce.approximation='projected';
-    config_parameters.cce.basis.formalism='zeeman-hilb';
+    config_system.bas.formalism='zeeman-hilb';
     if strcmp(method{1},'mecce')
-        config_parameters.cce.basis.formalism='zeeman-liouv';
+        config_system.bas.formalism='zeeman-liouv';
     end
     config_model_p=cce_options(config_system,config_parameters,@cce_compile,'labframe');
     config_model=cce_compile(config_system,config_model_p,'labframe');
-    config_model.bas.formalism=config_parameters.cce.basis.formalism;
     config_schedule=@free_evolution;
     config_raw=cce_evaluate(config_model,config_cluster,config_state,config_schedule,config_model_p);
     result=test_close(result,[method{1} ' spin_config bath phase'],config_raw.value,exp(2i*config_parameters.times(:)),...
@@ -482,7 +466,6 @@ for method={'cce','mecce'}
     config_swapped.transition.beta=config_parameters.transition.alpha;
     config_model_p=cce_options(config_system,config_swapped,@cce_compile,'labframe');
     config_model=cce_compile(config_system,config_model_p,'labframe');
-    config_model.bas.formalism=config_swapped.cce.basis.formalism;
     config_raw=cce_evaluate(config_model,config_cluster,config_state,config_schedule,config_model_p);
     result=test_close(result,[method{1} ' supplied projection'],config_raw.value,exp(-2i*config_parameters.times(:)),...
                       2e-12,2e-12,'Swapped user manifold vectors reverse the projected phase.');
@@ -492,7 +475,6 @@ end
 p.bath_jumps=struct('support',[3 2],'operator',kron(j,z),'rate',rate);
 m_p=cce_options(s,p,@cce_compile,'labframe');
 m=cce_compile(s,m_p,'labframe');
-m.bas.formalism=p.cce.basis.formalism;
 refused=false;
 try
     local=cce_subsystem(m,m_p,2,struct(),[]);
@@ -516,6 +498,9 @@ tutorial_sys.isotopes=repmat({'1H'},1,7);
 tutorial_sys.magnet=0;
 tutorial_sys.output='hush';
 tutorial_sys.parallel={'processes',1};
+tutorial_sys.tols.cce_atol=1e-3;
+tutorial_sys.tols.cce_rtol=1e-3;
+tutorial_sys.tols.cce_mem=1e9;
 tutorial_inter.zeeman.scalar=num2cell(zeros(1,7));
 tutorial_inter.coupling.scalar=cell(7);
 tutorial_system=create(tutorial_sys,tutorial_inter);
@@ -597,7 +582,7 @@ tutorial_parameters.times=linspace(0,0.001,11);
 tutorial_parameters.rho0=[1 1;1 1]/2;
 tutorial_parameters.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 tutorial_sequence=@hahn_echo;
-tutorial_parameters.cce.numerics=struct('atol',1e-3,'rtol',1e-3,'max_memory_bytes',1e9,'propagator','stock');
+tutorial_parameters.cce.propagator='stock';
 tutorial_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
 for k=2:7
     tutorial_parameters.bath_jumps(end+1)=struct('support',k,'operator',[0 1;0 0],'rate',500);
@@ -641,7 +626,6 @@ projected_error=max(abs(tutorial_value-tutorial_reference));
 % Match PyCCE run/gcce.py:116-131 pulse-rotated final detection states
 tutorial_system.inter.zeeman.matrix{1}(3,3)=5282579115.0000000;
 tutorial_parameters.cce.approximation='generalized';
-tutorial_parameters.cce.basis.formalism='zeeman-liouv';
 tutorial_parameters.transition.alpha=[0;1];
 tutorial_parameters.transition.beta=[1;0];
 tutorial_parameters.normalized=true;
@@ -686,10 +670,7 @@ function p=parameters()
 p=struct('observed',1,'output','signal','times',0,'orientation',[0 0 0]);
 p.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 p.cce=struct('bath_spins',[2 3],'approximation','projected','expansion','standard',...
-             'order',2,'interaction_cutoff',Inf,'meanfield','none',...
-             'graph',struct('mode','complete'),'bath_state',struct('mode','mixed_product'),...
-             'basis',struct('formalism','zeeman-liouv'));
-p.cce.numerics=struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',1e9);
+             'order',2,'interaction_cutoff',Inf,'meanfield','none');
 end
 
 

@@ -34,7 +34,7 @@
 % of a system created with sys.tols.prox_cutoff=0 and adds user-supplied
 % couplings. Its complete pair family is implicit, so raw clusters,
 % checkpoints, and nonstandard graph policies are unavailable. In this
-% path cce.numerics.atol budgets screening loss.
+% path sys.tols.cce_atol budgets screening loss.
 % A checkpoint requires exactly one retained node. Grid nodes run serially;
 % cluster/state parallelism stays with the scheduler, or with an outer worker.
 %
@@ -65,20 +65,6 @@ parameters=cce_options(spin_system,parameters,pulse_sequence,assumptions);
 % Check consistency
 grumble(spin_system,pulse_sequence,parameters,assumptions);
 
-% Derive default numerical controls from precision and available host memory
-numerics=parameters.cce.numerics;
-if ~isfield(numerics,'atol')
-    numerics.atol=sqrt(eps);
-end
-if ~isfield(numerics,'rtol')
-    numerics.rtol=sqrt(eps);
-end
-if ~isfield(numerics,'max_memory_bytes')
-    [~,host_memory]=memory();
-    numerics.max_memory_bytes=floor(host_memory.PhysicalMemory.Available/2);
-end
-parameters.cce.numerics=numerics;
-
 % Resolve the quadrature before any checkpoint or cluster evaluation
 if isfield(parameters,'grid')
     grid=parameters.grid;
@@ -91,9 +77,6 @@ if isfield(parameters,'grid')
         grid.(field{1})=double(data(indices));
     end
     grid.weights=grid.weights/sum(grid.weights);
-    if ~isempty(getCurrentTask())&&~strcmp(parameters.cce.backend,'analytical_hahn')
-        parameters.cce.parallel.mode='serial';
-    end
 end
 
 % Use the supplied finite bath when no expansion order was declared
@@ -110,57 +93,60 @@ if strcmp(parameters.cce.expansion,'disjoint_inter')
 end
 
 % Construct product-state assignments without changing the caller's random stream
-state=parameters.cce.bath_state;
 ids=parameters.cce.bath_spins;
+sampled=isfield(parameters,'bath_samples');
 count=1;
-if ismember(state.mode,{'sampled','interlaced'})
-    count=state.samples;
+if sampled
+    count=parameters.bath_samples;
 end
 bytes=count*(1024+16*sum(spin_system.comp.mults(ids).^2)+32*numel(ids));
-if ~isfinite(bytes)||bytes>numerics.max_memory_bytes
+if ~isfinite(bytes)||bytes>spin_system.tols.cce_mem
     error('clexpn:memory','Sampled product-state storage exceeds the declared memory budget.');
 end
 configuration=struct('configuration_id',1,'state_id',1,'weight',1/count,...
                      'bath_ids',ids,'bath_rho',{{}},'assignment',zeros(1,numel(ids)));
-if isfield(state,'configuration_id')
-    configuration.configuration_id=state.configuration_id;
-end
 configs=repmat(configuration,1,count);
 bases=cell(1,numel(ids));
 probabilities=bases;
 for n=1:count
-    if ismember(state.mode,{'sampled','interlaced'})
-        stream=RandStream('Threefry','Seed',state.seed);
-        stream.Substream=(configuration.configuration_id-1)*count+n;
+    if sampled
+        stream=RandStream('Threefry','Seed',parameters.bath_seed);
+        stream.Substream=n;
     end
     configs(n).state_id=n;
     configs(n).bath_rho=cell(1,numel(ids));
     for j=1:numel(ids)
         d=spin_system.comp.mults(ids(j));
-        switch state.mode
-            case 'mixed_product'
-                rho=eye(d)/d;
-            case 'explicit_product'
-                rho=state.rho{j};
-            otherwise
-                if ischar(state.basis)
-                    bases{j}=eye(d);
-                else
-                    bases{j}=state.basis{j};
-                end
-                if ischar(state.probabilities)
-                    probabilities{j}=ones(d,1)/d;
-                else
-                    probabilities{j}=state.probabilities{j}(:);
-                end
-                u=rand(stream);
-                pick=find(u<=cumsum(probabilities{j}),1);
-                if isempty(pick)
-                    pick=d;
-                end
-                configs(n).assignment(j)=pick;
-                vector=bases{j}(:,pick);
-                rho=vector*vector';
+        if sampled
+
+            % Draw a pure state; Zeeman basis and equal populations by default
+            bases{j}=eye(d);
+            if isfield(parameters,'bath_basis')
+                bases{j}=parameters.bath_basis{j};
+            end
+            probabilities{j}=ones(d,1)/d;
+            if isfield(parameters,'bath_probs')
+                probabilities{j}=parameters.bath_probs{j}(:);
+            end
+            u=rand(stream);
+            pick=find(u<=cumsum(probabilities{j}),1);
+            if isempty(pick)
+                pick=d;
+            end
+            configs(n).assignment(j)=pick;
+            vector=bases{j}(:,pick);
+            rho=vector*vector';
+
+        elseif isfield(parameters,'bath_state')
+
+            % Use the supplied density matrix
+            rho=parameters.bath_state{j};
+
+        else
+
+            % Default to the maximally mixed state
+            rho=eye(d)/d;
+
         end
         configs(n).bath_rho{j}=rho;
     end
@@ -227,12 +213,12 @@ if count>1&&strcmp(parameters.cce.averaging,'internal_then_expansion')
     end
     request=first.parameters;
     request.cce.bath_spins=first.graph.bath_ids;
-    reduction=cce_reduce(raw,first.clusters,request);
+    reduction=cce_reduce(spin_system,raw,first.clusters,request);
 
     % Only complete, uncentred records have an internal-first sampling estimate
     reduction.sampling_standard_error=first.reduction.sampling_standard_error;
     complete=reduction.complete_record;
-    if strcmp(parameters.cce.bath_state.mode,'sampled')&&samples>1&&...
+    if sampled&&~isfield(parameters.cce,'interlaced')&&samples>1&&...
        ~isempty(complete)&&~(isfield(parameters,'noise')&&parameters.noise.connected)
         draws=zeros([size(reduction.value) samples]);
         for n=1:count
@@ -287,22 +273,17 @@ end
 
 % Compile immutable physical data, not a full-bath basis
 spin_system=cce_compile(spin_system,parameters,assumptions);
-if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
-    spin_system.bas.formalism=parameters.cce.basis.formalism;
-elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
-    spin_system.bas.formalism='zeeman-liouv';
-end
 
 % Validate propagation choices here rather than in graph or reduction services
-if isfield(parameters.cce.numerics,'propagator')
+if isfield(parameters.cce,'propagator')
     supported={'eig'};
     if strcmp(spin_system.bas.formalism,'zeeman-liouv')
         supported={'stock'};
     elseif isequal(pulse_sequence,@hahn_echo)&&strcmp(parameters.cce.approximation,'generalized')
         supported={'eig','expm'};
     end
-    if ~ischar(parameters.cce.numerics.propagator)||~isrow(parameters.cce.numerics.propagator)||...
-       ~ismember(parameters.cce.numerics.propagator,supported)
+    if ~ischar(parameters.cce.propagator)||~isrow(parameters.cce.propagator)||...
+       ~ismember(parameters.cce.propagator,supported)
         error('clexpn:propagator','Propagation preference is incompatible with this experiment and representation.');
     end
 end
@@ -327,7 +308,7 @@ raw=cce_schedule(spin_system,clusters,ensemble,pulse_sequence,parameters);
 % Test completeness on the graph domain without trimming the exterior state
 request=parameters;
 request.cce.bath_spins=graph.bath_ids;
-reduced=cce_reduce(raw,clusters,request);
+reduced=cce_reduce(spin_system,raw,clusters,request);
 
 % Keep diagnostics separate from the natural sequence output
 diagnostics.raw=raw;
@@ -383,7 +364,7 @@ if any(isfield(parameters,{'noise','spectrum'}))&&~isequal(pulse_sequence,@noise
     error('clexpn:noise','Noise and spectrum parameters belong to the noise_correlation experiment.');
 end
 if isequal(pulse_sequence,@noise_correlation)&&...
-   strcmp(parameters.cce.bath_state.mode,'interlaced')
+   isfield(parameters.cce,'interlaced')
     error('clexpn:noise','Connected noise uses ordinary ensemble moment averaging, not interlaced factors.');
 end
 if isfield(parameters.cce,'selection')&&isfield(parameters.cce.selection,'adaptive')

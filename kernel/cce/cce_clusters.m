@@ -59,10 +59,7 @@ elseif strcmp(parameters.cce.expansion,'disjoint_inter')
 end
 
 % Bound group graph and every subsequent family before growing it
-budget=Inf;
-if isfield(parameters.cce,'numerics')&&isfield(parameters.cce.numerics,'max_memory_bytes')
-    budget=parameters.cce.numerics.max_memory_bytes;
-end
+budget=spin_system.tols.cce_mem;
 prototype={[]};
 metadata=whos('prototype');
 family_bytes=metadata.bytes/numel(prototype)+8*(max_order+1);
@@ -201,7 +198,7 @@ characters=(physical_digits+1)*numel(parameters.cce.bath_spins)+2*ng+1+...
            (group_digits+1)*sum(cellfun(@numel,family))+2*numel(family);
 if ~isfinite(characters)||6*characters>budget
     error('cce_clusters:memory',...
-          'Cluster family signature exceeds numerics.max_memory_bytes.');
+          'Cluster family signature exceeds sys.tols.cce_mem.');
 end
 family_id='';
 for k=1:numel(groups)
@@ -239,7 +236,7 @@ bytes=6*characters+3*numel(family)*(metadata.bytes+16*subset_limit+...
                                   8*(4*max_order+3*numel(parameters.cce.bath_spins)));
 if ~isfinite(bytes)||bytes>budget
     error('cce_clusters:memory',...
-          'Cluster records and subset maps exceed numerics.max_memory_bytes.');
+          'Cluster records and subset maps exceed sys.tols.cce_mem.');
 end
 entry.family_id=family_id;
 clusters=repmat(entry,numel(family),1);
@@ -327,7 +324,7 @@ function check_storage(count)
     bytes=graph_bytes+3*count*family_bytes;
     if ~isfinite(bytes)||bytes>budget
         error('cce_clusters:memory',...
-              'Cluster family workspace exceeds numerics.max_memory_bytes.');
+              'Cluster family workspace exceeds sys.tols.cce_mem.');
     end
 
 end

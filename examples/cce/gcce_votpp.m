@@ -115,21 +115,27 @@ for k=1:numel(left)
 
 end
 
-% Keep the supplied dipolar tensors rather than adding coordinate-generated copies
+% Keep the supplied dipolar tensors; the coupled proton pairs define the clusters
 sys.tols.prox_cutoff=0;
 inter.coordinates=num2cell([zeros(2,3); coords],2).';
+
+% Cluster expansion tolerances and memory budget
+sys.tols.cce_atol=1e-2;
+sys.tols.cce_rtol=0;
+sys.tols.cce_mem=64*2^30;
+
+% Spinach housekeeping
 spin_system=create(sys,inter);
 
-% Evaluate the normalised complex Hahn echo with diagonal register projection
+% Second-order projected expansion with diagonal register projection
 parameters.observed=[1 2];
 parameters.transition=struct('spins',[1 2],'levels',[4 12]);
 parameters.times=linspace(0,30e-6,121);
 parameters.cce.approximation='projected';
 parameters.cce.projection='conditional';
 parameters.cce.order=2;
-parameters.cce.parallel=struct('mode','clusters','batch_size',1+size(coords,1)+numel(left));
-parameters.cce.numerics=struct('atol',1e-2,'rtol',0,'max_memory_bytes',64*2^30);
-parameters.cce.graph=struct('mode','distance','radius',pair_radius);
+
+% Simulation
 echo=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
 % Plot the proton-limited coherence

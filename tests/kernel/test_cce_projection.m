@@ -19,6 +19,9 @@ result=new_test_result('kernel/cce_projection','CCE observed projection',...
 sys.isotopes={'1H','13C'};
 sys.magnet=0;
 sys.output='hush';
+sys.tols.cce_atol=1e-10;
+sys.tols.cce_rtol=1e-12;
+sys.tols.cce_mem=1e8;
 system=create(sys,struct());
 gap=1000;
 coupling=4;
@@ -29,7 +32,6 @@ parameters.cce.bath_spins=2;
 parameters.times=0;
 parameters.orientation=[0 0 0];
 parameters.cce.interaction_cutoff=Inf;
-parameters.cce.numerics=struct('atol',1e-10,'rtol',1e-12,'max_memory_bytes',1e8);
 model_p=cce_options(system,parameters,@cce_compile,'labframe');
 model=cce_compile(system,model_p,'labframe');
 projection=model_p;
@@ -116,6 +118,8 @@ result=test_close(result,'multiple observed-spin system',...
 
 % Compare mediated pair dynamics against independently projected dense matrices
 sys.isotopes={'1H','1H','1H'};
+sys.tols.cce_atol=1e-9;
+sys.tols.cce_rtol=1e-9;
 system=create(sys,struct());
 system.inter.zeeman.matrix{1}=1000*eye(3);
 system=cce_test_write(system,[1 2],diag([100 0 0]));
@@ -127,9 +131,6 @@ p.transition=struct('spins',1,'ms',[0.5 -0.5]);
 p.cce=struct('bath_spins',[2 3],'approximation','projected',...
              'expansion','standard','order',2,'interaction_cutoff',Inf,...
              'meanfield','none');
-p.cce.graph=struct('mode','coupling','threshold',0);
-p.cce.bath_state=struct('mode','mixed_product');
-p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',1e8);
 p.cce.second_order=struct('enabled',true,'gap_tolerance',1,'overlap_tolerance',1e-10);
 [actual,~]=clexpn(system,@free_evolution,p,'labframe');
 x=[0 1;1 0]/2;
@@ -142,7 +143,7 @@ result=test_close(result,'second-order mediated graph',actual,reference,...
 fprintf('R7 projection sparse dense discrepancy %.17g\n',max(abs(actual-reference)));
 
 % Preserve the explicit opt-out without altering the projected Hamiltonian
-p.cce.graph.approximate=true;
+p.cce.mediated=false;
 [approximate,~]=clexpn(system,@free_evolution,p,'labframe');
 result=test_true(result,'second-order graph approximation explicit',...
                  max(abs(approximate-reference))>0.4,...

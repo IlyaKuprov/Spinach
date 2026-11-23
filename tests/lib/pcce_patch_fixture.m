@@ -16,6 +16,9 @@ sys.magnet=0.01;
 sys.isotopes={'E','E','E','E'};
 sys.output='hush';
 sys.parallel={'local',1};
+sys.tols.cce_atol=1e-5;
+sys.tols.cce_rtol=1e-5;
+sys.tols.cce_mem=2^28;
 
 % Coordinates in Angstrom, zero electron g, nuclear shifts in ppm
 inter.coordinates={[0 0 0];[20 0 0];[21 0 0];[0 30 0]};
@@ -42,10 +45,6 @@ end
 % Coordinates define the toy geometry; all couplings above are explicit
 inter=rmfield(inter,'coordinates');
 
-% Local Hilbert basis for retained clusters
-bas.formalism='zeeman-hilb';
-bas.approximation='none';
-
 % Spinach housekeeping
 spin_system=create(sys,inter);
 
@@ -57,11 +56,6 @@ parameters.transition.ms=[1/2 -1/2];
 parameters.times=linspace(0,200e-6,41);
 parameters.cce.order=2;
 parameters.cce.approximation='projected';
-parameters.cce.graph=struct('mode','complete');
-parameters.cce.bath_state.mode='mixed_product';
-parameters.cce.basis=bas;
-parameters.cce.numerics=struct('atol',1e-5,'rtol',1e-5,...
-                               'max_memory_bytes',2^28);
 parameters.cce.expansion='partition';
 parameters.cce.groups={[2 3],4};
 parameters.cce.partition=struct('mode','user','max_dimension',4);

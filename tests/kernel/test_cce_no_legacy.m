@@ -75,6 +75,9 @@ result=test_true(result,'Transpose does not hide a call',...
 sys.isotopes={'1H','13C'};
 sys.magnet=0;
 sys.output='hush';
+sys.tols.cce_atol=1e-12;
+sys.tols.cce_rtol=1e-10;
+sys.tols.cce_mem=2^28;
 sys.parallel={'processes',1};
 sys.disable={'hygiene'};
 inter.zeeman.matrix={zeros(3),zeros(3)};
@@ -83,7 +86,6 @@ p.observed=1;
 p.times=[0 0.1];
 p.transition=struct('spins',1,'ms',[0.5 -0.5]);
 p.cce=struct('approximation','generalized','order',1);
-p.cce.numerics=struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',2^28);
 paths={'bath_state.temperature',...
        'cluster_cap',...
        'clusters',...

@@ -58,9 +58,9 @@ else
 end
 
 % Build ideal observed-spin transition pulses without a global bath basis
-model=spin_system.model;
-obs_dim=spin_system.observed_dimension;
-bath_dim=spin_system.bath_dimension;
+model=spin_system;
+obs_dim=spin_system.cce.observed_dimension;
+bath_dim=spin_system.cce.bath_dimension;
 alpha=model.cce.transition.alpha;
 beta=model.cce.transition.beta;
 rotation=eye(obs_dim)-alpha*alpha'-beta*beta'-1i*(alpha*beta'+beta*alpha');
@@ -94,7 +94,7 @@ for n=1:numel(parameters.times)
             else
                 rho=reshape(rho,obs_dim*bath_dim,obs_dim*bath_dim);
                 rho=rotation*rho*rotation';
-                if strcmp(spin_system.formalism,'zeeman-liouv')
+                if strcmp(spin_system.bas.formalism,'zeeman-liouv')
                     rho=rho(:);
                 end
             end
@@ -137,8 +137,8 @@ end
 
 % Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
-if ~isstruct(spin_system)||~isfield(spin_system,'kind')||...
-   ~strcmp(spin_system.kind,'cce_subsystem')||~isstruct(parameters)||...
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||...
+   ~isfield(spin_system.cce,'sites')||~isstruct(parameters)||...
    ~isfield(parameters,'times')||~isnumeric(parameters.times)||...
    ~isreal(parameters.times)||~isvector(parameters.times)||...
    any(~isfinite(parameters.times))||any(parameters.times<0)||any(diff(parameters.times)<0)
@@ -158,7 +158,7 @@ end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('cce_eseem:generators','Supply conventional or tagged projected generators.');
 end
-if ~isfield(spin_system.model.cce,'transition')
+if ~isfield(spin_system.cce,'transition')
     error('cce_eseem:transition',...
           'An explicit transition is required for ideal refocusing.');
 end

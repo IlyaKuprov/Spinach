@@ -329,7 +329,7 @@ for projected=[true false]
     restricted=observed_system;
     generator=struct('left',0,'right',0);
     if ~projected
-        restricted.formalism='zeeman-liouv';
+        restricted.bas.formalism='zeeman-liouv';
         generator=zeros(4);
     end
     unsupported=false;

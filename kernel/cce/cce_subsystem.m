@@ -1,16 +1,16 @@
 % Bind a retained subsystem without constructing a full-bath basis.
 % Syntax:
 %
-%   [cluster_system,cache]=cce_subsystem(model,sites,configuration,cache)
+%   [spin_system,cache]=cce_subsystem(spin_system,sites,configuration,cache)
 %
-% model is cce_compile output. sites is an ordered row of physical bath IDs.
+% spin_system is cce_compile output. sites is an ordered row of physical bath IDs.
 % configuration is a scalar structure; bath_ids and bath_rho specify product
 % density matrices in matching order. Omitted densities use the model's
 % mixed_product or explicit_product declaration; sampling requires an explicit
 % configuration. configuration_id, state_id and weight are optional metadata.
 % Explicit exterior_ids/exterior_expectations override no physical states:
 % they must agree with the corresponding configuration density matrices.
-% cache=[] starts a caller-owned single-entry cache, keyed by the entire model,
+% cache=[] starts a caller-owned single-entry cache, keyed by the entire spin_system,
 % ordered sites and configuration. No process-global or persistent cache exists.
 % cluster_system carries observed-first IDs, mappings, multiplicities, isotope
 % labels, local Pauli matrices, local bath densities, and exterior mean fields.
@@ -21,7 +21,7 @@
 %
 % Parameters:
 %
-%   model         - canonical physical model returned by cce_compile
+%   spin_system         - canonical physical spin_system returned by cce_compile
 %   sites         - ordered row of retained physical bath IDs
 %   configuration - scalar product-state and ensemble-metadata structure
 %   cache         - empty or the caller-owned cache returned by this service
@@ -34,42 +34,35 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [cluster_system,cache]=cce_subsystem(model,parameters,sites,configuration,cache)
+function [spin_system,cache]=cce_subsystem(spin_system,parameters,sites,configuration,cache)
 
 % Reject malformed ownership and configuration before consulting the cache
-grumble(model,parameters,sites,configuration,cache);
+grumble(spin_system,parameters,sites,configuration,cache);
 
-% An exact key avoids hash collisions and stale model or representation data
-signature=struct('model',model,'parameters',parameters,'sites',sites,'configuration',configuration);
+% An exact key avoids hash collisions and stale spin_system or representation data
+signature=struct('spin_system',spin_system,'parameters',parameters,'sites',sites,'configuration',configuration);
 if ~isempty(cache)&&isequaln(cache.signature,signature)
-    cluster_system=cache.cluster_system;
+    spin_system=cache.spin_system;
     cache.hits=cache.hits+1;
     return
 end
 
 % Preserve observed-first tensor-product order and explicit physical mappings
 ids=[parameters.observed sites];
-dims=model.comp.mults(ids);
-cluster_system.kind='cce_subsystem';
-cluster_system.model=model;
-cluster_system.formalism=model.bas.formalism;
-cluster_system.sites=sites;
-cluster_system.physical_ids=ids;
-cluster_system.local_to_physical=ids;
-cluster_system.physical_to_local=zeros(1,model.comp.nspins);
-cluster_system.physical_to_local(ids)=1:numel(ids);
-cluster_system.multiplicities=dims;
-cluster_system.dimension=prod(dims);
-cluster_system.observed_dimension=prod(model.comp.mults(parameters.observed));
-cluster_system.bath_dimension=prod(model.comp.mults(sites));
-cluster_system.isotopes=model.comp.isotopes(ids);
-cluster_system.assumptions=model.cce.assumptions;
-cluster_system.groups={};
+dims=spin_system.comp.mults(ids);
+spin_system.cce.sites=sites;
+spin_system.cce.ids=ids;
+spin_system.cce.physical_to_local=zeros(1,spin_system.comp.nspins);
+spin_system.cce.physical_to_local(ids)=1:numel(ids);
+spin_system.cce.dimension=prod(dims);
+spin_system.cce.observed_dimension=prod(spin_system.comp.mults(parameters.observed));
+spin_system.cce.bath_dimension=prod(spin_system.comp.mults(sites));
+spin_system.cce.groups={};
 if isfield(parameters.cce,'groups')
-    cluster_system.groups=cellfun(@(group)group(ismember(group,ids)),...
+    spin_system.cce.groups=cellfun(@(group)group(ismember(group,ids)),...
                                   parameters.cce.groups,'UniformOutput',false);
 end
-cluster_system.local_operators=cellfun(@pauli,num2cell(dims),'UniformOutput',false);
+spin_system.cce.local_operators=cellfun(@pauli,num2cell(dims),'UniformOutput',false);
 
 % Bind a declared product bath density, never an inferred population
 bath_ids=parameters.cce.bath_spins;
@@ -78,7 +71,7 @@ if isfield(configuration,'bath_rho')
     bath_ids=configuration.bath_ids;
     densities=configuration.bath_rho;
 elseif strcmp(state.mode,'mixed_product')
-    densities=arrayfun(@(id)speye(model.comp.mults(id))/model.comp.mults(id),...
+    densities=arrayfun(@(id)speye(spin_system.comp.mults(id))/spin_system.comp.mults(id),...
                        bath_ids,'UniformOutput',false);
 else
     densities=state.rho;
@@ -87,7 +80,7 @@ expectations=zeros(numel(bath_ids),3);
 for n=1:numel(bath_ids)
 
     % Compute physical Cartesian expectations from each validated local density
-    d=model.comp.mults(bath_ids(n));
+    d=spin_system.comp.mults(bath_ids(n));
     rho=densities{n};
     operators=pauli(d);
     expectations(n,:)=[real(trace(rho*operators.x)) real(trace(rho*operators.y))...
@@ -101,7 +94,7 @@ end
 
 % Use the same exterior assignment for every retained cluster
 [~,local]=ismember(sites,bath_ids);
-cluster_system.bath_rho=densities(local);
+spin_system.cce.bath_rho=densities(local);
 exterior=~ismember(bath_ids,sites);
 exterior_ids=bath_ids(exterior);
 exterior_values=expectations(exterior,:);
@@ -114,26 +107,26 @@ if isfield(configuration,'exterior_ids')
         error('cce_subsystem:exterior','Exterior fields must match the common bath configuration.');
     end
 end
-cluster_system.configuration=configuration;
-cluster_system.configuration.bath_ids=bath_ids;
-cluster_system.configuration.bath_rho=densities;
-cluster_system.configuration.expectations=expectations;
-cluster_system.configuration.exterior_ids=[];
-cluster_system.configuration.exterior_expectations=zeros(0,3);
+spin_system.cce.configuration=configuration;
+spin_system.cce.configuration.bath_ids=bath_ids;
+spin_system.cce.configuration.bath_rho=densities;
+spin_system.cce.configuration.expectations=expectations;
+spin_system.cce.configuration.exterior_ids=[];
+spin_system.cce.configuration.exterior_expectations=zeros(0,3);
 if strcmp(parameters.cce.meanfield,'static')
     if isfield(parameters.cce,'meanfield_radius')&&...
        isfinite(parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
         distance=inf(1,numel(exterior_ids));
         for id=parameters.observed
-            delta=vertcat(model.inter.coordinates{exterior_ids})-model.inter.coordinates{id};
+            delta=vertcat(spin_system.inter.coordinates{exterior_ids})-spin_system.inter.coordinates{id};
             distance=min(distance,sqrt(sum(delta.^2,2)).');
         end
         keep=distance<=parameters.cce.meanfield_radius;
         exterior_ids=exterior_ids(keep);
         exterior_values=exterior_values(keep,:);
     end
-    cluster_system.configuration.exterior_ids=exterior_ids;
-    cluster_system.configuration.exterior_expectations=exterior_values;
+    spin_system.cce.configuration.exterior_ids=exterior_ids;
+    spin_system.cce.configuration.exterior_expectations=exterior_values;
 end
 
 % Cache only this explicit immutable view; generator caches belong downstream
@@ -143,7 +136,7 @@ if ~isempty(cache)
     hits=cache.hits;
     misses=cache.misses;
 end
-cache=struct('signature',signature,'cluster_system',cluster_system,...
+cache=struct('signature',signature,'spin_system',spin_system,...
              'hits',hits,'misses',misses+1);
 
 end
@@ -156,8 +149,8 @@ answer=isnumeric(left)&&isequal(size(left),size(right))&&...
 end
 
 % Validate the complete public service boundary
-function grumble(model,parameters,sites,configuration,cache)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')
+function grumble(spin_system,parameters,sites,configuration,cache)
+if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'cce')
     error('cce_subsystem:model','model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
@@ -190,7 +183,7 @@ if isfield(configuration,'backend')&&...
     error('cce_subsystem:backend','Unknown Hamiltonian backend.');
 end
 if ~isempty(cache)&&(~isstruct(cache)||~isscalar(cache)||...
-   ~all(isfield(cache,{'signature','cluster_system','hits','misses'})))
+   ~all(isfield(cache,{'signature','spin_system','hits','misses'})))
     error('cce_subsystem:cache','cache must be empty or returned by this service.');
 end
 if isfield(configuration,'bath_rho')
@@ -201,7 +194,7 @@ if isfield(configuration,'bath_rho')
         error('cce_subsystem:density','Supply one density matrix per bath ID.');
     end
     for n=1:numel(bath_ids)
-        d=model.comp.mults(bath_ids(n));
+        d=spin_system.comp.mults(bath_ids(n));
         rho=densities{n};
         tolerance=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(rho,'fro');
         if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...
@@ -225,7 +218,7 @@ if strcmp(parameters.cce.meanfield,'static')&&...
    isfinite(parameters.cce.meanfield_radius)
     exterior=setdiff(parameters.cce.bath_spins,sites);
     if ~isempty(exterior)&&...
-       any(cellfun(@isempty,model.inter.coordinates([parameters.observed exterior])))
+       any(cellfun(@isempty,spin_system.inter.coordinates([parameters.observed exterior])))
         error('cce:coordinates','cce.meanfield_radius requires finite observed and exterior coordinates.');
     end
 end

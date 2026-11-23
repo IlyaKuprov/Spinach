@@ -92,7 +92,7 @@ for sequence={@cpmg_echo,@cce_eseem}
 
             % Compare Hilbert and Liouville representations
             full_cluster=phase_cluster;
-            full_cluster.formalism=formalism{1};
+            full_cluster.bas.formalism=formalism{1};
             phased.cce.approximation='generalized';
             [hf,rf,kf,full_p]=cce_generators(full_cluster,phased,[]);
             expected=sequence{1}(full_cluster,full_p,hf,rf,kf);
@@ -124,7 +124,7 @@ for sites={[],2}
         for formalism={'zeeman-hilb','zeeman-liouv'}
 
             % Compare Hilbert and Liouville representations
-            retained.formalism=formalism{1};
+            retained.bas.formalism=formalism{1};
             for normalised=[false true]
 
                 % Compare normalised and unnormalised detection
@@ -159,7 +159,7 @@ end
 
 % Nonzero dissipation and manifold-preserving rotations retain the fixed receiver
 [retained,~]=cce_subsystem(phase_model,phase_model_p,2,struct(),[]);
-retained.formalism='zeeman-liouv';
+retained.bas.formalism='zeeman-liouv';
 q=phased;
 q.bath_jumps=struct('support',2,'operator','L+','rate',2);
 for angle=[pi 2*pi]
@@ -182,7 +182,7 @@ q=rmfield(phased,{'rho0','coil'});
 q.normalized=true;
 q.pump=struct('center',11,'halfwidth',0,'units','rad/s',...
               'fraction',0.25,'allow_empty',false);
-retained.formalism='zeeman-hilb';
+retained.bas.formalism='zeeman-hilb';
 q.cce.approximation='generalized';
 [hf,rf,kf,full_p]=cce_generators(retained,q,[]);
 expected=bath_pumped_hahn(retained,full_p,hf,rf,kf);
@@ -676,14 +676,14 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                     coils={coils};
                 end
                 if isstruct(H)&&~isempty(H.dissipator)
-                    db=retained.bath_dimension;
+                    db=retained.cce.bath_dimension;
                     scale=64*eps*db^2;
                     frequency=norm(-1i*(kron(eye(db),H.left)-kron(H.right.',eye(db)))+H.dissipator,1);
                 elseif isstruct(H)
-                    scale=16*eps*retained.bath_dimension^3;
+                    scale=16*eps*retained.cce.bath_dimension^3;
                     frequency=norm(H.left,1)+norm(H.right,1);
                 elseif strcmp(formalism{1},'zeeman-hilb')
-                    scale=16*eps*retained.dimension^3;
+                    scale=16*eps*retained.cce.dimension^3;
                     frequency=2*norm(H,1);
                 else
                     scale=64*eps*size(H,1);
@@ -695,10 +695,10 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 end
                 pulse_cost=0;
                 if hahn||pumped
-                    dim=retained.dimension;
+                    dim=retained.cce.dimension;
                     products=1+pumped;
                     if isstruct(H)
-                        dim=retained.bath_dimension;
+                        dim=retained.cce.bath_dimension;
                         products=pumped;
                     end
                     pulse_cost=products*16*dim^3*eps;

@@ -520,7 +520,7 @@ model_p=cce_options(spin_system,p,@cce_compile,'labframe');
 model=cce_compile(spin_system,model_p,'labframe');
 configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},'state_id',1,'configuration_id',1,'weight',1);
 local=cce_subsystem(model,model_p,2,configuration,[]);
-ensemble.spin_configs=rmfield(local.configuration,{'exterior_ids','exterior_expectations'});
+ensemble.spin_configs=rmfield(local.cce.configuration,{'exterior_ids','exterior_expectations'});
 
 end
 

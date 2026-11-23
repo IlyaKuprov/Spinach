@@ -39,11 +39,11 @@ function [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,n
 % Reject unsupported representation/output pairs before propagation
 grumble(cluster_system,L,coil,rho,timestep,nsteps,output);
 projected=isstruct(L);
-hilbert=~projected&&strcmp(cluster_system.formalism,'zeeman-hilb');
+hilbert=~projected&&strcmp(cluster_system.bas.formalism,'zeeman-hilb');
 if projected
-    d=cluster_system.bath_dimension;
+    d=cluster_system.cce.bath_dimension;
 else
-    d=cluster_system.dimension;
+    d=cluster_system.cce.dimension;
 end
 if iscell(coil)
     coils=coil;
@@ -152,7 +152,7 @@ end
 
 % Validate dimensions and explicit evolution semantics
 function grumble(system,L,coil,rho,timestep,nsteps,output)
-if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')
+if ~isstruct(system)||~isfield(system,'cce')||~isfield(system.cce,'sites')
     error('cce_evolution:system','A native retained subsystem is required.');
 end
 if ~isnumeric(timestep)||~isreal(timestep)||~isscalar(timestep)||~isfinite(timestep)||...
@@ -166,11 +166,11 @@ if ~isnumeric(rho)||any(~isfinite(rho),'all')
 end
 if isstruct(L)
     if ~isscalar(L)||~all(isfield(L,{'kind','left','right','dissipator','physical_ids','formalism'}))||...
-       ~strcmp(L.kind,'cce_projected')||~isequal(L.physical_ids,system.physical_ids)||...
-       ~strcmp(L.formalism,system.formalism)
+       ~strcmp(L.kind,'cce_projected')||~isequal(L.physical_ids,system.cce.ids)||...
+       ~strcmp(L.formalism,system.bas.formalism)
         error('cce_evolution:branches','Use the explicitly tagged generator for this subsystem.');
     end
-    d=system.bath_dimension;
+    d=system.cce.bath_dimension;
     if ~isequal(size(rho),[d^2 1])||~isequal(size(L.left),[d d])||...
        ~isequal(size(L.right),[d d])||any(~isfinite(L.left),'all')||...
        any(~isfinite(L.right),'all')||(~isempty(L.dissipator)&&...
@@ -181,8 +181,8 @@ if isstruct(L)
        norm(L.right-L.right','fro')>d*eps(max(1,norm(L.right,'fro')))
         error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
     end
-elseif strcmp(system.formalism,'zeeman-hilb')
-    d=system.dimension;
+elseif strcmp(system.bas.formalism,'zeeman-hilb')
+    d=system.cce.dimension;
     if ~isnumeric(L)||any(~isfinite(L),'all')||~isequal(size(L),[d d])||...
        ~isequal(size(rho),[d d])
         error('cce_evolution:hilbert','Hilbert generators and states must be square retained matrices.');
@@ -190,8 +190,8 @@ elseif strcmp(system.formalism,'zeeman-hilb')
     if norm(L-L','fro')>d*eps(max(1,norm(L,'fro')))
         error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
     end
-elseif strcmp(system.formalism,'zeeman-liouv')
-    d=system.dimension;
+elseif strcmp(system.bas.formalism,'zeeman-liouv')
+    d=system.cce.dimension;
     if ~isnumeric(L)||any(~isfinite(L),'all')||~isequal(size(L),[d^2 d^2])||...
        ~isequal(size(rho),[d^2 1])
         error('cce_evolution:liouville','Liouville generators act on column-major density vectors.');

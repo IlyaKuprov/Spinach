@@ -56,10 +56,10 @@ result=test_true(result,'Retained metadata order',isequal(aux.cce_aux.physical_i
 
 % A changed representation is a cache miss, not a reused Hilbert matrix
 changed=cluster;
-changed.formalism='zeeman-liouv';
+changed.bas.formalism='zeeman-liouv';
 [changed_H,~,~,~,changed_cache]=cce_generators(changed,p,cache);
 result=test_true(result,'Representation cache invalidation',...
-                 changed_cache.misses==2&&isequal(size(changed_H),[cluster.dimension^2 cluster.dimension^2]),...
+                 changed_cache.misses==2&&isequal(size(changed_H),[cluster.cce.dimension^2 cluster.cce.dimension^2]),...
                  'An exact cache key includes the retained representation.');
 
 % Compare conventional evolution against independent dense matrix exponentials
@@ -84,7 +84,7 @@ result=test_close(result,'Finite coherent pulse',actual,U*rho*U',2e-12,2e-13,...
 
 % Compare column-major Liouville propagation and stock evolution explicitly
 liouv=cluster;
-liouv.formalism='zeeman-liouv';
+liouv.bas.formalism='zeeman-liouv';
 [L,R,K,~,~]=cce_generators(liouv,p,[]);
 actual=cce_evolution(liouv,L+1i*R+1i*K,[],rho(:),time,1,'final');
 result=test_close(result,'Hilbert and Liouville identity',actual,reference(:),2e-12,2e-13,...
@@ -114,7 +114,7 @@ projected.cce.approximation='projected';
 [branches,~,~,~,~]=cce_generators(cluster,projected,[]);
 [block,detector,~,~]=cce_observation(cluster,projected);
 actual=cce_evolution(cluster,branches,detector,block,time,1,'final');
-db=cluster.bath_dimension;
+db=cluster.cce.bath_dimension;
 expected=expm(-1i*branches.left*time)*reshape(block,db,db)*expm(1i*branches.right*time);
 result=test_close(result,'Projected left and right branches',actual,expected(:),2e-12,2e-13,...
                   'The left and right conditional generators retain the detected phase.');
@@ -183,7 +183,7 @@ nitrogen=pauli(3);
 ordered.bath_jumps=struct('support',[2 3],'operator',kron(local.p,nitrogen.z),'rate',rate);
 [~,multi,~,~,~]=cce_generators(liouv,ordered,[]);
 op=cce_operator(cluster,{'L+','Lz'},{2,3});
-d=cluster.dimension;
+d=cluster.cce.dimension;
 expected=rate*(kron(conj(op),op)-0.5*kron(eye(d),op'*op)-...
                0.5*kron((op'*op).',eye(d)));
 result=test_close(result,'Ordered multi-spin jump support',multi,expected,2e-13,2e-13,...

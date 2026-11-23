@@ -43,29 +43,29 @@ grumble(spin_system,parameters,H,R,K);
 
 % Get the retained dimensions and physical spin identifiers
 noise=parameters.noise;
-obs_dim=spin_system.observed_dimension;
-bath_dim=spin_system.bath_dimension;
+obs_dim=spin_system.cce.observed_dimension;
+bath_dim=spin_system.cce.bath_dimension;
 dimension=obs_dim*bath_dim;
-ids=spin_system.physical_ids;
+ids=spin_system.cce.ids;
 
 % Form the product bath density and the retained fluctuation operator
 B=zeros(dimension);
 density=1;
-for j=1:numel(spin_system.bath_rho)
-    density=kron(density,spin_system.bath_rho{j});
+for j=1:numel(spin_system.cce.bath_rho)
+    density=kron(density,spin_system.cce.bath_rho{j});
 end
 if isfield(noise,'terms')
     for term=reshape(noise.terms,1,[])
 
         % Embed each supported physical fluctuation term
         if all(ismember(term.support,ids))
-            B=B+embed(term.operator,term.support,ids,spin_system.multiplicities);
+            B=B+embed(term.operator,term.support,ids,spin_system.comp.mults(spin_system.cce.ids));
         end
 
     end
 else
     local=spin_system;
-    local.formalism='zeeman-hilb';
+    local.bas.formalism='zeeman-hilb';
     for descriptor=reshape(noise.descriptors,1,[])
 
         % Restrict the named spin sum to this retained cluster
@@ -81,7 +81,7 @@ B=B(1:bath_dim,1:bath_dim);
 
 % Construct the declared bath Hamiltonian without tracing an observed transition
 system=spin_system;
-system.formalism='zeeman-hilb';
+system.bas.formalism='zeeman-hilb';
 local=parameters;
 local.cce.approximation='generalized';
 if isfield(local,'bath_jumps')
@@ -95,7 +95,7 @@ if strcmp(noise.manifold,'bath_only')
         bath_ham=bath_ham+reshape(ham(:,n,:,n),bath_dim,bath_dim)/obs_dim;
     end
 else
-    transition=system.model.cce.transition;
+    transition=system.cce.transition;
     if strcmp(noise.manifold,'alpha')
         vector=transition.alpha;
     else
@@ -220,7 +220,7 @@ if isfield(parameters,'sequence')
     error('noise_correlation:sequence',...
           'Use finite_drive, refocusing_train, or hahn_echo for controls.');
 end
-if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsystem')||...
+if ~isstruct(system)||~isfield(system,'cce')||~isfield(system.cce,'sites')||...
    ~isnumeric(H)||~isnumeric(R)||~isnumeric(K)||~isfield(parameters,'noise')||...
    ~all(isfield(parameters.noise,{'ordering','connected','manifold'}))||...
    (isfield(parameters.noise,'terms')==isfield(parameters.noise,'descriptors'))
@@ -242,15 +242,15 @@ if ~isfield(parameters,'times')||any(~isfinite(parameters.times))||...
     error('noise_correlation:times',...
           'Elapsed times must be finite, nonnegative and increasing.');
 end
-dimension=system.observed_dimension*system.bath_dimension;
-if 16*(8*dimension^2+8*system.bath_dimension^4+4*numel(parameters.times))>...
+dimension=system.cce.observed_dimension*system.cce.bath_dimension;
+if 16*(8*dimension^2+8*system.cce.bath_dimension^4+4*numel(parameters.times))>...
    parameters.cce.numerics.max_memory_bytes
     error('noise_correlation:memory',...
           'Noise propagation exceeds the declared memory budget.');
 end
 if isfield(noise,'terms')
     for term=noise.terms
-        dimension=prod(system.model.comp.mults(term.support));
+        dimension=prod(system.comp.mults(term.support));
         if ~all(ismember(term.support,parameters.cce.bath_spins))||...
            ~isequal(size(term.operator),[dimension dimension])||...
            any(~isfinite(term.operator),'all')||...
@@ -258,7 +258,7 @@ if isfield(noise,'terms')
             error('noise_correlation:operator',...
                   'Fluctuation operators must be Hermitian and supported on bath spins.');
         end
-        overlap=ismember(term.support,system.physical_ids);
+        overlap=ismember(term.support,system.cce.ids);
         if any(overlap)&&~all(overlap)
             error('noise_correlation:support',...
                   'A fluctuation support is split by this cluster.');
@@ -293,7 +293,7 @@ if isfield(parameters,'bath_jumps')
         end
     end
 end
-if ~strcmp(noise.manifold,'bath_only')&&~isfield(system.model.cce,'transition')
+if ~strcmp(noise.manifold,'bath_only')&&~isfield(system.cce,'transition')
     error('noise_correlation:transition',...
           'A selected noise manifold requires an observed transition.');
 end

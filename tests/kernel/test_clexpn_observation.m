@@ -69,7 +69,7 @@ result=test_close(result,'Non-Hermitian descriptor',coil,kron([0 1;0 0],eye(2)),
 result=test_close(result,'Descriptor reference',reference,0.5,0,0,...
                   'The actual initial signal supplies the normalization reference.');
 liouv=cluster;
-liouv.formalism='zeeman-liouv';
+liouv.bas.formalism='zeeman-liouv';
 [vector,detector,~,~]=cce_observation(liouv,spec);
 result=test_close(result,'Liouville preparation vectorisation',vector,rho(:),0,0,...
                   'Preparation is vectorised column-major.');

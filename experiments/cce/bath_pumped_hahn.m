@@ -63,10 +63,10 @@ aux=struct();
 if ~iscell(coil)
     coil={coil};
 end
-projected=isstruct(H);
+projected=iscell(H);
 E=complex(zeros(numel(parameters.times),numel(reference)));
 if projected
-    generator=H;
+    generator=[H {R}];
 else
     generator=H+1i*R+1i*K;
 end
@@ -124,17 +124,17 @@ pulse_kind=[1 2];
 pulse_kind=pulse_kind(order);
 
 % Retain ordered branch propagators and their numerical error diagnostics
-if projected&&isempty(H.dissipator)&&...
+if projected&&isempty(R)&&...
    ~isfield(parameters,'rho0')&&~isfield(parameters,'preparation')&&~isfield(parameters,'coil')
     selected=aux.selected_sites;
 
     % Resolve both spectra once for the complete observation-time axis
-    [va,ea]=eig(full((H.left+H.left')/2),'vector');
-    [vb,eb]=eig(full((H.right+H.right')/2),'vector');
-    ra=norm(H.left*va-va.*ea.','fro');
-    rb=norm(H.right*vb-vb.*eb.','fro');
-    oa=norm(va'*va-eye(size(H.left)),'fro');
-    ob=norm(vb'*vb-eye(size(H.right)),'fro');
+    [va,ea]=eig(full((H{1}+H{1}')/2),'vector');
+    [vb,eb]=eig(full((H{2}+H{2}')/2),'vector');
+    ra=norm(H{1}*va-va.*ea.','fro');
+    rb=norm(H{2}*vb-vb.*eb.','fro');
+    oa=norm(va'*va-eye(size(H{1})),'fro');
+    ob=norm(vb'*vb-eye(size(H{2})),'fro');
     residual=max(ra,rb);
     orthogonality=max(oa,ob);
     db=spin_system.cce.bath_dimension;
@@ -226,8 +226,8 @@ if projected&&isempty(H.dissipator)&&...
         end
         operations=28*db^3;
         gamma=operations*eps/(1-operations*eps);
-        bounds(n)=2*time*(residual+H.hamiltonian_abs_error_bound)+12*orthogonality+...
-                  gamma*(1+time*H.hamiltonian_norm);
+        bounds(n)=2*time*(residual+parameters.cce_aux.roundoff_bound)+12*orthogonality+...
+                  gamma*(1+time*parameters.cce_aux.hamiltonian_norm);
 
     end
     if ~meta.normalized
@@ -238,7 +238,7 @@ if projected&&isempty(H.dissipator)&&...
     % Retain numerical propagation diagnostics
     aux=struct('abs_error_bound',bounds,'eigen_residual',residual,...
                'orthogonality_residual',orthogonality,...
-               'hamiltonian_bound',H.hamiltonian_abs_error_bound,...
+               'hamiltonian_bound',parameters.cce_aux.roundoff_bound,...
                'backend',parameters.cce_aux.backend);
 
     aux.selected_sites=selected;
@@ -270,7 +270,7 @@ else
 end
 
 % Bound the Frobenius gain of all subsequent trace-norm-contractive channels
-if (projected&&nnz(H.dissipator)>0)||(~projected&&(nnz(R)>0||nnz(K)>0))
+if (projected&&nnz(R)>0)||(~projected&&(nnz(R)>0||nnz(K)>0))
     scale=sqrt(pulse_dim)*scale;
 end
 aux.abs_error_bound=zeros(size(E));
@@ -290,8 +290,7 @@ for n=1:numel(parameters.times)
             % Apply the next free interval and physical rotation
             segment=generator;
             if projected&&swapped
-                segment.left=H.right;
-                segment.right=H.left;
+                segment=generator([2 1 3]);
             end
             duration=(fractions(j)-previous)*parameters.times(n);
             [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
@@ -330,8 +329,7 @@ for n=1:numel(parameters.times)
     end
     segment=generator;
     if projected&&swapped
-        segment.left=H.right;
-        segment.right=H.left;
+        segment=generator([2 1 3]);
     end
     duration=(1-previous)*parameters.times(n);
     [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
@@ -378,7 +376,7 @@ end
 if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
     error('bath_pumped_hahn:dissipation','This experiment is closed-system only.');
 end
-if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
+if ~(isnumeric(H)||iscell(H))||~isnumeric(R)||~isnumeric(K)
     error('bath_pumped_hahn:generators','Supply conventional or tagged projected generators.');
 end
 if ~isfield(parameters,'pump')||~isstruct(parameters.pump)||...

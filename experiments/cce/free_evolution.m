@@ -51,7 +51,7 @@ if ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'times')||.
     error('free_evolution:times','Supply finite nonnegative increasing elapsed times.');
 end
 if ~isstruct(spin_system)||~isstruct(parameters)||~isscalar(parameters)||...
-   ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
+   ~(isnumeric(H)||iscell(H))||~isnumeric(R)||~isnumeric(K)
     error('free_evolution:input',...
           'Supply a native subsystem, parameters, and generators.');
 end

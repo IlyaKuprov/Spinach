@@ -120,19 +120,17 @@ result=test_true(result,'C7 contract check',refused,'Negative native dissipative
 
 % Require a zero-rate nonclosed jump to disappear rather than change the model
 p.bath_jumps.rate=0;
-zero_rate=cce_generators(subsystem,p,[]);
+[zero_rate,zero_loss]=cce_generators(subsystem,p,[]);
 p.bath_jumps=struct('support',{},'operator',{},'rate',{});
-no_jump=cce_generators(subsystem,p,[]);
-zero_loss=0;
-no_loss=0;
-if ~isempty(zero_rate.dissipator)
-    zero_loss=zero_rate.dissipator;
+[no_jump,no_loss]=cce_generators(subsystem,p,[]);
+if isempty(zero_loss)
+    zero_loss=0;
 end
-if ~isempty(no_jump.dissipator)
-    no_loss=no_jump.dissipator;
+if isempty(no_loss)
+    no_loss=0;
 end
-zero_rate=-1i*(zero_rate.left-zero_rate.right)+zero_loss;
-no_jump=-1i*(no_jump.left-no_jump.right)+no_loss;
+zero_rate=-1i*(zero_rate{1}-zero_rate{2})+zero_loss;
+no_jump=-1i*(no_jump{1}-no_jump{2})+no_loss;
 result=test_close(result,'Zero-rate limit',zero_rate,no_jump,0,0,...
                   'A vanishing coefficient contributes no dissipator or manifold leakage.');
 

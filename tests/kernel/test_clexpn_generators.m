@@ -111,18 +111,17 @@ result=test_close(result,'Stock Liouville observable semantics',ours,stock_signa
 % Conditional alpha/beta generators preserve complex branch phase and swapping
 projected=p;
 projected.cce.approximation='projected';
-[branches,~,~,~,~]=cce_generators(cluster,projected,[]);
+[branches,loss,~,~,~]=cce_generators(cluster,projected,[]);
+branches=[branches {loss}];
 [block,detector,~,~]=cce_observation(cluster,projected);
 actual=cce_evolution(cluster,branches,detector,block,time,1,'final');
 db=cluster.cce.bath_dimension;
-expected=expm(-1i*branches.left*time)*reshape(block,db,db)*expm(1i*branches.right*time);
+expected=expm(-1i*branches{1}*time)*reshape(block,db,db)*expm(1i*branches{2}*time);
 result=test_close(result,'Projected left and right branches',actual,expected(:),2e-12,2e-13,...
                   'The left and right conditional generators retain the detected phase.');
-swapped=branches;
-swapped.left=branches.right;
-swapped.right=branches.left;
+swapped=branches([2 1 3]);
 actual=cce_evolution(cluster,swapped,detector,actual,time,1,'final');
-expected=expm(-1i*branches.right*time)*expected*expm(1i*branches.left*time);
+expected=expm(-1i*branches{2}*time)*expected*expm(1i*branches{1}*time);
 result=test_close(result,'Projected pulse branch swap',actual,expected(:),2e-12,2e-13,...
                   'A refocusing pulse swaps conditional branches without conjugating the state.');
 
@@ -152,7 +151,8 @@ result=test_close(result,'Dissipative Hermiticity',final,final',2e-14,0,...
 
 % Compare projected dissipation against a full-space coherence block
 projected.bath_jumps=struct('support',2,'operator','L+','rate',rate);
-[branches,~,~,~,~]=cce_generators(cluster,projected,[]);
+[branches,loss,~,~,~]=cce_generators(cluster,projected,[]);
+branches=[branches {loss}];
 actual=cce_evolution(cluster,branches,detector,block,time,1,'final');
 fullp=projected;
 fullp.cce.approximation='generalized';
@@ -165,11 +165,10 @@ result=test_close(result,'Projected and full dissipative block',actual,expected(
                   'Projected jumps preserve the complete left/right GKSL contraction.');
 
 % The projected swap matrix matches independently reversed GKSL branches
-swap=branches.swap_matrix;
-reversed=branches;
-reversed.left=branches.right;
-reversed.right=branches.left;
-reversed.dissipator=swap*conj(branches.dissipator)*swap;
+labels=reshape(1:db^2,db,db).';
+swap=sparse(1:db^2,labels(:),1,db^2,db^2);
+reversed=branches([2 1 3]);
+reversed{3}=swap*conj(branches{3})*swap;
 reversed_state=cce_evolution(cluster,reversed,detector,block,time,1,'final');
 expected=reshape(conj(cce_evolution(cluster,branches,detector,...
                     reshape(reshape(block,db,db)',db^2,1),time,1,'final')),db,db).';
@@ -204,13 +203,14 @@ second.cce.second_order=struct('enabled',true,'gap_tolerance',1,'overlap_toleran
 second_model_p=cce_options(second_system,second,@cce_compile,{'labframe'});
 second_model=cce_compile(second_system,second_model_p,{'labframe'});
 [second_cluster,~]=cce_subsystem(second_model,second_model_p,[2 3],struct(),[]);
-[branches,~,~,~,~]=cce_generators(second_cluster,second,[]);
+[branches,loss,~,~,~]=cce_generators(second_cluster,second,[]);
+branches=[branches {loss}];
 x=[0 1;1 0]/2;
 field=100*kron(x,eye(2))+80*kron(eye(2),x);
-result=test_close(result,'Static alpha virtual-state correction',branches.left,...
+result=test_close(result,'Static alpha virtual-state correction',branches{1},...
                   500*eye(4)+field*field/4000,2e-12,2e-13,...
                   'The susceptibility keeps the observed matrix elements and signed gaps.');
-result=test_close(result,'Static beta virtual-state correction',branches.right,...
+result=test_close(result,'Static beta virtual-state correction',branches{2},...
                   -500*eye(4)-field*field/4000,2e-12,2e-13,...
                   'The opposite observed manifold has the opposite energy denominator.');
 
@@ -231,9 +231,9 @@ result=test_true(result,'Negative jump rate rejected',...
 result=test_true(result,'Unsupported output rejected',...
                  rejects(@()cce_evolution(cluster,H,[],rho,time,1,'refocus')),...
                  'Undeclared evolution output semantics must fail explicitly.');
-result=test_true(result,'Untagged branch struct rejected',...
-                 rejects(@()cce_evolution(cluster,struct('left',H),[],rho,time,1,'final')),...
-                 'An arbitrary structure is not a projected generator.');
+result=test_true(result,'Incomplete branch cell rejected',...
+                 rejects(@()cce_evolution(cluster,{H},[],rho,time,1,'final')),...
+                 'A projected generator needs both branches and the dissipator.');
 
 end
 

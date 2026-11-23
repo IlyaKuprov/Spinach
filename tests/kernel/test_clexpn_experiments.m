@@ -143,8 +143,9 @@ for sites={[],2}
                 result=test_close(result,'Hahn physical fixed receiver',actual,expected,...
                                   3e-13,3e-13,'Complex preparation and detector match full-space evolution.');
                 if isequal(sequence{1},@hahn_echo)&&strcmp(formalism{1},'zeeman-hilb')
-                    plain=rmfield(hp,{'hamiltonian_abs_error_bound','hamiltonian_norm'});
-                    fallback=hahn_echo(retained,proj_p,plain,rp,kp);
+                    plain=proj_p;
+                    plain.cce_aux=rmfield(plain.cce_aux,'hamiltonian_norm');
+                    fallback=hahn_echo(retained,plain,hp,rp,kp);
                     result=test_close(result,'Hahn non-spectral fixed receiver',fallback,expected,...
                                       3e-13,3e-13,'The interval fallback detects the same physical coherence.');
                 end
@@ -587,8 +588,9 @@ config=rmfield(diagnostics.ensemble.spin_config,'assignment');
 [cluster,~]=cce_subsystem(model,model_p,2,config,[]);
 [H,R,K,p]=cce_generators(cluster,diagnostics.parameters,[]);
 [actual,aux]=hahn_echo(cluster,p,H,R,K);
-plain=rmfield(H,{'hamiltonian_abs_error_bound','hamiltonian_norm'});
-expected=hahn_echo(cluster,p,plain,R,K);
+plain=p;
+plain.cce_aux=rmfield(plain.cce_aux,'hamiltonian_norm');
+expected=hahn_echo(cluster,plain,H,R,K);
 result=test_close(result,'Projected unnormalised spectral pulse products',...
                   actual,expected,2e-14,2e-14,...
                   'Arbitrary coherent preparation and receiver phase retain their scale.');
@@ -675,13 +677,13 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 if ~iscell(coils)
                     coils={coils};
                 end
-                if isstruct(H)&&~isempty(H.dissipator)
+                if iscell(H)&&~isempty(R)
                     db=retained.cce.bath_dimension;
                     scale=64*eps*db^2;
-                    frequency=norm(-1i*(kron(eye(db),H.left)-kron(H.right.',eye(db)))+H.dissipator,1);
-                elseif isstruct(H)
+                    frequency=norm(-1i*(kron(eye(db),H{1})-kron(H{2}.',eye(db)))+R,1);
+                elseif iscell(H)
                     scale=16*eps*retained.cce.bath_dimension^3;
-                    frequency=norm(H.left,1)+norm(H.right,1);
+                    frequency=norm(H{1},1)+norm(H{2},1);
                 elseif strcmp(formalism{1},'zeeman-hilb')
                     scale=16*eps*retained.cce.dimension^3;
                     frequency=2*norm(H,1);
@@ -697,7 +699,7 @@ for sequence={@cpmg_echo,@cce_eseem,@hahn_echo,@bath_pumped_hahn}
                 if hahn||pumped
                     dim=retained.cce.dimension;
                     products=1+pumped;
-                    if isstruct(H)
+                    if iscell(H)
                         dim=retained.cce.bath_dimension;
                         products=pumped;
                     end

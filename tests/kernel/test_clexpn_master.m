@@ -97,11 +97,11 @@ zero_model_p=cce_options(s,zero,@cce_compile,'labframe');
 zero_model=cce_compile(s,zero_model_p,'labframe');
 [zero_system,~]=cce_subsystem(zero_model,zero_model_p,[],struct(),[]);
 zero_parameters=zero_model_p;
-[with_zero,~,~]=cce_generators(zero_system,zero_parameters,[]);
+[with_zero,zero_loss,~]=cce_generators(zero_system,zero_parameters,[]);
 zero_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
 [without_jump,~,~]=cce_generators(zero_system,zero_parameters,[]);
-zero_generator=-1i*(with_zero.left-with_zero.right)+with_zero.dissipator;
-no_generator=-1i*(without_jump.left-without_jump.right);
+zero_generator=-1i*(with_zero{1}-with_zero{2})+zero_loss;
+no_generator=-1i*(without_jump{1}-without_jump{2});
 result=test_close(result,'Zero-rate projected jump omitted',zero_generator,no_generator,0,0,...
                   'A zero coefficient contributes neither dissipation nor manifold leakage.');
 

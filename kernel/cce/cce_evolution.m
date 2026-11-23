@@ -38,7 +38,7 @@ function [answer,state_error]=cce_evolution(spin_system,L,coil,rho,timestep,nste
 
 % Reject unsupported representation/output pairs before propagation
 grumble(spin_system,L,coil,rho,timestep,nsteps,output);
-projected=isstruct(L);
+projected=iscell(L);
 hilbert=~projected&&strcmp(spin_system.bas.formalism,'zeeman-hilb');
 if projected
     d=spin_system.cce.bath_dimension;
@@ -56,10 +56,10 @@ if ~projected&&~hilbert
     L=full(L);
 end
 if projected
-    [va,ea]=eig(full((L.left+L.left')/2),'vector');
-    [vb,eb]=eig(full((L.right+L.right')/2),'vector');
-    if ~isempty(L.dissipator)
-        generator=-1i*(kron(eye(d),L.left)-kron(L.right.',eye(d)))+L.dissipator;
+    [va,ea]=eig(full((L{1}+L{1}')/2),'vector');
+    [vb,eb]=eig(full((L{2}+L{2}')/2),'vector');
+    if ~isempty(L{3})
+        generator=-1i*(kron(eye(d),L{1})-kron(L{2}.',eye(d)))+L{3};
     end
 elseif hilbert
     [vectors,energies]=eig(full((L+L')/2),'vector');
@@ -88,8 +88,8 @@ end
 % Estimate state roundoff using the CCE segment arithmetic models
 if nargout>1
     elapsed=abs(timestep)*steps(:);
-    if projected&&isempty(L.dissipator)
-        frequency=norm(L.left,1)+norm(L.right,1);
+    if projected&&isempty(L{3})
+        frequency=norm(L{1},1)+norm(L{2},1);
         roundoff=16*d^3*eps;
     elseif hilbert
         frequency=2*norm(L,1);
@@ -113,7 +113,7 @@ for step=steps
     if time==0
         state=rho;
     elseif projected
-        if isempty(L.dissipator)
+        if isempty(L{3})
             ua=va*diag(exp(-1i*ea*time))*va';
             ub=vb*diag(exp(-1i*eb*time))*vb';
             state=ua*reshape(rho,d,d)*ub';
@@ -164,21 +164,19 @@ end
 if ~isnumeric(rho)||any(~isfinite(rho),'all')
     error('cce_evolution:state','The initial state must be finite numeric data.');
 end
-if isstruct(L)
-    if ~isscalar(L)||~all(isfield(L,{'kind','left','right','dissipator','physical_ids','formalism'}))||...
-       ~strcmp(L.kind,'cce_projected')||~isequal(L.physical_ids,system.cce.ids)||...
-       ~strcmp(L.formalism,system.bas.formalism)
-        error('cce_evolution:branches','Use the explicitly tagged generator for this subsystem.');
+if iscell(L)
+    if numel(L)~=3
+        error('cce_evolution:branches','Supply the two branch Hamiltonians and the dissipator.');
     end
     d=system.cce.bath_dimension;
-    if ~isequal(size(rho),[d^2 1])||~isequal(size(L.left),[d d])||...
-       ~isequal(size(L.right),[d d])||any(~isfinite(L.left),'all')||...
-       any(~isfinite(L.right),'all')||(~isempty(L.dissipator)&&...
-       (~isequal(size(L.dissipator),[d^2 d^2])||any(~isfinite(L.dissipator),'all')))
+    if ~isequal(size(rho),[d^2 1])||~isequal(size(L{1}),[d d])||...
+       ~isequal(size(L{2}),[d d])||any(~isfinite(L{1}),'all')||...
+       any(~isfinite(L{2}),'all')||(~isempty(L{3})&&...
+       (~isequal(size(L{3}),[d^2 d^2])||any(~isfinite(L{3}),'all')))
         error('cce_evolution:branches','Projected branch dimensions must match the bath block.');
     end
-    if norm(L.left-L.left','fro')>d*eps(max(1,norm(L.left,'fro')))||...
-       norm(L.right-L.right','fro')>d*eps(max(1,norm(L.right,'fro')))
+    if norm(L{1}-L{1}','fro')>d*eps(max(1,norm(L{1},'fro')))||...
+       norm(L{2}-L{2}','fro')>d*eps(max(1,norm(L{2},'fro')))
         error('cce_evolution:hermiticity','Hilbert branch generators must be Hermitian.');
     end
 elseif strcmp(system.bas.formalism,'zeeman-hilb')

@@ -46,13 +46,13 @@ if ~iscell(coil)
 end
 
 % Allocate the signal and choose the propagation representation
-projected=isstruct(H);
+projected=iscell(H);
 E=complex(zeros(numel(parameters.times),numel(reference)));
 scale=cellfun(@(x)norm(x,'fro'),coil(:).')./abs(meta.normalization_divisor);
 aux.abs_error_bound=zeros(size(E));
 aux.error_bound_kind='floating_point_estimate';
 if projected
-    generator=H;
+    generator=[H {R}];
 else
     generator=H+1i*R+1i*K;
 end
@@ -80,8 +80,7 @@ for n=1:numel(parameters.times)
             % Evolve up to the next ideal inversion
             segment=generator;
             if projected&&swapped
-                segment.left=H.right;
-                segment.right=H.left;
+                segment=generator([2 1 3]);
             end
             duration=(fractions(j)-previous)*parameters.times(n);
             [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
@@ -105,8 +104,7 @@ for n=1:numel(parameters.times)
     % Propagate from the final pulse to the detection time
     segment=generator;
     if projected&&swapped
-        segment.left=H.right;
-        segment.right=H.left;
+        segment=generator([2 1 3]);
     end
     duration=(1-previous)*parameters.times(n);
     [rho,estimate]=cce_evolution(spin_system,segment,[],rho,duration,1,'final');
@@ -154,7 +152,7 @@ end
 if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
     error('cce_eseem:dissipation','This experiment is closed-system only.');
 end
-if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
+if ~(isnumeric(H)||iscell(H))||~isnumeric(R)||~isnumeric(K)
     error('cce_eseem:generators','Supply conventional or tagged projected generators.');
 end
 if ~isfield(spin_system.cce,'transition')

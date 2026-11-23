@@ -271,8 +271,8 @@ liouville.cce.numerics.max_memory_bytes=2^28;
 large_model.bas.formalism='zeeman-liouv';
 large_model_p=liouville;
 [subsystem,~]=cce_subsystem(large_model,large_model_p,7,struct(),[]);
-[H,~,~]=cce_generators(subsystem,liouville,[]);
-reference=-1i*(kron(eye(2),H.left)-kron(H.right.',eye(2)))+H.dissipator;
+[H,R,~]=cce_generators(subsystem,liouville,[]);
+reference=-1i*(kron(eye(2),H{1})-kron(H{2}.',eye(2)))+R;
 liouville.cce.numerics.max_memory_bytes=10000;
 refused=false;
 try

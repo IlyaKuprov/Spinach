@@ -183,26 +183,17 @@ if projected
         right=(right+right')/2;
 
     end
-    H=struct('kind','cce_projected','left',left,'right',right,...
-             'formalism',spin_system.bas.formalism,'physical_ids',ids,...
-             'dissipator',[],'swap_matrix',[]);
-    H.hamiltonian_abs_error_bound=meta.roundoff_bound;
-    H.hamiltonian_norm=norm(ham,'fro');
-    if ~isempty(jumps)||strcmp(spin_system.bas.formalism,'zeeman-liouv')
-        [H.dissipator,jump_records]=dissipator(spin_system,jumps,va,vb);
-        if periodic
-            H.left=sparse(H.left);
-            H.right=sparse(H.right);
-            H.dissipator=sparse(H.dissipator);
-        end
-
-        % Map each column-major bath entry to its transposed position
-        labels=reshape(1:db^2,db,db).';
-        H.swap_matrix=sparse(1:db^2,labels(:),1,db^2,db^2);
-
-    end
+    H={left,right};
     R=[];
     K=[];
+    parameters.cce_aux.hamiltonian_norm=norm(ham,'fro');
+    if ~isempty(jumps)||strcmp(spin_system.bas.formalism,'zeeman-liouv')
+        [R,jump_records]=dissipator(spin_system,jumps,va,vb);
+        if periodic
+            H={sparse(left),sparse(right)};
+            R=sparse(R);
+        end
+    end
 elseif strcmp(spin_system.bas.formalism,'zeeman-liouv')
 
     % Column-major vectorisation fixes the transposes and the relaxation sign
@@ -222,8 +213,8 @@ if exist('jump_records','var')
     ha=ham;
     hb=ham;
     if projected
-        ha=H.left;
-        hb=H.right;
+        ha=H{1};
+        hb=H{2};
     end
     parameters.cce_aux.generator=struct('physical_ids',ids,'dimension',d,...
         'bath_dimension',db,'observed_dimension',spin_system.cce.observed_dimension,...

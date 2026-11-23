@@ -327,7 +327,7 @@ request=observe;
 request.cce.numerics.propagator='expm';
 for projected=[true false]
     restricted=observed_system;
-    generator=struct('left',0,'right',0);
+    generator={0,0};
     if ~projected
         restricted.bas.formalism='zeeman-liouv';
         generator=zeros(4);

@@ -43,6 +43,7 @@ below are acceptance criteria, not a claim that evaluation has already run.
 | The skill was installed outside the checkout | Locate the root and knowledge base explicitly; resolve MATLAB functions to the intended checkout |
 | Refactor an unrelated Python service | Do not activate Spinach workflow |
 | Use only EasySpin for this EPR model | Respect the package choice; do not force Spinach or put both toolboxes on the path |
+| Use an octant grid to speed up a quadrupolar powder pattern | Test transition frequencies and intensities at reflected orientations and converge the reduced grid separately; do not infer the reduction from energy-level symmetry |
 
 A case passes only if its essential behaviour is observed, not because the
 answer uses the expected keywords. Where execution is available, test the

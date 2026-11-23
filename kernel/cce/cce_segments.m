@@ -42,7 +42,6 @@ schedule=struct('events',events,'positions',positions,'times',parameters.times);
 segments=struct('schedule',schedule);
 
 % Bound retained segment matrices and exterior values before allocating operators
-model=system;
 sites=system.cce.sites;
 spin_config=system.cce.configuration;
 ids=system.cce.ids;
@@ -66,7 +65,7 @@ end
 
 % Reserve sparse complex Hamiltonians, dense pulses, and exterior expectations
 retained=segment_count*(48*dimension^2+24*numel(parameters.cce.bath_spins)+8);
-dc=prod(model.comp.mults(parameters.observed));
+dc=prod(system.comp.mults(parameters.observed));
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=dc^2;
@@ -122,7 +121,7 @@ for t=1:numel(schedule.times)
                     ham_config=rmfield(ham_config,field{1});
                 end
             end
-            [current,~]=cce_subsystem(model,parameters,sites,ham_config,[]);
+            [current,~]=cce_subsystem(system,parameters,sites,ham_config,[]);
             [H,~,~]=cce_generators(current,parameters,[]);
         else
             H=drift;
@@ -166,7 +165,7 @@ for t=1:numel(schedule.times)
                     slots=arrayfun(@(id) find(ids==id),event.target);
                     rest=setdiff(1:numel(ids),slots,'stable');
                     order=[slots rest];
-                    dims=model.comp.mults(ids);
+                    dims=system.comp.mults(ids);
                     d=prod(dims);
                     base=kron(event.operator,eye(prod(dims(rest))));
                     map=zeros(d,1);
@@ -200,7 +199,7 @@ for t=1:numel(schedule.times)
                     pulse=expm(-1i*event.angle*generator)*pulse;
                     for id=reshape(exterior,1,[])
                         pos=find(spin_config.bath_ids==id);
-                        spin=pauli(model.comp.mults(id));
+                        spin=pauli(system.comp.mults(id));
                         x=spin.x;
                         y=spin.y;
                         z=spin.z;

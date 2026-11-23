@@ -37,10 +37,10 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function clusters=cce_clusters(model,graph,parameters)
+function clusters=cce_clusters(spin_system,graph,parameters)
 
 % Validate the physical group and graph contracts
-grumble(model,graph,parameters);
+grumble(spin_system,graph,parameters);
 
 % Resolve the complete physical partition
 if isfield(parameters.cce,'groups')&&~isempty(parameters.cce.groups)
@@ -190,8 +190,8 @@ index=dictionary(keys,(1:numel(family)).');
 
 % Bound decimal family signatures, including old/new concatenation copies
 physical_digits=1;
-if (model.comp.nspins>0)
-    physical_digits=1+floor(log10(model.comp.nspins));
+if (spin_system.comp.nspins>0)
+    physical_digits=1+floor(log10(spin_system.comp.nspins));
 end
 group_digits=1;
 if ng>0
@@ -245,18 +245,18 @@ entry.family_id=family_id;
 clusters=repmat(entry,numel(family),1);
 
 % Build canonical physical cluster metadata and subset index maps
-[~,observed_pos]=ismember(parameters.observed,1:model.comp.nspins);
-observed_dimension=prod(model.comp.mults(observed_pos));
+[~,observed_pos]=ismember(parameters.observed,1:spin_system.comp.nspins);
+observed_dimension=prod(spin_system.comp.mults(observed_pos));
 for k=1:numel(family)
 
     % Map group unions to physical Hilbert dimensions
     sites=sort([groups{family{k}}]);
-    [~,positions]=ismember(sites,1:model.comp.nspins);
+    [~,positions]=ismember(sites,1:spin_system.comp.nspins);
     clusters(k).id=uint64(k);
     clusters(k).groups=family{k};
     clusters(k).sites=sites;
     clusters(k).order=numel(family{k});
-    clusters(k).bath_dimension=prod(model.comp.mults(positions));
+    clusters(k).bath_dimension=prod(spin_system.comp.mults(positions));
     clusters(k).dimension=observed_dimension*clusters(k).bath_dimension;
     if ~isfinite(clusters(k).dimension)||clusters(k).dimension>flintmax
         error('cce_clusters:dimension','Hilbert dimension exceeds exact double integer range.');
@@ -335,13 +335,13 @@ end
 end
 
 % Validate the immutable metadata and explicit combinatorial decisions
-function grumble(model,graph,parameters)
+function grumble(spin_system,graph,parameters)
 if ~isstruct(parameters)||~isscalar(parameters)||~all(isfield(parameters,{'observed','cce'}))||...
    ~isstruct(parameters.cce)||~isfield(parameters.cce,'bath_spins')
     error('cce_clusters:parameters','resolved parameters are required.');
 end
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
-   ~all(ismember([parameters.observed parameters.cce.bath_spins],1:model.comp.nspins))||...
+if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'cce')||...
+   ~all(ismember([parameters.observed parameters.cce.bath_spins],1:spin_system.comp.nspins))||...
    ~isempty(intersect(parameters.observed,parameters.cce.bath_spins))
     error('cce_clusters:model','observed and bath spins must be distinct spins of the system.');
 end

@@ -41,27 +41,27 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function graph=cce_graph(model,parameters)
+function graph=cce_graph(spin_system,parameters)
 
 % Validate inputs
-grumble(model,parameters);
+grumble(spin_system,parameters);
 
 % Locate physical sites without interpreting IDs as array subscripts
-[~,bath_pos]=ismember(parameters.cce.bath_spins,1:model.comp.nspins);
-[~,observed_pos]=ismember(parameters.observed,1:model.comp.nspins);
+[~,bath_pos]=ismember(parameters.cce.bath_spins,1:spin_system.comp.nspins);
+[~,observed_pos]=ismember(parameters.observed,1:spin_system.comp.nspins);
 ids=parameters.cce.bath_spins;
 n=numel(ids);
 
 % Obtain physical two-spin operator norms before graph pruning
-ends=reshape([model.cce.pairs.ids],2,[]);
-[~,positions]=ismember(ends,1:model.comp.nspins);
-weights=zeros(1,numel(model.cce.pairs));
-for k=1:numel(model.cce.pairs)
+ends=reshape([spin_system.cce.pairs.ids],2,[]);
+[~,positions]=ismember(ends,1:spin_system.comp.nspins);
+weights=zeros(1,numel(spin_system.cce.pairs));
+for k=1:numel(spin_system.cce.pairs)
 
     % Resolve this unordered physical pair
-    pair=model.cce.pairs(k);
-    ma=model.comp.mults(positions(1,k));
-    mb=model.comp.mults(positions(2,k));
+    pair=spin_system.cce.pairs(k);
+    ma=spin_system.comp.mults(positions(1,k));
+    mb=spin_system.comp.mults(positions(2,k));
     spins=cell(2,3);
     for q=1:2
 
@@ -120,7 +120,7 @@ switch parameters.cce.graph.mode
     case 'complete'
         adjacency=~speye(n);
     case 'distance'
-        xyz=vertcat(model.inter.coordinates{bath_pos});
+        xyz=vertcat(spin_system.inter.coordinates{bath_pos});
         radius=parameters.cce.graph.radius;
         if radius==0
 
@@ -172,8 +172,8 @@ keep=true(1,n);
 if isfield(parameters.cce,'bath_radius')&&isfinite(parameters.cce.bath_radius)
     distance=inf(n,1);
     for k=observed_pos
-        distance=min(distance,vecnorm(vertcat(model.inter.coordinates{bath_pos})-...
-                                      model.inter.coordinates{k},2,2));
+        distance=min(distance,vecnorm(vertcat(spin_system.inter.coordinates{bath_pos})-...
+                                      spin_system.inter.coordinates{k},2,2));
     end
     keep=distance.'<=parameters.cce.bath_radius;
 end
@@ -189,7 +189,7 @@ graph=struct('bath_ids',ids(keep),'adjacency',sparse(adjacency(keep,keep)),...
 end
 
 % Validate shapes, physical IDs, graph semantics, and physical units
-function grumble(model,parameters)
+function grumble(spin_system,parameters)
 if ~isstruct(parameters)||~isscalar(parameters)||~all(isfield(parameters,{'observed','cce'}))||...
    ~all(isfield(parameters.cce,{'bath_spins','approximation','graph'}))||...
    ~isstruct(parameters.cce.graph)||~isscalar(parameters.cce.graph)||...
@@ -197,11 +197,11 @@ if ~isstruct(parameters)||~isscalar(parameters)||~all(isfield(parameters,{'obser
    ~ismember(parameters.cce.graph.mode,{'complete','distance','coupling','explicit'})
     error('cce_graph:parameters','resolved parameters with a graph mode are required.');
 end
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
-   ~isfield(model.cce,'pairs')
-    error('cce_graph:model','incomplete scalar model structure.');
+if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'cce')||...
+   ~isfield(spin_system.cce,'pairs')
+    error('cce_graph:model','incomplete scalar spin_system structure.');
 end
-ids=1:model.comp.nspins;
+ids=1:spin_system.comp.nspins;
 n=numel(parameters.cce.bath_spins);
 for name={parameters.observed,parameters.cce.bath_spins}
     values=name{1};
@@ -213,12 +213,12 @@ end
 if ~isempty(intersect(parameters.observed,parameters.cce.bath_spins))||isempty(parameters.observed)
     error('cce_graph:ids','observed IDs must be nonempty and disjoint from bath IDs.');
 end
-if ~isstruct(model.cce.pairs)||(~isempty(model.cce.pairs)&&~all(isfield(model.cce.pairs,{'ids','tensor'})))
+if ~isstruct(spin_system.cce.pairs)||(~isempty(spin_system.cce.pairs)&&~all(isfield(spin_system.cce.pairs,{'ids','tensor'})))
     error('cce_graph:pairs','pairs must be records ids,tensor.');
 end
-pairs=zeros(numel(model.cce.pairs),2);
-for k=1:numel(model.cce.pairs)
-    p=model.cce.pairs(k);
+pairs=zeros(numel(spin_system.cce.pairs),2);
+for k=1:numel(spin_system.cce.pairs)
+    p=spin_system.cce.pairs(k);
     if ~isnumeric(p.ids)||~isrow(p.ids)||numel(p.ids)~=2||...
        ~all(ismember(p.ids,ids))||p.ids(1)==p.ids(2)||...
        ~isnumeric(p.tensor)||~isreal(p.tensor)||~isequal(size(p.tensor),[3 3])||...
@@ -294,7 +294,7 @@ if isfield(parameters.cce,'bath_radius')&&(~isnumeric(parameters.cce.bath_radius
     error('cce_graph:radius','bath_radius must be nonnegative.');
 end
 if (strcmp(g.mode,'distance')||(isfield(parameters.cce,'bath_radius')&&...
-    isfinite(parameters.cce.bath_radius)))&&any(cellfun(@isempty,model.inter.coordinates))
+    isfinite(parameters.cce.bath_radius)))&&any(cellfun(@isempty,spin_system.inter.coordinates))
     error('cce_graph:coordinates','distance selection requires finite physical coordinates.');
 end
 end

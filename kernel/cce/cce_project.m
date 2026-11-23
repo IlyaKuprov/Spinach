@@ -29,13 +29,13 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function manifolds=cce_project(model,parameters)
+function manifolds=cce_project(spin_system,parameters)
 
 % Validate explicit observed vectors and perturbation controls
-grumble(model,parameters);
+grumble(spin_system,parameters);
 
 % Obtain the isolated observed Hamiltonian in the declared physical ordering
-[H_obs,meta]=cce_hamiltonian(model,parameters,[],struct());
+[H_obs,meta]=cce_hamiltonian(spin_system,parameters,[],struct());
 [eigenvectors,eigenvalues]=eig(full(H_obs),'vector');
 operators=reshape(meta.operators.',1,[]);
 
@@ -45,7 +45,7 @@ manifolds.second_order_enabled=enabled;
 manifolds.observed_hamiltonian=H_obs;
 manifolds.observed_ids=parameters.observed;
 manifolds.eigenvalues=eigenvalues;
-manifolds.source_hash=model.cce.source_hash;
+manifolds.source_hash=spin_system.cce.source_hash;
 
 % Project both user-supplied vectors without selecting arbitrary eigenindices
 for name={'alpha','beta'}
@@ -101,15 +101,15 @@ end
 end
 
 % Reject invalid state vectors and unresolved perturbation settings
-function grumble(model,parameters)
-if ~isstruct(model)||~isfield(model,'cce')||~isfield(model.cce,'source_hash')
+function grumble(spin_system,parameters)
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||~isfield(spin_system.cce,'source_hash')
     error('model must be returned by cce_compile.');
 end
 if ~isstruct(parameters)||~all(isfield(parameters,{'observed','cce','transition'}))||...
    ~isstruct(parameters.transition)||~all(isfield(parameters.transition,{'alpha','beta'}))
     error('transition.alpha and transition.beta must be explicitly supplied.');
 end
-dimension=prod(model.comp.mults(parameters.observed));
+dimension=prod(spin_system.comp.mults(parameters.observed));
 for name={'alpha','beta'}
     state=parameters.transition.(name{1});
     if ~isa(state,'double')||~isequal(size(state),[dimension 1])||any(~isfinite(state))

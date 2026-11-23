@@ -23,16 +23,16 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function partition=cce_partition(model,graph,parameters,pulse_sequence)
+function partition=cce_partition(spin_system,graph,parameters,pulse_sequence)
 
 % Validate native partition controls before constructing internal selections
-grumble(model,graph,parameters,pulse_sequence);
+grumble(spin_system,graph,parameters,pulse_sequence);
 
 % Canonicalise physical group membership
 p=parameters.cce.partition;
 ids=graph.bath_ids;
-[~,positions]=ismember(ids,1:model.comp.nspins);
-dims=model.comp.mults(positions);
+[~,positions]=ismember(ids,1:spin_system.comp.nspins);
+dims=spin_system.comp.mults(positions);
 groups=num2cell(ids);
 if isfield(parameters.cce,'groups')&&~isempty(parameters.cce.groups)
     groups=cellfun(@sort,parameters.cce.groups,'UniformOutput',false);
@@ -78,7 +78,7 @@ end
 
 % Assign farthest-first spatial seeds subject to exact Hilbert capacities
 if strcmp(p.mode,'spatial')&&~isempty(ids)
-    xyz=vertcat(model.inter.coordinates{positions});
+    xyz=vertcat(spin_system.inter.coordinates{positions});
     seeds=1;
     for k=2:p.group_count
         distance=inf(numel(ids),1);
@@ -276,9 +276,9 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
                 local.cce.graph.(field{1})=matrix(indices,indices);
             end
         end
-        local_graph=cce_graph(model,local);
-        family=cce_clusters(model,local_graph,local);
-        dc=prod(model.comp.mults(parameters.observed));
+        local_graph=cce_graph(spin_system,local);
+        family=cce_clusters(spin_system,local_graph,local);
+        dc=prod(spin_system.comp.mults(parameters.observed));
         components=1;
         if isfield(parameters,'output')&&strcmp(parameters.output,'density')
             components=dc^2;
@@ -304,11 +304,11 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             used=used+1;
             state=spin_configs(s);
             state.weight=1;
-            baseline=cce_evaluate(model,empty,state,pulse_sequence,evaluation);
-            exact=cce_evaluate(model,whole,state,pulse_sequence,evaluation);
+            baseline=cce_evaluate(spin_system,empty,state,pulse_sequence,evaluation);
+            exact=cce_evaluate(spin_system,whole,state,pulse_sequence,evaluation);
             records=repmat(baseline,1,numel(family));
             for c=1:numel(family)
-                records(c)=cce_evaluate(model,family(c),state,pulse_sequence,evaluation);
+                records(c)=cce_evaluate(spin_system,family(c),state,pulse_sequence,evaluation);
             end
 
             % Score all times using exact complete patches without auxiliary denominators
@@ -371,15 +371,15 @@ valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&value>=
 end
 
 % Validate declared group membership and partition bounds
-function grumble(model,graph,parameters,pulse_sequence)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
+function grumble(spin_system,graph,parameters,pulse_sequence)
+if ~isstruct(spin_system)||~isscalar(spin_system)||~isfield(spin_system,'cce')||...
    ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','pair_norm'}))||...
    ~isa(pulse_sequence,'function_handle')||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
    ~isstruct(parameters.cce)||~isscalar(parameters.cce)||...
    ~all(isfield(parameters.cce,{'partition','graph','order','numerics','expansion','approximation'}))||...
    ~isstruct(parameters.cce.partition)||~isscalar(parameters.cce.partition)
-    error('Canonical model, graph, and scalar partition parameters are required.');
+    error('Canonical spin_system, graph, and scalar partition parameters are required.');
 end
 parameters=parameters.cce;
 p=parameters.partition;
@@ -403,8 +403,8 @@ if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
    any(~isfinite(ids)|ids<1|mod(ids,1)~=0)||numel(unique(ids))~=numel(ids)
     error('Bath IDs must be distinct positive integers in a row.');
 end
-[found,index]=ismember(ids,1:model.comp.nspins);
-if any(~found)||any(model.comp.mults(index)>p.max_dimension)
+[found,index]=ismember(ids,1:spin_system.comp.nspins);
+if any(~found)||any(spin_system.comp.mults(index)>p.max_dimension)
     error('A bath spin is missing or exceeds the partition capacity.');
 end
 if ~isnumeric(graph.pair_norm)||~isreal(graph.pair_norm)||...
@@ -421,14 +421,14 @@ if isfield(parameters,'groups')&&~isempty(parameters.groups)
     if ~iscell(groups)||~isrow(groups)||any(cellfun(@(g)~isnumeric(g)||...
        ~isreal(g)||~isrow(g)||isempty(g)||any(~isfinite(g)|g<1|mod(g,1)~=0),groups))||...
        ~isequal(sort([groups{:}]),sort(ids))||...
-       any(cellfun(@(g)dimension(g,ids,model.comp.mults(index)),groups)>p.max_dimension)
+       any(cellfun(@(g)dimension(g,ids,spin_system.comp.mults(index)),groups)>p.max_dimension)
         error('Groups must partition physical bath IDs within capacity.');
     end
 end
 if strcmp(p.mode,'spatial')
     if ~all(isfield(p,{'group_count','max_rounds'}))||~integer(p.group_count,0)||...
        p.group_count>numel(ids)||(~isempty(ids)&&p.group_count<1)||...
-       ~integer(p.max_rounds,1)||any(cellfun(@isempty,model.inter.coordinates(index)))
+       ~integer(p.max_rounds,1)||any(cellfun(@isempty,spin_system.inter.coordinates(index)))
         error('Spatial grouping requires finite coordinates, group count, and round ceiling.');
     end
 end

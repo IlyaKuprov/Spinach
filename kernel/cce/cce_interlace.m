@@ -35,18 +35,18 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function raw=cce_interlace(model,cluster,clusters,ensemble,pulse_sequence,parameters)
+function raw=cce_interlace(spin_system,cluster,clusters,ensemble,pulse_sequence,parameters)
 
 % Validate the native conditional ensemble and explicit experiment callback
-grumble(model,cluster,clusters,ensemble,pulse_sequence,parameters);
+grumble(spin_system,cluster,clusters,ensemble,pulse_sequence,parameters);
 
 % Reuse the same callback and conditioning event in every denominator
-raw=native_interlace(model,cluster,clusters,ensemble,pulse_sequence,parameters);
+raw=native_interlace(spin_system,cluster,clusters,ensemble,pulse_sequence,parameters);
 
 end
 
 % Form the conditional average and its separately retained irreducible factor
-function raw=native_interlace(model,cluster,clusters,ensemble,pulse_sequence,parameters)
+function raw=native_interlace(spin_system,cluster,clusters,ensemble,pulse_sequence,parameters)
 
 % Select the validated state budget and common reference assignment
 spec=parameters.cce.interlaced;
@@ -80,7 +80,7 @@ for j=1:numel(cylinders)
 end
 cylinders=cylinders(keep);
 nb=numel(parameters.cce.bath_spins);
-dimensions=model.comp.mults(parameters.cce.bath_spins);
+dimensions=spin_system.comp.mults(parameters.cce.bath_spins);
 counts=cellfun(@(sites)prod(dimensions(ismember(parameters.cce.bath_spins,sites))),cylinders);
 count=sum(counts);
 if count>spec.max_states
@@ -132,7 +132,7 @@ for n=reshape(retained,1,[])
         vector=ensemble.bases{j}(:,assignments(n,j));
         configuration.bath_rho{j}=vector*vector';
     end
-    item=cce_evaluate(model,cluster,configuration,pulse_sequence,parameters);
+    item=cce_evaluate(spin_system,cluster,configuration,pulse_sequence,parameters);
     if n==retained(1)
         raw=item;
         raw.value(:)=0;
@@ -175,11 +175,11 @@ if ~isempty(cluster.sites)&&~raw.full_bath
     family=family(included);
     records=cell(1,numel(family)+1);
     empty=struct('id',0,'sites',[]);
-    records{1}=native_interlace(model,empty,clusters,ensemble,pulse_sequence,local);
+    records{1}=native_interlace(spin_system,empty,clusters,ensemble,pulse_sequence,local);
     for k=1:numel(family)
         if isequal(family(k).sites,cluster.sites), records{k+1}=raw;
         else
-            records{k+1}=native_interlace(model,family(k),clusters,ensemble,pulse_sequence,local);
+            records{k+1}=native_interlace(spin_system,family(k),clusters,ensemble,pulse_sequence,local);
         end
     end
     factors=records{1}.value;
@@ -229,15 +229,15 @@ end
 end
 
 % Validate the resolved ensemble contract without a method-name fallback
-function grumble(model,cluster,clusters,ensemble,pulse_sequence,parameters)
-if ~isstruct(model)||~isfield(model,'cce')||...
+function grumble(spin_system,cluster,clusters,ensemble,pulse_sequence,parameters)
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||...
    ~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
    (~isempty(clusters)&&(~isstruct(clusters)||~all(isfield(clusters,{'id','sites'}))))||...
    ~isstruct(ensemble)||~all(isfield(ensemble,{'spin_config','bases','probabilities'}))||...
    ~isa(pulse_sequence,'function_handle')||...
    ~isstruct(parameters)||~isfield(parameters,'cce')||...
    ~isfield(parameters.cce,'interlaced')
-    error('cce_interlace:input','Native model, cluster, ensemble and experiment handle required.');
+    error('cce_interlace:input','Native spin_system, cluster, ensemble and experiment handle required.');
 end
 if isfield(parameters.cce,'checkpoint')
     error('cce_options:checkpoint','Interlaced evaluations cannot own a checkpoint ledger.');
@@ -256,10 +256,10 @@ end
 reference=ensemble.spin_config(spec.reference_state);
 if ~isequal(reference.bath_ids,parameters.cce.bath_spins)||...
    numel(reference.assignment)~=numel(parameters.cce.bath_spins)
-    error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
+    error('cce:spin_config','Interlaced reference bath IDs and assignments must match the spin_system.');
 end
 for j=1:numel(parameters.cce.bath_spins)
-    dimension=model.comp.mults(parameters.cce.bath_spins(j));
+    dimension=spin_system.comp.mults(parameters.cce.bath_spins(j));
     index=reference.assignment(j);
     if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
         error('cce:spin_config','Interlaced reference assignments must select local basis states.');

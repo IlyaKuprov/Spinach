@@ -46,8 +46,7 @@ baseline=parameters;
 baseline.cce=rmfield(baseline.cce,'convergence');
 [answer,diagnostics]=clexpn(spin_system,pulse_sequence,baseline,assumptions);
 work=1;
-model=struct('comp',spin_system.comp);
-audit=cce_diagnostics(model,diagnostics.raw,diagnostics.reduction,diagnostics.parameters);
+audit=cce_diagnostics(spin_system,diagnostics.raw,diagnostics.reduction,diagnostics.parameters);
 capacity=sum(arrayfun(@(x) numel(x.values)-1,control.ladders));
 if isfield(control,'checks')
     capacity=capacity+numel(control.checks);
@@ -78,7 +77,7 @@ for k=1:numel(control.ladders)
         end
         [current,details]=clexpn(spin_system,pulse_sequence,trial,assumptions);
         work=work+1;
-        current_audit=cce_diagnostics(model,details.raw,details.reduction,details.parameters);
+        current_audit=cce_diagnostics(spin_system,details.raw,details.reduction,details.parameters);
         entry=compare(answer,diagnostics,current,details,audit,current_audit,control,ladder.field,j);
         recorded=recorded+1;
         report(recorded)=entry;
@@ -113,7 +112,7 @@ if isfield(control,'checks')&&~limited
         end
         [current,details]=clexpn(spin_system,pulse_sequence,trial,assumptions);
         work=work+1;
-        current_audit=cce_diagnostics(model,details.raw,details.reduction,details.parameters);
+        current_audit=cce_diagnostics(spin_system,details.raw,details.reduction,details.parameters);
         entry=compare(answer,diagnostics,current,details,audit,current_audit,control,'independent_check',k);
         recorded=recorded+1;
         report(recorded)=entry;

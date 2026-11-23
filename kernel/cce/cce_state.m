@@ -26,24 +26,24 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function rho=cce_state(cluster_system,parameters,states,spins)
+function rho=cce_state(spin_system,parameters,states,spins)
 
 % Validate descriptors before changing the local representation
-grumble(cluster_system,parameters,states,spins);
-formalism=cluster_system.bas.formalism;
-cluster_system.bas.formalism='zeeman-hilb';
+grumble(spin_system,parameters,states,spins);
+formalism=spin_system.bas.formalism;
+spin_system.bas.formalism='zeeman-hilb';
 if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
 
     % Conventional spin-density operators use the common operator algebra
-    rho=cce_operator(cluster_system,states,spins);
+    rho=cce_operator(spin_system,states,spins);
 else
 
     % Every physical population is supplied explicitly in local dimension
-    ids=cluster_system.cce.ids;
+    ids=spin_system.cce.ids;
     rho=sparse(1);
     [~,order]=ismember(ids,spins);
     for n=1:numel(ids)
-        d=cluster_system.comp.mults(cluster_system.cce.ids(n));
+        d=spin_system.comp.mults(spin_system.cce.ids(n));
         local=states{order(n)};
         if isvector(local)&&numel(local)==d
             local=diag(local);

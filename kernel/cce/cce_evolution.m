@@ -34,16 +34,16 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [answer,state_error]=cce_evolution(cluster_system,L,coil,rho,timestep,nsteps,output)
+function [answer,state_error]=cce_evolution(spin_system,L,coil,rho,timestep,nsteps,output)
 
 % Reject unsupported representation/output pairs before propagation
-grumble(cluster_system,L,coil,rho,timestep,nsteps,output);
+grumble(spin_system,L,coil,rho,timestep,nsteps,output);
 projected=isstruct(L);
-hilbert=~projected&&strcmp(cluster_system.bas.formalism,'zeeman-hilb');
+hilbert=~projected&&strcmp(spin_system.bas.formalism,'zeeman-hilb');
 if projected
-    d=cluster_system.cce.bath_dimension;
+    d=spin_system.cce.bath_dimension;
 else
-    d=cluster_system.cce.dimension;
+    d=spin_system.cce.dimension;
 end
 if iscell(coil)
     coils=coil;

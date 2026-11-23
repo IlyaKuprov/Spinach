@@ -58,11 +58,10 @@ else
 end
 
 % Build ideal observed-spin transition pulses without a global bath basis
-model=spin_system;
 obs_dim=spin_system.cce.observed_dimension;
 bath_dim=spin_system.cce.bath_dimension;
-alpha=model.cce.transition.alpha;
-beta=model.cce.transition.beta;
+alpha=spin_system.cce.transition.alpha;
+beta=spin_system.cce.transition.beta;
 rotation=eye(obs_dim)-alpha*alpha'-beta*beta'-1i*(alpha*beta'+beta*alpha');
 rotation=kron(rotation,eye(bath_dim));
 fractions=0.5;

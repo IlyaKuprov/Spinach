@@ -37,19 +37,18 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [rho0,coil,reference,meta]=cce_observation(cluster_system,parameters)
+function [rho0,coil,reference,meta]=cce_observation(spin_system,parameters)
 
 % Validate physical ownership before constructing preparation and detection
-grumble(cluster_system,parameters);
-model=cluster_system;
-dc=cluster_system.cce.observed_dimension;
-db=cluster_system.cce.bath_dimension;
+grumble(spin_system,parameters);
+dc=spin_system.cce.observed_dimension;
+db=spin_system.cce.bath_dimension;
 ids=parameters.observed;
-local=cluster_system;
+local=spin_system;
 local.cce.ids=ids;
 local.cce.sites=[];
 local.cce.dimension=dc;
-local.cce.physical_to_local=zeros(1,model.comp.nspins);
+local.cce.physical_to_local=zeros(1,spin_system.comp.nspins);
 local.cce.physical_to_local(ids)=1:numel(ids);
 local.bas.formalism='zeeman-hilb';
 local.cce.local_operators=cellfun(@pauli,num2cell(local.comp.mults(local.cce.ids)),...
@@ -72,7 +71,7 @@ elseif isfield(parameters,'preparation')&&isstruct(parameters.preparation)
     spec=parameters.preparation;
     observed=cce_state(local,parameters,spec.states,spec.spins);
 else
-    vector=(model.cce.transition.alpha+model.cce.transition.beta)/sqrt(2);
+    vector=(spin_system.cce.transition.alpha+spin_system.cce.transition.beta)/sqrt(2);
     observed=vector*vector';
 end
 if ~isnumeric(observed)||~isequal(size(observed),[dc dc])||any(~isfinite(observed),'all')
@@ -86,7 +85,7 @@ elseif isfield(parameters,'detection')&&isstruct(parameters.detection)
     spec=parameters.detection;
     detectors=cce_operator(local,spec.operators,spec.spins);
 else
-    detectors=model.cce.transition.alpha*model.cce.transition.beta';
+    detectors=spin_system.cce.transition.alpha*spin_system.cce.transition.beta';
 end
 if ~iscell(detectors)
     detectors={detectors};
@@ -96,7 +95,7 @@ for k=1:numel(detectors)
 end
 reference=cellfun(@(x)trace(x'*observed),detectors(:).');
 if ~isfield(parameters,'coil')&&~isfield(parameters,'detection')
-    reference=exp(-1i*phase)*(model.cce.transition.alpha'*observed*model.cce.transition.beta);
+    reference=exp(-1i*phase)*(spin_system.cce.transition.alpha'*observed*spin_system.cce.transition.beta);
 end
 if normalised&&any(abs(reference)<=cellfun(@(x)dc*eps*norm(x,'fro')*...
                                              norm(observed,'fro'),detectors(:).'))
@@ -105,13 +104,13 @@ end
 
 % Build the bath product in the exact retained order supplied by the subsystem
 bath=1;
-for k=1:numel(cluster_system.cce.bath_rho)
-    bath=kron(bath,cluster_system.cce.bath_rho{k});
+for k=1:numel(spin_system.cce.bath_rho)
+    bath=kron(bath,spin_system.cce.bath_rho{k});
 end
 projected=strcmp(parameters.cce.approximation,'projected');
 if projected
-    alpha=model.cce.transition.alpha;
-    beta=model.cce.transition.beta;
+    alpha=spin_system.cce.transition.alpha;
+    beta=spin_system.cce.transition.beta;
     basis_detector=alpha*beta';
     coefficient=trace(basis_detector'*detectors{1});
     if norm(detectors{1}-coefficient*basis_detector,'fro')>...
@@ -128,7 +127,7 @@ else
     for k=1:numel(detectors)
         coil{k}=kron(detectors{k},eye(db));
     end
-    if strcmp(cluster_system.bas.formalism,'zeeman-liouv')
+    if strcmp(spin_system.bas.formalism,'zeeman-liouv')
         rho0=rho0(:);
         coil=cellfun(@(x)x(:),coil,'UniformOutput',false);
     end
@@ -138,15 +137,15 @@ else
 end
 
 % Keep actual and applied references distinct so normalisation occurs once
-meta=struct('physical_ids',cluster_system.cce.ids,'observed_ids',ids,...
+meta=struct('physical_ids',spin_system.cce.ids,'observed_ids',ids,...
             'receiver_phase',phase,'normalized',normalised,...
             'initial_signal',reference,'normalization_divisor',ones(size(reference)),...
             'output_orientation','time-by-detector','vectorization','column-major');
 if normalised
     meta.normalization_divisor=reference;
 end
-if isfield(model.cce,'transition')
-    meta.transition=model.cce.transition;
+if isfield(spin_system.cce,'transition')
+    meta.transition=spin_system.cce.transition;
 end
 
 end

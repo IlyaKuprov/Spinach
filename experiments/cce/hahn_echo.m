@@ -105,11 +105,10 @@ else
 end
 
 % Build ideal observed-spin transition pulses without a global bath basis
-model=spin_system;
 dc=spin_system.cce.observed_dimension;
 db=spin_system.cce.bath_dimension;
-a=model.cce.transition.alpha;
-b=model.cce.transition.beta;
+a=spin_system.cce.transition.alpha;
+b=spin_system.cce.transition.beta;
 rotation=expm(-1i*pi*kron((a*b'+b*a')/2,eye(db)));
 positions=parameters.times/2;
 h_after=H;
@@ -151,12 +150,12 @@ if isfield(parameters,'refocusing')
 
                 % Rotate the exterior product density
                 index=find(configuration.bath_ids==id,1);
-                operators=pauli(model.comp.mults(id));
+                operators=pauli(spin_system.comp.mults(id));
                 rotation=expm(-1i*pulse.angle*(axis(1)*operators.x+axis(2)*operators.y+axis(3)*operators.z));
                 configuration.bath_rho{index}=rotation*configuration.bath_rho{index}*rotation';
 
             end
-            [after,~]=cce_subsystem(model,parameters,spin_system.cce.sites,configuration,[]);
+            [after,~]=cce_subsystem(spin_system,parameters,spin_system.cce.sites,configuration,[]);
             [h_after,~,~]=cce_generators(after,parameters,[]);
             parameters.cce.numerics.propagator='expm';
         end

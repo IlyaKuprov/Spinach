@@ -28,15 +28,15 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function diagnostics=cce_diagnostics(model,raw,result,parameters)
+function diagnostics=cce_diagnostics(spin_system,raw,result,parameters)
 
 % Validate the supplied records before interpreting native density output
-grumble(model,raw,result,parameters);
+grumble(spin_system,raw,result,parameters);
 
 % Select the declared numerical policy and observed-density representation
 if isfield(parameters,'cce')
     if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-        dimension=prod(model.comp.mults(parameters.observed));
+        dimension=prod(spin_system.comp.mults(parameters.observed));
         result.density=reshape(result.value.',dimension,dimension,numel(parameters.times));
     end
     parameters=struct('times',parameters.times,'numerics',parameters.cce.numerics);
@@ -156,8 +156,8 @@ diagnostics.error_bound_kind='numerical estimate, not CCE truncation bound';
 end
 
 % Validate matching result arrays and the explicitly requested time mesh
-function grumble(model,raw,result,parameters)
-if ~isstruct(model)||~iscell(raw)||~isstruct(result)||...
+function grumble(spin_system,raw,result,parameters)
+if ~isstruct(spin_system)||~iscell(raw)||~isstruct(result)||...
    ~all(isfield(result,{'value','valid','abs_error_bound'}))||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'times')||...
    isempty(result.value)||~isnumeric(result.value)||...
@@ -170,8 +170,8 @@ if isfield(parameters,'cce')
         error('cce_diagnostics:input','Supply the declared numerical tolerances.');
     end
     if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-        if ~isfield(model,'comp')||...
-           size(result.value,2)~=prod(model.comp.mults(parameters.observed))^2
+        if ~isfield(spin_system,'comp')||...
+           size(result.value,2)~=prod(spin_system.comp.mults(parameters.observed))^2
             error('cce_diagnostics:input','Density values must match the observed Hilbert dimension.');
         end
     end

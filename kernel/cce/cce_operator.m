@@ -22,17 +22,17 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function A=cce_operator(cluster_system,operators,spins)
+function A=cce_operator(spin_system,operators,spins)
 
 % Check the view, descriptor shape, and explicit tensor-product selections
-grumble(cluster_system,operators,spins);
+grumble(spin_system,operators,spins);
 if ischar(operators)
     operators={operators};
     spins={spins};
 end
 
 % Start from the unit operator on the retained space
-d=cluster_system.cce.dimension;
+d=spin_system.cce.dimension;
 A=speye(d);
 labels={'E','Lx','Ly','Lz','L+','L-'};
 fields={'u','x','y','z','p','m'};
@@ -42,9 +42,9 @@ for n=1:numel(operators)
     ids=spins{n};
     if ischar(ids)
         if strcmp(ids,'all')
-            ids=cluster_system.cce.ids;
+            ids=spin_system.cce.ids;
         else
-            ids=cluster_system.cce.ids(strcmp(cluster_system.comp.isotopes(cluster_system.cce.ids),ids));
+            ids=spin_system.cce.ids(strcmp(spin_system.comp.isotopes(spin_system.cce.ids),ids));
         end
     end
     position=find(strcmp(labels,operators{n}),1);
@@ -52,9 +52,9 @@ for n=1:numel(operators)
     for id=ids
 
         % Embed only the requested canonical local matrix
-        local=cluster_system.cce.physical_to_local(id);
-        dims=cluster_system.comp.mults(cluster_system.cce.ids);
-        matrix=cluster_system.cce.local_operators{local}.(fields{position});
+        local=spin_system.cce.physical_to_local(id);
+        dims=spin_system.comp.mults(spin_system.cce.ids);
+        matrix=spin_system.cce.local_operators{local}.(fields{position});
         term=term+kron(kron(speye(prod(dims(1:local-1))),matrix),...
                        speye(prod(dims(local+1:end))));
 
@@ -64,7 +64,7 @@ for n=1:numel(operators)
 end
 
 % Stock commutator convention for column-major density vectors
-if strcmp(cluster_system.bas.formalism,'zeeman-liouv')
+if strcmp(spin_system.bas.formalism,'zeeman-liouv')
     A=kron(speye(d),A)-kron(A.',speye(d));
 end
 

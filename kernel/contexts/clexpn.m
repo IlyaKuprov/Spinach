@@ -286,17 +286,17 @@ if strcmp(parameters.cce.backend,'analytical_hahn')
 end
 
 % Compile immutable physical data, not a full-bath basis
-model=cce_compile(spin_system,parameters,assumptions);
+spin_system=cce_compile(spin_system,parameters,assumptions);
 if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
-    model.bas.formalism=parameters.cce.basis.formalism;
+    spin_system.bas.formalism=parameters.cce.basis.formalism;
 elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
-    model.bas.formalism='zeeman-liouv';
+    spin_system.bas.formalism='zeeman-liouv';
 end
 
 % Validate propagation choices here rather than in graph or reduction services
 if isfield(parameters.cce.numerics,'propagator')
     supported={'eig'};
-    if strcmp(model.bas.formalism,'zeeman-liouv')
+    if strcmp(spin_system.bas.formalism,'zeeman-liouv')
         supported={'stock'};
     elseif isequal(pulse_sequence,@hahn_echo)&&strcmp(parameters.cce.approximation,'generalized')
         supported={'eig','expm'};
@@ -308,9 +308,9 @@ if isfield(parameters.cce.numerics,'propagator')
 end
 
 % Build the physical connectivity and downward-closed cluster family
-graph=cce_graph(model,parameters);
+graph=cce_graph(spin_system,parameters);
 if isfield(parameters.cce,'partition')
-    partition=cce_partition(model,graph,parameters,pulse_sequence);
+    partition=cce_partition(spin_system,graph,parameters,pulse_sequence);
     if ~partition.complete
         error('clexpn:partition','Partition adaptation is incomplete: %s.',partition.diagnostics.reason);
     end
@@ -319,10 +319,10 @@ if isfield(parameters.cce,'partition')
     end
     diagnostics.partition=partition;
 end
-clusters=cce_clusters(model,graph,parameters);
+clusters=cce_clusters(spin_system,graph,parameters);
 
 % Evaluate every cluster through the scheduler
-raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters);
+raw=cce_schedule(spin_system,clusters,ensemble,pulse_sequence,parameters);
 
 % Test completeness on the graph domain without trimming the exterior state
 request=parameters;
@@ -335,7 +335,7 @@ diagnostics.clusters=clusters;
 diagnostics.graph=graph;
 diagnostics.reduction=reduced;
 diagnostics.parameters=parameters;
-diagnostics.physical_ids=1:model.comp.nspins;
+diagnostics.physical_ids=1:spin_system.comp.nspins;
 diagnostics.observed_ids=parameters.observed;
 diagnostics.bath_ids=parameters.cce.bath_spins;
 diagnostics.ensemble=ensemble;

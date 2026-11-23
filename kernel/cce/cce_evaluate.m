@@ -26,16 +26,16 @@
 %
 % talos@spindynamics.org
 
-function raw=cce_evaluate(model,cluster,configuration,pulse_sequence,parameters)
+function raw=cce_evaluate(spin_system,cluster,configuration,pulse_sequence,parameters)
 
 % Check consistency
-grumble(model,cluster,configuration,pulse_sequence,parameters);
+grumble(spin_system,cluster,configuration,pulse_sequence,parameters);
 
 % Build the retained subsystem and its generators
 if isfield(configuration,'assignment')
     configuration=rmfield(configuration,'assignment');
 end
-[spin_system,~]=cce_subsystem(model,parameters,cluster.sites,configuration,[]);
+[spin_system,~]=cce_subsystem(spin_system,parameters,cluster.sites,configuration,[]);
 [H,R,K,parameters]=cce_generators(spin_system,parameters,[]);
 
 % Test invariance unless the user declares the diagonal register approximation
@@ -87,18 +87,18 @@ end
 end
 
 % Consistency enforcement
-function grumble(model,cluster,configuration,pulse_sequence,parameters)
-if ~isstruct(model)||~isfield(model,'cce')||...
+function grumble(spin_system,cluster,configuration,pulse_sequence,parameters)
+if ~isstruct(spin_system)||~isfield(spin_system,'cce')||...
    ~isstruct(cluster)||~isscalar(cluster)||~all(isfield(cluster,{'id','sites'}))||...
    ~isstruct(configuration)||~isscalar(configuration)||~isfield(configuration,'weight')||...
    ~isa(pulse_sequence,'function_handle')||...
    ~isstruct(parameters)||~isscalar(parameters)||~all(isfield(parameters,{'cce','times'}))
-    error('cce_evaluate:input','Supply a compiled model, one cluster, one bath configuration, a pulse sequence handle and resolved parameters.');
+    error('cce_evaluate:input','Supply a compiled spin_system, one cluster, one bath configuration, a pulse sequence handle and resolved parameters.');
 end
 if isfield(parameters.cce,'checkpoint')
     error('cce_options:checkpoint','Only the scheduler may consume checkpoint requests.');
 end
-dc=prod(model.comp.mults(parameters.observed));
+dc=prod(spin_system.comp.mults(parameters.observed));
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=dc^2;

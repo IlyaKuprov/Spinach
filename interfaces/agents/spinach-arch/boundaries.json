@@ -46,10 +46,10 @@
       "interfaces/gissmo/gissmo2spinach.m"
     ],
     "contracts": [
-      "Gaussian and ORCA readers produce property records; g2spinach maps the requested nuclei, references and isotope-dependent tensors into sys and inter. GISSMO builds those inputs directly from a selected XML coupling matrix."
+      "Gaussian and ORCA readers produce property records; g2spinach selects atoms by element and maps their parsed isotopes, tensors, and element-specific references into sys and inter. GISSMO builds those inputs directly from a selected XML coupling matrix."
     ],
     "change_guidance": [
-      "Change format-specific parsing in the reader and shared physical conversions in the mapper. Check signed isotope scaling and both halves of the stored coupling tensor, not just parsed text."
+      "Change format-specific parsing in the reader and shared physical conversions in the mapper. Check the imported isotope and both halves of the stored coupling tensor, not just parsed text. Check signed isotope scaling in isoswap after substitution."
     ],
     "verification": [
       "tests/interfaces/test_orca_parser.m",

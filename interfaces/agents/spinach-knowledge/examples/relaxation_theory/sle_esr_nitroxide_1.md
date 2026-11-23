@@ -4,7 +4,7 @@
 
 ## Purpose and spin model
 
-Compares two calculated ESR spectra for a nitroxide model: one from stochastic Liouville equation (SLE) propagation and one from Bloch–Redfield–Wangsness (BRW/Redfield) relaxation. These are model calculations, not experimental spectra. The source loads `../standard_systems/nitroxide.log` through `gparse`, then calls `g2spinach` with the spin-selection argument `{{'E','E'},{'N','14N'}}`, `[0 0]`, and `options.no_xyz=1`. It sets `sys.magnet=3.5` and a proximity cutoff of `4.0`; the source does not state units for these values. Both calculations use the full `sphten-liouv` basis with no approximation.
+Compares two calculated ESR spectra for a nitroxide model: one from stochastic Liouville equation (SLE) propagation and one from Bloch–Redfield–Wangsness (BRW/Redfield) relaxation. These are model calculations, not experimental spectra. The source loads `../standard_systems/nitroxide.log` through `gparse`, then calls `g2spinach` with the element list `{'E','N'}` (`14N` in the log), `[0 0]`, and `options.no_xyz=1`. It sets `sys.magnet=3.5` and a proximity cutoff of `4.0`; the source does not state units for these values. Both calculations use the full `sphten-liouv` basis with no approximation.
 
 ## SLE and Redfield calculations
 

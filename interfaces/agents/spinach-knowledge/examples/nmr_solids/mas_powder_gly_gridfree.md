@@ -8,7 +8,7 @@
 
 This example constructs a computed 13C MAS spectrum for glycine powder with the grid-free Fokker–Planck route: the source calls `gridfree(spin_system,@acquire,parameters,'nmr')`. Its header says the magnetic parameters are estimated from a DFT calculation and estimates minutes for calculation time; that duration is a source estimate, not a measured runtime.
 
-`gparse` reads `../standard_systems/glycine.log`; `g2spinach` imports `13C` and `15N` with reference arguments `[182.1 264.5]` in isotope order. The `g2spinach` argument `references` denotes absolute shielding values for zero-ppm reference substances, not measured spectrum peaks. The source sets field `14.1 T`. The basis is `sphten-liouv`, approximation `none`, longitudinal `15N`, and projection `+1`; interaction and proximity cutoffs are `5.0` and `4.0`.
+`gparse` reads `../standard_systems/glycine.log`; `g2spinach` selects C and N with reference arguments `[182.1 264.5]` in element order. It imports `13C` and `14N`; `isoswap` replaces `14N` with `15N`. The `g2spinach` argument `references` denotes absolute shielding values for zero-ppm reference substances, not measured spectrum peaks. The source sets field `14.1 T`. The basis is `sphten-liouv`, approximation `none`, longitudinal `15N`, and projection `+1`; interaction and proximity cutoffs are `5.0` and `4.0`.
 
 ## MAS acquisition and spectrum
 

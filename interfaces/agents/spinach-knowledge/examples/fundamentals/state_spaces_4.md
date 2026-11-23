@@ -8,7 +8,7 @@ This example sets up a powder magic-angle-spinning (MAS) trajectory calculation 
 
 ## System and state-space setup
 
-The system is read from ../standard_systems/glycine.log using gparse and g2spinach, with isotope labels 1H, 13C, and 15N and the three numeric arguments [31.5 182.1 264.5] passed to g2spinach. The script sets the magnet field to 14.1 and uses sphten-liouv with approximation='none'. Its longitudinal subspace specification is {{'15N','13C'}}, and its maximum coherence rank is 17. The Krylov tolerance field is set to 1000; the source gives no interpretation of this value.
+The system is read from ../standard_systems/glycine.log using gparse and g2spinach, selecting H, C, and N with shielding references [31.5 182.1 264.5]. The import returns 1H, 13C, and 14N; isoswap replaces 14N with 15N and rescales its couplings. The script sets the magnet field to 14.1 and uses sphten-liouv with approximation='none'. Its longitudinal subspace specification is {{'15N','13C'}}, and its maximum coherence rank is 17. The Krylov tolerance field is set to 1000; the source gives no interpretation of this value.
 
 The source configures a spinning rate of 2000, rotor axis [sqrt(2/3) 0 sqrt(1/3)], sweep 1e5, 64 points, and offset 15000. It selects the 13C spin channel and the orientation grid named rep_2ang_200pts_sph. Both the initial state and receiver are proton L+. GPU enablement appears only as a commented-out line, so the script as written does not explicitly enable GPU execution.
 

@@ -6,7 +6,7 @@
 
 ## Purpose and spin system
 
-Magnitude-mode liquid-state HETCOR for sucrose at natural 13C abundance; the source comment estimates minutes of calculation time. The wrapper parses `../standard_systems/sucrose.log` as a vacuum-DFT spin system and maps H/C atoms to `1H`/`13C`. It sets `options.min_j=3.0` and `options.no_xyz=1`, then replaces isotropic shifts at spin indices `[1:19 24:30]` with the following source values (units are not specified in the example):
+Magnitude-mode liquid-state HETCOR for sucrose at natural 13C abundance; the source comment estimates minutes of calculation time. The wrapper parses `../standard_systems/sucrose.log` as a vacuum-DFT spin system and selects H and C, which the log supplies as `1H` and `13C`. It sets `options.min_j=3.0` and `options.no_xyz=1`, then replaces isotropic shifts at spin indices `[1:19 24:30]` with the following source values (units are not specified in the example):
 
 ```text
 [94.5 73.4 74.9 71.5 74.7 62.4 63.6 106.0 78.7 76.3 83.7 64.7 5.49 3.63 3.83 3.54 3.90 3.90 3.90 3.75 3.75 4.29 4.12 3.96 3.90 3.90]

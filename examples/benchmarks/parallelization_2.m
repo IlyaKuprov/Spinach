@@ -12,7 +12,7 @@ function parallelization_2()
 % Read the spin system properties (vacuum DFT calculation)
 options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/pyrene_cation.log'),...
-                                {{'E','E'},{'H','1H'}},[0 0],options);
+                      {'E','H'},[0 0],options);
 % Magnet field
 sys.magnet=50e-6;
 

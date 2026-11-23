@@ -7,7 +7,7 @@ A W-band pulse-acquire FFT ESR example for the phenyl radical. It takes the phen
 ## Interface and input
 
 - Call from MATLAB with no arguments: `pulse_acquire_phenyl()`. The function declares no return values; it displays a figure rather than saving or returning the FID or spectrum.
-- The input path is `../standard_systems/phenyl.log`, parsed by `gparse` and converted by `g2spinach` with electron and proton isotope mappings. `options.no_xyz=1` tells the importer to ignore coordinates because the hyperfine couplings are supplied in the input.
+- The input path is `../standard_systems/phenyl.log`, parsed by `gparse` and converted by `g2spinach` for the electron and hydrogen (`1H` in the log). `options.no_xyz=1` tells the importer to ignore coordinates because the hyperfine couplings are supplied in the input.
 
 ## Spin system and experiment
 

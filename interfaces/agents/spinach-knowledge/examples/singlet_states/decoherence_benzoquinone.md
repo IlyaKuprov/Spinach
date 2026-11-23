@@ -8,7 +8,7 @@ Build a Redfield relaxation superoperator for the four-proton para-benzoquinone 
 
 ## Spin system and relaxation model
 
-The source imports coordinates, chemical shifts, J couplings and chemical-shift-anisotropy (CSA) tensors from `../standard_systems/benzoquinone.log` using `gparse` and `g2spinach` with mapping `{{'H','1H'}}`, argument `31.8` and final argument `[]` (the source does not describe these argument roles); the source comment states that the relaxation model accounts for every dipolar coupling and every CSA tensor. The magnetic field is set to 1.0 T. Redfield relaxation uses zero equilibrium, lab-frame retention and a 100 ps correlation time. The full `sphten-liouv` basis is used, with relaxation-integration and relaxation-zero tolerances of `1e-5`.
+The source imports coordinates, chemical shifts, J couplings and chemical-shift-anisotropy (CSA) tensors from `../standard_systems/benzoquinone.log` using `gparse` and `g2spinach` selecting hydrogen (`1H` in the log) with a shielding reference of 31.8 ppm and no import options; the source comment states that the relaxation model accounts for every dipolar coupling and every CSA tensor. The magnetic field is set to 1.0 T. Redfield relaxation uses zero equilibrium, lab-frame retention and a 100 ps correlation time. The full `sphten-liouv` basis is used, with relaxation-integration and relaxation-zero tolerances of `1e-5`.
 
 ## Observable and limits
 

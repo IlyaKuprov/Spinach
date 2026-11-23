@@ -40,11 +40,22 @@
 %   props.symbols          - atomic symbols; 'Bq' for ghost
 %                            atoms, 'X' for dummy atoms, 'TV'
 %                            for translation vectors
-%   props.isotopes         - mass numbers of the isotopes for
-%                            which hyperfine couplings are
-%                            reported
+%   props.isotopes         - isotopes that the magnetic para-
+%                            meters refer to, a cell array of
+%                            strings such as '13C': the label
+%                            of the hyperfine table; otherwise
+%                            the stated mass isotope (mass
+%                            tables, quadrupole table labels)
+%                            when it has a spin; otherwise the
+%                            isotope that Gaussian uses in its
+%                            magnetic property tables for that
+%                            element
 %   props.mass_numbers     - mass numbers of the isotopes used
-%                            by Gaussian for atomic masses
+%                            by Gaussian for atomic masses, from
+%                            the isotope table of #p output,
+%                            the vibrational analysis, or the
+%                            Iso= labels of the molecule speci-
+%                            fication; NaN when not stated
 %   props.atom_masses      - atomic masses used by Gaussian
 %                            (atomic mass units)
 %   props.nuc_spins        - spin quantum numbers of the mass
@@ -141,7 +152,7 @@ props.error=0;
 props.complete=0;
 
 % Parse the file
-atoms=[]; atomic_numbers=[]; charge_read=false; new_job=false;
+atoms=[]; atomic_numbers=[]; hfc_labels=zeros(0,1); chi_labels=zeros(0,1); charge_read=false; new_job=false;
 for n=1:length(g03_output)
 
    % Note the start of each job
@@ -191,6 +202,28 @@ for n=1:length(g03_output)
        disp('Gaussian import: found total electron spin.');
    end
 
+   % Read isotope labels of a molecule specification, which supersedes earlier isotope data
+   if strcmp(current_line,'Symbolic Z-matrix:')
+       [props.mass_numbers,props.atom_masses,props.nuc_spins,props.nuc_qmom,props.nuc_mmom]=deal(zeros(0,1));
+       k=n+1;
+       while k<=numel(g03_output)
+           atom_label=regexp(char(g03_output(k)),'^\S+','match','once');
+           k=k+1;
+           if strcmp(atom_label,'Charge'), continue; end
+           if isempty(regexp(atom_label,'^([A-Za-z]{1,2}|-?\d+)(?![A-Za-z:])','once')), break; end
+           if ~isempty(regexp(atom_label,'^([Xx]\d*|-1)(?![A-Za-z])','once')), continue; end
+           iso_label=regexp(atom_label,'(?i)[(,]iso[a-z]*=(\d+)','tokens','once');
+           props.mass_numbers(end+1,1)=str2double([iso_label{:}]);
+       end
+   end
+
+   % Read isotope masses of the vibrational analysis, which reflect Freq=ReadIsotopes
+   mass_data=str2double(regexp(current_line,'^Atom\s+(\d+) has atomic number\s+\d+ (?:and )?mass\s+([\d.]+)$','tokens','once'));
+   if ~isempty(mass_data)
+       props.mass_numbers(mass_data(1),1)=round(mass_data(2));
+       props.atom_masses(mass_data(1),1)=mass_data(2);
+   end
+
    % Read the isotope table
    if strcmp(current_line,'Isotopes and Nuclear Properties:')
        [props.mass_numbers,props.atom_masses,props.nuc_spins,props.nuc_qmom,props.nuc_mmom]=deal(zeros(0,1));
@@ -218,7 +251,7 @@ for n=1:length(g03_output)
 
    % Read isotropic hyperfine couplings and check the unit columns
    if strcmp(current_line,'Isotropic Fermi Contact Couplings')
-      props.hfc.iso=zeros(natoms,1); props.isotopes=zeros(natoms,1); k=n+2;
+      props.hfc.iso=zeros(natoms,1); k=n+2;
       while true
          tokens=regexp(char(g03_output(k)),'^(\d+)\s+[A-Za-z]+\((\d+)\)?\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)$','tokens');
          if isempty(tokens), break; end
@@ -226,7 +259,7 @@ for n=1:length(g03_output)
          if abs(tokens(4)-2.802495*tokens(5))>(1e-3*abs(tokens(4))+1e-3)
              error('Gaussian import: hyperfine coupling unit columns disagree.');
          end
-         props.isotopes(tokens(1),1)=tokens(2); props.hfc.iso(tokens(1),1)=tokens(5);
+         hfc_labels(tokens(1),1)=tokens(2); props.hfc.iso(tokens(1),1)=tokens(5);
       end
       disp('Gaussian import: found isotropic hyperfine couplings.');
       disp('Gaussian import: found isotope numbers.');
@@ -360,6 +393,9 @@ for n=1:length(g03_output)
        tensors=cell(natoms,1); k=n+1;
        while ~isempty(regexp(char(g03_output(k)),'^\d+\s+[A-Za-z]','once'))
            atom_num=sscanf(char(g03_output(k)),'%d'); T=zeros(3);
+           if contains(current_line,'[Chi]')
+               chi_labels(atom_num,1)=str2double(regexp(char(g03_output(k)),'\((\d+)','tokens','once'));
+           end
            for m=1:3
                T(m,:)=sscanf(regexprep(char(g03_output(k+m)),'[a-c]{2}=',' '),'%f')';
            end
@@ -436,6 +472,43 @@ periodic_table={'TV','X','Bq','H','He','Li','Be','B','C','N','O','F','Ne','Na','
 if ~isempty(atomic_numbers)
     props.symbols=periodic_table(atomic_numbers+3);
     props.atomic_numbers=atomic_numbers;
+
+    % Gaussian 16 hyperfine table isotopes, or default mass isotopes where it prints none, for Z=1..103
+    magnetic_iso=[  1   3   7   9  11  13  14  17  19  21  23  25  27  29  31  33  35  40 ...
+                   39  40  45  47  51  53  55  57  59  61  63  67  69  73  75  80  79  83 ...
+                   85  87  89  91  93  95  99  99 103 105 107 111 115 117 121 125 127 129 ...
+                  133 135 139 140 141 143 145 147 153 157 159 161 165 167 169 171 175 177 ...
+                  181 183 187 189 193 195 197 199 205 207 209 209 211 222 223 226 227 232 ...
+                  231 235 237 242 243 246 247 249 252 252 255 259 262];
+
+    % Assume the magnetic isotope of each element when the log states nothing
+    magnetic_iso(end+1:max(atomic_numbers))=NaN;
+    real_atoms=find(atomic_numbers>0);
+    iso_mass=magnetic_iso(atomic_numbers(real_atoms));
+
+    % Collect the stated mass isotopes: mass tables, then quadrupole table labels
+    stated=nan(size(real_atoms));
+    if isfield(props,'mass_numbers')&&(numel(props.mass_numbers)==numel(atomic_numbers))
+        stated(:)=props.mass_numbers(real_atoms);
+    end
+    chi_labels(end+1:numel(atomic_numbers),1)=0;
+    labelled=chi_labels(real_atoms)>0;
+    stated(labelled)=chi_labels(real_atoms(labelled));
+
+    % Prefer the stated mass isotopes that have a spin
+    [~,~,nuclei]=spin('table');
+    has_spin=ismember(strcat(string(stated(:)),props.symbols(real_atoms)'),nuclei.isotope(nuclei.spin>0));
+    iso_mass(has_spin)=stated(has_spin);
+
+    % Prefer the isotope labels of the hyperfine table
+    hfc_labels(end+1:numel(atomic_numbers),1)=0;
+    labelled=hfc_labels(real_atoms)>0;
+    iso_mass(labelled)=hfc_labels(real_atoms(labelled));
+
+    % Report isotope strings, empty for dummies, ghosts, translation vectors, and unknowns
+    props.isotopes=cell(size(atomic_numbers)); known=real_atoms(~isnan(iso_mass));
+    props.isotopes(known)=cellstr(strcat(string(iso_mass(~isnan(iso_mass)))',props.symbols(known)'));
+
 end
 
 % Assign source information

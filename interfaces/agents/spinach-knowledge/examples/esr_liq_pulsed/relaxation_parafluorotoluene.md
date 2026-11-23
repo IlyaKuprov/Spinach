@@ -6,7 +6,7 @@
 
 ## What it models
 
-An X-band pulse-acquire FFT ESR spectrum of the para-fluorotoluene radical, using explicit time-domain propagation and a Redfield relaxation superoperator. The spin system is imported from <code>../standard_systems/parafluorotoluene.log</code> with <code>gparse</code> and <code>g2spinach</code>; the isotope mapping is <code>E</code>, <code>1H</code>, and <code>19F</code>, and <code>options.no_xyz=1</code> because hyperfine couplings are supplied. The source sets <code>sys.magnet=0.33</code>; its comment calls this a magnet field but does not state a unit.
+An X-band pulse-acquire FFT ESR spectrum of the para-fluorotoluene radical, using explicit time-domain propagation and a Redfield relaxation superoperator. The spin system is imported from <code>../standard_systems/parafluorotoluene.log</code> with <code>gparse</code> and <code>g2spinach</code>; the importer selects the electron, hydrogen, and fluorine, with <code>1H</code> and <code>19F</code> from the log, and <code>options.no_xyz=1</code> because hyperfine couplings are supplied. The source sets <code>sys.magnet=0.33</code>; its comment calls this a magnet field but does not state a unit.
 
 The basis is <code>sphten-liouv</code> with <code>approximation='none'</code>. Relaxation is Redfield with <code>equilibrium='zero'</code>, <code>rlx_keep='secular'</code>, and <code>tau_c={1e-10}</code>. The .m file does not list the imported tensors explicitly; they come from the linked DFT log through the parser.
 

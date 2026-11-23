@@ -13,7 +13,11 @@ options.no_xyz=1;
 
 % Read the spin system properties (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/nitroxide.log'),...
-                           {{'E','E'},{'N','15N'}},[0 0],options);
+                      {'E','N'},[0 0],options);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
+
 % Magnet field
 sys.magnet=0.33;
 

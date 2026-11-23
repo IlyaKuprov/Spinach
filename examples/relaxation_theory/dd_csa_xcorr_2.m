@@ -8,8 +8,13 @@
 function dd_csa_xcorr_2()
 
 % Read the spin system parameters (vacuum DFT calculation)
-[sys,inter]=g2spinach(gparse('../standard_systems/fdnb.log'),...
-                   {{'H','1H'},{'F','19F'}},[32.0 270.0],[]);
+props=gparse('../standard_systems/fdnb.log');
+
+% Rebuild J-couplings from K-couplings, one printed J-coupling disagrees
+props=rmfield(props,'j_couplings');
+
+% Convert into Spinach data structures
+[sys,inter]=g2spinach(props,{'H','F'},[32.0 270.0],[]);
 
 % Set up the calculation
 sys.magnet=9.4;                  % Magnet induction

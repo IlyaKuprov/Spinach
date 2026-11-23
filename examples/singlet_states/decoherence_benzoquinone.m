@@ -13,7 +13,7 @@ function decoherence_benzoquinone()
 % Read the spin system (coordinates, chemical shifts,
 % J-couplings and CSAs) from a vacuum DFT calculation
 [sys,inter]=g2spinach(gparse('../standard_systems/benzoquinone.log'),...
-                                               {{'H','1H'}},31.8,[]);
+                      {'H'},31.8,[]);
 % Set magnet field to 1.0 Tesla
 sys.magnet=1.0;
 

@@ -12,7 +12,7 @@ options.no_xyz=1;
 
 % Read the spin system properties (vacuum DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/phenyl.log'),...
-                     {{'E','E'},{'H','1H'}},[0 0],options);
+                      {'E','H'},[0 0],options);
 % Magnet induction
 sys.magnet=3.5;
 

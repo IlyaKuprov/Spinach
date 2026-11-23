@@ -4,7 +4,7 @@
 
 ## Purpose
 
-Simulates a two-dimensional proton NOESY spectrum for the methanol spin system built from the vacuum-DFT log. The isotope map retains 13C and 1H, then the script removes the terminal OH proton, leaving the three methyl protons and 13C. The source identifies the J-couplings as values from Pecul and Helgaker and the CSA tensors as DFT-derived; it specifically notes cross-peaks between the two 13C-coupled doublet components. The field setting is `14.1`. The example header estimates seconds for calculation time.
+Simulates a two-dimensional proton NOESY spectrum for the methanol spin system built from the vacuum-DFT log. The import selects H and C (1H and 13C in this log), then the script removes the terminal OH proton, leaving the three methyl protons and 13C. The source identifies the J-couplings as values from Pecul and Helgaker and the CSA tensors as DFT-derived; it specifically notes cross-peaks between the two 13C-coupled doublet components. The field setting is `14.1`. The example header estimates seconds for calculation time.
 
 ## Spin model and sequence
 

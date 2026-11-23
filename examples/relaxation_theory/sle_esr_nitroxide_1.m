@@ -10,7 +10,7 @@ function sle_esr_nitroxide_1()
 % Spin system properties
 options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/nitroxide.log'),...
-                           {{'E','E'},{'N','14N'}},[0 0],options);
+                      {'E','N'},[0 0],options);
 % Magnet induction
 sys.magnet=3.5;
 

@@ -2,7 +2,7 @@
 
 [Spinach source](https://github.com/IlyaKuprov/Spinach/blob/main/examples/nmr_liquids/roesy_sucrose.m)
 
-This wrapper simulates a proton ROESY spectrum for sucrose using molecular magnetic parameters read from a vacuum-DFT log, not an experimental spectrum. It parses `../standard_systems/sucrose.log` with `gparse` and `g2spinach`, selecting `1H` and setting `options.min_j=1.0`. The source header says the magnetic parameters were computed with DFT; the source comment estimates minutes of calculation time, but no calculation or runtime measurement was performed for this draft.
+This wrapper simulates a proton ROESY spectrum for sucrose using molecular magnetic parameters read from a vacuum-DFT log, not an experimental spectrum. It parses `../standard_systems/sucrose.log` with `gparse` and `g2spinach`, selecting hydrogen (`1H` in this log) and setting `options.min_j=1.0`. The source header says the magnetic parameters were computed with DFT; the source comment estimates minutes of calculation time, but no calculation or runtime measurement was performed for this draft.
 
 At `sys.magnet=5.9` (5.9 T by Spinach convention), the spin system uses a `sphten-liouv` basis, `IK-2` approximation, scalar-coupling connectivity, and proximity level 3. The wrapper specifies Redfield relaxation, zero equilibrium, secular relaxation terms, and correlation time `200e-12` s (200 ps). It enables `zte` and `greedy`, disables `krylov`, and sets a proximity cutoff of 4.0. The initial density operator is `Lz` for `1H`. These settings describe the model; this script does not compare its output against measurement.
 

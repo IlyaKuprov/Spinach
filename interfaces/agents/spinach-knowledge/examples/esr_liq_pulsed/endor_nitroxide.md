@@ -5,7 +5,7 @@
 
 ## Spin system and input dependency
 
-This is liquid-state Mims ENDOR for a `15N`-labelled nitroxide radical. Instead of defining its magnetic tensors inline, the function parses `../standard_systems/nitroxide.log` with `gparse`, then calls `g2spinach` using isotope mapping `{{'E','E'},{'N','15N'}}` and the `[0 0]` argument. It sets `options.no_xyz=1` because coordinates are not used, then sets `sys.magnet=0.33`. The field and imported magnetic values have no units stated in this source. Running the example therefore depends on that relative-path Gaussian output being available from the expected example working directory; the nitroxide parameters are not self-contained in this file.
+This is liquid-state Mims ENDOR for a `15N`-labelled nitroxide radical. Instead of defining its magnetic tensors inline, the function parses `../standard_systems/nitroxide.log` with `gparse`, then calls `g2spinach` using the element list `{'E','N'}` and the `[0 0]` argument. It sets `options.no_xyz=1` because coordinates are not used, then sets `sys.magnet=0.33`. The field and imported magnetic values have no units stated in this source. Running the example therefore depends on that relative-path Gaussian output being available from the expected example working directory; the nitroxide parameters are not self-contained in this file.
 
 ## Simulation and output
 
@@ -13,4 +13,4 @@ The basis is `sphten-liouv` with `approximation='none'`; `sys.disable={'pt'}` di
 
 ## Scope and caveats
 
-The isotope mapping explicitly requests `15N`, while the numerical g and hyperfine parameters come from the external log rather than constants visible here. No explicit relaxation settings or DOI for the parameter calculation are supplied in the source.
+The log supplies the g-tensor and the `14N` hyperfine tensor. After import, `isoswap` replaces `14N` with `15N` and rescales its hyperfine coupling by the ratio of their magnetogyric ratios. No explicit relaxation settings or DOI for the parameter calculation are supplied in the source.

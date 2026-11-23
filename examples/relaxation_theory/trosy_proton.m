@@ -9,7 +9,7 @@ function trosy_proton()
 
 % Read 3-fluorotyrosine DFT calculation
 [~,inter_dft]=g2spinach(gparse('../standard_systems/amino_acids/tyr.log'),...
-                                 {{'C','13C'},{'H','1H'}},[186.38 33.44]);
+                        {'C','H'},[186.38 33.44]);
                                  
 % Extract coordinates and CSAs
 sys.isotopes={'1H','13C'};

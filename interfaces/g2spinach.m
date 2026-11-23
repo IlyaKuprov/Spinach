@@ -1,30 +1,39 @@
 % Makes Spinach data structures from parsed outputs of electronic
 % structure theory packages, such as Gaussian and ORCA. Syntax:
 %
-%    [sys,inter]=g2spinach(props,particles,references,options)
+%    [sys,inter]=g2spinach(props,elements,references,options)
 %
 % Parameters:
 %
-%    props      - the output of gparse() or oparse(); EPR import
-%                 requires props.isotopes for each nonempty HFC:
-%                 Gaussian mass numbers or ORCA isotope strings.
-%                 HFCs are scaled by target/source gyromagnetic
-%                 ratio before thresholding and purging.
+%    props      - the output of gparse() or oparse(); isotopes
+%                 are taken from props.isotopes, which reports
+%                 what the log specifies or assumes for each
+%                 atom; interaction tensors are imported as
+%                 the log reports them for those isotopes.
+%                 When the data cannot be interpreted without
+%                 a guess (no isotope or a non-magnetic one
+%                 for a requested atom, a quadrupolar tensor
+%                 on an isotope without a quadrupole moment,
+%                 printed J-couplings that K-couplings and
+%                 the isotopes do not reproduce), an error
+%                 names the field of props to be edited.
+%                 Use isoswap() to replace isotopes after the
+%                 import.
 %
-%    particles  - a cell array of the following form:
+%    elements   - a cell array of element symbols:
 %
-%                         {{'H','1H'},{'N','15N'}...}
+%                             {'H','N',...}
 %
-%                 giving the list of elements and isotopes that
-%                 should be imported. If the isotope list contains
-%                 an electron, e.g. {{'E','E'},{'H','1H'}...}, 
-%                 then EPR mode is assumed - chemical shielding 
-%                 and scalar couplings are ignored, but g-tensor
-%                 and hyperfine couplings are included.
+%                 giving the list of elements that should be
+%                 imported. If the list contains an electron,
+%                 e.g. {'E','H',...}, then EPR mode is assumed:
+%                 chemical shielding and scalar couplings are
+%                 ignored, but g-tensor and hyperfine couplings
+%                 are included.
 %
-%    references - a vector of absolute shielding values for 
-%                 the reference substances that are to be
-%                 placed at zero ppm chemical shift; you ne-
+%    references - a vector of absolute shielding values, one
+%                 per element, for the reference substances
+%                 that are to be placed at zero ppm; you ne-
 %                 ed to run separate electronic structure 
 %                 theory calculations for those substances
 %                 wuth the same method. Absolute isotropic 
@@ -93,28 +102,27 @@
 %
 % <https://spindynamics.org/wiki/index.php?title=g2spinach.m>
 
-function [sys,inter]=g2spinach(props,particles,references,options)
+function [sys,inter]=g2spinach(props,elements,references,options)
 
 % Set default options
 if ~exist('options','var'), options=[]; end
 
 % Check consistency
-source_gammas=grumble(props,particles,references,options);
+grumble(props,elements,references,options);
 
 % Fundamental constants
 nuclear_magneton=7.6225932291E6;
 
-% Index the particles to include
-sys.isotopes={}; index=[]; ref_index=[];
-for n=1:length(props.symbols) %#ok<*AGROW>
-    for k=1:length(particles) 
-        if strcmp(props.symbols{n},particles{k}{1})
-            sys.isotopes=[sys.isotopes particles{k}{2}];
-            index=[index n]; ref_index=[ref_index k];
-        end
-    end
+% Index the atoms to include and take their isotopes from the log
+[selected,ref_index]=ismember(props.symbols,elements);
+index=find(selected); ref_index=ref_index(selected);
+sys.isotopes=reshape(props.isotopes(index),1,[]);
+nspins=numel(index);
+
+% Warn about zero-field splitting
+if isfield(props,'zfs')
+    disp('WARNING: zero-field splitting in the log has not been imported.');
 end
-nspins=length(index);
 
 % Decide whether to include coordinates
 if nargin<4
@@ -136,7 +144,7 @@ if include_xyz
 end
 
 % Decide which magnetic parameters to return
-switch ismember('E',[particles{:}])
+switch ismember('E',elements)
     
     % EPR parameterization
     case 1
@@ -156,16 +164,19 @@ switch ismember('E',[particles{:}])
         % All couplings are zero except for the hyperfine couplings to the electron
         inter.coupling.matrix=mat2cell(zeros(3*nspins,3*nspins),3*ones(nspins,1),3*ones(nspins,1));
         for n=1:(nspins-1)
-
-            % Scale the entire tensor before thresholding or purging
-            hfc=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
-            if ~isempty(hfc)
-                hfc=hfc*(spin(sys.isotopes{n})/source_gammas(index(n)));
-            end
-
-            % Preserve the symmetric-pair storage convention
-            inter.coupling.matrix{n,end}=hfc;
-            inter.coupling.matrix{end,n}=hfc;
+            inter.coupling.matrix{n,end}=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
+            inter.coupling.matrix{end,n}=1e6*gauss2mhz(props.hfc.full.matrix{index(n)}/2);
+        end
+        
+        % Warn about nuclear interactions that are ignored in EPR mode
+        if isfield(props,'nqi')&&any(cellfun(@(x)any(x,'all'),props.nqi(index)))
+            disp('WARNING: nuclear quadrupolar couplings in the log have been ignored.');
+        end
+        if isfield(props,'k_couplings')||isfield(props,'j_couplings')
+            disp('WARNING: scalar couplings in the log have been ignored.');
+        end
+        if isfield(props,'srt')
+            disp('WARNING: spin-rotation couplings in the log have been ignored.');
         end
         
         % Remove small hyperfine couplings
@@ -193,7 +204,12 @@ switch ismember('E',[particles{:}])
     case 0
         
         % Reference to bare nuclei if the user did not supply any reference values
-        if (nargin<3)||(~any(references)), references=zeros(size(particles)); end
+        if (nargin<3)||(~any(references)), references=zeros(size(elements)); end
+        
+        % Warn about electron interactions that are ignored in NMR mode
+        if isfield(props,'hfc')||isfield(props,'g_tensor')
+            disp('WARNING: hyperfine couplings and g-tensor in the log have been ignored.');
+        end
         
         % Absorb Zeeman tensors
         if isfield(props,'cst')
@@ -247,6 +263,17 @@ switch ismember('E',[particles{:}])
                 
             end
             
+            % Refuse printed J-couplings that differ by more than the scatter of gamma tables (0.14%)
+            if isfield(props,'j_couplings')
+                printed=props.j_couplings(index,index)/2; rebuilt=inter.coupling.scalar;
+                stated=(printed~=0)&(rebuilt~=0);
+                if any(abs(printed(stated)-rebuilt(stated))>3e-3*abs(printed(stated)))
+                    error(['J-couplings printed in the log do not follow from its K-couplings for the isotopes in ' ...
+                           'props.isotopes: set props.isotopes to the isotopes of the calculation, or remove ' ...
+                           'props.j_couplings to rebuild J-couplings for the isotopes in props.isotopes.']);
+                end
+            end
+            
             % Drop insignificant J-couplings
             if (nargin==4)&&isfield(options,'min_j')
                 inter.coupling.scalar=inter.coupling.scalar.*(abs(inter.coupling.scalar)>options.min_j);
@@ -257,11 +284,6 @@ switch ismember('E',[particles{:}])
             
         elseif isfield(props,'j_couplings')
 
-            % Warn the user about isotope scaling
-            disp('g2spinach: WARNING - J-couplings are isotope-specific, make sure');
-            disp('g2spinach: your electronic structure theory package had assumed');
-            disp('g2spinach: correct isotopes; scale by gamma ratio if not.');
-            
             % Absorb J-couplings and drop insignificant ones
             inter.coupling.scalar=props.j_couplings(index,index)/2;
             if (nargin==4)&&isfield(options,'min_j')
@@ -278,60 +300,36 @@ end
 end
 
 % Consistency enforcement
-function source_gammas=grumble(props,nuclei,references,options) %#ok<INUSD>
+function grumble(props,elements,references,options) %#ok<INUSD>
 if ~isstruct(props)
-    error('the first argument must be a structure returned by gparse().');
+    error('the first argument must be a structure returned by gparse() or oparse().');
 end
-if ~iscell(nuclei)
-    error('the second argument must have the form {{''H'',''1H''},{''C'',''13C''},...}');
+if (~iscell(elements))||any(~cellfun(@ischar,elements))
+    error('elements must be a cell array of element symbols, e.g. {''H'',''C''}.');
 end
-if (~isnumeric(references))||(numel(nuclei)~=numel(references))
-    error('references must be a numerical array with the same number of entries as nuclei.');
+if (~isnumeric(references))||(numel(elements)~=numel(references))
+    error('references must be a numerical array with the same number of entries as elements.');
 end
-source_gammas=[];
-if ismember('E',[nuclei{:}])
-    elements=cellfun(@(entry)entry{1},nuclei,'UniformOutput',false);
-    source_gammas=zeros(size(props.symbols));
-    for n=1:numel(props.symbols)
-        if ~ismember(props.symbols{n},elements)||isempty(props.hfc.full.matrix{n})
-            continue
-        end
-        if isfield(props,'isotopes')&&...
-           (numel(props.isotopes)~=numel(props.symbols))
-            error(['EPR import requires an explicit HFC source isotope '...
-                   'for each atom: props.isotopes and props.symbols must '...
-                   'have the same length; subset both with the same indices.']);
-        end
-        source_iso='';
-        if isfield(props,'isotopes')&&(numel(props.isotopes)>=n)
-            if isnumeric(props.isotopes)
-                mass_number=props.isotopes(n);
-                if isreal(mass_number)&&isfinite(mass_number)&&...
-                   (mass_number>0)&&(mod(mass_number,1)==0)
-                    source_iso=[num2str(mass_number) props.symbols{n}];
-                end
-            elseif iscell(props.isotopes)
-                source_iso=props.isotopes{n};
-            end
-        end
-        if ~ischar(source_iso)||isempty(source_iso)||~isrow(source_iso)||...
-           isempty(regexp(source_iso,['^[1-9][0-9]*' props.symbols{n} '$'],'once'))
-            error('EPR import without an explicit HFC source isotope is not implemented.');
-        end
-        try
-            source_gammas(n)=spin(source_iso);
-        catch exception
-            if strcmp(exception.identifier,'spin:unknown_isotope')
-                error(['invalid HFC source isotope ' source_iso ' at atom '...
-                       num2str(n) '; check props.isotopes and props.symbols atom order.']);
-            elseif strcmp(exception.identifier,'spin:data_unavailable')
-                error(['no spin data for HFC source isotope ' source_iso ' at atom '...
-                       num2str(n) '; check props.isotopes and props.symbols atom order.']);
-            end
-            rethrow(exception)
-        end
-        if source_gammas(n)==0
-            error('EPR import with a zero-gamma HFC source isotope is not implemented.');
+if (~isfield(props,'isotopes'))||(~iscell(props.isotopes))||(numel(props.isotopes)~=numel(props.symbols))
+    error('props.isotopes must be a cell array of isotope strings, e.g. ''13C'', with one entry per atom of props.symbols.');
+end
+selected=find(ismember(props.symbols,elements));
+unknown=selected(cellfun(@isempty,props.isotopes(selected)));
+if ~isempty(unknown)
+    error(['the log does not identify the isotope of atom ' int2str(unknown(1)) ' (' props.symbols{unknown(1)} '): set props.isotopes{' ...
+           int2str(unknown(1)) '}, e.g. to ''13C'', for every such atom.']);
+end
+silent=selected(cellfun(@spin,props.isotopes(selected))==0);
+if ~isempty(silent)
+    error(['the isotope of atom ' int2str(silent(1)) ' (' props.isotopes{silent(1)} ') is non-magnetic: set props.isotopes{' ...
+           int2str(silent(1)) '} to the magnetic isotope to be imported, for every such atom.']);
+end
+if (~ismember('E',elements))&&isfield(props,'nqi')
+    for n=selected(:)'
+        [~,mult]=spin(props.isotopes{n});
+        if (mult<3)&&any(props.nqi{n},'all')
+            error(['atom ' int2str(n) ' has a quadrupolar tensor in props.nqi, but ' props.isotopes{n} ' has no quadrupole moment: set ' ...
+                   'props.isotopes{' int2str(n) '} to the isotope of that tensor, or empty props.nqi{' int2str(n) '}.']);
         end
     end
 end

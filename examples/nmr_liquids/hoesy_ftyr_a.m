@@ -11,7 +11,7 @@ function hoesy_ftyr_a()
 
 % Read 3-fluorotyrosine DFT calculation
 [sys,inter]=g2spinach(gparse('../standard_systems/3_fluoro_tyr.log'),...
-                            {{'H','1H'},{'F','19F'}},[31.82 192.97]);
+                      {'H','F'},[31.82 192.97]);
          
 % Magnet field
 sys.magnet=14.1;

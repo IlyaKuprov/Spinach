@@ -9,7 +9,11 @@ function static_powder_ala()
 
 % Spin system properties (PCM DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/alanine.log'),...
-                     {{'C','13C'},{'N','15N'}},[182.1 264.5],[]);
+                      {'C','N'},[182.1 264.5],[]);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
+
 % Magnet field
 sys.magnet=14.1;
 

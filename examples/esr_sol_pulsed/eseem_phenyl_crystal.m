@@ -12,7 +12,7 @@ function eseem_phenyl_crystal()
 % Spin system properties (vacuum DFT calculation)
 options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/phenyl.log'),...
-                      {{'E','E'},{'H','1H'}},[0 0],options);
+                      {'E','H'},[0 0],options);
 % Magnet field
 sys.magnet=0.33;
 

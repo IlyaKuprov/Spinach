@@ -9,8 +9,12 @@ function state_spaces_4()
 
 % Spin system properties (PCM DFT calculation)
 [sys,inter]=g2spinach(gparse('../standard_systems/glycine.log'),...
-                     {{'H','1H'},{'C','13C'},{'N','15N'}},...
-                     [31.5 182.1 264.5],[]);
+                      {'H','C','N'},...
+                      [31.5 182.1 264.5],[]);
+
+% Isotope substitution
+[sys,inter]=isoswap(sys,inter,find(strcmp(sys.isotopes,'14N')),'15N');
+
 % Magnet field
 sys.magnet=14.1;
 

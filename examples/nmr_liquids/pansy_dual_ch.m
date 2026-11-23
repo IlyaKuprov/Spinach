@@ -11,7 +11,7 @@ function pansy_dual_ch()
 % Spin system properties (vacuum DFT calculation)
 options.min_j=3.0; options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/camphor.log'),...
-            {{'H','1H'},{'C','13C'}},[31.5 189.2],options); 
+                      {'H','C'},[31.5 189.2],options);
          
 % Magnet field
 sys.magnet=14.1;

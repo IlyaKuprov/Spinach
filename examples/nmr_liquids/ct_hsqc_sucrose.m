@@ -11,7 +11,7 @@ function ct_hsqc_sucrose()
 % Spin system properties (vacuum DFT calculation)
 options.min_j=3.0; options.no_xyz=1;
 [sys,inter]=g2spinach(gparse('../standard_systems/sucrose.log'),...
-                 {{'H','1H'},{'C','13C'}},[31.8 182.1],options);
+                      {'H','C'},[31.8 182.1],options);
 
 % Set the isotropic parts of shielding tensors to experimental values
 spin_numbers=[1:19 24:30];

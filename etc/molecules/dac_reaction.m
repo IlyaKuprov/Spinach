@@ -39,7 +39,7 @@ own_folder=own_folder(1:(end-12));
 
 % Cyclopentadiene (substance A)
 props_a=gparse([own_folder 'cyclopentadiene.log']);
-[sys_a,inter_a]=g2spinach(props_a,{{'H','1H'}},31.8);
+[sys_a,inter_a]=g2spinach(props_a,{'H'},31.8);
 
 % Replace isotropic shifts 
 inter_a.zeeman.matrix=shift_iso(inter_a.zeeman.matrix,[1 2 3 4 5 6],...
@@ -68,7 +68,7 @@ inter_a.coupling.scalar=num2cell(inter_a.coupling.scalar);
 
 % Acrylonitrile (substance B)
 props_b=gparse([own_folder 'acrylonitrile.log']);
-[sys_b,inter_b]=g2spinach(props_b,{{'H','1H'}},31.8);
+[sys_b,inter_b]=g2spinach(props_b,{'H'},31.8);
 
 % Replace isotropic shifts 
 inter_b.zeeman.matrix=shift_iso(inter_b.zeeman.matrix,[1 2 3],...
@@ -86,7 +86,7 @@ inter_b.coupling.scalar=num2cell(inter_b.coupling.scalar);
 
 % Endo-norbornene carbonitrile (substance C)
 props_c=gparse([own_folder 'norbornene_endo.log']);
-[sys_c,inter_c]=g2spinach(props_c,{{'H','1H'}},31.8);
+[sys_c,inter_c]=g2spinach(props_c,{'H'},31.8);
 
 % Replace isotropic shifts 
 inter_c.zeeman.matrix=shift_iso(inter_c.zeeman.matrix,[1 2 3 4 5 6 7 8 9],...
@@ -116,7 +116,7 @@ inter_c.coupling.scalar=num2cell(inter_c.coupling.scalar);
 
 % Exo-norbornene carbonitrile (substance D)
 props_d=gparse([own_folder 'norbornene_exo.log']);
-[sys_d,inter_d]=g2spinach(props_d,{{'H','1H'}},31.8);
+[sys_d,inter_d]=g2spinach(props_d,{'H'},31.8);
 
 % Replace isotropic shifts 
 inter_d.zeeman.matrix=shift_iso(inter_d.zeeman.matrix,[1 2 3 4 5 6 7 8 9],...

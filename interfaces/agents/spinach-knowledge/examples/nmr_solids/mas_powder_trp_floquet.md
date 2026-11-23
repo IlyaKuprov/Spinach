@@ -8,7 +8,7 @@ Source: [examples/nmr_solids/mas_powder_trp_floquet.m](../../../../../examples/n
 
 ## Model and data
 
-This example calculates the `13C` MAS spectrum of tryptophan powder under the stated assumption of `1H` decoupling. It imports tryptophan data from `trp_xray.out`, maps C and N to `13C` and `15N`, and sets the field to 9.4 T. The source describes the coordinates as X-ray data, chemical-shift anisotropies as DFT estimates, and isotropic shifts as experimental inputs. The spectrum is calculated from those inputs; it is not a reported measured spectrum.
+This example calculates the `13C` MAS spectrum of tryptophan powder under the stated assumption of `1H` decoupling. It imports C and N from `trp_xray.out` as `13C` and `14N`, replaces `14N` with `15N` using `isoswap`, and sets the field to 9.4 T. The source describes the coordinates as X-ray data, chemical-shift anisotropies as DFT estimates, and isotropic shifts as experimental inputs. The spectrum is calculated from those inputs; it is not a reported measured spectrum.
 
 The code separately builds the two unit-cell molecules. Its 11 indexed isotropic-shift assignments are 124.2, 110.1, 114.7, 118.0, 119.3, 107.5, 134.9, 125.0, 26.8, 54.6, and 174.4 ppm for the first; the second retains the first eight values and uses 28.0, 52.1, and 173.3 ppm for the last three. These Zeeman-tensor inputs are not calculated peak positions.
 

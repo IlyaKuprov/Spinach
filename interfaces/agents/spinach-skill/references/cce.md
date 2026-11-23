@@ -10,20 +10,20 @@ Use `clexpn` for observed-spin/bath dynamics represented by a hierarchy of retai
 
 `parameters.observed` is the ordered row of observed physical IDs; `parameters.times` is a nonempty, strictly increasing row of nonnegative total elapsed times in seconds. `assumptions` is an explicit stock assumption string, not an approximation inferred from isotope names. The context returns the numerical experiment answer first and validity, error, convergence and execution evidence second. Invalid values remain invalid; inspect `diagnostics.reduction.valid` and `diagnostics.reduction.reason` before fitting or plotting an inferred decay.
 
-The registered five-argument experiments in `experiments/cce/` are:
+The five-argument experiments in `experiments/cce/` are:
 
 | Handle | Experiment and native restrictions |
 |---|---|
-| `@free_evolution` | Free evolution; generalised or projected generators; signal, observable, and density outputs; registered dissipative support |
-| `@hahn_echo` | Ideal midpoint pi pulse; total duration is twice the free interval; signal, observable, and density outputs; registered dissipative support |
+| `@free_evolution` | Free evolution; generalised or projected generators; signal, observable, and density outputs; dissipative support |
+| `@hahn_echo` | Ideal midpoint pi pulse; total duration is twice the free interval; signal, observable, and density outputs; dissipative support |
 | `@cpmg_echo` | Ideal transition-selective x-pulse CPMG train with positive integer `parameters.nloops`; signal or observable output |
 | `@refocusing_train` | Explicit ideal refocusing descriptors or named XY8/UDD trains; generalised Hilbert dynamics; signal, observable, or density output |
 | `@bath_pumped_hahn` | Hahn echo with a spectrally selected bath pump; `parameters.pump` declares the window and selected sites/species |
 | `@cce_eseem` | Two-pulse ESEEM with ideal pi/2 preparation and a midpoint pi pulse |
-| `@finite_drive` | Generalised finite-duration rotating-frame control; signal, observable, and density outputs; registered dissipative support |
+| `@finite_drive` | Generalised finite-duration rotating-frame control; signal, observable, and density outputs; dissipative support |
 | `@noise_correlation` | Generalised bath correlation with additive cluster cumulants; `output='correlation'`; bath-only Lindblad dissipation supported |
 
-`cce_capabilities` checks handle identity and rejects unregistered callbacks before generator construction. A five-argument signature alone does not establish compatibility. Experiments receive `(cluster_system,parameters,H,R,K)`. The context owns retained subsystem construction, state sampling, cluster enumeration, and reduction; the experiment owns propagation, preparation/detection, and pulse timing.
+`cce_evaluate` builds the retained subsystem and generators of one cluster and calls the experiment as `(cluster_system,parameters,H,R,K)`. Each experiment tests in its own grumbler what it supports: projected generators, dissipation, and density output. The context owns retained subsystem construction, state sampling, cluster enumeration, and reduction; the experiment owns propagation, preparation/detection, and pulse timing.
 
 ## Physical approximation and input ownership
 
@@ -79,7 +79,7 @@ A dissipative noise estimate includes source and trace arithmetic even at zero e
 
 ## Numerical evidence and resource limits
 
-`cce.numerics.atol`, `rtol` and `max_memory_bytes` define the propagation/reduction budget. Omitted accuracy or resource values are resolved by `clexpn` and recorded in `diagnostics.policy`; lower-level compilation requires resolved values. Graph closure, state storage, retained generators, density propagation, and reduction buffers are memory consumers, not just the final answer.
+`cce.numerics.atol`, `rtol` and `max_memory_bytes` define the propagation/reduction budget. Omitted accuracy or resource values are resolved by `clexpn` and returned in `diagnostics.parameters`; lower-level compilation requires resolved values. Graph closure, state storage, retained generators, density propagation, and reduction buffers are memory consumers, not just the final answer.
 
 Inspect numerical error, denominator conditioning, density validity, and sampling error separately. A converged cluster order does not prove bath-radius, graph-cutoff, partition or sample-count convergence. For controlled comparisons, hold the bath realisation, physical spin ordering, transition phase, pulse schedule, and normalisation fixed; compare complete-bath raw responses with an independently constructed small-system calculation.
 
@@ -93,7 +93,7 @@ Each orientation constructs its own tensors, transition, graph, pump selection, 
 
 ## Native adaptive and sampling controls
 
-Use parameters.cce.partition for bounded adaptive partitions, with separate native pilot_configs and heldout_configs. clexpn supplies the registered experiment to each exact patch calculation and returns the frozen groups in diagnostics.policy.partition. parameters.cce.parallel.max_tasks caps batch concurrency, not the number of physical tasks. Internal-first sampled full-bath uncertainty is computed from individual unaveraged exact responses; truncated internal-first, connected-noise internal-first, and single-draw estimates are NaN. Interlacing rejects a reference density inconsistent with its declared local basis assignment using cce:spin_config and dimension^2*eps, independently of propagation tolerances.
+Use parameters.cce.partition for bounded adaptive partitions, with separate native pilot_configs and heldout_configs. clexpn supplies the experiment to each exact patch calculation and returns the frozen groups in diagnostics.partition. parameters.cce.parallel.max_tasks caps batch concurrency, not the number of physical tasks. Internal-first sampled full-bath uncertainty is computed from individual unaveraged exact responses; truncated internal-first, connected-noise internal-first, and single-draw estimates are NaN. Interlacing rejects a reference density inconsistent with its declared local basis assignment using cce:spin_config and dimension^2*eps, independently of propagation tolerances.
 
 ## Selected-transition numerical conventions
 
@@ -109,11 +109,9 @@ For Liouville free evolution, coherent generalised generators use sparse stock-s
 
 Zero-rate bath_jumps records contribute nothing and are skipped before projected manifold and support checks. Active split supports require a common retained group; active exterior jumps cannot drive a frozen mean field. Projected jumps must preserve both selected manifolds and the loss-operator subspaces, with scale-relative leakage checks. Generalised Liouville evolution permits observed-spin jumps.
 
-Noise inputs belong exclusively to noise_correlation, including direct evaluator requests. Explicit noise matrices use the relative Hermiticity criterion 100*eps*norm(B,'fro'), without an absolute unit-scale floor. Both noise moments and first moments remain available for ensemble connected subtraction.
+Noise inputs belong exclusively to noise_correlation, which returns the correlation output only. Explicit noise matrices use the relative Hermiticity criterion 100*eps*norm(B,'fro'), without an absolute unit-scale floor. Both noise moments and first moments remain available for ensemble connected subtraction.
 
 Connected sampled noise retains M_s-mu_s*mean(nu)-mean(mu)*(nu_s-mean(nu)) before reduction. These centred contributions determine after-expansion sampling uncertainty; internal-first connected uncertainty remains unavailable (NaN). Complete-bath values and propagation bounds use the exact raw reference after centring. Free-evolution master dynamics uses stock exponential action with dense generator arithmetic, including projected coherence blocks, and reports its dimension/norm-based floating-point estimate. The registered rates and noise tests use native clexpn and service contracts throughout.
-
-Capability versions distinguish propagation and retained-control-density schemas; regenerate checkpoints from preceding contracts rather than reusing their raw records.
 
 Receiver matrices supplied as a cell vector retain linear channel order for either row or column storage; output references and uncertainty factors are rows. Generalised Hilbert Hahn calculations may explicitly select cce.numerics.propagator='expm' for direct segment evolution and its segment arithmetic estimate. The default spectral Hahn path remains available; propagation-only policy is not a graph or reduction constraint.
 
@@ -131,9 +129,9 @@ Use pump.center, halfwidth, and units for bath_pumped_hahn spectral selection; s
 
 Native convergence uses an explicit registered experiment and assumptions in `[answer,diagnostics]=cce_converge(spin_system,parameters,pulse_sequence,assumptions)`. Its independent native-path ladders preserve the original baseline, work cap, held-out seed requirement, shared-time coverage, and numerical validity. Agreement between later refinements never certifies an inaccurate baseline.
 
-Interlaced native diagnostics distinguish conditional raw responses from irreducible factors: inspect raw.value for the physical average and raw.factor for the quotient, and never reduce a factor twice. The registered evaluator is shared by every denominator. A full-bath average bypasses singular lower ratios; unavailable lower prefixes remain masked, and one truncated reference does not estimate a sampling error. Preparation rho0 is experiment-owned, not part of a bath configuration.
+Interlaced native diagnostics distinguish conditional raw responses from irreducible factors: inspect raw.value for the physical average and raw.factor for the quotient, and never reduce a factor twice. Every denominator is evaluated by cce_evaluate. A full-bath average bypasses singular lower ratios; unavailable lower prefixes remain masked, and one truncated reference does not estimate a sampling error. Preparation rho0 is experiment-owned, not part of a bath configuration.
 
-For checkpointed native experiments, place file and optional logical resume under parameters.cce.checkpoint. Resume may change cce.parallel scheduling and batch size, but not physical tensors, tolerances, sampled configurations, time mesh, or experiment. Do not pass checkpoint requests to direct experiment/interlacing evaluators, or combine them with interlaced sampling or independent convergence ladders. Adaptive partition pilot and held-out work run without the production checkpoint.
+For checkpointed native experiments, place file and optional logical resume under parameters.cce.checkpoint. Resume may change cce.parallel scheduling and batch size, but not physical tensors, tolerances, sampled configurations, time mesh, or experiment. Do not pass checkpoint requests to cce_evaluate or cce_interlace directly, or combine them with interlaced sampling or independent convergence ladders. Adaptive partition pilot and held-out work run without the production checkpoint.
 
 For native parallel work, choose the pool through sys.parallel before create. cce.parallel.max_tasks limits the concurrent batch, not the number of physical cluster/configuration records. The memory preflight includes unprojected observed-plus-bath construction, simultaneous Hilbert/Liouville workspaces, all detector columns, and the master-generator arrays retained by completed tasks. Increasing worker count can therefore require a larger budget even when every individual cluster fits; no silent task dropping or model truncation occurs.
 
@@ -152,7 +150,7 @@ drift, and reject unsupported exterior dynamics. Single master echoes continue
 to use hahn_echo. Native control tests keep experiment-owned preparation and
 normalisation, independent dense references, and all physical assertions.
 
-Retained services validate their own consumed records; `cce_options` owns public input validation. `cce_schedule` and `cce_interlace` require the explicit registered evaluator and native parameters, with no method-name fallback. Internal graph, projection, state, control, and scalar-reduction records are numerical-engine inputs, not alternate public context parameters. Density extraction and reference normalisation within the internal control engine are file-local and preserve column-major ordering and complex detector phase.
+Retained services validate their own consumed records; `cce_options` owns public input validation. `cce_schedule` and `cce_interlace` take the experiment function handle and native parameters, with no method-name fallback. Internal graph, projection, state, control, and scalar-reduction records are numerical-engine inputs, not alternate public context parameters. Density extraction and reference normalisation within the internal control engine are file-local and preserve column-major ordering and complex detector phase.
 
 The legacy entry points `cce`, `cce_bath`, `cce_cluster`, `cce_master`, `cce_noise`, `cce_observe`, `cce_prepare`, `cce_sequence`, and `cce_validate` are removed, with no adapters or alternate parameter forms. Use `clexpn` and the registered experiments; construct baths with `spin_bath`. Lower-level work uses the native compilation, subsystem, generator, and observation services described above.
 
@@ -162,7 +160,7 @@ Use [sys,inter,fixture]=cce_fixture('nv_four_c13','6f7282b6') for the fixed four
 
 ## Removed input ownership
 
-The old observed_spins spelling is removed; use observed. Old top-level order, graph, bath_state, partition, interlaced, numerical, scheduling, and reduction controls belong under cce, while assumptions is the fourth context argument. method and quantity wrappers are replaced by the experiment capability and output; hamiltonian_backend becomes cce.backend, deer becomes pump with explicit frequency units and boundary, and jumps becomes bath_jumps. Supplied clusters and cluster_cap overrides are removed: the context owns the family, and the numerical policy owns its memory budget. Reserved controls, sampling, run, diagnostics, initial_rho, bath_state.temperature, and numerics.full_bath are not supported public inputs.
+The old observed_spins spelling is removed; use observed. Old top-level order, graph, bath_state, partition, interlaced, numerical, scheduling, and reduction controls belong under cce, while assumptions is the fourth context argument. method and quantity wrappers are replaced by the experiment handle and output; hamiltonian_backend becomes cce.backend, deer becomes pump with explicit frequency units and boundary, and jumps becomes bath_jumps. Supplied clusters and cluster_cap overrides are removed: the context owns the family, and the numerical policy owns its memory budget. Reserved controls, sampling, run, diagnostics, initial_rho, bath_state.temperature, and numerics.full_bath are not supported public inputs.
 
 Raw sequence/name/event-array forms are rejected at runtime, including empty arrays. Use the registered experiment and its drive, refocusing, train, nloops, or pump controls instead. All finite-drive physics checks use native descriptors: independent-axis overlapping drives, fractional starts, partial observations, coupled drift, and simultaneous GKSL relaxation. Internal events are compiled inside cce_acquire from validated native declarations; no raw parameter field or alternate context API remains.
 

@@ -135,7 +135,7 @@ end
 
 end
 
-% Validate the registered sequence contract before preparation
+% Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
 if ~isstruct(spin_system)||~isfield(spin_system,'kind')||...
    ~strcmp(spin_system.kind,'cce_subsystem')||~isstruct(parameters)||...
@@ -151,6 +151,9 @@ if isfield(parameters,'sequence')
 end
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     error('cce_eseem:density','This experiment returns detected signal or observables.');
+end
+if isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
+    error('cce_eseem:dissipation','This experiment is closed-system only.');
 end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('cce_eseem:generators','Supply conventional or tagged projected generators.');

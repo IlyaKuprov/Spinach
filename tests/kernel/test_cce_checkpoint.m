@@ -298,12 +298,10 @@ for method={'cce','gcce','mecce','megcce','noise'}
         direct.noise=struct('ordering','ordered','connected',false,'manifold','bath_only',...
                             'descriptors',struct('spins',2,'operators','Lz','coefficient',1));
     end
-    schedule=struct('pulse_sequence',pulse_sequence,'contract',cce_capabilities(pulse_sequence));
-    evaluator=schedule.contract.evaluator;
     direct.cce.checkpoint=struct('file',fullfile(folder,'direct.mat'),'resume',true);
     refused=false;
     try
-        evaluator(model,cluster,ensemble.spin_config(1),schedule,direct);
+        cce_evaluate(model,cluster,ensemble.spin_config(1),pulse_sequence,direct);
     catch exception
         refused=strcmp(exception.identifier,'cce_options:checkpoint');
     end
@@ -317,14 +315,13 @@ interlaced.cce.bath_state.mode='interlaced';
 interlaced.cce.interlaced=struct('max_states',16,'reference_state',1);
 model=cce_compile(spin_system,plain,'labframe');
 ensemble=uninterrupted_data.ensemble;
-schedule=struct('pulse_sequence',@free_evolution,'contract',cce_capabilities(@free_evolution));
 for resume=[false true]
     interlaced.cce.checkpoint=struct('file',fullfile(folder,'interlaced.mat'),'resume',resume);
     for direct=[false true]
         refused=false;
         try
             if direct
-                cce_interlace(model,cluster,ensemble,schedule,interlaced,schedule.contract.evaluator);
+                cce_interlace(model,cluster,ensemble,@free_evolution,interlaced);
             else
                 clexpn(spin_system,@free_evolution,interlaced,'labframe');
             end

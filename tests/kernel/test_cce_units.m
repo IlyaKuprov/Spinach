@@ -30,7 +30,7 @@ inter.coupling.scalar={0,137;0,0};
 
 % Compare scalar Hz conversion with the explicit singlet/triplet matrix
 system=create(sys,inter);
-[parameters,~]=cce_options(system,parameters,@free_evolution,'labframe');
+parameters=cce_options(system,parameters,@free_evolution,'labframe');
 model=cce_compile(system,parameters,'labframe');
 [H,meta]=cce_hamiltonian(model,2,struct());
 reference=2*pi*137*[1/4 0 0 0;0 -1/4 1/2 0;0 1/2 -1/4 0;0 0 0 1/4];
@@ -41,7 +41,7 @@ result=test_close(result,'scalar Hz to rad/s',...
 inter=struct('zeeman',struct('scalar',{{0,0}}));
 inter.coordinates={[0 0 0],[0 0 2]};
 system=create(sys,inter);
-[parameters,~]=cce_options(system,parameters,@free_evolution,'labframe');
+parameters=cce_options(system,parameters,@free_evolution,'labframe');
 model=cce_compile(system,parameters,'labframe');
 [H,meta]=cce_hamiltonian(model,2,struct());
 gamma_carbon=0.70236944*5.0507837393e-27/(0.5*1.054571817e-34);

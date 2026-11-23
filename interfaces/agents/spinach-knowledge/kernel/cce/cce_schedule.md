@@ -1,6 +1,6 @@
 # cce_schedule — native experiment task scheduling
 
-`raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)` schedules native cluster and configuration records prepared by `clexpn`. All six arguments are required. `schedule` identifies the registered experiment and capability contract; `evaluator` is its explicit callback. There is no method-name fallback or five-argument form.
+`raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters)` schedules native cluster and configuration records prepared by `clexpn`. All five arguments are required. `pulse_sequence` is the experiment function handle; every task is evaluated by `cce_evaluate`. There is no method-name fallback.
 
 ## Deterministic execution
 
@@ -16,14 +16,14 @@ Master-equation records retain manifold Hamiltonians, physical spin operators, a
 
 ## Checkpoints and interlacing
 
-`parameters.cce.checkpoint.file` and logical `resume` select scheduler-owned atomic restart. Identity binds physical model content, Spinach tolerances, experiment and capability version, time mesh, sampled configurations, and cluster family. Checkpoint names, resume switches, parallel scheduling, and raw-retention choices are excluded from physical identity. A compatible restart may therefore change serial/parallel scheduling or batching. The scheduler removes checkpoint options before calling direct evaluators.
+`parameters.cce.checkpoint.file` and logical `resume` select scheduler-owned atomic restart. Identity binds physical model content, Spinach tolerances, experiment, time mesh, sampled configurations, and cluster family. Checkpoint names, resume switches, parallel scheduling, and raw-retention choices are excluded from physical identity. A compatible restart may therefore change serial/parallel scheduling or batching. The scheduler removes checkpoint options before calling `cce_evaluate`.
 
-Interlaced tasks pass the same evaluator into every conditional recursion. With a complete bath, only the exact full-bath conditional average is propagated; lower-order placeholders are explicitly not evaluated and omitted from the returned raw ledger before concatenation. Master placeholders carry an empty generator field, never fabricated operators. Unavailable prefixes remain masked rather than being presented as convergence evidence. Direct interlacing and independent convergence do not own this checkpoint ledger.
+Interlaced tasks use `cce_evaluate` in every conditional recursion. With a complete bath, only the exact full-bath conditional average is propagated; lower-order placeholders are explicitly not evaluated and omitted from the returned raw ledger before concatenation. Master placeholders carry an empty generator field, never fabricated operators. Unavailable prefixes remain masked rather than being presented as convergence evidence. Direct interlacing and independent convergence do not own this checkpoint ledger.
 
 [MATLAB source](../../../../../kernel/cce/cce_schedule.m)
 
 Native finite_drive and refocusing_train preflight counts every retained time-by-segment Hamiltonian, pulse, and exterior expectation before dispatch. This is added to the existing simultaneous-workspace requirement without changing physical task enumeration or batch semantics.
 
-Checkpoint identities omit `cce.numerics.max_memory_bytes` from the hashed parameter/model copies; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, experiment, and capability revision remain bound to the ledger.
+Checkpoint identities omit `cce.numerics.max_memory_bytes` from the hashed parameter/model copies; the stored payload retains the recorded allowance: this is a checked dispatch limit, not a physical or accuracy input. The current memory allowance is still enforced before a ledger is read. Changing available host memory therefore does not invalidate an otherwise identical calculation. Physical tensors, numerical accuracy tolerances, state draws, clusters, and experiment remain bound to the ledger.
 
 Caller-selected parallel mode, batch caps, and the interlaced enumeration declaration are checked before task bookkeeping. Existing-pool availability and calculated resident storage remain execution-time checks.

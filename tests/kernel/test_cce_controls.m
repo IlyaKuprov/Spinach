@@ -349,7 +349,7 @@ refused=false;
 try
     clexpn(model.spin_system,@finite_drive,p,'labframe');
 catch exception
-    refused=strcmp(exception.identifier,'clexpn:projection');
+    refused=strcmp(exception.identifier,'finite_drive:generators');
 end
 result=test_true(result,'Projected finite observed drive refused',refused,'General observed drives need gCCE');
 

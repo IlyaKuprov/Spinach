@@ -2,19 +2,19 @@
 
 ## Native role and invocation
 
-`raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator)` is an internal service called by `cce_schedule` with a registered experiment evaluator. Public calculations enter through `clexpn`; native interlaced controls are nested in `parameters.cce`. The evaluator is propagated through every recursive conditional calculation.
+`raw=cce_interlace(model,cluster,ensemble,pulse_sequence,parameters)` is an internal service called by `cce_schedule` with the experiment function handle. Public calculations enter through `clexpn`; native interlaced controls are nested in `parameters.cce`. Every recursive conditional calculation is evaluated by `cce_evaluate`.
 
 ## Conditional averaging
 
 Interlaced sampling changes selected bath assignments on an explicitly constructed conditioning domain while preserving the outer realisation elsewhere. The implementation forms maximal conditioning cylinders, removes contained cylinders, enumerates supported basis levels, and deduplicates assignment rows. Enumeration is bounded by `parameters.cce.interlaced.max_states` and the resolved memory budget; these limits are explicit rejection thresholds, not silent truncations.
 
-Each assignment is passed to the registered retained-cluster evaluator. Conditional means retain absolute error and validity evidence. For an irreducible cluster, required subset responses are recomputed under the same conditioning domain before denominator formation. Error propagation, denominator-resolution checks, and invalid masks accompany the quotient; unresolved factors remain invalid. Per-state nonlinear reduction must precede the outer ensemble average.
+Each assignment is passed to `cce_evaluate`. Conditional means retain absolute error and validity evidence. For an irreducible cluster, required subset responses are recomputed under the same conditioning domain before denominator formation. Error propagation, denominator-resolution checks, and invalid masks accompany the quotient; unresolved factors remain invalid. Per-state nonlinear reduction must precede the outer ensemble average.
 
 With `raw_only=true`, the service returns the conditional physical raw average instead of a recursively divided factor. This is an engine control, not an additional public experiment. The returned `kind` distinguishes irreducible and exact full-bath records; `assignment_count` records conditional assignments.
 
 ## Native restrictions
 
-`clexpn` rejects interlaced `noise_correlation`: connected noise uses ordinary ensemble moment averaging. Checkpoint ownership remains with the native scheduler; the interlaced evaluator returns raw records rather than publishing checkpoint files itself. The registered evaluator, not a method-name dispatch or an inferred callback signature, determines physical propagation.
+`clexpn` rejects interlaced `noise_correlation`: connected noise uses ordinary ensemble moment averaging. Checkpoint ownership remains with the native scheduler; the interlaced service returns raw records rather than publishing checkpoint files itself. The experiment function handle, not a method-name dispatch, determines physical propagation.
 
 [MATLAB source](../../../../../kernel/cce/cce_interlace.m)
 
@@ -26,6 +26,6 @@ The conditioning contract uses cce.interlaced.max_states. Returned assignments, 
 
 A direct native interlacing request rejects cce.checkpoint, for both writes and resumes, before constructing its conditioning distribution. Interlaced calculations do not own an ordinary raw-task checkpoint ledger.
 
-All six arguments are mandatory; the service accepts native ensemble records and an explicit evaluator only. Its local validator checks reference indices, required native records, and checkpoint ownership before conditional enumeration.
+All five arguments are mandatory; the service accepts native ensemble records and an experiment function handle only. Its local validator checks reference indices, required native records, and checkpoint ownership before conditional enumeration.
 
 The local entry validator checks the state budget and the common reference density/assignment before recursive conditional evaluation. The recursion changes conditioning cylinders but retains that same validated reference.

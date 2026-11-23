@@ -29,7 +29,7 @@
 function model=cce_compile(spin_system,parameters,assumptions)
 
 % Resolve native defaults without translating obsolete parameter forms
-[parameters,~]=cce_options(spin_system,parameters,@cce_compile,assumptions);
+parameters=cce_options(spin_system,parameters,@cce_compile,assumptions);
 
 % Validate the compiler inputs before copying or rotating physical tensors
 grumble(spin_system,parameters,assumptions);

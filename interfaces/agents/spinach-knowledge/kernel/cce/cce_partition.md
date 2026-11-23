@@ -4,9 +4,9 @@
 
 Internal partition construction and hybrid-group metadata service used by clexpn before cluster enumeration.
 
-Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a registered experiment.
+Public simulations enter through `clexpn(spin_system,pulse_sequence,parameters,assumptions)` with a five-argument experiment.
 
-Internal/expert signature: `partition=cce_partition(model,graph,parameters)`. The native call takes the experiment parameters with partition controls under `parameters.cce`; the context supplies the physical model and registered pulse-sequence handle.
+Internal/expert signature: `partition=cce_partition(model,graph,parameters)`. The native call takes the experiment parameters with partition controls under `parameters.cce`; the context supplies the physical model and the pulse-sequence handle.
 
 [MATLAB source](../../../../../kernel/cce/cce_partition.m)
 
@@ -47,11 +47,11 @@ Unresolved (infinite-objective) reductions may take a deterministic capacity-lim
 
 ## Native adaptive partition contract
 
-The context passes the native parameters structure directly to cce_partition(model,graph,parameters). Controls live in parameters.cce.partition; pilot_configs and heldout_configs contain native bath-state records (bath_ids, bath_rho, assignment, configuration_id, state_id, and weight). The context supplies model.pulse_sequence. Pilot and held-out patch calculations use that registered experiment evaluator and native reduction, preserving the declared time grid, finite controls, exterior state, and observable. Partition selection uses a bounded merge search, memory preflight, independent held-out validation, and completion diagnostics.
+The context passes the native parameters structure directly to cce_partition(model,graph,parameters). Controls live in parameters.cce.partition; pilot_configs and heldout_configs contain native bath-state records (bath_ids, bath_rho, assignment, configuration_id, state_id, and weight). The context supplies model.pulse_sequence. Pilot and held-out patch calculations evaluate that experiment through `cce_evaluate` with native reduction, preserving the declared time grid, finite controls, exterior state, and observable. Partition selection uses a bounded merge search, memory preflight, independent held-out validation, and completion diagnostics.
 
-Native adaptive patch selection removes the experiment-owned propagator preference only from its internal graph and cluster-selection request. The native evaluator still receives the original numerical preference, so an explicit stock master-equation propagator is used unchanged for pilot, held-out, and production dynamics.
+Native adaptive patch selection removes the experiment-owned propagator preference only from its internal graph and cluster-selection request. `cce_evaluate` still receives the original numerical preference, so an explicit stock master-equation propagator is used unchanged for pilot, held-out, and production dynamics.
 
-Only the native experiment parameter contract is accepted. Exact-patch evaluation always obtains its callback from the registered pulse sequence; no method-name dispatch or event-schedule compiler is used.
+Only the native experiment parameter contract is accepted. Exact-patch evaluation always calls `cce_evaluate` with the pulse sequence of the model; no method-name dispatch or event-schedule compiler is used.
 
 Native partition bounds and group membership are checked before constructing the internal graph and cluster-selection request.
 

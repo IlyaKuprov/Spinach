@@ -49,7 +49,7 @@ result=test_true(result,'Bidirectional physical map',...
 
 % Reproduce the direct-versus-stock Hamiltonian fixture through native inputs
 H=cce_hamiltonian(model,2,struct('backend','direct'));
-[repeated,~]=cce_options(system,parameters,@free_evolution,'labframe');
+repeated=cce_options(system,parameters,@free_evolution,'labframe');
 reference=cce_compile(system,repeated,'labframe');
 H_repeat=cce_hamiltonian(reference,2,struct('backend','direct'));
 result=test_true(result,'Native compiler bitwise identity',isequal(H,H_repeat),...

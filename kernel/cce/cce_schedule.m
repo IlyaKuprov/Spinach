@@ -1,6 +1,6 @@
 % Evaluate CCE state/cluster tasks in deterministic indexed batches. Syntax:
 %
-%     raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
+%     raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters)
 %
 % raw is a cell per input spin_config, containing the empty-cluster record
 % followed by cluster records in input order. Tasks execute in ascending
@@ -17,8 +17,8 @@
 %
 % Parameters:
 %
-%   model, clusters, ensemble, schedule, parameters, evaluator - prepared
-%   objects and evaluator function handle. Optional parallel.mode,
+%   model, clusters, ensemble, pulse_sequence, parameters - prepared
+%   objects and the experiment function handle. Optional parallel.mode,
 %   parallel.batch_size, parallel.max_tasks, and checkpoint.file/resume;
 %   serial batch_size defaults to one and parallel batch_size to the pool
 %   size.
@@ -28,14 +28,14 @@
 %   raw - cell per input spin_config, each containing the baseline record then
 %   cluster records in input order.
 %
-% See also cce_checkpoint, cce_capabilities, clexpn.
+% See also cce_checkpoint, cce_evaluate, clexpn.
 %
 % ilya.kuprov@weizmann.ac.il
 
-function raw=cce_schedule(model,clusters,ensemble,schedule,parameters,evaluator)
+function raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters)
 
-% Validate the registered experiment and resolved native scheduling inputs
-grumble(model,clusters,ensemble,schedule,parameters,evaluator);
+% Check consistency
+grumble(model,clusters,ensemble,pulse_sequence,parameters);
 
 % Build deterministic tasks from resolved native controls
 options=parameters.cce;
@@ -71,9 +71,9 @@ elseif isfield(parameters,'coil')&&iscell(parameters.coil)
 end
 nt=numel(parameters.times);
 dc=prod(model.multiplicities(model.observed_ids));
-metadata=whos('model','clusters','ensemble','schedule','parameters');
+metadata=whos('model','clusters','ensemble','parameters');
 resident=3*ns*nc*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
-noise=isequal(schedule.pulse_sequence,@noise_correlation);
+noise=isequal(pulse_sequence,@noise_correlation);
 master=strcmp(model.formalism,'zeeman-liouv')||...
        (isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps));
 if noise
@@ -82,7 +82,7 @@ end
 
 % Count retained experiment-owned control intervals before dispatch
 segment_count=0;
-if isequal(schedule.pulse_sequence,@finite_drive)||isequal(schedule.pulse_sequence,@refocusing_train)
+if isequal(pulse_sequence,@finite_drive)||isequal(pulse_sequence,@refocusing_train)
     events=cce_pulse_events(parameters);
     for t=parameters.times
         starts=[events.at].';
@@ -156,8 +156,7 @@ task_clusters=[struct('id',uint64(0),'sites',[]);...
 
 % Hash physical and experiment inputs, not checkpoint filenames or resume switches
 payload=struct('model',model,'clusters',clusters,'ensemble',ensemble,...
-               'parameters',parameters,'experiment',func2str(schedule.pulse_sequence),...
-               'contract_version',schedule.contract.version);
+               'parameters',parameters,'experiment',func2str(pulse_sequence));
 for field={'checkpoint','parallel','retain_raw'}
     if isfield(payload.parameters.cce,field{1})
         payload.parameters.cce=rmfield(payload.parameters.cce,field{1});
@@ -198,7 +197,7 @@ if isfield(options,'checkpoint')
     physical.model.numerics=rmfield(physical.model.numerics,'max_memory_bytes');
     identity=struct('model',md5_hash(physical.model),'parameters',md5_hash(physical.parameters),...
                     'clusters',md5_hash(clusters),'schedule',md5_hash(payload.experiment),...
-                    'samples',md5_hash(ensemble),'code',payload.contract_version);
+                    'samples',md5_hash(ensemble));
 
 end
 state=struct('version',1,'identity',identity,'payload',payload,...
@@ -228,11 +227,11 @@ for b=1:batch_size:numel(pending)
     configuration_ids=tasks(:,1);
     if strcmp(mode,'serial')
         for j=1:numel(selected)
-            records{j}=native_task(model,local_clusters(j),ensemble,schedule,parameters,evaluator,configuration_ids(j));
+            records{j}=native_task(model,local_clusters(j),ensemble,pulse_sequence,parameters,configuration_ids(j));
         end
     else
         parfor (j=1:numel(selected),workers)
-            records{j}=native_task(model,local_clusters(j),ensemble,schedule,parameters,evaluator,configuration_ids(j));
+            records{j}=native_task(model,local_clusters(j),ensemble,pulse_sequence,parameters,configuration_ids(j));
         end
     end
     state.records(selected)=records;
@@ -256,8 +255,8 @@ end
 
 end
 
-% Invoke exactly the registered evaluator on ordinary and conditioned paths
-function raw=native_task(model,cluster,ensemble,schedule,parameters,evaluator,config_id)
+% Evaluate one cluster on the ordinary or the conditioned path
+function raw=native_task(model,cluster,ensemble,pulse_sequence,parameters,config_id)
 
 % Keep conditioned tasks on the same physical family and configuration
 if strcmp(parameters.cce.bath_state.mode,'interlaced')
@@ -279,22 +278,21 @@ if strcmp(parameters.cce.bath_state.mode,'interlaced')
             raw.generator=[];
         end
     else
-        raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator);
+        raw=cce_interlace(model,cluster,ensemble,pulse_sequence,parameters);
     end
 else
-    raw=evaluator(model,cluster,ensemble.spin_config(config_id),schedule,parameters);
+    raw=cce_evaluate(model,cluster,ensemble.spin_config(config_id),pulse_sequence,parameters);
 end
 end
 
-% Validate producer-owned records and the required explicit callback
-function grumble(model,clusters,ensemble,schedule,parameters,evaluator)
+% Consistency enforcement
+function grumble(model,clusters,ensemble,pulse_sequence,parameters)
 if ~isstruct(model)||~isscalar(model)||~all(isfield(model,{'spin_system','multiplicities','observed_ids'}))||...
    ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
    ~isstruct(ensemble)||~isfield(ensemble,'spin_config')||isempty(ensemble.spin_config)||...
-   ~isstruct(schedule)||~all(isfield(schedule,{'pulse_sequence','contract'}))||...
-   ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
-   ~isa(evaluator,'function_handle')
-    error('cce_schedule:input','Native model, ensemble, schedule, parameters and evaluator are required.');
+   ~isa(pulse_sequence,'function_handle')||...
+   ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')
+    error('cce_schedule:input','Native model, ensemble, experiment handle and parameters are required.');
 end
 mode='serial';
 if isfield(parameters.cce,'parallel')

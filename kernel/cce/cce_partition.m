@@ -257,7 +257,7 @@ partition=struct('groups',{groups},'dimensions',cellfun(@(g)dimension(g,ids,dims
 % Evaluate exact patches against the production group expansion
 function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
 
-    % Choose the same exact evaluator and group order as production
+    % Choose the same group order as production
     objective=0;
     errors=[];
     valid=true;
@@ -275,9 +275,6 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
     if strcmp(parameters.expansion,'disjoint_inter')
         q.order=2;
     end
-    contract=cce_capabilities(model.pulse_sequence);
-    evaluator=contract.evaluator;
-    schedule=struct('pulse_sequence',model.pulse_sequence,'contract',contract);
     evaluation=native_parameters;
     evaluation.cce.groups=q.groups;
     evaluation.cce.order=q.order;
@@ -337,11 +334,11 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             used=used+1;
             state=spin_configs(s);
             state.weight=1;
-            baseline=evaluator(model,empty,state,schedule,evaluation);
-            exact=evaluator(model,whole,state,schedule,evaluation);
+            baseline=cce_evaluate(model,empty,state,model.pulse_sequence,evaluation);
+            exact=cce_evaluate(model,whole,state,model.pulse_sequence,evaluation);
             records=repmat(baseline,1,numel(family));
             for c=1:numel(family)
-                records(c)=evaluator(model,family(c),state,schedule,evaluation);
+                records(c)=cce_evaluate(model,family(c),state,model.pulse_sequence,evaluation);
             end
 
             % Score all times using exact complete patches without auxiliary denominators

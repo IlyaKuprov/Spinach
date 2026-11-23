@@ -43,8 +43,7 @@ p.cce.bath_state=struct('mode','sampled','samples',1,'seed',17,'basis','uniform'
 p=diagnostics.parameters;
 model=cce_compile(spin_system,p,'labframe');
 ensemble=diagnostics.ensemble;
-evaluator=diagnostics.contract.evaluator;
-schedule=struct('pulse_sequence',@free_evolution,'contract',diagnostics.contract);
+schedule=@free_evolution;
 weights=[0.14 0.56 0.06 0.24];
 sampled=zeros(2,2,numel(p.times));
 for a=1:2
@@ -58,7 +57,7 @@ for a=1:2
             spin_config.bath_rho{j}=state;
             spin_config.expectations(j,:)=[0 0 1.5-assignment(j)];
         end
-        raw=evaluator(model,struct('id',1,'sites',[2 3]),spin_config,schedule,p);
+        raw=cce_evaluate(model,struct('id',1,'sites',[2 3]),spin_config,schedule,p);
         sampled=sampled+weights(k)*reshape(raw.value.',2,2,[]);
     end
 end
@@ -113,13 +112,13 @@ result=test_true(result,'Average of products differs from product of averages',.
 % Compare static exterior fields to exact quantum dynamics at an avoided crossing
 spin_config=ensemble.spin_config(1);
 spin_config.bath_rho{2}=diag([1 0]);
-full=evaluator(model,struct('id',1,'sites',[2 3]),spin_config,schedule,p);
+full=cce_evaluate(model,struct('id',1,'sites',[2 3]),spin_config,schedule,p);
 p.cce.meanfield='static';
 model=cce_compile(spin_system,p,'labframe');
-sampled_field=evaluator(model,struct('id',1,'sites',2),spin_config,schedule,p);
+sampled_field=cce_evaluate(model,struct('id',1,'sites',2),spin_config,schedule,p);
 p.cce.meanfield='none';
 model=cce_compile(spin_system,p,'labframe');
-absent_field=evaluator(model,struct('id',1,'sites',2),spin_config,schedule,p);
+absent_field=cce_evaluate(model,struct('id',1,'sites',2),spin_config,schedule,p);
 field_error=norm(sampled_field.value(:)-full.value(:));
 field_effect=norm(absent_field.value(:)-full.value(:));
 result=test_close(result,'Clock-transition static eigenstate exterior matches exact retained bath',...

@@ -358,15 +358,14 @@ if ~strcmp(parameters.cce.bath_state.mode,'interlaced')
 end
 
 % Evaluate the same raw conditional average using the registered callback
-[parameters,~]=cce_options(spin_system,parameters,pulse_sequence,'labframe');
+parameters=cce_options(spin_system,parameters,pulse_sequence,'labframe');
 model=cce_compile(spin_system,parameters,'labframe');
 model.formalism=parameters.cce.basis.formalism;
 model.clusters=diagnostics.clusters;
-schedule=struct('pulse_sequence',pulse_sequence,'contract',diagnostics.contract);
 parameters.cce.interlaced.raw_only=true;
 parameters.cce.interlaced.reference_state=1;
 cluster=struct('id',uint64(1),'sites',parameters.cce.bath_spins(1:parameters.cce.order));
-raw=cce_interlace(model,cluster,diagnostics.ensemble,schedule,parameters,diagnostics.contract.evaluator);
+raw=cce_interlace(model,cluster,diagnostics.ensemble,pulse_sequence,parameters);
 value=raw.value;
 bound=raw.abs_error_bound;
 

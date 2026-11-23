@@ -288,7 +288,7 @@ for n=1:numel(cases)
         rejected=contains(lower(exception.message),lower(labels{n}))||...
                  (n==4&&strcmp(exception.identifier,'cce_options:state'))||...
                  (n==1&&strcmp(exception.identifier,'clexpn:propagator'))||...
-                 (n==9&&strcmp(exception.identifier,'clexpn:dissipation'))||...
+                 (n==9&&strcmp(exception.identifier,'cpmg_echo:dissipation'))||...
                  (n==16&&strcmp(exception.identifier,'clexpn:noise'));
     end
     result=test_true(result,['Ignored option rejected: ' labels{n}],rejected,...
@@ -403,8 +403,7 @@ for method={'cce','gcce','mecce','megcce'}
     base=model.parameters;
     spin_config=struct('bath_ids',[2 3],'bath_rho',{base.cce.bath_state.rho},...
                        'state_id',1,'configuration_id',1,'weight',1);
-    contract=cce_capabilities(@free_evolution);
-    schedule=struct('pulse_sequence',@free_evolution,'contract',contract);
+    schedule=@free_evolution;
 
     % Distinguish missing observed and exterior sites from irrelevant included sites
     for missing=[model.observed_ids 3]
@@ -413,7 +412,7 @@ for method={'cce','gcce','mecce','megcce'}
         partial.coordinates_A(missing,:)=NaN;
         rejected=false;
         try
-            contract.evaluator(partial,cluster,spin_config,schedule,base);
+            cce_evaluate(partial,cluster,spin_config,schedule,base);
         catch err
             rejected=strcmp(err.identifier,'cce:coordinates')&&...
                      contains(err.message,'meanfield_radius');
@@ -425,7 +424,7 @@ for method={'cce','gcce','mecce','megcce'}
     spatial.coordinates_A=[0 0 0;NaN NaN NaN;3 0 0];
     accepted=true;
     try
-        contract.evaluator(spatial,cluster,spin_config,schedule,base);
+        cce_evaluate(spatial,cluster,spin_config,schedule,base);
     catch
         accepted=false;
     end
@@ -437,18 +436,16 @@ for method={'cce','gcce','mecce','megcce'}
     calls=cell(1,5+master);
     names=cell(size(calls));
     calls(1:3)={@()clexpn(ss,@free_evolution,base,'labframe'),...
-                @()contract.evaluator(model,cluster,spin_config,schedule,base),...
+                @()cce_evaluate(model,cluster,spin_config,schedule,base),...
                 @()cce_subsystem(model,cluster.sites,spin_config,[])};
     names(1:3)={'driver','cluster','controls'};
     if master
-        calls{6}=@()contract.evaluator(model,cluster,spin_config,schedule,base);
+        calls{6}=@()cce_evaluate(model,cluster,spin_config,schedule,base);
         names{6}='master';
     end
 
-    % A controlled schedule must not bypass the pre-dispatch prerequisite
-    driven=schedule;
-    driven.controls=true;
-    calls{4}=@()contract.evaluator(model,cluster,spin_config,driven,base);
+    % A driven experiment must not bypass the prerequisite
+    calls{4}=@()cce_evaluate(model,cluster,spin_config,@finite_drive,base);
     names{4}='controlled dispatch';
 
     % Projected enumeration must use the same checked evaluators
@@ -459,7 +456,7 @@ for method={'cce','gcce','mecce','megcce'}
     spin_config.assignment=[1 1];
     sampled=struct('spin_config',spin_config,'weights',1,'bases',{{eye(2),eye(2)}},...
                    'probabilities',{{[0.5 0.5],[0.5 0.5]}});
-    calls{5}=@()cce_interlace(model,cluster,sampled,schedule,ip,contract.evaluator);
+    calls{5}=@()cce_interlace(model,cluster,sampled,schedule,ip);
     names{5}='interlace';
     for k=1:numel(calls)
         rejected=false;

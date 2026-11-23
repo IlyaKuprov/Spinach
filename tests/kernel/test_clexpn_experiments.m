@@ -31,7 +31,7 @@ p.transition.alpha=[1;0];
 p.transition.beta=[0;1];
 p.cce.numerics=struct('atol',1e-12,'rtol',1e-10,'max_memory_bytes',1e8);
 p.cce.bath_state=struct('mode','explicit_product','rho',{{diag([0.8 0.2])}});
-[p,~]=cce_options(spin_system,p,@free_evolution,'labframe');
+p=cce_options(spin_system,p,@free_evolution,'labframe');
 model=cce_compile(spin_system,p,'labframe');
 [cluster,~]=cce_subsystem(model,2,struct(),[]);
 [H,R,K,p]=cce_generators(cluster,p,[]);
@@ -479,7 +479,7 @@ failed=false;
 try
     clexpn(system,@finite_drive,p,'labframe');
 catch err
-    failed=strcmp(err.identifier,'clexpn:projection');
+    failed=strcmp(err.identifier,'finite_drive:generators');
 end
 result=test_true(result,'Projected finite drives rejected',failed,...
                  'A finite observed drive requires generalized propagation.');

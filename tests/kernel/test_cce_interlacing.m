@@ -51,10 +51,9 @@ p=details.parameters;
 model=cce_compile(spin_system,p,'labframe');
 model.clusters=details.clusters;
 ensemble=details.ensemble;
-schedule=struct('pulse_sequence',@free_evolution,'contract',details.contract);
+schedule=@free_evolution;
 
 pulse_sequence=@free_evolution;
-evaluator=schedule.contract.evaluator;
 
 % Refuse count-scaled storage before constructing conditioning assignments
 q=p;
@@ -67,7 +66,7 @@ q.cce.interlaced=struct('max_states',8,'reference_state',1,...
 probe=struct('id',uint64(0),'sites',[],'groups',[]);
 refused=false;
 try
-    cce_interlace(model,probe,ensemble,schedule,q,evaluator);
+    cce_interlace(model,probe,ensemble,schedule,q);
 catch exception
     refused=strcmp(exception.identifier,'cce_interlace:memory');
 end
@@ -94,7 +93,7 @@ q.times=linspace(0,1,1024);
 q.cce.numerics.max_memory_bytes=4096;
 refused=false;
 try
-    evaluator(model,probe,ensemble.spin_config(1),schedule,q);
+    cce_evaluate(model,probe,ensemble.spin_config(1),schedule,q);
 catch exception
     refused=strcmp(exception.identifier,'clexpn:memory');
 end
@@ -104,14 +103,14 @@ ensemble.spin_config(1).assignment=[1 1 1];
 ensemble.spin_config(1).bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
 p.cce.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3],[2 4]}});
 cluster=struct('id',uint64(1),'sites',2);
-raw=cce_interlace(model,cluster,ensemble,schedule,p,evaluator);
+raw=cce_interlace(model,cluster,ensemble,schedule,p);
 
 % Reject reference states inconsistent with their declared product assignment
 rejected=false;
 supplied=ensemble;
 supplied.spin_config(1).bath_rho{1}=eye(2)/2;
 try
-    cce_interlace(model,cluster,supplied,schedule,p,evaluator);
+    cce_interlace(model,cluster,supplied,schedule,p);
 catch exception
     rejected=strcmp(exception.identifier,'cce:spin_config');
 end
@@ -123,7 +122,7 @@ supplied=ensemble;
 supplied.spin_config(1).assignment=[2 1 1];
 rejected=false;
 try
-    cce_interlace(model,cluster,supplied,schedule,p,evaluator);
+    cce_interlace(model,cluster,supplied,schedule,p);
 catch exception
     rejected=strcmp(exception.identifier,'cce:spin_config');
 end
@@ -135,7 +134,7 @@ supplied=ensemble;
 supplied.spin_config(1).projection=eye(2);
 rejected=false;
 try
-    cce_interlace(model,cluster,supplied,schedule,p,evaluator);
+    cce_interlace(model,cluster,supplied,schedule,p);
 catch exception
     rejected=strcmp(exception.identifier,'cce_subsystem:configuration');
 end
@@ -150,7 +149,7 @@ q.output='density';
 q.times=0;
 supplied=ensemble;
 q.rho0=diag([0.2 0.8]);
-initial=cce_interlace(model,cluster,supplied,schedule,q,evaluator);
+initial=cce_interlace(model,cluster,supplied,schedule,q);
 expected=q.rho0;
 result=test_close(result,'Interlaced supplied observed state',initial.value,expected(:).',...
                   1e-12,1e-12,'The experiment-owned observed density survives the projected bath average.');
@@ -165,10 +164,10 @@ baseline_error=Inf;
 try
     empty_model=model;
     empty_model.clusters=model.clusters([]);
-    baseline=cce_interlace(empty_model,empty_cluster,ensemble,schedule,q,evaluator);
+    baseline=cce_interlace(empty_model,empty_cluster,ensemble,schedule,q);
     reference=ensemble.spin_config(1);
     reference.bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
-    direct=evaluator(model,empty_cluster,reference,schedule,q);
+    direct=cce_evaluate(model,empty_cluster,reference,schedule,q);
     baseline_error=norm(baseline.value-direct.value);
 catch exception
     baseline_ok=false;
@@ -237,7 +236,7 @@ for a=1:2
                 spin_config.bath_rho{j}=rho;
                 weight=weight*p.cce.bath_state.probabilities{j}(assignment(j));
             end
-            item=evaluator(model,cluster,spin_config,schedule,p);
+            item=cce_evaluate(model,cluster,spin_config,schedule,p);
             value=value+weight*item.value;
             mass=mass+weight;
             duplicated=duplicated+multiplicity*weight*item.value;
@@ -262,7 +261,7 @@ sample=probe;
 sample.cce.interlaced.raw_only=false;
 [~,probe_details]=clexpn(probe_model.spin_system,@free_evolution,sample,'labframe');
 probe_ensemble=probe_details.ensemble;
-measured=cce_interlace(probe_model,cluster,probe_ensemble,schedule,probe,evaluator);
+measured=cce_interlace(probe_model,cluster,probe_ensemble,schedule,probe);
 residual=0;
 orthogonality=0;
 for k=1:size(measured.assignments,1)
@@ -271,7 +270,7 @@ for k=1:size(measured.assignments,1)
         vector=probe.cce.bath_state.basis{j}(:,measured.assignments(k,j));
         spin_config.bath_rho{j}=vector*vector';
     end
-    item=evaluator(probe_model,cluster,spin_config,schedule,probe);
+    item=cce_evaluate(probe_model,cluster,spin_config,schedule,probe);
     residual=max(residual,max(item.eigen_residual));
     orthogonality=max(orthogonality,max(item.orthogonality_residual));
 end
@@ -282,21 +281,21 @@ result=test_close(result,'Interlaced worst orthogonality retained',max(measured.
 
 % Denominator subclusters are conditioned on exactly the numerator distribution
 empty=struct('id',uint64(0),'sites',[]);
-baseline=cce_interlace(model,empty,ensemble,schedule,p,evaluator);
+baseline=cce_interlace(model,empty,ensemble,schedule,p);
 result=test_true(result,...
                  'Explicit shared K is identical in numerator and empty denominator',isequal(raw.assignments,baseline.assignments)&&isequal(raw.weights,baseline.weights),...
                  'Explicit shared K is identical in numerator and empty denominator');
 p.cce.interlaced.max_states=7;
 refused=false;
 try
-    cce_interlace(model,cluster,ensemble,schedule,p,evaluator);
+    cce_interlace(model,cluster,ensemble,schedule,p);
 catch exception
     refused=strcmp(exception.identifier,'cce_interlace:budget');
 end
 result=test_true(result,'Enumeration work exceeding the declared budget is refused',refused,'Enumeration work exceeding the declared budget is refused');
 p.cce.interlaced.max_states=16;
 p.cce.interlaced=rmfield(p.cce.interlaced,'condition_sites');
-automatic=cce_interlace(model,cluster,ensemble,schedule,p,evaluator);
+automatic=cce_interlace(model,cluster,ensemble,schedule,p);
 result=test_true(result,'Included-supercluster family generates the same K automatically',isequal(automatic.assignments,expected),'Included-supercluster family generates the same K automatically');
 
 % At full order every conditioning cylinder is the full bath and W12 is exact

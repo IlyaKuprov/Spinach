@@ -683,7 +683,7 @@ end
 
 end
 
-% Validate the registered sequence contract before preparation
+% Consistency enforcement
 function grumble(spin_system,parameters,H,R,K)
 if ~isstruct(spin_system)||~isfield(spin_system,'kind')||...
    ~strcmp(spin_system.kind,'cce_subsystem')||~isstruct(parameters)||...
@@ -697,12 +697,6 @@ if isfield(parameters,'sequence')
 end
 if ~(isnumeric(H)||isstruct(H))||~isnumeric(R)||~isnumeric(K)
     error('hahn_echo:generators','Supply conventional or tagged projected generators.');
-end
-if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&isstruct(H)
-    error('hahn_echo:density','Projected blocks do not define an observed density.');
-end
-if ~isfield(spin_system.model,'transition')
-    error('hahn_echo:transition','An explicit transition is required for ideal refocusing.');
 end
 if isfield(parameters,'refocusing')
     pulse=parameters.refocusing;
@@ -747,19 +741,26 @@ if isfield(parameters,'refocusing')
        ~isfinite(position)||position<0||position>upper
         error('hahn_echo:refocusing','Use a fraction in [0,1] or nonnegative time in seconds.');
     end
-    if strcmp(parameters.cce.meanfield,'static')&&any(~ismember(ids,spin_system.physical_ids))
-        if isfield(pulse,'operator')
-            error('hahn_echo:exterior','Exterior pulses require time-dependent mean fields.');
-        elseif isstruct(H)||~strcmp(spin_system.formalism,'zeeman-hilb')
-            error('hahn_echo:exterior','Exterior rotations require generalized Hilbert dynamics.');
-        end
-    end
 end
 if isfield(parameters.cce.numerics,'propagator')&&...
    strcmp(parameters.cce.numerics.propagator,'expm')&&...
    (isstruct(H)||~strcmp(spin_system.formalism,'zeeman-hilb')||...
     any(R(:))||any(K(:))||isfield(parameters,'pump'))
     error('hahn_echo:propagator','Direct segment exponentials require closed generalized Hilbert dynamics.');
+end
+if isfield(parameters,'output')&&strcmp(parameters.output,'density')&&isstruct(H)
+    error('hahn_echo:density','Projected blocks do not define an observed density.');
+end
+if ~isfield(spin_system.model,'transition')
+    error('hahn_echo:transition','An explicit transition is required for ideal refocusing.');
+end
+if isfield(parameters,'refocusing')&&strcmp(parameters.cce.meanfield,'static')&&...
+   any(~ismember(parameters.refocusing.spins,spin_system.physical_ids))
+    if isfield(parameters.refocusing,'operator')
+        error('hahn_echo:exterior','Exterior pulses require time-dependent mean fields.');
+    elseif isstruct(H)||~strcmp(spin_system.formalism,'zeeman-hilb')
+        error('hahn_echo:exterior','Exterior rotations require generalized Hilbert dynamics.');
+    end
 end
 end
 

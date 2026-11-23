@@ -227,6 +227,9 @@ if ~isstruct(system)||~isfield(system,'kind')||~strcmp(system.kind,'cce_subsyste
     error('noise_correlation:input',...
           'A native subsystem and complete noise convention are required.');
 end
+if isfield(parameters,'output')&&~strcmp(parameters.output,'correlation')
+    error('noise_correlation:output','This experiment returns the correlation output only.');
+end
 noise=parameters.noise;
 if ~ismember(noise.ordering,{'ordered','symmetrized'})||...
    ~ismember(noise.manifold,{'bath_only','alpha','beta'})||...

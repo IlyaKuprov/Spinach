@@ -46,7 +46,7 @@ for j=1:4
 end
 
 parameters=choices();
-[parameters,~]=cce_options(spin_system,parameters,@hahn_echo,'labframe');
+parameters=cce_options(spin_system,parameters,@hahn_echo,'labframe');
 exact=dense_echo(inter,2:4,parameters.times);
 ordinary=clexpn(spin_system,@hahn_echo,parameters,'labframe');
 
@@ -369,7 +369,7 @@ for method={'gcce','megcce'}
         q.cce.basis.formalism='zeeman-liouv';
         q.cce.numerics=rmfield(q.cce.numerics,'propagator');
     end
-    [q,~]=cce_options(spin_system,q,@free_evolution,'labframe');
+    q=cce_options(spin_system,q,@free_evolution,'labframe');
     local_model=cce_compile(spin_system,q,'labframe');
     local_model.pulse_sequence=@free_evolution;
     if strcmp(method{1},'megcce')
@@ -417,7 +417,7 @@ open.cce.partition=parameters.cce.partition;
 open.cce.partition.adaptive=true;
 open.cce.partition.max_probes=2;
 open.bath_jumps=struct('support',2,'operator',diag([1 -1])/2,'rate',100);
-[open,~]=cce_options(spin_system,open,@hahn_echo,'labframe');
+open=cce_options(spin_system,open,@hahn_echo,'labframe');
 open_model=model;
 open_model.formalism='zeeman-liouv';
 open_partition=cce_partition(open_model,graph,open);
@@ -443,7 +443,7 @@ for method={'gcce','megcce'}
         q.cce.numerics.propagator='stock';
     end
     [reference,reference_diag]=clexpn(spin_system,@free_evolution,q,'labframe');
-    [q,~]=cce_options(spin_system,q,@free_evolution,'labframe');
+    q=cce_options(spin_system,q,@free_evolution,'labframe');
     local_model=cce_compile(spin_system,q,'labframe');
     local_model.pulse_sequence=@free_evolution;
     if strcmp(method{1},'megcce')

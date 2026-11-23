@@ -4,16 +4,16 @@
 
 Syntax: `[answer,diagnostics]=clexpn(spin_system,pulse_sequence,parameters,assumptions)`
 
-Native context over create output and a registered five-argument experiment. Physical observed IDs are in `parameters.observed`; algorithm controls are in `parameters.cce`. It compiles subsystem generators, schedules raw records, and returns the natural numeric experiment output separately from diagnostics.
+Native context over create output and a five-argument experiment. Physical observed IDs are in `parameters.observed`; algorithm controls are in `parameters.cce`. It compiles subsystem generators, schedules raw records, and returns the natural numeric experiment output separately from diagnostics.
 
-Supports mixed, explicit, and deterministic sampled product states; `after_expansion` and `internal_then_expansion` estimators; explicit, coupling, and spatial partitions; serial or outer parallel scheduling and exact checkpoint resume. Interlaced product states use the supplied evaluator on every subset and the complete bath, with common parent conditioning. Irreducible factors are consumed once.
+Supports mixed, explicit, and deterministic sampled product states; `after_expansion` and `internal_then_expansion` estimators; explicit, coupling, and spatial partitions; serial or outer parallel scheduling and exact checkpoint resume. Interlaced product states use `cce_evaluate` on every subset and the complete bath, with common parent conditioning. Irreducible factors are consumed once.
 
 Free evolution and Hahn echo support GKSL dissipation; the context selects Liouville representation for jumps unless a representation is explicit. Generalised free evolution supports elementwise observed density reconstruction, which need not remain positive at truncated order. Noise correlation retains first moments and centres after ensemble averaging. No legacy parameter translation occurs. Adaptive partition controls live under parameters.cce.partition; independent convergence uses cce_converge. Omitted order uses the included bath order.
 
 Hahn echo also supports generalised `output='density'`, with column-vectorised observed density rows and the same elementwise reduction/full-bath override as free evolution. Projected coherence blocks do not expose a density.
 
 Sampled assignments use configuration-indexed Threefry substreams, preserving deterministic physical state IDs independently of worker scheduling. Density-only free evolution needs an observed initial density but no receiver operator.
-Resolved transition policy metadata is copied from the compiled model; transition construction is not repeated in options validation. Coherent free-evolution raw records preserve measured spectral residuals and absolute propagation-error estimates. Exact-reference validity and budget satisfaction are distinct.
+Transition construction happens once, in the compiled model, and is not repeated in options validation. Coherent free-evolution raw records preserve measured spectral residuals and absolute propagation-error estimates. Exact-reference validity and budget satisfaction are distinct.
 
 The polarised-bath, two-observed-centre, and dissipative-bath examples use native hahn_echo/free_evolution calls and return [answer,diagnostics]. Sampled probability tables are rows; the 'uniform' basis selector names the standard Zeeman basis independently of the supplied probabilities. Reduced-density columns use column-major matrix ordering. Independent dense and exhaustive reference calculations are in test_cce_examples.
 
@@ -25,7 +25,7 @@ Bath-pumped Hahn evaluation uses `clexpn(spin_system,@bath_pumped_hahn,parameter
 
 ## Native adaptive groups and ensemble contracts
 
-parameters.cce.partition.mode=adaptive is executed through the registered experiment, using explicitly supplied pilot_configs and heldout_configs. The frozen production partition and convergence diagnostics are returned in diagnostics.policy.partition. parameters.cce.parallel.max_tasks caps each scheduler batch. diagnostics.reduction.sampling_standard_error preserves raw full-bath Monte Carlo uncertainty under internal-first averaging; truncated internal-first and single-draw uncertainty are NaN.
+parameters.cce.partition.mode=adaptive is executed through the experiment, using explicitly supplied pilot_configs and heldout_configs. The frozen production partition and convergence diagnostics are returned in diagnostics.partition. parameters.cce.parallel.max_tasks caps each scheduler batch. diagnostics.reduction.sampling_standard_error preserves raw full-bath Monte Carlo uncertainty under internal-first averaging; truncated internal-first and single-draw uncertainty are NaN.
 
 For projected evolution, `parameters.cce.second_order` is included in graph construction. Enabled virtual-level corrections therefore retain observed-mediated bath pairs unless `parameters.cce.graph.approximate` is explicitly true.
 
@@ -35,7 +35,7 @@ Before propagation, the resolved representation validates the numerical preferen
 
 The disjoint and disjoint_inter expansion families fix the retained physical-group order at one and two, respectively, capped by the number of bath spins, independently of a supplied generic order. This resolution precedes cluster enumeration and reduction: disjoint_inter must retain inter-group pairs even when the caller supplied order one. The resolved order is visible in diagnostics.parameters.cce.order.
 
-A projected request is rejected before subsystem construction when its registered experiment does not support projected generators. Finite_drive and refocusing_train therefore cannot silently discard driven observed-spin population transfer.
+A projected request is rejected by the grumbler of an experiment that does not support projected generators. Finite_drive and refocusing_train therefore cannot silently discard driven observed-spin population transfer.
 
 The native input boundary rejects parameters.sequence, including empty arrays. Finite, fractional, overlapping, and partially observed controls belong to finite_drive; ideal trains belong to refocusing_train. No raw-event parameter adapter is provided.
 

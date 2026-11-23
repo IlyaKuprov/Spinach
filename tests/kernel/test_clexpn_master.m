@@ -124,26 +124,18 @@ end
 result=test_true(result,'Active exterior jump refused',rejected,...
                  'An evolving exterior population cannot silently become a static field.');
 
-% Instrument the supplied evaluator on recursive and complete-bath paths
+% Exercise the recursive and complete-bath conditioned paths
 model=cce_compile(s,df.parameters,'labframe');
 model.formalism='zeeman-liouv';
 model.clusters=df.clusters;
-calls=[];
-events={};
 local=df.parameters;
 local.cce.interlaced.reference_state=1;
-schedule.pulse_sequence=@free_evolution;
-schedule.contract=cce_capabilities(@free_evolution);
-callback=schedule.contract.evaluator;
-cce_interlace(model,df.clusters(1),df.ensemble,schedule,local,@counted);
-result=test_true(result,'Recursive evaluator callback',any(calls==0)&&any(calls==df.clusters(1).id),...
-                 'The empty reference and denominator subsets invoke the supplied evaluator.');
-calls=[];
-cce_interlace(model,df.clusters(end),df.ensemble,schedule,local,@counted);
-result=test_true(result,'Full-bath evaluator callback',numel(calls)==4&&all(calls==df.clusters(end).id),...
-                 'The complete-bath shortcut never substitutes a closed-system evaluator.');
-result=test_true(result,'Conditioned physical assignments',~isempty(events),...
-                 'Callbacks receive explicit parent-conditioned bath densities.');
+raw=cce_interlace(model,df.clusters(1),df.ensemble,@free_evolution,local);
+result=test_true(result,'Recursive conditioned factor',strcmp(raw.kind,'irreducible'),...
+                 'The empty reference and denominator subsets enter the irreducible factor.');
+raw=cce_interlace(model,df.clusters(end),df.ensemble,@free_evolution,local);
+result=test_true(result,'Full-bath conditioned factor',raw.full_bath&&raw.assignment_count==4,...
+                 'The complete-bath shortcut evaluates every physical assignment.');
 
 % Checkpoint payload retains contract version, moments, masks, and uncertainties
 file=[tempname '.mat'];
@@ -232,16 +224,6 @@ local.output='density';
 result=test_close(result,'Driven Liouville density scaling',densities.abs_error_bound,...
                   repmat(estimates,1,4),16*eps*norm(estimates),0,...
                   'Density entries retain the unscaled segment estimate.');
-
-% Capture physical conditioning, not just callback counts
-function raw=counted(model,cluster,configuration,schedule,parameters)
-
-% Record the retained cluster and conditioned bath state
-calls(end+1)=cluster.id;
-events{end+1}=configuration.bath_rho;
-raw=callback(model,cluster,configuration,schedule,parameters);
-
-end
 
 end
 

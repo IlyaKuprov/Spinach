@@ -1,6 +1,6 @@
 % Projected product-state averages for interlaced CCE (W12). Syntax:
 %
-%       raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
+%       raw=cce_interlace(model,cluster,ensemble,pulse_sequence,parameters)
 %
 % parameters.cce.interlaced contains max_states (explicit enumeration budget),
 % reference_state (ensemble spin_config index), and optionally condition_sites
@@ -14,12 +14,11 @@
 %
 % Parameters:
 %
-%   model, cluster, ensemble, schedule, parameters - physical model, selected
-%   cluster, complete sampled ensemble, compiled sequence, and interlaced
-%   settings.
+%   model, cluster, ensemble, pulse_sequence, parameters - physical model,
+%   selected cluster, complete sampled ensemble, experiment function handle,
+%   and interlaced settings.
 %   parameters.cce.interlaced - max_states, reference_state (ensemble spin_config
-%   index), optional condition_sites cell array and raw_only flag. The
-%   registered evaluator selects the experiment and propagation representation.
+%   index), optional condition_sites cell array and raw_only flag.
 %
 % Outputs:
 %
@@ -36,18 +35,18 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function raw=cce_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
+function raw=cce_interlace(model,cluster,ensemble,pulse_sequence,parameters)
 
 % Validate the native conditional ensemble and explicit experiment callback
-grumble(model,cluster,ensemble,schedule,parameters,evaluator);
+grumble(model,cluster,ensemble,pulse_sequence,parameters);
 
 % Reuse the same callback and conditioning event in every denominator
-raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator);
+raw=native_interlace(model,cluster,ensemble,pulse_sequence,parameters);
 
 end
 
 % Form the conditional average and its separately retained irreducible factor
-function raw=native_interlace(model,cluster,ensemble,schedule,parameters,evaluator)
+function raw=native_interlace(model,cluster,ensemble,pulse_sequence,parameters)
 
 % Select the validated state budget and common reference assignment
 spec=parameters.cce.interlaced;
@@ -133,7 +132,7 @@ for n=reshape(retained,1,[])
         vector=ensemble.bases{j}(:,assignments(n,j));
         configuration.bath_rho{j}=vector*vector';
     end
-    item=evaluator(model,cluster,configuration,schedule,parameters);
+    item=cce_evaluate(model,cluster,configuration,pulse_sequence,parameters);
     if n==retained(1)
         raw=item;
         raw.value(:)=0;
@@ -176,11 +175,11 @@ if ~isempty(cluster.sites)&&~raw.full_bath
     family=family(included);
     records=cell(1,numel(family)+1);
     empty=struct('id',0,'sites',[]);
-    records{1}=native_interlace(model,empty,ensemble,schedule,local,evaluator);
+    records{1}=native_interlace(model,empty,ensemble,pulse_sequence,local);
     for k=1:numel(family)
         if isequal(family(k).sites,cluster.sites), records{k+1}=raw;
         else
-            records{k+1}=native_interlace(model,family(k),ensemble,schedule,local,evaluator);
+            records{k+1}=native_interlace(model,family(k),ensemble,pulse_sequence,local);
         end
     end
     factors=records{1}.value;
@@ -230,14 +229,14 @@ end
 end
 
 % Validate the resolved ensemble contract without a method-name fallback
-function grumble(model,cluster,ensemble,schedule,parameters,evaluator)
+function grumble(model,cluster,ensemble,pulse_sequence,parameters)
 if ~isstruct(model)||~all(isfield(model,{'bath_ids','multiplicities'}))||...
    ~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
    ~isstruct(ensemble)||~all(isfield(ensemble,{'spin_config','bases','probabilities'}))||...
-   ~isstruct(schedule)||~all(isfield(schedule,{'pulse_sequence','contract'}))||...
+   ~isa(pulse_sequence,'function_handle')||...
    ~isstruct(parameters)||~isfield(parameters,'cce')||...
-   ~isfield(parameters.cce,'interlaced')||~isa(evaluator,'function_handle')
-    error('cce_interlace:input','Native model, cluster, ensemble, schedule and evaluator required.');
+   ~isfield(parameters.cce,'interlaced')
+    error('cce_interlace:input','Native model, cluster, ensemble and experiment handle required.');
 end
 if isfield(parameters.cce,'checkpoint')
     error('cce_options:checkpoint','Interlaced evaluations cannot own a checkpoint ledger.');

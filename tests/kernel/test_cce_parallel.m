@@ -41,7 +41,7 @@ p.cce=struct('approximation','projected','bath_spins',[2 3],...
              'bath_state',struct('mode','sampled','basis','uniform','probabilities','uniform',...
                                  'samples',4,'seed',193),...
              'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^26));
-[p,~]=cce_options(spin_system,p,@free_evolution,'labframe');
+p=cce_options(spin_system,p,@free_evolution,'labframe');
 
 % Measure serial and one-worker execution on the identical sample list
 p.cce.parallel=struct('mode','serial','batch_size',3,'max_tasks',16);
@@ -107,13 +107,13 @@ p.cce.numerics.max_memory_bytes=2^26;
 model=cce_compile(spin_system,p,'labframe');
 clusters=serial_data.clusters;
 ensemble=serial_data.ensemble;
-schedule=struct('pulse_sequence',@free_evolution,'contract',cce_capabilities(@free_evolution));
+schedule=@free_evolution;
 p.cce.parallel.mode='clusters';
 p.cce.parallel.batch_size=2;
 count=numel(ensemble.spin_config)*(numel(clusters)+1);
 nt=numel(p.times);
 dc=prod(model.multiplicities(model.observed_ids));
-metadata=whos('model','clusters','ensemble','schedule','p');
+metadata=whos('model','clusters','ensemble','p');
 resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
 dimension=max([clusters.dimension])/dc;
 construction=16*(12+3*numel(model.physical_ids))*(dc*dimension)^2;
@@ -121,7 +121,7 @@ workspace=construction+16*24*dimension^2;
 p.cce.numerics.max_memory_bytes=resident+1.5*workspace;
 refused=false;
 try
-    cce_schedule(model,clusters,ensemble,schedule,p,schedule.contract.evaluator);
+    cce_schedule(model,clusters,ensemble,schedule,p);
 catch exception
     if ~strcmp(exception.identifier,'cce_schedule:memory')
         rethrow(exception);
@@ -131,7 +131,7 @@ end
 result=test_true(result,'Concurrent worker memory preflight',refused,...
                  'A cap fitting one workspace but not two must reject a two-worker batch before evaluation.');
 p.cce.parallel.mode='serial';
-accepted=cce_schedule(model,clusters,ensemble,schedule,p,schedule.contract.evaluator);
+accepted=cce_schedule(model,clusters,ensemble,schedule,p);
 result=test_true(result,'Single-worker memory preflight',numel(accepted)==numel(ensemble.spin_config),...
                  'The same cap must still admit one serial workspace.');
 fprintf('Memory cap %.0f bytes; one workspace %.0f; two-worker refusal %d.\n',...
@@ -143,13 +143,13 @@ p.bath_jumps=struct([]);
 p.cce.parallel.mode='clusters';
 model=cce_compile(spin_system,p,'labframe');
 model.formalism='zeeman-liouv';
-metadata=whos('model','clusters','ensemble','schedule','p');
+metadata=whos('model','clusters','ensemble','p');
 resident=3*count*(nt*(25+16*dc^2)+1024)+sum([metadata.bytes]);
 workspace=construction+16*24*dimension^4;
 p.cce.numerics.max_memory_bytes=resident+1.5*workspace;
 refused=false;
 try
-    cce_schedule(model,clusters,ensemble,schedule,p,schedule.contract.evaluator);
+    cce_schedule(model,clusters,ensemble,schedule,p);
 catch exception
     if ~strcmp(exception.identifier,'cce_schedule:memory')
         rethrow(exception);
@@ -175,7 +175,7 @@ large.transition=struct('spins',1:6,'alpha',[1;zeros(63,1)],...
 large.cce.bath_state=struct('mode','mixed_product');
 large.cce.parallel.batch_size=2;
 large.cce.numerics.max_memory_bytes=2^28;
-[large,~]=cce_options(large_spin,large,@free_evolution,'labframe');
+large=cce_options(large_spin,large,@free_evolution,'labframe');
 [~,large_data]=clexpn(large_spin,@free_evolution,large,'labframe');
 large_model=cce_compile(large_spin,large,'labframe');
 large_clusters=large_data.clusters;
@@ -197,12 +197,11 @@ for method={'cce','mecce','noise'}
         large.noise=struct('terms',struct('support',7,'operator',diag([1 -1])/2),...
                            'ordering','ordered','connected',false,'manifold','bath_only');
     end
-    large_schedule=struct('pulse_sequence',pulse_sequence,'contract',cce_capabilities(pulse_sequence));
-    evaluator=large_schedule.contract.evaluator;
+    large_schedule=pulse_sequence;
     large_model.parameters=large;
     large.cce.numerics.max_memory_bytes=2^28;
-    high=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
-    metadata=whos('large_model','large_clusters','large_ensemble','large_schedule','large');
+    high=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large);
+    metadata=whos('large_model','large_clusters','large_ensemble','large');
     resident=3*2*(2*(25+16*64^2)+1024)+sum([metadata.bytes]);
     if strcmp(method{1},'noise')
         resident=resident+3*2*(32*2+16);
@@ -220,7 +219,7 @@ for method={'cce','mecce','noise'}
     large.cce.numerics.max_memory_bytes=resident+1.5*full_workspace;
     refused=false;
     try
-        cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
+        cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large);
     catch exception
         if ~strcmp(exception.identifier,'cce_schedule:memory')
             rethrow(exception);
@@ -232,7 +231,7 @@ for method={'cce','mecce','noise'}
 
     % The same ceiling must still permit one worker and preserve its numerical result
     large.cce.parallel.mode='serial';
-    low=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large,evaluator);
+    low=cce_schedule(large_model,large_clusters,large_ensemble,large_schedule,large);
     result=test_close(result,['Full-observed-spin system serial parity ' method{1}],...
                       low{1}(end).value,high{1}(end).value,0,0,...
                       'The memory guard must reject concurrency, not an individually fitting task.');
@@ -252,7 +251,7 @@ noise_model.formalism='zeeman-liouv';
 refused=false;
 try
     cce_schedule(noise_model,large_clusters,large_ensemble,large_schedule,...
-                 noise_request,large_schedule.contract.evaluator);
+                 noise_request);
 catch exception
     refused=strcmp(exception.identifier,'cce_schedule:memory');
 end
@@ -335,7 +334,7 @@ for method={'mecce','megcce'}
         retained.output='density';
         retained.rho0=ones(2)/2;
     end
-    [retained,~]=cce_options(spin_system,retained,@free_evolution,'labframe');
+    retained=cce_options(spin_system,retained,@free_evolution,'labframe');
     [~,retained_data]=clexpn(spin_system,@free_evolution,retained,'labframe');
     retained_model=cce_compile(spin_system,retained,'labframe');
     retained_model.formalism='zeeman-liouv';
@@ -373,7 +372,7 @@ for method={'mecce','megcce'}
     refused=false;
     try
         cce_schedule(retained_model,retained_clusters,retained_states,...
-                     retained_schedule,retained,retained_schedule.contract.evaluator);
+                     retained_schedule,retained);
     catch exception
         refused=strcmp(exception.identifier,'cce_schedule:memory');
     end

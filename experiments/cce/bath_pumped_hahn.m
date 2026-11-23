@@ -82,7 +82,7 @@ rotation=kron(rotation,eye(db));
 
 % Select against canonical laboratory-frame bath frequencies in rad/s
 spec=parameters.pump;
-ids=model.cce.parameters.cce.bath_spins;
+ids=parameters.cce.bath_spins;
 if isfield(spec,'sites')
     ids=intersect(ids,spec.sites,'stable');
 end
@@ -403,7 +403,7 @@ if ~isscalar(spec)||~isnumeric(spec.center)||~isreal(spec.center)||...
 end
 if isfield(spec,'sites')&&(~isnumeric(spec.sites)||~isreal(spec.sites)||...
    (~isempty(spec.sites)&&~isrow(spec.sites))||...
-   any(~ismember(spec.sites,spin_system.model.cce.parameters.cce.bath_spins))||...
+   any(~ismember(spec.sites,parameters.cce.bath_spins))||...
    numel(unique(spec.sites))~=numel(spec.sites))
     error('bath_pumped_hahn:sites','Pump sites must be distinct physical bath IDs.');
 end
@@ -414,7 +414,7 @@ end
 if ~isfield(spin_system.model.cce,'transition')
     error('bath_pumped_hahn:transition','An explicit transition is required for ideal refocusing.');
 end
-ids=spin_system.model.cce.parameters.cce.bath_spins;
+ids=parameters.cce.bath_spins;
 if isfield(spec,'sites')
     ids=intersect(ids,spec.sites,'stable');
 end

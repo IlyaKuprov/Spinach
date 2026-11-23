@@ -29,9 +29,6 @@
 
 function spin_system=cce_compile(spin_system,parameters,assumptions)
 
-% Resolve native defaults without translating obsolete parameter forms
-parameters=cce_options(spin_system,parameters,@cce_compile,assumptions);
-
 % Validate the compiler inputs before copying or rotating physical tensors
 grumble(spin_system,parameters,assumptions);
 
@@ -49,17 +46,12 @@ end
 spin_system=assume(spin_system,assumptions{:});
 
 % Copy immutable source metadata and stable physical identifiers
-spin_system.cce.parameters=parameters;
 spin_system.bas.formalism=formalism;
-spin_system.cce.groups={};
-if isfield(parameters.cce,'groups')
-    spin_system.cce.groups=parameters.cce.groups;
-end
 spin_system.cce.manifold_projectors=struct();
 spin_system.cce.assumptions=assumptions;
-spin_system.cce.interaction_cutoff=inf;
+cutoff=inf;
 if isfield(parameters.cce,'interaction_cutoff')
-    spin_system.cce.interaction_cutoff=parameters.cce.interaction_cutoff;
+    cutoff=parameters.cce.interaction_cutoff;
 end
 
 nspins=spin_system.comp.nspins;
@@ -141,11 +133,11 @@ for p=1:numel(n_ids)
     end
 
     % Apply only the explicitly requested physical distance cutoff
-    if isfinite(spin_system.cce.interaction_cutoff)&&(norm(tensor,'fro')>0)
+    if isfinite(cutoff)&&(norm(tensor,'fro')>0)
         if isempty(spin_system.inter.coordinates{n})||isempty(spin_system.inter.coordinates{k})
             error('finite interaction_cutoff requires coordinates for every coupled pair.');
         end
-        if norm(spin_system.inter.coordinates{n}-spin_system.inter.coordinates{k})>spin_system.cce.interaction_cutoff
+        if norm(spin_system.inter.coordinates{n}-spin_system.inter.coordinates{k})>cutoff
             spin_system.cce.omitted_pairs(end+1,:)=[n k];
             rows=[index(n,k) index(k,n)];
             omit(rows(rows>0))=true;

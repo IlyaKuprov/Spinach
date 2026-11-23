@@ -3,7 +3,7 @@
 %                [H,meta]=cce_hamiltonian(model,sites,spin_config)
 %
 % model is returned by cce_compile; sites are physical bath spin IDs.
-% Ordering is model.cce.parameters.observed followed by sites, in the supplied order.
+% Ordering is parameters.observed followed by sites, in the supplied order.
 % spin_config is a scalar struct with optional backend (auto/direct/stock),
 % exterior_ids and exterior_expectations (one real [Ix Iy Iz] row per ID).
 % Exterior fields use exactly the model's retained pair interactions.
@@ -27,13 +27,13 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [H,meta]=cce_hamiltonian(model,sites,spin_config)
+function [H,meta]=cce_hamiltonian(model,parameters,sites,spin_config)
 
 % Check cluster membership, spin_config, and the requested backend
-grumble(model,sites,spin_config);
+grumble(model,parameters,sites,spin_config);
 
 % Resolve the validated construction path
-backend=model.cce.parameters.cce.backend;
+backend=parameters.cce.backend;
 if isfield(spin_config,'backend')
     backend=spin_config.backend;
 end
@@ -46,7 +46,7 @@ if strcmp(backend,'auto')
 end
 
 % Bound simultaneous dense matrices before allocating cluster operators
-ids=[model.cce.parameters.observed sites];
+ids=[parameters.observed sites];
 dims=model.comp.mults(ids);
 dimension=prod(dims);
 copies=4+3*numel(ids);
@@ -57,7 +57,7 @@ if strcmp(backend,'stock')
     copies=copies+sum((2*(1:ranks)+1).^2);
 
 end
-if ~isfinite(dimension)||16*dimension^2*copies>model.cce.parameters.cce.numerics.max_memory_bytes
+if ~isfinite(dimension)||16*dimension^2*copies>parameters.cce.numerics.max_memory_bytes
     error('cluster Hamiltonian exceeds numerics.max_memory_bytes.');
 end
 
@@ -183,7 +183,7 @@ else
     system=basis(system,basis_parameters);
     system=assume(system,model.cce.assumptions{:});
     [H,Q]=hamiltonian(system);
-    H=H+orientation(Q,model.cce.parameters.orientation);
+    H=H+orientation(Q,parameters.orientation);
 
     % Reorder the stock ascending physical indices into observed-first order
     sorted_ids=sort(ids);
@@ -230,26 +230,26 @@ H=(H+H')/2;
 meta.physical_ids=ids;
 meta.dimensions=dims;
 meta.dimension=dimension;
-meta.observed_dimension=prod(model.comp.mults(model.cce.parameters.observed));
+meta.observed_dimension=prod(model.comp.mults(parameters.observed));
 meta.bath_dimension=prod(model.comp.mults(sites));
 meta.operators=ops;
 meta.backend=backend;
 meta.fallback_reason=model.cce.fallback_reason;
 meta.source_hash=model.cce.source_hash;
 meta.omitted_pairs=model.cce.omitted_pairs;
-meta.observable_budget=model.cce.parameters.cce.numerics.atol+model.cce.parameters.cce.numerics.rtol*norm(H,'fro');
+meta.observable_budget=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(H,'fro');
 
 end
 
 % Validate structure, IDs, and explicitly supplied exterior expectations
-function grumble(model,sites,spin_config)
+function grumble(model,parameters,sites,spin_config)
 if ~isstruct(model)||~isfield(model,'cce')||...
-   ~all(isfield(model.cce,{'source_hash','parameters','pairs'}))
+   ~all(isfield(model.cce,{'source_hash','pairs'}))
     error('model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
    any(~isfinite(sites))||any(sites~=fix(sites))||...
-   numel(unique(sites))~=numel(sites)||~all(ismember(sites,model.cce.parameters.cce.bath_spins))
+   numel(unique(sites))~=numel(sites)||~all(ismember(sites,parameters.cce.bath_spins))
     error('sites must be a row of unique model bath spin IDs.');
 end
 if ~isstruct(spin_config)||~isscalar(spin_config)||...
@@ -261,7 +261,7 @@ if isfield(spin_config,'backend')&&~ismember(spin_config.backend,{'auto','direct
 end
 if ~model.cce.direct_supported&&...
    ((isfield(spin_config,'backend')&&strcmp(spin_config.backend,'direct'))||...
-    (~isfield(spin_config,'backend')&&strcmp(model.cce.parameters.cce.backend,'direct')))
+    (~isfield(spin_config,'backend')&&strcmp(parameters.cce.backend,'direct')))
     error('direct Hamiltonian is not validated for %s.',model.cce.fallback_reason);
 end
 if xor(isfield(spin_config,'exterior_ids'),isfield(spin_config,'exterior_expectations'))
@@ -272,7 +272,7 @@ if isfield(spin_config,'exterior_ids')
     values=spin_config.exterior_expectations;
     if ~isnumeric(ids)||~isreal(ids)||(~isempty(ids)&&~isrow(ids))||...
        any(~isfinite(ids))||numel(unique(ids))~=numel(ids)||...
-       ~all(ismember(ids,setdiff(1:model.comp.nspins,[model.cce.parameters.observed sites])))||...
+       ~all(ismember(ids,setdiff(1:model.comp.nspins,[parameters.observed sites])))||...
        ~isnumeric(values)||~isreal(values)||~isequal(size(values),[numel(ids) 3])||...
        any(~isfinite(values),'all')
         error('invalid exterior IDs or expectation rows.');

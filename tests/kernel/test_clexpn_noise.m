@@ -124,7 +124,8 @@ for ordering={'ordered','symmetrized'}
                       'The nonunital map amplifies its source; the two orderings have distinct source norms.');
 
     % Raw and connected deterministic records separately retain their strict-budget decisions
-    model=cce_compile(s,connected.parameters,'labframe');
+    model_p=cce_options(s,connected.parameters,@cce_compile,'labframe');
+    model=cce_compile(s,model_p,'labframe');
     first=cce_diagnostics(model,unconnected.raw,unconnected.reduction,unconnected.parameters);
     second=cce_diagnostics(model,connected.raw,connected.reduction,connected.parameters);
     result=test_true(result,['Dissipative budgets ' ordering{1}],...

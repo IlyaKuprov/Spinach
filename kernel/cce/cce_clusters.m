@@ -3,7 +3,7 @@
 %             clusters=cce_clusters(model,graph,parameters)
 %
 % model supplies physical_ids, bath_ids, observed_ids, and multiplicities.
-% graph is cce_graph output. parameters.order counts groups, not sites;
+% graph is cce_graph output. parameters.cce.order counts groups, not sites;
 % groups is an optional cell partition of graph.bath_ids (default single
 % sites). Non-singleton group construction belongs to cce_partition.
 % clusters optionally supplies sorted group-ID rows instead of graph
@@ -43,25 +43,25 @@ function clusters=cce_clusters(model,graph,parameters)
 grumble(model,graph,parameters);
 
 % Resolve the complete physical partition
-if isfield(parameters,'groups')&&~isempty(parameters.groups)
-    groups=parameters.groups;
+if isfield(parameters.cce,'groups')&&~isempty(parameters.cce.groups)
+    groups=parameters.cce.groups;
 else
     groups=num2cell(sort(graph.bath_ids));
 end
 ng=numel(groups);
-max_order=min(parameters.order,ng);
+max_order=min(parameters.cce.order,ng);
 
 % Disjoint families contain single groups or inter-group pairs
-if strcmp(parameters.expansion,'disjoint')
+if strcmp(parameters.cce.expansion,'disjoint')
     max_order=min(max_order,1);
-elseif strcmp(parameters.expansion,'disjoint_inter')
+elseif strcmp(parameters.cce.expansion,'disjoint_inter')
     max_order=min(max_order,2);
 end
 
 % Bound group graph and every subsequent family before growing it
 budget=Inf;
-if isfield(parameters,'numerics')&&isfield(parameters.numerics,'max_memory_bytes')
-    budget=parameters.numerics.max_memory_bytes;
+if isfield(parameters.cce,'numerics')&&isfield(parameters.cce.numerics,'max_memory_bytes')
+    budget=parameters.cce.numerics.max_memory_bytes;
 end
 prototype={[]};
 metadata=whos('prototype');
@@ -82,10 +82,10 @@ adjacency(1:ng+1:end)=false;
 scores(1:ng+1:end)=0;
 
 % Enumerate unique connected candidates by one-vertex frontier growth
-explicit=isfield(parameters,'clusters')&&~isempty(parameters.clusters);
+explicit=isfield(parameters.cce,'clusters')&&~isempty(parameters.cce.clusters);
 if explicit
-    check_storage(numel(parameters.clusters));
-    family=parameters.clusters(:);
+    check_storage(numel(parameters.cce.clusters));
+    family=parameters.cce.clusters(:);
 else
     family=cell(0,1);
     frontier=(1:ng).';
@@ -137,10 +137,10 @@ for order=1:max_order
 
     % Apply selection caps before adding all missing subsets
     count=numel(candidates);
-    if isfield(parameters,'cluster_cap')&&~isscalar(parameters.cluster_cap)
-        count=min(count,parameters.cluster_cap(order));
-    elseif isfield(parameters,'cluster_cap')&&isfinite(parameters.cluster_cap)
-        count=min(count,parameters.cluster_cap);
+    if isfield(parameters.cce,'cluster_cap')&&~isscalar(parameters.cce.cluster_cap)
+        count=min(count,parameters.cce.cluster_cap(order));
+    elseif isfield(parameters.cce,'cluster_cap')&&isfinite(parameters.cce.cluster_cap)
+        count=min(count,parameters.cce.cluster_cap);
     end
     selected=[selected;candidates(1:count)]; %#ok<AGROW>
     selected_counts(order)=count;
@@ -150,7 +150,7 @@ end
 % Close the selected family unless the model uses only periodic segments
 family=selected;
 closure_order=max_order;
-if strcmp(parameters.expansion,'periodic_segments')
+if strcmp(parameters.cce.expansion,'periodic_segments')
     closure_order=1;
 end
 for order=closure_order:-1:2
@@ -197,7 +197,7 @@ group_digits=1;
 if ng>0
     group_digits=1+floor(log10(ng));
 end
-characters=(physical_digits+1)*numel(model.cce.parameters.cce.bath_spins)+2*ng+1+...
+characters=(physical_digits+1)*numel(parameters.cce.bath_spins)+2*ng+1+...
            (group_digits+1)*sum(cellfun(@numel,family))+2*numel(family);
 if ~isfinite(characters)||6*characters>budget
     error('cce_clusters:memory',...
@@ -218,8 +218,8 @@ for order=1:max_order
     actual_counts(order)=sum(cellfun(@numel,family)==order);
 end
 cap_overrun=zeros(1,max_order);
-if isfield(parameters,'cluster_cap')&&~all(isinf(parameters.cluster_cap))
-    cap=parameters.cluster_cap;
+if isfield(parameters.cce,'cluster_cap')&&~all(isinf(parameters.cce.cluster_cap))
+    cap=parameters.cce.cluster_cap;
     if isscalar(cap)
         cap=repmat(cap,1,max_order);
     end
@@ -236,7 +236,7 @@ entry=struct('id',uint64(0),'groups',[],'sites',[],'order',0,'dimension',1,...
 metadata=whos('entry');
 subset_limit=min(numel(family),2^max_order-1);
 bytes=6*characters+3*numel(family)*(metadata.bytes+16*subset_limit+...
-                                  8*(4*max_order+3*numel(model.cce.parameters.cce.bath_spins)));
+                                  8*(4*max_order+3*numel(parameters.cce.bath_spins)));
 if ~isfinite(bytes)||bytes>budget
     error('cce_clusters:memory',...
           'Cluster records and subset maps exceed numerics.max_memory_bytes.');
@@ -245,7 +245,7 @@ entry.family_id=family_id;
 clusters=repmat(entry,numel(family),1);
 
 % Build canonical physical cluster metadata and subset index maps
-[~,observed_pos]=ismember(model.cce.parameters.observed,1:model.comp.nspins);
+[~,observed_pos]=ismember(parameters.observed,1:model.comp.nspins);
 observed_dimension=prod(model.comp.mults(observed_pos));
 for k=1:numel(family)
 
@@ -270,7 +270,7 @@ for k=1:numel(family)
         for n=1:size(rows,1)
             subkeys(n)=string(sprintf('%u,',rows(n,:)));
         end
-        if strcmp(parameters.expansion,'periodic_segments')
+        if strcmp(parameters.cce.expansion,'periodic_segments')
             subkeys=subkeys(isKey(index,subkeys));
         end
         children=sort(index(subkeys)).';
@@ -336,17 +336,20 @@ end
 
 % Validate the immutable metadata and explicit combinatorial decisions
 function grumble(model,graph,parameters)
+if ~isstruct(parameters)||~isscalar(parameters)||~all(isfield(parameters,{'observed','cce'}))||...
+   ~isstruct(parameters.cce)||~isfield(parameters.cce,'bath_spins')
+    error('cce_clusters:parameters','resolved parameters are required.');
+end
 if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
-   ~isfield(model.cce,'parameters')||...
-   ~all(ismember([model.cce.parameters.observed model.cce.parameters.cce.bath_spins],1:model.comp.nspins))||...
-   ~isempty(intersect(model.cce.parameters.observed,model.cce.parameters.cce.bath_spins))
+   ~all(ismember([parameters.observed parameters.cce.bath_spins],1:model.comp.nspins))||...
+   ~isempty(intersect(parameters.observed,parameters.cce.bath_spins))
     error('cce_clusters:model','observed and bath spins must be distinct spins of the system.');
 end
 if ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','adjacency','scores'}))
     error('cce_clusters:graph','cce_graph output is required.');
 end
 n=numel(graph.bath_ids);
-if numel(unique(graph.bath_ids))~=n||~all(ismember(graph.bath_ids,model.cce.parameters.cce.bath_spins))||...
+if numel(unique(graph.bath_ids))~=n||~all(ismember(graph.bath_ids,parameters.cce.bath_spins))||...
    ~isequal(size(graph.adjacency),[n n])||~islogical(graph.adjacency)||...
    ~isequal(graph.adjacency,graph.adjacency.')||any(diag(graph.adjacency))||...
    ~isequal(size(graph.scores),[n n])||~isreal(graph.scores)||...
@@ -354,55 +357,54 @@ if numel(unique(graph.bath_ids))~=n||~all(ismember(graph.bath_ids,model.cce.para
    ~isequal(graph.scores,graph.scores.')
     error('cce_clusters:graph','invalid physical graph ordering, adjacency, or scores.');
 end
-if ~isstruct(parameters)||~isscalar(parameters)||...
-   ~all(isfield(parameters,{'order','expansion'}))||...
-   ~isnumeric(parameters.order)||~isreal(parameters.order)||...
-   ~isscalar(parameters.order)||~isfinite(parameters.order)||...
-   parameters.order<0||parameters.order~=fix(parameters.order)||...
-   ~ismember(parameters.expansion,{'standard','partition','disjoint','disjoint_inter','periodic_segments'})
+if ~all(isfield(parameters.cce,{'order','expansion'}))||...
+   ~isnumeric(parameters.cce.order)||~isreal(parameters.cce.order)||...
+   ~isscalar(parameters.cce.order)||~isfinite(parameters.cce.order)||...
+   parameters.cce.order<0||parameters.cce.order~=fix(parameters.cce.order)||...
+   ~ismember(parameters.cce.expansion,{'standard','partition','disjoint','disjoint_inter','periodic_segments'})
     error('cce_clusters:parameters','nonnegative order and explicit expansion are required.');
 end
-if isfield(parameters,'groups')&&~isempty(parameters.groups)
-    if ~iscell(parameters.groups)
+if isfield(parameters.cce,'groups')&&~isempty(parameters.cce.groups)
+    if ~iscell(parameters.cce.groups)
         error('cce_clusters:groups','groups must be a cell partition of physical bath IDs.');
     end
-    for k=1:numel(parameters.groups)
-        g=parameters.groups{k};
+    for k=1:numel(parameters.cce.groups)
+        g=parameters.cce.groups{k};
         if ~isnumeric(g)||~isreal(g)||~isrow(g)||isempty(g)||...
            ~issorted(g)||numel(unique(g))~=numel(g)
             error('cce_clusters:groups','group members must be sorted distinct physical IDs.');
         end
     end
-    members=[parameters.groups{:}];
+    members=[parameters.cce.groups{:}];
     if numel(unique(members))~=numel(members)||~isequal(sort(members),sort(graph.bath_ids))
         error('cce_clusters:groups','groups must partition the retained bath exactly.');
     end
-    ng=numel(parameters.groups);
+    ng=numel(parameters.cce.groups);
 else
     ng=n;
 end
-if strcmp(parameters.expansion,'periodic_segments')
+if strcmp(parameters.cce.expansion,'periodic_segments')
     [~,~,components,~]=dmperm(speye(n)+graph.adjacency);
     if n<3||any(sum(graph.adjacency,2)~=2)||numel(components)~=2||...
-       parameters.order<1||parameters.order>=n||...
-       any(isfield(parameters,{'groups','clusters','cluster_cap'}))
+       parameters.cce.order<1||parameters.cce.order>=n||...
+       any(isfield(parameters.cce,{'groups','clusters','cluster_cap'}))
         error('cce_clusters:periodicSegments','Periodic segments require all contiguous subsets of one cycle up to a truncated order.');
     end
 end
-limit=parameters.order;
-if strcmp(parameters.expansion,'disjoint')
+limit=parameters.cce.order;
+if strcmp(parameters.cce.expansion,'disjoint')
     limit=min(limit,1);
 end
-if strcmp(parameters.expansion,'disjoint_inter')
+if strcmp(parameters.cce.expansion,'disjoint_inter')
     limit=min(limit,2);
 end
-if isfield(parameters,'clusters')&&~isempty(parameters.clusters)
-    if ~iscell(parameters.clusters)
+if isfield(parameters.cce,'clusters')&&~isempty(parameters.cce.clusters)
+    if ~iscell(parameters.cce.clusters)
         error('cce_clusters:explicit','explicit clusters must be cell rows of group IDs.');
     end
-    keys=cell(size(parameters.clusters));
-    for k=1:numel(parameters.clusters)
-        g=parameters.clusters{k};
+    keys=cell(size(parameters.cce.clusters));
+    for k=1:numel(parameters.cce.clusters)
+        g=parameters.cce.clusters{k};
         if ~isnumeric(g)||~isreal(g)||~isrow(g)||isempty(g)||~issorted(g)||...
            numel(unique(g))~=numel(g)||any(g<1)||any(g>ng)||any(g~=fix(g))||...
            numel(g)>limit
@@ -414,12 +416,12 @@ if isfield(parameters,'clusters')&&~isempty(parameters.clusters)
         error('cce_clusters:explicit','duplicate explicit clusters are not permitted.');
     end
 end
-if isfield(parameters,'cluster_cap')
-    cap=parameters.cluster_cap;
+if isfield(parameters.cce,'cluster_cap')
+    cap=parameters.cce.cluster_cap;
     if ~isnumeric(cap)||~isreal(cap)||~isrow(cap)||any(isnan(cap))||any(cap<0)||...
        any(isfinite(cap)&cap~=fix(cap))||...
-       (~isscalar(cap)&&numel(cap)<min(parameters.order,ng))||...
-       (isscalar(cap)&&isfinite(cap)&&min(parameters.order,ng)>1)
+       (~isscalar(cap)&&numel(cap)<min(parameters.cce.order,ng))||...
+       (isscalar(cap)&&isfinite(cap)&&min(parameters.cce.order,ng)>1)
         error('cce_clusters:cap','cluster_cap must be Inf or a sufficiently long integer row.');
     end
 end

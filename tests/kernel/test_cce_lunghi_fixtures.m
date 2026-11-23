@@ -102,8 +102,9 @@ for case_id=1:2
     p.transition.spins=p.observed;
     p.transition.alpha=eye(observed_dim,1);
     p.transition.beta=circshift(p.transition.alpha,1);
-    model=cce_compile(ss,p,'labframe');
-    [hamiltonian,~]=cce_hamiltonian(model,[],struct());
+    model_p=cce_options(ss,p,@cce_compile,'labframe');
+    model=cce_compile(ss,model_p,'labframe');
+    [hamiltonian,~]=cce_hamiltonian(model,model_p,[],struct());
     states=jsondecode(fileread(fullfile(states_folder,[name '_states.json'])));
     a=states.alpha_real+1i*states.alpha_imag;
     b=states.beta_real+1i*states.beta_imag;
@@ -126,7 +127,7 @@ for case_id=1:2
     actual=clexpn(ss,@hahn_echo,p,'labframe');
 
     % Separate the stored source pulse from the unitary Spinach selective pulse
-    [full_hamiltonian,~]=cce_hamiltonian(model,[3 4],struct());
+    [full_hamiltonian,~]=cce_hamiltonian(model,model_p,[3 4],struct());
 
     % Permute bath-first PyCCE ordering into the observed-first native basis
     permutation=reshape(1:4*observed_dim,observed_dim,4).';

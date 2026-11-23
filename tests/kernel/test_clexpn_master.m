@@ -93,9 +93,10 @@ zero=relax;
 zero.cce.approximation='projected';
 zero.output='signal';
 zero.bath_jumps=struct('support',1,'operator',[0 1;0 0],'rate',0);
-zero_model=cce_compile(s,zero,'labframe');
-[zero_system,~]=cce_subsystem(zero_model,[],struct(),[]);
-zero_parameters=zero_model.cce.parameters;
+zero_model_p=cce_options(s,zero,@cce_compile,'labframe');
+zero_model=cce_compile(s,zero_model_p,'labframe');
+[zero_system,~]=cce_subsystem(zero_model,zero_model_p,[],struct(),[]);
+zero_parameters=zero_model_p;
 [with_zero,~,~]=cce_generators(zero_system,zero_parameters,[]);
 zero_parameters.bath_jumps=struct('support',{},'operator',{},'rate',{});
 [without_jump,~,~]=cce_generators(zero_system,zero_parameters,[]);
@@ -111,13 +112,14 @@ exterior.cce.order=1;
 exterior.cce.meanfield='static';
 exterior.bath_jumps.support=2;
 exterior.bath_jumps.rate=1;
-exterior_model=cce_compile(s,exterior,'labframe');
+exterior_model_p=cce_options(s,exterior,@cce_compile,'labframe');
+exterior_model=cce_compile(s,exterior_model_p,'labframe');
 configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},...
                      'exterior_ids',2,'exterior_expectations',[0 0 0.5]);
-[exterior_system,~]=cce_subsystem(exterior_model,[],configuration,[]);
+[exterior_system,~]=cce_subsystem(exterior_model,exterior_model_p,[],configuration,[]);
 rejected=false;
 try
-    cce_generators(exterior_system,exterior_model.cce.parameters,[]);
+    cce_generators(exterior_system,exterior_model_p,[]);
 catch exception
     rejected=strcmp(exception.identifier,'cce:exteriorJump');
 end
@@ -125,15 +127,16 @@ result=test_true(result,'Active exterior jump refused',rejected,...
                  'An evolving exterior population cannot silently become a static field.');
 
 % Exercise the recursive and complete-bath conditioned paths
-model=cce_compile(s,df.parameters,'labframe');
+model_p=cce_options(s,df.parameters,@cce_compile,'labframe');
+model=cce_compile(s,model_p,'labframe');
 model.bas.formalism='zeeman-liouv';
-model.cce.clusters=df.clusters;
+model_clusters=df.clusters;
 local=df.parameters;
 local.cce.interlaced.reference_state=1;
-raw=cce_interlace(model,df.clusters(1),df.ensemble,@free_evolution,local);
+raw=cce_interlace(model,df.clusters(1),model_clusters,df.ensemble,@free_evolution,local);
 result=test_true(result,'Recursive conditioned factor',strcmp(raw.kind,'irreducible'),...
                  'The empty reference and denominator subsets enter the irreducible factor.');
-raw=cce_interlace(model,df.clusters(end),df.ensemble,@free_evolution,local);
+raw=cce_interlace(model,df.clusters(end),model_clusters,df.ensemble,@free_evolution,local);
 result=test_true(result,'Full-bath conditioned factor',raw.full_bath&&raw.assignment_count==4,...
                  'The complete-bath shortcut evaluates every physical assignment.');
 
@@ -164,7 +167,8 @@ request.drive(2).axis='y';
 request.drive(2).amplitude=3;
 [~,driven]=clexpn(s,@finite_drive,request,'labframe');
 request=driven.parameters;
-drive_model=cce_compile(s,request,'labframe');
+drive_model_p=cce_options(s,request,@cce_compile,'labframe');
+drive_model=cce_compile(s,drive_model_p,'labframe');
 drive_model.bas.formalism='zeeman-liouv';
 checks=cce_diagnostics(drive_model,driven.raw,driven.reduction,request);
 result=test_true(result,'Driven Liouville numerical budget is not exact',...
@@ -173,7 +177,7 @@ result=test_true(result,'Driven Liouville numerical budget is not exact',...
                  'Full-bath reductions propagate nonzero segment estimates into budget diagnostics.');
 
 % Independently sum the declared arithmetic estimate over all finite intervals
-[retained,~]=cce_subsystem(drive_model,drive_model.cce.parameters.cce.bath_spins,struct(),[]);
+[retained,~]=cce_subsystem(drive_model,drive_model_p,drive_model_p.cce.bath_spins,struct(),[]);
 [H,R,K,local]=cce_generators(retained,request,[]);
 L=H+1i*R+1i*K;
 [~,aux]=finite_drive(retained,local,H,R,K);

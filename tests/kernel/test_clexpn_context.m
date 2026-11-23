@@ -58,8 +58,9 @@ result=test_true(result,'Native bath-radius truncation',isempty(outside.graph.ba
                  'The explicit Angstrom radius includes its boundary and excludes distant sites.');
 
 % Direct standard-signature evaluation must match the full retained-cluster task
-model=cce_compile(spin_system,diagnostics.parameters,'labframe');
-[cluster,~]=cce_subsystem(model,2,struct(),[]);
+model_p=cce_options(spin_system,diagnostics.parameters,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+[cluster,~]=cce_subsystem(model,model_p,2,struct(),[]);
 [H,R,K,parameters]=cce_generators(cluster,diagnostics.parameters,[]);
 reference=hahn_echo(cluster,parameters,H,R,K);
 result=test_close(result,'Standard five-argument dispatch',...
@@ -173,28 +174,27 @@ q.cce.interlaced=struct('max_states',16);
 q.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 [~,interlace_details]=clexpn(interlace_system,@free_evolution,q,'labframe');
 q=interlace_details.parameters;
-model=cce_compile(interlace_system,q,'labframe');
+model_p=cce_options(interlace_system,q,@cce_compile,'labframe');
+model=cce_compile(interlace_system,model_p,'labframe');
 ensemble=interlace_details.ensemble;
 q.cce.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3]}});
-selection=struct('method','gcce','expansion','standard','graph',q.cce.graph,'order',q.cce.order,...
-                 'numerics',q.cce.numerics);
-family=cce_clusters(model,cce_graph(model,selection),selection);
-model.cce.clusters=family;
+model_p.cce.order=q.cce.order;
+family=cce_clusters(model,cce_graph(model,model_p),model_p);
+model_clusters=family;
 selected=family(find(arrayfun(@(item)isequal(item.sites,[2 3]),family),1));
-raw=cce_interlace(model,selected,ensemble,@free_evolution,q);
+raw=cce_interlace(model,selected,model_clusters,ensemble,@free_evolution,q);
 result=test_true(result,'Recursive conditioned factor',...
                  strcmp(raw.kind,'irreducible')&&isfield(raw,'value'),...
                  'A conditioned cluster returns its irreducible factor.');
 q.cce.order=3;
 q.cce.interlaced.condition_sites={2:4};
-selection=struct('method','gcce','expansion','standard','graph',q.cce.graph,'order',q.cce.order,...
-                 'numerics',q.cce.numerics);
-family=cce_clusters(model,cce_graph(model,selection),selection);
-model.cce.clusters=family;
+model_p.cce.order=q.cce.order;
+family=cce_clusters(model,cce_graph(model,model_p),model_p);
+model_clusters=family;
 selected=family(end);
-raw=cce_interlace(model,selected,ensemble,@free_evolution,q);
+raw=cce_interlace(model,selected,model_clusters,ensemble,@free_evolution,q);
 result=test_true(result,'Full-bath conditioned factor',...
-                 raw.assignment_count==prod(model.comp.mults(model.cce.parameters.cce.bath_spins))&&raw.full_bath,...
+                 raw.assignment_count==prod(model.comp.mults(model_p.cce.bath_spins))&&raw.full_bath,...
                  'Every complete-bath configuration is evaluated exactly once.');
 
 end

@@ -31,8 +31,9 @@ inter.coupling.scalar={0,137;0,0};
 % Compare scalar Hz conversion with the explicit singlet/triplet matrix
 system=create(sys,inter);
 parameters=cce_options(system,parameters,@free_evolution,'labframe');
-model=cce_compile(system,parameters,'labframe');
-[H,meta]=cce_hamiltonian(model,2,struct());
+model_p=cce_options(system,parameters,@cce_compile,'labframe');
+model=cce_compile(system,model_p,'labframe');
+[H,meta]=cce_hamiltonian(model,model_p,2,struct());
 reference=2*pi*137*[1/4 0 0 0;0 -1/4 1/2 0;0 1/2 -1/4 0;0 0 0 1/4];
 result=test_close(result,'scalar Hz to rad/s',...
                   H,reference,meta.roundoff_bound,0,'Independent spin-half scalar matrix.');
@@ -42,8 +43,9 @@ inter=struct('zeeman',struct('scalar',{{0,0}}));
 inter.coordinates={[0 0 0],[0 0 2]};
 system=create(sys,inter);
 parameters=cce_options(system,parameters,@free_evolution,'labframe');
-model=cce_compile(system,parameters,'labframe');
-[H,meta]=cce_hamiltonian(model,2,struct());
+model_p=cce_options(system,parameters,@cce_compile,'labframe');
+model=cce_compile(system,model_p,'labframe');
+[H,meta]=cce_hamiltonian(model,model_p,2,struct());
 gamma_carbon=0.70236944*5.0507837393e-27/(0.5*1.054571817e-34);
 dipole=1e-7*1.054571817e-34*267522187.08*gamma_carbon/(2e-10)^3;
 reference=dipole*[-1/2 0 0 0;0 1/2 1/2 0;0 1/2 1/2 0;0 0 0 -1/2];
@@ -52,11 +54,12 @@ result=test_close(result,'dipole SI units',...
 
 % Check one full ordered cell versus two transposed half cells
 system=model;
+system_p=model_p;
 tensor=cce_test_read(system,[1 2])+...
         cce_test_read(system,[2 1]).';
 system=cce_test_write(system,[1 2],tensor);
 system=cce_test_write(system,[2 1],zeros(3));
-one=cce_hamiltonian(cce_compile(system,parameters,'labframe'),2,struct());
+one=cce_hamiltonian(cce_compile(system,model_p,'labframe'),model_p,2,struct());
 result=test_close(result,'ordered half cells',...
                   H,one,meta.roundoff_bound,0,'Coordinate tensors must not double-count.');
 
@@ -65,8 +68,9 @@ for isotope={'1H','E'}
     sys.isotopes=isotope;
     sys.magnet=0.07;
     parameters.cce.bath_spins=[];
-    model=cce_compile(create(sys,struct()),parameters,'labframe');
-    [H,meta]=cce_hamiltonian(model,[],struct());
+    model_p=cce_options(create(sys,struct()),parameters,@cce_compile,'labframe');
+    model=cce_compile(create(sys,struct()),model_p,'labframe');
+    [H,meta]=cce_hamiltonian(model,model_p,[],struct());
     if strcmp(isotope{1},'1H')
         gamma=267.52218744e6;
     else

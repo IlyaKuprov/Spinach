@@ -147,14 +147,15 @@ result=test_close(result,'Parallel task ceiling preserves signals',limited,a,0,0
 % Reject an interlacing density inconsistent with its sampled basis state
 request=da.parameters;
 request.cce.interlaced=struct('max_states',4,'reference_state',1);
-model=cce_compile(s,request,'labframe');
-model.cce.clusters=da.clusters;
+model_p=cce_options(s,request,@cce_compile,'labframe');
+model=cce_compile(s,model_p,'labframe');
+model_clusters=da.clusters;
 ensemble=da.ensemble;
 ensemble.spin_config(1).bath_rho{1}=eye(2)/2;
 schedule=@free_evolution;
 refused=false;
 try
-    cce_interlace(model,da.clusters(1),ensemble,schedule,request);
+    cce_interlace(model,da.clusters(1),model_clusters,ensemble,schedule,request);
 catch exception
     refused=strcmp(exception.identifier,'cce:spin_config')&&...
             strcmp(exception.message,['Interlaced reference bath_rho must agree with its basis '...

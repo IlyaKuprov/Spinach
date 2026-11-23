@@ -65,12 +65,12 @@ if isfield(options,'parallel')&&isfield(options.parallel,'max_tasks')
 end
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-    components=prod(model.comp.mults(model.cce.parameters.observed))^2;
+    components=prod(model.comp.mults(parameters.observed))^2;
 elseif isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
 nt=numel(parameters.times);
-dc=prod(model.comp.mults(model.cce.parameters.observed));
+dc=prod(model.comp.mults(parameters.observed));
 metadata=whos('model','clusters','ensemble','parameters');
 resident=3*ns*nc*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
 noise=isequal(pulse_sequence,@noise_correlation);
@@ -107,11 +107,11 @@ for k=0:numel(clusters)
     if k>0
         sites=clusters(k).sites;
     end
-    ids=[model.cce.parameters.observed sites];
+    ids=[parameters.observed sites];
     db=prod(model.comp.mults(sites));
     dimension=dc*db;
     copies=12+3*numel(ids);
-    if ~model.cce.direct_supported||strcmp(model.cce.parameters.cce.backend,'stock')
+    if ~model.cce.direct_supported||strcmp(parameters.cce.backend,'stock')
         ranks=max([2 cellfun(@numel,model.inter.giant.coeff).']);
         copies=copies+sum((2*(1:ranks)+1).^2);
     end
@@ -140,7 +140,7 @@ for k=0:numel(clusters)
         propagated=propagated^2;
 
     end
-    workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(model.cce.parameters.cce.bath_spins)+8);
+    workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(parameters.cce.bath_spins)+8);
     peak=max(peak,workspace);
 end
 if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_bytes
@@ -148,8 +148,9 @@ if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_byt
 end
 
 % Keep the full family out of conventional worker payloads
+family=[];
 if strcmp(options.bath_state.mode,'interlaced')
-    model.cce.clusters=clusters;
+    family=clusters;
 end
 task_clusters=[struct('id',uint64(0),'sites',[]);...
                struct('id',{clusters.id},'sites',{clusters.sites}).'];
@@ -160,9 +161,6 @@ payload=struct('model',model,'clusters',clusters,'ensemble',ensemble,...
 for field={'checkpoint','parallel','retain_raw'}
     if isfield(payload.parameters.cce,field{1})
         payload.parameters.cce=rmfield(payload.parameters.cce,field{1});
-    end
-    if isfield(payload.model.cce.parameters.cce,field{1})
-        payload.model.cce.parameters.cce=rmfield(payload.model.cce.parameters.cce,field{1});
     end
 end
 
@@ -190,10 +188,8 @@ identity=struct();
 if isfield(options,'checkpoint')
 
     % Available memory is a dispatch limit, not part of the physical calculation
-    payload.model.cce.clusters=clusters;
     physical=payload;
     physical.parameters.cce.numerics=rmfield(physical.parameters.cce.numerics,'max_memory_bytes');
-    physical.model.cce.parameters.cce.numerics=rmfield(physical.model.cce.parameters.cce.numerics,'max_memory_bytes');
     identity=struct('model',md5_hash(physical.model),'parameters',md5_hash(physical.parameters),...
                     'clusters',md5_hash(clusters),'schedule',md5_hash(payload.experiment),...
                     'samples',md5_hash(ensemble));
@@ -226,11 +222,11 @@ for b=1:batch_size:numel(pending)
     configuration_ids=tasks(:,1);
     if strcmp(mode,'serial')
         for j=1:numel(selected)
-            records{j}=native_task(model,local_clusters(j),ensemble,pulse_sequence,parameters,configuration_ids(j));
+            records{j}=native_task(model,local_clusters(j),family,ensemble,pulse_sequence,parameters,configuration_ids(j));
         end
     else
         parfor (j=1:numel(selected),workers)
-            records{j}=native_task(model,local_clusters(j),ensemble,pulse_sequence,parameters,configuration_ids(j));
+            records{j}=native_task(model,local_clusters(j),family,ensemble,pulse_sequence,parameters,configuration_ids(j));
         end
     end
     state.records(selected)=records;
@@ -255,13 +251,13 @@ end
 end
 
 % Evaluate one cluster on the ordinary or the conditioned path
-function raw=native_task(model,cluster,ensemble,pulse_sequence,parameters,config_id)
+function raw=native_task(model,cluster,family,ensemble,pulse_sequence,parameters,config_id)
 
 % Keep conditioned tasks on the same physical family and configuration
 if strcmp(parameters.cce.bath_state.mode,'interlaced')
     parameters.cce.interlaced.reference_state=config_id;
-    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.cce.parameters.cce.bath_spins)),model.cce.clusters));
-    if complete&&~isequal(sort(cluster.sites),sort(model.cce.parameters.cce.bath_spins))
+    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(parameters.cce.bath_spins)),family));
+    if complete&&~isequal(sort(cluster.sites),sort(parameters.cce.bath_spins))
         channels=1;
         if isfield(parameters,'coil')&&iscell(parameters.coil)
             channels=numel(parameters.coil);
@@ -277,7 +273,7 @@ if strcmp(parameters.cce.bath_state.mode,'interlaced')
             raw.generator=[];
         end
     else
-        raw=cce_interlace(model,cluster,ensemble,pulse_sequence,parameters);
+        raw=cce_interlace(model,cluster,family,ensemble,pulse_sequence,parameters);
     end
 else
     raw=cce_evaluate(model,cluster,ensemble.spin_config(config_id),pulse_sequence,parameters);
@@ -286,7 +282,7 @@ end
 
 % Consistency enforcement
 function grumble(model,clusters,ensemble,pulse_sequence,parameters)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~isfield(model.cce,'parameters')||...
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
    ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
    ~isstruct(ensemble)||~isfield(ensemble,'spin_config')||isempty(ensemble.spin_config)||...
    ~isa(pulse_sequence,'function_handle')||...

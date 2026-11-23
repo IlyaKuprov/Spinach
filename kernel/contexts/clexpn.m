@@ -287,7 +287,6 @@ end
 
 % Compile immutable physical data, not a full-bath basis
 model=cce_compile(spin_system,parameters,assumptions);
-model.cce.pulse_sequence=pulse_sequence;
 if isfield(parameters.cce,'basis')&&isfield(parameters.cce.basis,'formalism')
     model.bas.formalism=parameters.cce.basis.formalism;
 elseif isfield(parameters,'bath_jumps')&&~isempty(parameters.bath_jumps)
@@ -309,45 +308,18 @@ if isfield(parameters.cce.numerics,'propagator')
 end
 
 % Build the physical connectivity and downward-closed cluster family
-options=parameters.cce;
-selection=struct('graph',options.graph,'order',options.order,'numerics',options.numerics);
-if isfield(selection.numerics,'propagator')
-    selection.numerics=rmfield(selection.numerics,'propagator');
-end
-selection.method='gcce';
-selection.expansion=options.expansion;
-if strcmp(options.approximation,'projected')
-    selection.method='cce';
-end
-if isequal(pulse_sequence,@noise_correlation)
-    selection.method='noise';
-    selection.noise=parameters.noise;
-    selection.bath_state=options.bath_state;
-end
-if strcmp(options.approximation,'projected')
-    selection.second_order=options.second_order;
-end
-for field={'groups','selection','bath_radius'}
-    if isfield(options,field{1})
-        selection.(field{1})=options.(field{1});
-    end
-end
-graph=cce_graph(model,selection);
-if isfield(options,'partition')
-    partition=cce_partition(model,graph,parameters);
+graph=cce_graph(model,parameters);
+if isfield(parameters.cce,'partition')
+    partition=cce_partition(model,graph,parameters,pulse_sequence);
     if ~partition.complete
         error('clexpn:partition','Partition adaptation is incomplete: %s.',partition.diagnostics.reason);
     end
-    selection.groups=partition.groups;
     if ~isempty(partition.groups)
         parameters.cce.groups=partition.groups;
     end
-    model.cce.parameters=parameters;
-    model.cce.groups=partition.groups;
     diagnostics.partition=partition;
 end
-clusters=cce_clusters(model,graph,selection);
-model.cce.parameters=parameters;
+clusters=cce_clusters(model,graph,parameters);
 
 % Evaluate every cluster through the scheduler
 raw=cce_schedule(model,clusters,ensemble,pulse_sequence,parameters);
@@ -364,8 +336,8 @@ diagnostics.graph=graph;
 diagnostics.reduction=reduced;
 diagnostics.parameters=parameters;
 diagnostics.physical_ids=1:model.comp.nspins;
-diagnostics.observed_ids=model.cce.parameters.observed;
-diagnostics.bath_ids=model.cce.parameters.cce.bath_spins;
+diagnostics.observed_ids=parameters.observed;
+diagnostics.bath_ids=parameters.cce.bath_spins;
 diagnostics.ensemble=ensemble;
 if isfield(parameters,'spectrum')
     diagnostics.spectrum=cce_spectrum(parameters.times,reduced.value,...

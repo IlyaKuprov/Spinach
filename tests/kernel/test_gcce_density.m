@@ -111,7 +111,7 @@ bad=p;
 bad.rho0=diag([1.1 -0.1]);
 caught=false;
 try
-    cce_compile(spin_system,bad,'labframe');
+    cce_compile(spin_system,cce_options(spin_system,bad,@cce_compile,'labframe'),'labframe');
 catch
     caught=true;
 end
@@ -151,7 +151,8 @@ sample.cce.bath_state.probabilities={[0.5 0.5]};
 sample.cce.meanfield='static';
 [~,sample_diagnostics]=clexpn(spin_system,@free_evolution,sample,'labframe');
 spin_config=sample_diagnostics.ensemble.spin_config(1);
-model=cce_compile(spin_system,sample,'labframe');
+model_p=cce_options(spin_system,sample,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
 local=sample;
 local.cce.bath_state=struct('mode','explicit_product',...
                             'rho',{spin_config.bath_rho});
@@ -195,8 +196,9 @@ echo=sample;
 echo.cce.bath_state=struct('mode','mixed_product');
 echo.transition=struct('spins',1,'alpha',[1;0],'beta',[0;1]);
 [observed,echo_diagnostics]=clexpn(spin_system,@hahn_echo,echo,'labframe');
-model=cce_compile(spin_system,echo_diagnostics.parameters,'labframe');
-cluster=cce_subsystem(model,2,struct(),[]);
+model_p=cce_options(spin_system,echo_diagnostics.parameters,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+cluster=cce_subsystem(model,model_p,2,struct(),[]);
 [H,~,~,~,~]=cce_generators(cluster,echo_diagnostics.parameters,[]);
 initial=kron(echo.rho0,eye(2)/2);
 pulse=kron(-1i*[0 1;1 0],eye(2));

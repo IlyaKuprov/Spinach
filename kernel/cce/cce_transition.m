@@ -62,8 +62,8 @@ else
 end
 native=~isempty(model)&&isfield(parameters.transition,'ms')&&...
        strcmp(model.bas.formalism,'zeeman-hilb')&&...
-       strcmp(model.cce.parameters.cce.bath_state.mode,'mixed_product')&&...
-       (~isfield(model.cce.parameters,'bath_jumps')||isempty(model.cce.parameters.bath_jumps));
+       strcmp(parameters.cce.bath_state.mode,'mixed_product')&&...
+       (~isfield(parameters,'bath_jumps')||isempty(parameters.bath_jumps));
 if ~native
     system=spin_system;
     if isfield(system,'bas')
@@ -94,12 +94,12 @@ if ~native
 else
 
     % Reuse the compiled observed subsystem without exterior mean fields
-    model.cce.parameters.cce.meanfield='none';
+    p=parameters;
+    p.cce.meanfield='none';
+    p.cce.approximation='generalized';
     model.bas.formalism='zeeman-hilb';
     config=struct('configuration_id',1,'state_id',1,'weight',1);
-    [system,~]=cce_subsystem(model,[],config,[]);
-    p=model.cce.parameters;
-    p.cce.approximation='generalized';
+    [system,~]=cce_subsystem(model,p,[],config,[]);
     [H,~,~,~]=cce_generators(system,p,[]);
     H=full(H);
 end

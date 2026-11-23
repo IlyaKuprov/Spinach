@@ -208,21 +208,6 @@ if strcmp(output,'observable')
         error('cce_evolution:coil','Every detector must match the propagated state.');
     end
 end
-elements=numel(rho);
-if strcmp(output,'trajectory')
-    elements=elements*(nsteps+1);
-end
-if strcmp(output,'observable')
-    elements=numel(coil)*(nsteps+1);
-end
-bytes=16*(12*d^2+elements);
-if (isstruct(L)&&~isempty(L.dissipator))||...
-   (~isstruct(L)&&strcmp(system.formalism,'zeeman-liouv'))
-    bytes=bytes+16*4*d^4;
-end
-if bytes>system.model.cce.parameters.cce.numerics.max_memory_bytes
-    error('cce:memory','Propagation exceeds max_memory_bytes.');
-end
 end
 
 

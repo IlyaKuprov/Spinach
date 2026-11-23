@@ -49,7 +49,8 @@ result=test_close(result,'C7 numerical check',r,reference,1e-12,1e-12,'Full-orde
 exact_error=max(abs(r-reference));
 
 % Honour an explicitly supplied bath state independently of parameter defaults
-model=cce_compile(s,p,'labframe');
+model_p=cce_options(s,p,@cce_compile,'labframe');
+model=cce_compile(s,model_p,'labframe');
 state_parameters=diagnostics.parameters;
 state_parameters.rho0=eye(2)/2;
 ensemble=diagnostics.ensemble;
@@ -65,7 +66,7 @@ rho=kron(spin_config.bath_rho{1},spin_config.bath_rho{2});
 q=state_parameters;
 q.rho0=observed_state;
 q.times=linspace(0,1,128);
-local=cce_subsystem(model,cluster.sites,spin_config,[]);
+local=cce_subsystem(model,model_p,cluster.sites,spin_config,[]);
 [ham,R,K,q]=cce_generators(local,q,[]);
 q.cce.numerics.max_memory_bytes=4096;
 refused=false;

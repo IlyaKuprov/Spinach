@@ -42,8 +42,9 @@ q=struct('observed',1,'times',0,'output','observable',...
          'coil',{{diag([1 0]),1e-20*diag([1 0]),1e20*diag([1 0])}});
 q.cce=struct('bath_spins',[],'order',0,'approximation','generalized',...
              'numerics',struct('atol',1e-8,'rtol',1e-8,'max_memory_bytes',2^29));
-model=cce_compile(spin_system,q,'labframe');
-observed_system=cce_subsystem(model,[],struct(),[]);
+model_p=cce_options(spin_system,q,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+observed_system=cce_subsystem(model,model_p,[],struct(),[]);
 scaled=NaN(1,3);
 accepted=true;
 try
@@ -359,13 +360,14 @@ end
 
 % Evaluate the same raw conditional average using the registered callback
 parameters=cce_options(spin_system,parameters,pulse_sequence,'labframe');
-model=cce_compile(spin_system,parameters,'labframe');
+model_p=cce_options(spin_system,parameters,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
 model.bas.formalism=parameters.cce.basis.formalism;
-model.cce.clusters=diagnostics.clusters;
+model_clusters=diagnostics.clusters;
 parameters.cce.interlaced.raw_only=true;
 parameters.cce.interlaced.reference_state=1;
 cluster=struct('id',uint64(1),'sites',parameters.cce.bath_spins(1:parameters.cce.order));
-raw=cce_interlace(model,cluster,diagnostics.ensemble,pulse_sequence,parameters);
+raw=cce_interlace(model,cluster,model_clusters,diagnostics.ensemble,pulse_sequence,parameters);
 value=raw.value;
 bound=raw.abs_error_bound;
 

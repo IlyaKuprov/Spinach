@@ -46,9 +46,10 @@ for angles={[0 0 0],[0.3 0.7 -0.2]}
             if ~isempty(retention{1})
                 assumptions={assumption{1},retention{1}};
             end
-            model=cce_compile(system,parameters,assumptions);
-            [H,meta]=cce_hamiltonian(model,[3 1],struct('backend','direct'));
-            reference=cce_hamiltonian(model,[3 1],struct('backend','stock'));
+            model_p=cce_options(system,parameters,@cce_compile,assumptions);
+            model=cce_compile(system,model_p,assumptions);
+            [H,meta]=cce_hamiltonian(model,model_p,[3 1],struct('backend','direct'));
+            reference=cce_hamiltonian(model,model_p,[3 1],struct('backend','stock'));
             error_norm=norm(H-reference,'fro');
             max_error=max(max_error,error_norm);
             max_relative=max(max_relative,error_norm/max(norm(reference,'fro'),realmin));
@@ -71,11 +72,12 @@ fprintf('CCE Hamiltonian: max dense propagator error=%g\n',max_propagator);
 % Demonstrate that transposing a single ordered nonsymmetric cell is detected
 assumptions='labframe';
 parameters.orientation=[0 0 0];
-model=cce_compile(system,parameters,assumptions);
-[reference,meta]=cce_hamiltonian(model,[3 1],struct('backend','stock'));
+model_p=cce_options(system,parameters,@cce_compile,assumptions);
+model=cce_compile(system,model_p,assumptions);
+[reference,meta]=cce_hamiltonian(model,model_p,[3 1],struct('backend','stock'));
 mutant=system;
 mutant=cce_test_write(mutant,[1 2],cce_test_read(mutant,[1 2]).');
-wrong=cce_hamiltonian(cce_compile(mutant,parameters,assumptions),[3 1],struct());
+wrong=cce_hamiltonian(cce_compile(mutant,model_p,assumptions),model_p,[3 1],struct());
 result=test_true(result,'transpose mutation rejected',...
                  norm(wrong-reference,'fro')>100*meta.roundoff_bound,'Antisymmetric ordered-cell convention is observable.');
 
@@ -84,7 +86,7 @@ half=system;
 tensor=cce_test_read(half,[1 2]);
 half=cce_test_write(half,[1 2],tensor/2);
 half=cce_test_write(half,[2 1],tensor.'/2);
-H=cce_hamiltonian(cce_compile(half,parameters,assumptions),[3 1],struct());
+H=cce_hamiltonian(cce_compile(half,model_p,assumptions),model_p,[3 1],struct());
 result=test_close(result,'nonsymmetric half cells',...
                   H,reference,meta.roundoff_bound,0,'Reverse ordered cell requires tensor transpose.');
 
@@ -98,32 +100,35 @@ permuted_inter.coupling.matrix=inter.coupling.matrix(permutation,permutation);
 permuted_params=parameters;
 permuted_params.observed=3;
 permuted_params.cce.bath_spins=[1 2];
-permuted=cce_compile(create(permuted_sys,permuted_inter),permuted_params,assumptions);
-H=cce_hamiltonian(permuted,[1 2],struct());
+permuted_p=cce_options(create(permuted_sys,permuted_inter),permuted_params,@cce_compile,assumptions);
+permuted=cce_compile(create(permuted_sys,permuted_inter),permuted_p,assumptions);
+H=cce_hamiltonian(permuted,permuted_p,[1 2],struct());
 result=test_close(result,'physical spin permutation',...
                   H,reference,meta.roundoff_bound,0,'Relabelling leaves the ordered physical Hamiltonian invariant.');
 
 % Check an observed-spin system in nonascending physical order and a proper subset
 parameters.observed=[3 1];
 parameters.cce.bath_spins=2;
-model=cce_compile(system,parameters,assumptions);
-[H,meta]=cce_hamiltonian(model,2,struct());
-reference=cce_hamiltonian(model,2,struct('backend','stock'));
+model_p=cce_options(system,parameters,@cce_compile,assumptions);
+model=cce_compile(system,model_p,assumptions);
+[H,meta]=cce_hamiltonian(model,model_p,2,struct());
+reference=cce_hamiltonian(model,model_p,2,struct('backend','stock'));
 result=test_close(result,'multiple observed spins',...
                   H,reference,meta.roundoff_bound,0,'Product basis follows the supplied observed order.');
-[H,meta]=cce_hamiltonian(model,[],struct());
-reference=cce_hamiltonian(model,[],struct('backend','stock'));
+[H,meta]=cce_hamiltonian(model,model_p,[],struct());
+reference=cce_hamiltonian(model,model_p,[],struct('backend','stock'));
 result=test_close(result,'observed-spin-only subset',...
                   H,reference,meta.roundoff_bound,0,'Metadata slicing preserves physical indices.');
 
 % Compare exterior fields with an explicit partial expectation of the full system
 parameters.observed=1;
 parameters.cce.bath_spins=[2 3];
-model=cce_compile(system,parameters,assumptions);
-[full_h,full_meta]=cce_hamiltonian(model,[2 3],struct());
+model_p=cce_options(system,parameters,@cce_compile,assumptions);
+model=cce_compile(system,model_p,assumptions);
+[full_h,full_meta]=cce_hamiltonian(model,model_p,[2 3],struct());
 spin_config.exterior_ids=3;
 spin_config.exterior_expectations=[0 0 1/2];
-[H,meta]=cce_hamiltonian(model,2,spin_config);
+[H,meta]=cce_hamiltonian(model,model_p,2,spin_config);
 embedding=kron(speye(meta.dimension),[1;0]);
 reference=embedding'*full_h*embedding;
 reference=reference-trace(reference-H)*speye(meta.dimension)/meta.dimension;
@@ -134,9 +139,10 @@ result=test_close(result,'exterior expectation',...
 cut=system;
 cut.inter.coordinates={[0 0 0],[0 0 2],[0 0 20]};
 parameters.cce.interaction_cutoff=3;
-model=cce_compile(cut,parameters,assumptions);
-[H,meta]=cce_hamiltonian(model,[2 3],struct());
-reference=cce_hamiltonian(model,[2 3],struct('backend','stock'));
+model_p=cce_options(cut,parameters,@cce_compile,assumptions);
+model=cce_compile(cut,model_p,assumptions);
+[H,meta]=cce_hamiltonian(model,model_p,[2 3],struct());
+reference=cce_hamiltonian(model,model_p,[2 3],struct('backend','stock'));
 result=test_close(result,'physical distance cutoff',...
                   H,reference,meta.roundoff_bound,0,'Both paths omit the same declared pairs.');
 result=test_true(result,'cutoff omission count',...
@@ -148,7 +154,8 @@ small.cce.interaction_cutoff=Inf;
 small.cce.numerics.max_memory_bytes=1;
 rejected=false;
 try
-    cce_hamiltonian(cce_compile(system,small,assumptions),[2 3],struct());
+    small_p=cce_options(system,small,@cce_compile,assumptions);
+    cce_hamiltonian(cce_compile(system,small_p,assumptions),small_p,[2 3],struct());
 catch exception
     rejected=contains(exception.message,'max_memory_bytes');
 end
@@ -160,7 +167,7 @@ parameters.cce.interaction_cutoff=Inf;
 assumptions='unsupported';
 rejected=false;
 try
-    cce_compile(system,parameters,assumptions);
+    cce_compile(system,cce_options(system,parameters,@cce_compile,assumptions),assumptions);
 catch
     rejected=true;
 end
@@ -177,16 +184,17 @@ inter.giant.euler={{[0 0 0],[0 0 0],[0 0 0]}};
 parameters.observed=1;
 parameters.cce.bath_spins=[];
 parameters.cce.interaction_cutoff=Inf;
-model=cce_compile(create(sys,inter),parameters,assumptions);
-[H,meta]=cce_hamiltonian(model,[],struct());
-reference=cce_hamiltonian(model,[],struct('backend','stock'));
+model_p=cce_options(create(sys,inter),parameters,@cce_compile,assumptions);
+model=cce_compile(create(sys,inter),model_p,assumptions);
+[H,meta]=cce_hamiltonian(model,model_p,[],struct());
+reference=cce_hamiltonian(model,model_p,[],struct('backend','stock'));
 result=test_close(result,'rank-three fallback',...
                   H,reference,meta.roundoff_bound,0,'Automatic fallback retains giant-spin terms.');
 result=test_true(result,'fallback recorded',...
                  strcmp(meta.backend,'stock'),'Unsupported direct domains cannot be guessed.');
 rejected=false;
 try
-    cce_hamiltonian(model,[],struct('backend','direct'));
+    cce_hamiltonian(model,model_p,[],struct('backend','direct'));
 catch
     rejected=true;
 end

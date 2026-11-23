@@ -50,7 +50,7 @@ ids=cluster_system.physical_ids;
 d=cluster_system.dimension;
 db=cluster_system.bath_dimension;
 projected=strcmp(parameters.cce.approximation,'projected');
-periodic=strcmp(model.cce.parameters.cce.expansion,'periodic_segments');
+periodic=strcmp(parameters.cce.expansion,'periodic_segments');
 jumps=[];
 if isfield(parameters,'bath_jumps')
     jumps=parameters.bath_jumps;
@@ -110,7 +110,7 @@ if projected
 
         % Resolve isolated observed eigenvectors against the compiled transition
         configuration=rmfield(cluster_system.configuration,{'exterior_ids','exterior_expectations'});
-        [observed_system,~]=cce_subsystem(model,[],configuration,[]);
+        [observed_system,~]=cce_subsystem(model,parameters,[],configuration,[]);
         observed_system.configuration.exterior_ids=[];
         observed_system.configuration.exterior_expectations=zeros(0,3);
         [observed_hamiltonian,~]=matrix(observed_system,parameters);
@@ -120,7 +120,7 @@ if projected
         [~,selected(1)]=max(abs(vectors'*model.cce.transition.alpha).^2);
         [~,selected(2)]=max(abs(vectors'*model.cce.transition.beta).^2);
         second=parameters.cce.second_order;
-        observed=model.cce.parameters.observed;
+        observed=parameters.observed;
         ops=cell(1,3*numel(observed));
         fields=cell(size(ops));
         axes={'x','y','z'};
@@ -262,7 +262,7 @@ if strcmp(backend,'auto')
 end
 ids=system.physical_ids;
 conditional=isfield(parameters.cce,'projection')&&strcmp(parameters.cce.projection,'conditional');
-observed=ismember(ids,model.cce.parameters.observed);
+observed=ismember(ids,parameters.observed);
 locals=~(conditional&observed);
 dims=system.multiplicities;
 dimension=system.dimension;
@@ -396,7 +396,7 @@ else
     if conditional
 
         % Remove only pure-register terms before stock Hamiltonian construction
-        register=find(ismember(sort(ids),model.cce.parameters.observed));
+        register=find(ismember(sort(ids),parameters.observed));
         system.inter.zeeman.matrix(register)={zeros(3)};
         system.inter.basefrqs(register)=0;
         keys=reshape(cell2mat(system.inter.coupling.matrix(:,1:2)),[],2);
@@ -409,7 +409,7 @@ else
     system=basis(system,basis_parameters);
     system=assume(system,model.cce.assumptions{:});
     [H,Q]=hamiltonian(system);
-    H=H+orientation(Q,model.cce.parameters.orientation);
+    H=H+orientation(Q,parameters.orientation);
 
     % Reorder the stock ascending physical indices into observed-first order
     sorted_ids=sort(ids);
@@ -467,14 +467,14 @@ H=(H+H')/2;
 meta.physical_ids=ids;
 meta.dimensions=dims;
 meta.dimension=dimension;
-meta.observed_dimension=prod(model.comp.mults(model.cce.parameters.observed));
+meta.observed_dimension=prod(model.comp.mults(parameters.observed));
 meta.bath_dimension=bath_dimension;
 meta.operators=ops;
 meta.backend=backend;
 meta.fallback_reason=model.cce.fallback_reason;
 meta.source_hash=model.cce.source_hash;
 meta.omitted_pairs=model.cce.omitted_pairs;
-meta.observable_budget=model.cce.parameters.cce.numerics.atol+model.cce.parameters.cce.numerics.rtol*norm(H,'fro');
+meta.observable_budget=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(H,'fro');
 
 end
 
@@ -618,7 +618,7 @@ if isfield(parameters,'bath_jumps')
         error('cce_options:jumps','bath_jumps must be a structure array.');
     end
     model=system.model;
-    selected=[model.cce.parameters.observed model.cce.parameters.cce.bath_spins];
+    selected=[parameters.observed parameters.cce.bath_spins];
     for k=1:numel(jumps)
         jump=jumps(k);
         required={'support','operator','rate'};
@@ -657,7 +657,7 @@ if isfield(parameters,'bath_jumps')
         if jump.rate~=0&&~any(included)&&...
            any(ismember(ids,system.configuration.exterior_ids))&&...
            ~(strcmp(parameters.cce.approximation,'projected')&&...
-             strcmp(model.cce.parameters.cce.expansion,'periodic_segments'))
+             strcmp(parameters.cce.expansion,'periodic_segments'))
             error('cce:exteriorJump','An active exterior jump cannot drive a frozen mean field.');
         end
         if jump.rate~=0&&any(included)&&~all(included)

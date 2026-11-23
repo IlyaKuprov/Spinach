@@ -15,15 +15,17 @@ function result=test_cce_conditioning()
 result=new_test_result('kernel/cce_conditioning','CCE zero conditioning',...
                        'Expose unresolved ratios rather than regularise or lose phase.');
 model.cce=struct();
-model.cce.parameters.observed=1;
-model.cce.parameters.cce.bath_spins=2:4;
+model_p.observed=1;
+model_p.cce.bath_spins=2:4;
 model.comp.mults=[2 2 2 2];
 model.comp.nspins=numel(model.comp.mults);
 adjacency=logical([0 1 0;1 0 1;0 1 0]);
 graph=struct('bath_ids',2:4,'adjacency',sparse(adjacency),'scores',double(adjacency));
 parameters=struct('method','cce','order',2,'expansion','standard',...
                   'numerics',struct('atol',1e-7,'rtol',1e-7));
-clusters=cce_clusters(model,graph,parameters);
+model_p.cce.order=parameters.order;
+model_p.cce.expansion=parameters.expansion;
+clusters=cce_clusters(model,graph,model_p);
 raw=repmat(struct('cluster_id',uint64(0),'value',ones(6,1),...
                   'abs_error_bound',zeros(6,1),'valid',true(6,1)),numel(clusters)+1,1);
 for k=1:numel(clusters)
@@ -110,7 +112,9 @@ result=test_true(result,'Uncertain nonzero baseline',all(~baseline.valid)&&...
 % Cancellation may remove algebraically irrelevant raw zeros in powers mode
 parameters.clusters={1:3};
 parameters.order=3;
-clusters=cce_clusters(model,graph,parameters);
+model_p.cce.clusters=parameters.clusters;
+model_p.cce.order=parameters.order;
+clusters=cce_clusters(model,graph,model_p);
 raw=repmat(struct('cluster_id',uint64(0),'value',1,'abs_error_bound',0,'valid',true),...
            numel(clusters)+1,1);
 for k=1:numel(clusters)

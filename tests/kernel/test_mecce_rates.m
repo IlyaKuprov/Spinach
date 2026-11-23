@@ -57,9 +57,10 @@ small.inter.zeeman.matrix{1}=zeros(3);
 small.bas.formalism='zeeman-liouv';
 small.tols.small_matrix=1;
 small.tols.prop_chop=1e-4;
-weak_model=cce_compile(small,weak,'labframe');
-[weak_system,~]=cce_subsystem(weak_model,[],struct(),[]);
-[H,R,K,weak]=cce_generators(weak_system,weak_model.cce.parameters,[]);
+weak_model_p=cce_options(small,weak,@cce_compile,'labframe');
+weak_model=cce_compile(small,weak_model_p,'labframe');
+[weak_system,~]=cce_subsystem(weak_model,weak_model_p,[],struct(),[]);
+[H,R,K,weak]=cce_generators(weak_system,weak_model_p,[]);
 [clean,clean_details]=free_evolution(weak_system,weak,H,R,K);
 population_error=abs(clean(end,1)-exp(-1e-5));
 result=test_true(result,'Stock ME clean-up error covered',...
@@ -82,9 +83,10 @@ result=test_close(result,'C7 numerical check',projected,2*expected(:),1e-12,1e-1
 % Refuse nonclosed projected jump blocks and negative rates
 p.bath_jumps.operator=[0 1;0 0];
 s.bas.formalism='zeeman-liouv';
-m=cce_compile(s,p,'labframe');
-p=m.cce.parameters;
-[subsystem,~]=cce_subsystem(m,[],struct(),[]);
+m_p=cce_options(s,p,@cce_compile,'labframe');
+m=cce_compile(s,m_p,'labframe');
+p=m_p;
+[subsystem,~]=cce_subsystem(m,m_p,[],struct(),[]);
 refused=false;
 try
     cce_generators(subsystem,p,[]);
@@ -141,14 +143,15 @@ bath_system=create(sys,inter);
 p.cce.bath_spins=2;
 p.bath_jumps=struct('support',2,'operator',[0 1;0 0],'rate',1);
 p.cce.order=1;
-model=cce_compile(bath_system,p,'labframe');
-model.cce.parameters.cce.meanfield='static';
+model_p=cce_options(bath_system,p,@cce_compile,'labframe');
+model=cce_compile(bath_system,model_p,'labframe');
+model_p.cce.meanfield='static';
 refused=false;
 try
     configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},...
                          'exterior_ids',2,'exterior_expectations',[0 0 0.5]);
-    [exterior_system,~]=cce_subsystem(model,[],configuration,[]);
-    cce_generators(exterior_system,model.cce.parameters,[]);
+    [exterior_system,~]=cce_subsystem(model,model_p,[],configuration,[]);
+    cce_generators(exterior_system,model_p,[]);
 catch err
     refused=strcmp(err.identifier,'cce:exteriorJump');
 end

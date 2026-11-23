@@ -28,24 +28,25 @@ p.cce=struct('approximation','generalized','order',5,'meanfield','none',...
              'numerics',struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26));
 p.pump=struct('species',{{'1H'}},'center',0,'halfwidth',10,...
               'boundary','open','units','rad/s','fraction',0.5,'allow_empty',false);
-model=cce_compile(ss,p,'labframe');
-s=selection(model,p);
+model_p=cce_options(ss,p,@cce_compile,'labframe');
+model=cce_compile(ss,model_p,'labframe');
+s=selection(model,model_p,p);
 result=test_true(result,'Both exact boundaries excluded and species respected',isequal(s.selected_sites,[3 4]),'Both exact boundaries excluded and species respected');
 result=test_true(result,'Boundary rule is recorded',strcmp(s.boundary_rule,'strict_abs_less_than'),'Boundary rule is recorded');
 p.pump=rmfield(p.pump,'species');
 p.pump.sites=[2 3 5 6];
-s=selection(model,p);
+s=selection(model,model_p,p);
 result=test_true(result,'Explicit site selection intersects frequency window',isequal(s.selected_sites,[3 6]),'Explicit site selection intersects frequency window');
 p.pump.halfwidth=0;
 refused=false;
 try
-    selection(model,p);
+    selection(model,model_p,p);
 catch exception
     refused=strcmp(exception.identifier,'bath_pumped_hahn:empty');
 end
 result=test_true(result,'Empty DEER window requires explicit opt-in',refused,'Empty DEER window requires explicit opt-in');
 p.pump.allow_empty=true;
-s=selection(model,p);
+s=selection(model,model_p,p);
 result=test_true(result,'Explicit empty-selection opt-in accepted',isempty(s.selected_sites),'Explicit empty-selection opt-in accepted');
 
 % Check canonical rad/s values are not shifted by a second gamma B term
@@ -53,7 +54,7 @@ model.inter.magnet=2;
 model.inter.gammas=3*ones(1,6);
 p.pump.halfwidth=10;
 p.pump.center=0;
-s=selection(model,p);
+s=selection(model,model_p,p);
 result=test_true(result,'Canonical frequencies are not converted twice',isequal(s.selected_sites,[3 6]),'Canonical frequencies are not converted twice');
 
 % Exercise isotope selection through canonical create/prepare metadata
@@ -71,8 +72,9 @@ q.cce=struct('bath_spins',[2 3],'approximation','generalized','expansion','stand
              'numerics',struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26));
 q.pump=struct('species',{{'13C'}},'center',0,'halfwidth',1,'boundary','open','units','rad/s',...
               'fraction',0.5,'allow_empty',false);
-prepared=cce_compile(ss,q,'labframe');
-selected=selection(prepared,q);
+prepared_p=cce_options(ss,q,@cce_compile,'labframe');
+prepared=cce_compile(ss,prepared_p,'labframe');
+selected=selection(prepared,prepared_p,q);
 result=test_true(result,'Prepared model DEER isotope selection',...
                  isequal(selected.selected_sites,2),...
                  'Species filters must read the canonical isotope table produced by create.');
@@ -85,14 +87,15 @@ result=test_close(result,'Public DEER species and site filters agree',...
                   'The public driver must accept documented species filters without synthetic metadata.');
 
 % Reject a non-axial canonical Zeeman field before frequency-window selection
-rotated=cce_compile(ss,q,'labframe');
+rotated_p=cce_options(ss,q,@cce_compile,'labframe');
+rotated=cce_compile(ss,rotated_p,'labframe');
 rotated.cce.zeeman{2}(3,:)=[3 0 4];
 axial=q;
 axial.pump.center=4;
 axial.pump.halfwidth=0.1;
 rejected=false;
 try
-    selection(rotated,axial);
+    selection(rotated,rotated_p,axial);
 catch exception
     rejected=strcmp(exception.identifier,'bath_pumped_hahn:axial');
 end
@@ -115,7 +118,7 @@ result=test_true(result,'Public DEER rejects non-axial Zeeman selection',rejecte
 axial.pump.sites=3;
 axial.pump.center=0;
 axial.pump.halfwidth=1;
-selected=selection(rotated,axial);
+selected=selection(rotated,rotated_p,axial);
 result=test_true(result,'DEER axial check respects site filters',...
                  isequal(selected.selected_sites,3),...
                  'An unrelated non-axial site must not invalidate an axial selection.');
@@ -220,16 +223,18 @@ q.output='signal';
 q=rmfield(q,{'noise','pump'});
 q.controls=struct('bandwidth',1);
 clean=rmfield(q,'controls');
-canonical=cce_compile(ss,clean,'labframe');
+canonical_p=cce_options(ss,clean,@cce_compile,'labframe');
+canonical=cce_compile(ss,canonical_p,'labframe');
 cluster=struct('id',1,'sites',2,'physical_ids',2);
 spin_config=struct('bath_ids',[2 3],'bath_rho',{{eye(2)/2,eye(2)/2}},...
                    'state_id',1,'configuration_id',1,'weight',1);
-retained_system=cce_subsystem(canonical,cluster.sites,spin_config,[]);
+retained_system=cce_subsystem(canonical,canonical_p,cluster.sites,spin_config,[]);
 result=test_true(result,'Native bath configuration ordering',...
                  isequal(retained_system.physical_ids,[1 2]),...
                  'The native subsystem preserves observed-first physical spin order.');
 calls={@()cce_options(ss,q,@free_evolution,'labframe'),...
-       @()cce_compile(ss,q,'labframe'),@()clexpn(ss,@free_evolution,q,'labframe'),...
+       @()cce_compile(ss,cce_options(ss,q,@cce_compile,'labframe'),'labframe'),...
+       @()clexpn(ss,@free_evolution,q,'labframe'),...
        @()clexpn(ss,@hahn_echo,q,'labframe'),@()clexpn(ss,@bath_pumped_hahn,q,'labframe'),...
        @()clexpn(ss,@finite_drive,q,'labframe'),@()clexpn(ss,@noise_correlation,q,'labframe')};
 for n=1:numel(calls)
@@ -356,11 +361,13 @@ for method={'cce','mecce','megcce'}
         end
         unlimited=r;
         unlimited.cce=rmfield(unlimited.cce,'meanfield_radius');
-        reference=cce_compile(ss,unlimited,'labframe');
+        reference_p=cce_options(ss,unlimited,@cce_compile,'labframe');
+        reference=cce_compile(ss,reference_p,'labframe');
         passed=true;
         difference=Inf;
         try
-            with_radius=cce_compile(ss,r,'labframe');
+            with_radius_p=cce_options(ss,r,@cce_compile,'labframe');
+            with_radius=cce_compile(ss,with_radius_p,'labframe');
             difference=double(~isequaln(with_radius.cce.pairs,reference.cce.pairs));
         catch
             passed=false;
@@ -399,15 +406,17 @@ for method={'cce','gcce','mecce','megcce'}
     if ismember(method{1},{'mecce','megcce'})
         base.cce.basis.formalism='zeeman-liouv';
     end
-    model=cce_compile(ss,base,'labframe');
-    base=model.cce.parameters;
+    model_p=cce_options(ss,base,@cce_compile,'labframe');
+    model=cce_compile(ss,model_p,'labframe');
+    base=model_p;
     spin_config=struct('bath_ids',[2 3],'bath_rho',{base.cce.bath_state.rho},...
                        'state_id',1,'configuration_id',1,'weight',1);
     schedule=@free_evolution;
 
     % Distinguish missing observed and exterior sites from irrelevant included sites
-    for missing=[model.cce.parameters.observed 3]
+    for missing=[model_p.observed 3]
         partial=model;
+        partial_p=model_p;
         partial.inter.coordinates={[0 0 0];[1 0 0];[3 0 0]};
         partial.inter.coordinates{missing}=[];
         rejected=false;
@@ -421,6 +430,7 @@ for method={'cce','gcce','mecce','megcce'}
                          rejected,'Each observed and exterior site needs finite coordinates.');
     end
     spatial=model;
+    spatial_p=model_p;
     spatial.inter.coordinates={[0 0 0];[];[3 0 0]};
     accepted=true;
     try
@@ -437,7 +447,7 @@ for method={'cce','gcce','mecce','megcce'}
     names=cell(size(calls));
     calls(1:3)={@()clexpn(ss,@free_evolution,base,'labframe'),...
                 @()cce_evaluate(model,cluster,spin_config,schedule,base),...
-                @()cce_subsystem(model,cluster.sites,spin_config,[])};
+                @()cce_subsystem(model,model_p,cluster.sites,spin_config,[])};
     names(1:3)={'driver','cluster','controls'};
     if master
         calls{6}=@()cce_evaluate(model,cluster,spin_config,schedule,base);
@@ -456,7 +466,7 @@ for method={'cce','gcce','mecce','megcce'}
     spin_config.assignment=[1 1];
     sampled=struct('spin_config',spin_config,'weights',1,'bases',{{eye(2),eye(2)}},...
                    'probabilities',{{[0.5 0.5],[0.5 0.5]}});
-    calls{5}=@()cce_interlace(model,cluster,sampled,schedule,ip);
+    calls{5}=@()cce_interlace(model,cluster,[],sampled,schedule,ip);
     names{5}='interlace';
     for k=1:numel(calls)
         rejected=false;
@@ -483,7 +493,8 @@ models{2}.inter.coordinates={[0 0 0],[1 0 0],[3 0 0]};
 for geometry=1:2
     compiled=false;
     try
-        events=cce_compile(models{geometry},base,'labframe');
+        events_p=cce_options(models{geometry},base,@cce_compile,'labframe');
+        events=cce_compile(models{geometry},events_p,'labframe');
         compiled=isstruct(events);
     catch
     end
@@ -564,14 +575,15 @@ for method={'cce','gcce','mecce','megcce'}
 end
 
 % A finite radius excludes an actual polarised exterior coupling
-field_model=cce_compile(spatial,base,'labframe');
+field_model_p=cce_options(spatial,base,@cce_compile,'labframe');
+field_model=cce_compile(spatial,field_model_p,'labframe');
 field_model.cce.pairs(end+1)=struct('ids',[1 3],'tensor',zeros(3),'retained',diag([0 0 4]));
-field_model.cce.parameters.cce.meanfield_radius=2;
-[near,~]=cce_subsystem(field_model,2,struct(),[]);
-[h_near,~,~]=cce_generators(near,field_model.cce.parameters,[]);
-field_model.cce.parameters.cce.meanfield_radius=4;
-[far,~]=cce_subsystem(field_model,2,struct(),[]);
-[h_far,R,K,field_par]=cce_generators(far,field_model.cce.parameters,[]);
+field_model_p.cce.meanfield_radius=2;
+[near,~]=cce_subsystem(field_model,field_model_p,2,struct(),[]);
+[h_near,~,~]=cce_generators(near,field_model_p,[]);
+field_model_p.cce.meanfield_radius=4;
+[far,~]=cce_subsystem(field_model,field_model_p,2,struct(),[]);
+[h_far,R,K,field_par]=cce_generators(far,field_model_p,[]);
 result=test_close(result,'Finite radius retains the physical exterior field',...
                   full(h_far-h_near),kron(diag([1 -1]),eye(2)),0,0,...
                   'Only the exterior spin inside the declared radius contributes its measured moment.');
@@ -603,7 +615,7 @@ for radius={NaN,-1,-Inf,[1 2],1i,'2'}
                      'meanfield_radius must be a nonnegative real scalar or positive Inf.');
     rejected=false;
     try
-        cce_compile(ss,base,'labframe');
+        cce_compile(ss,cce_options(ss,base,@cce_compile,'labframe'),'labframe');
     catch err
         rejected=contains(err.message,'meanfield_radius');
     end
@@ -616,21 +628,21 @@ fprintf('DEER exact-boundary cases passed: selected sites [3 4], [3 6], and empt
 end
 
 % Obtain experiment-owned selection without propagation or mean-field closure
-function selected=selection(model,parameters)
+function selected=selection(model,model_p,parameters)
 
 % Resolve the pump selection at zero propagation time
 parameters.times=0;
 parameters.output='signal';
 parameters=rmfield(parameters,intersect(fieldnames(parameters),{'refocusing','noise'}));
-parameters.cce=model.cce.parameters.cce;
+parameters.cce=model_p.cce;
 parameters.cce.meanfield='none';
 parameters.cce.approximation='generalized';
 if isfield(parameters.cce,'meanfield_radius')
     parameters.cce=rmfield(parameters.cce,'meanfield_radius');
 end
-model.cce.parameters=parameters;
+model_p=parameters;
 model.bas.formalism='zeeman-hilb';
-[system,~]=cce_subsystem(model,model.cce.parameters.cce.bath_spins,struct(),[]);
+[system,~]=cce_subsystem(model,model_p,model_p.cce.bath_spins,struct(),[]);
 [~,selected]=bath_pumped_hahn(system,parameters,zeros(system.dimension),0,0);
 
 end
@@ -639,8 +651,9 @@ end
 function [answer,details]=pumped(spin_system,parameters)
 
 % Map the selected bath pulse to an explicit native experiment
-model=cce_compile(spin_system,parameters,'labframe');
-selected=selection(model,parameters);
+model_p=cce_options(spin_system,parameters,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+selected=selection(model,model_p,parameters);
 parameters=rmfield(parameters,'pump');
 sequence=@free_evolution;
 if isfield(parameters,'noise')

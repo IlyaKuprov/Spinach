@@ -1,7 +1,7 @@
 % Deterministic physical-spin partitions and bounded exact-patch adaptation.
 % Syntax:
 %
-%                  partition=cce_partition(model,graph,parameters)
+%                  partition=cce_partition(model,graph,parameters,pulse_sequence)
 %
 % Parameters:
 %
@@ -23,40 +23,19 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function partition=cce_partition(model,graph,parameters)
+function partition=cce_partition(model,graph,parameters,pulse_sequence)
 
 % Validate native partition controls before constructing internal selections
-grumble(model,graph,parameters);
-
-% Keep experiment parameters intact while resolving the partition controls
-native_parameters=parameters;
-options=parameters.cce;
-parameters=struct('partition',options.partition,'graph',options.graph,...
-                  'order',options.order,'numerics',options.numerics,...
-                  'expansion',options.expansion,'method','gcce');
-if isfield(parameters.numerics,'propagator')
-    parameters.numerics=rmfield(parameters.numerics,'propagator');
-end
-if isfield(options,'groups')
-    parameters.groups=options.groups;
-end
-if strcmp(options.approximation,'projected')
-    parameters.method='cce';
-end
-if isfield(native_parameters,'noise')
-    parameters.method='noise';
-    parameters.noise=native_parameters.noise;
-    parameters.bath_state=options.bath_state;
-end
+grumble(model,graph,parameters,pulse_sequence);
 
 % Canonicalise physical group membership
-p=parameters.partition;
+p=parameters.cce.partition;
 ids=graph.bath_ids;
 [~,positions]=ismember(ids,1:model.comp.nspins);
 dims=model.comp.mults(positions);
 groups=num2cell(ids);
-if isfield(parameters,'groups')&&~isempty(parameters.groups)
-    groups=cellfun(@sort,parameters.groups,'UniformOutput',false);
+if isfield(parameters.cce,'groups')&&~isempty(parameters.cce.groups)
+    groups=cellfun(@sort,parameters.cce.groups,'UniformOutput',false);
 end
 [~,order]=sort(cellfun(@min,groups));
 groups=groups(order);
@@ -180,7 +159,7 @@ if adaptive&&complete
     metadata=whos('pilot','heldout');
     count=min(numel(p.patches)*(numel(pilot)+numel(heldout)),p.max_probes);
     bytes=sum([metadata.bytes])+3*8*count;
-    if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+    if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
         error('cce_partition:memory',...
               'Pilot and held-out configurations exceed numerics.max_memory_bytes.');
     end
@@ -261,24 +240,17 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
     objective=0;
     errors=[];
     valid=true;
-    q=parameters;
-    q.groups=candidate;
-    q.expansion='standard';
+    evaluation=parameters;
+    evaluation.cce.groups=candidate;
+    evaluation.cce.expansion='standard';
+    if strcmp(parameters.cce.expansion,'disjoint')
+        evaluation.cce.order=1;
+    end
+    if strcmp(parameters.cce.expansion,'disjoint_inter')
+        evaluation.cce.order=2;
+    end
 
     % Reserve checkpoint ownership for the production scheduler
-    if isfield(q,'checkpoint')
-        q=rmfield(q,'checkpoint');
-    end
-    if strcmp(parameters.expansion,'disjoint')
-        q.order=1;
-    end
-    if strcmp(parameters.expansion,'disjoint_inter')
-        q.order=2;
-    end
-    evaluation=native_parameters;
-    evaluation.cce.groups=q.groups;
-    evaluation.cce.order=q.order;
-    evaluation.cce.expansion=q.expansion;
     if isfield(evaluation.cce,'checkpoint')
         evaluation.cce=rmfield(evaluation.cce,'checkpoint');
     end
@@ -291,34 +263,32 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             objective=inf;
             return;
         end
-        local=q;
-        local.bath_spins=sites;
-        local.groups=cellfun(@(g)intersect(g,sites),candidate,'UniformOutput',false);
-        local.groups=local.groups(~cellfun(@isempty,local.groups));
+        local=evaluation;
+        local.cce.bath_spins=sites;
+        local.cce.groups=cellfun(@(g)intersect(g,sites),candidate,'UniformOutput',false);
+        local.cce.groups=local.cce.groups(~cellfun(@isempty,local.cce.groups));
 
         % Restrict bath-indexed graph data in the declared physical patch order
-        [~,indices]=ismember(sites,model.cce.parameters.cce.bath_spins);
+        [~,indices]=ismember(sites,parameters.cce.bath_spins);
         for field={'adjacency','scores','mismatch'}
-            if isfield(local.graph,field{1})
-                matrix=local.graph.(field{1});
-                local.graph.(field{1})=matrix(indices,indices);
+            if isfield(local.cce.graph,field{1})
+                matrix=local.cce.graph.(field{1});
+                local.cce.graph.(field{1})=matrix(indices,indices);
             end
         end
-        local_model=model;
-        local_model.cce.parameters.cce.bath_spins=sites;
-        local_graph=cce_graph(local_model,local);
-        family=cce_clusters(local_model,local_graph,local);
-        dc=prod(model.comp.mults(model.cce.parameters.observed));
+        local_graph=cce_graph(model,local);
+        family=cce_clusters(model,local_graph,local);
+        dc=prod(model.comp.mults(parameters.observed));
         components=1;
-        if isfield(native_parameters,'output')&&strcmp(native_parameters.output,'density')
+        if isfield(parameters,'output')&&strcmp(parameters.output,'density')
             components=dc^2;
-        elseif isfield(native_parameters,'coil')&&iscell(native_parameters.coil)
-            components=numel(native_parameters.coil);
+        elseif isfield(parameters,'coil')&&iscell(parameters.coil)
+            components=numel(parameters.coil);
         end
-        times=native_parameters.times;
+        times=parameters.times;
         bytes=3*(numel(family)+2)*...
               (numel(times)*(25*components+16*dc^2)+1024);
-        if ~isfinite(bytes)||bytes>parameters.numerics.max_memory_bytes
+        if ~isfinite(bytes)||bytes>parameters.cce.numerics.max_memory_bytes
             error('cce_partition:memory',...
                   'Patch cluster records exceed numerics.max_memory_bytes.');
         end
@@ -334,11 +304,11 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             used=used+1;
             state=spin_configs(s);
             state.weight=1;
-            baseline=cce_evaluate(model,empty,state,model.cce.pulse_sequence,evaluation);
-            exact=cce_evaluate(model,whole,state,model.cce.pulse_sequence,evaluation);
+            baseline=cce_evaluate(model,empty,state,pulse_sequence,evaluation);
+            exact=cce_evaluate(model,whole,state,pulse_sequence,evaluation);
             records=repmat(baseline,1,numel(family));
             for c=1:numel(family)
-                records(c)=cce_evaluate(model,family(c),state,model.cce.pulse_sequence,evaluation);
+                records(c)=cce_evaluate(model,family(c),state,pulse_sequence,evaluation);
             end
 
             % Score all times using exact complete patches without auxiliary denominators
@@ -348,7 +318,7 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
                 reduced=baseline;
             else
                 request=evaluation;
-                request.cce.groups=local.groups;
+                request.cce.groups=local.cce.groups;
                 request.cce.bath_spins=sites;
                 reduced=cce_reduce({[baseline records]},family,request);
             end
@@ -401,9 +371,10 @@ valid=isnumeric(value)&&isreal(value)&&isscalar(value)&&isfinite(value)&&value>=
 end
 
 % Validate declared group membership and partition bounds
-function grumble(model,graph,parameters)
+function grumble(model,graph,parameters,pulse_sequence)
 if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
    ~isstruct(graph)||~isscalar(graph)||~all(isfield(graph,{'bath_ids','pair_norm'}))||...
+   ~isa(pulse_sequence,'function_handle')||...
    ~isstruct(parameters)||~isscalar(parameters)||~isfield(parameters,'cce')||...
    ~isstruct(parameters.cce)||~isscalar(parameters.cce)||...
    ~all(isfield(parameters.cce,{'partition','graph','order','numerics','expansion','approximation'}))||...

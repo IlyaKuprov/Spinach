@@ -65,8 +65,8 @@ for k=1:numel(schedule.times)
 end
 
 % Reserve sparse complex Hamiltonians, dense pulses, and exterior expectations
-retained=segment_count*(48*dimension^2+24*numel(model.cce.parameters.cce.bath_spins)+8);
-dc=prod(model.comp.mults(model.cce.parameters.observed));
+retained=segment_count*(48*dimension^2+24*numel(parameters.cce.bath_spins)+8);
+dc=prod(model.comp.mults(parameters.observed));
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=dc^2;
@@ -122,7 +122,7 @@ for t=1:numel(schedule.times)
                     ham_config=rmfield(ham_config,field{1});
                 end
             end
-            [current,~]=cce_subsystem(model,sites,ham_config,[]);
+            [current,~]=cce_subsystem(model,parameters,sites,ham_config,[]);
             [H,~,~]=cce_generators(current,parameters,[]);
         else
             H=drift;
@@ -279,7 +279,7 @@ for event=events
             error('cce_segments:exterior_finite','Finite exterior pulses require dynamical exterior spins.');
         end
         if strcmp(parameters.cce.approximation,'projected')&&...
-           any(ismember(event.target,system.model.cce.parameters.observed))
+           any(ismember(event.target,parameters.observed))
             error('cce_segments:manifold_drive','Finite observed drives require gCCE.');
         end
     elseif isfield(event,'operator')&&~isempty(event.operator)

@@ -24,9 +24,10 @@ parameters.observed=[3 1];
 parameters.times=0;
 parameters.cce.bath_spins=[4 2];
 parameters.cce.numerics=struct('atol',1e-12,'rtol',1e-12,'max_memory_bytes',2e8);
-model=cce_compile(system,parameters,'labframe');
-[cluster,cache]=cce_subsystem(model,[4 2],struct(),[]);
-[swapped,cache]=cce_subsystem(model,[2 4],struct(),cache);
+model_p=cce_options(system,parameters,@cce_compile,'labframe');
+model=cce_compile(system,model_p,'labframe');
+[cluster,cache]=cce_subsystem(model,model_p,[4 2],struct(),[]);
+[swapped,cache]=cce_subsystem(model,model_p,[2 4],struct(),cache);
 result=test_true(result,'Retained ordering invalidates cache',cache.misses==2&&...
                  isequal(swapped.physical_ids,[3 1 2 4]),...
                  'Ordered physical IDs must be part of the exact cache signature.');
@@ -61,7 +62,7 @@ for n=1:numel(labels)
     result=test_close(result,['Stock descriptor ' labels{n}],A,reference,1e-14,1e-14,...
                   'The canonical physical representation must agree with the independent reference.');
 end
-rho=cce_state(cluster,{'Lx','Lz'},{3,2});
+rho=cce_state(cluster,model_p,{'Lx','Lz'},{3,2});
 reference=state(stock,{'Lx','Lz'},{3,2});
 reference=reference(indices,indices);
 result=test_close(result,'Stock product state',rho,reference,1e-14,1e-14,...
@@ -69,7 +70,7 @@ result=test_close(result,'Stock product state',rho,reference,1e-14,1e-14,...
 
 % Fully specified nonuniform populations are not normalised a second time
 states={diag([0.7 0.3]),[0.2 0.3 0.5],[0.9 0.1],[0.4 0.6]};
-rho=cce_state(cluster,states,[1 2 3 4]);
+rho=cce_state(cluster,model_p,states,[1 2 3 4]);
 expected=kron(kron(kron(diag(states{3}),states{1}),diag(states{4})),diag(states{2}));
 result=test_close(result,'Explicit physical state order',rho,expected,0,0,...
                   'The canonical physical representation must agree with the independent reference.');
@@ -79,22 +80,23 @@ result=test_close(result,'Explicit trace-one density',trace(rho),1,1e-14,0,...
 % Liouville operators and states use conventional column-major vectorisation
 bas.formalism='zeeman-liouv';
 stock=basis(system,bas);
-model=cce_compile(stock,parameters,'labframe');
-cluster=cce_subsystem(model,[4 2],struct(),[]);
+model_p=cce_options(stock,parameters,@cce_compile,'labframe');
+model=cce_compile(stock,model_p,'labframe');
+cluster=cce_subsystem(model,model_p,[4 2],struct(),[]);
 A=cce_operator(cluster,'Ly',2);
 H=kron(speye(8),operators.y);
 expected=kron(speye(24),H)-kron(H.',speye(24));
 result=test_close(result,'Liouville commutator',A,expected,0,0,...
                   'The canonical physical representation must agree with the independent reference.');
-vector=cce_state(cluster,states,[1 2 3 4]);
+vector=cce_state(cluster,model_p,states,[1 2 3 4]);
 result=test_close(result,'Column-major physical density',vector,rho(:),0,0,...
                   'The canonical physical representation must agree with the independent reference.');
-vector=cce_state(cluster,'Ly',2);
+vector=cce_state(cluster,model_p,'Ly',2);
 result=test_close(result,'Column-major operator state',vector,H(:),0,0,...
                   'The canonical physical representation must agree with the independent reference.');
 
 % An empty bath still permits observed-spin preparation and detection
-cluster=cce_subsystem(model,[],struct(),[]);
+cluster=cce_subsystem(model,model_p,[],struct(),[]);
 A=cce_operator(cluster,'Lx',3);
 H=kron(half.x,speye(2));
 result=test_close(result,'Empty-bath observed commutator',A,...
@@ -104,7 +106,7 @@ result=test_close(result,'Empty-bath observed commutator',A,...
 % Physical states cannot omit populations or refer to discarded spins
 rejected=false;
 try
-    cce_state(cluster,{[0.4 0.6]},3);
+    cce_state(cluster,model_p,{[0.4 0.6]},3);
 catch
     rejected=true;
 end

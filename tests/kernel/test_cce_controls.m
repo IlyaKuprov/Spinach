@@ -15,13 +15,14 @@ function result=test_cce_controls()
 result=new_test_result('kernel/cce_controls','CCE realistic controls',...
                        'Check finite drives, waveform refinement and named pulse schedules.');
 [model,p,ensemble]=fixture();
+model_p=cce_options(model,p,@cce_compile,'labframe');
 spin=pauli(2);
 x=spin.x;
 z=spin.z;
 spin_config=ensemble.spin_configs(1);
 p.drive=struct('spins',1,'duration',0.1,'axis','x','amplitude',7,'detuning',3);
 [~,s_aux]=controlled(model,2,spin_config,p,@finite_drive);
-local=cce_subsystem(model,2,spin_config,[]);
+local=cce_subsystem(model,model_p,2,spin_config,[]);
 H=cce_generators(local,p,[]);
 U=expm(-1i*0.1*(H+7*kron(x,eye(2))+3*kron(z,eye(2))));
 initial=kron(p.rho0,spin_config.bath_rho{1});
@@ -190,6 +191,7 @@ q=rmfield(p,'drive');
 q.output='signal';
 q.rho0=ones(2)/2;
 ss=model;
+ss_p=model_p;
 for normalised=[false true]
     q.normalized=normalised;
     plain=clexpn(ss,@free_evolution,q,'labframe');
@@ -378,7 +380,8 @@ q.cce.order=0;
 q.cce.bath_state=struct('mode','mixed_product');
 q.refocusing={struct('spins',1,'time',0,'axis','x','angle',pi)};
 q=cce_options(spin_system,q,@refocusing_train,'labframe');
-spin_one=cce_compile(spin_system,q,'labframe');
+spin_one_p=cce_options(spin_system,q,@cce_compile,'labframe');
+spin_one=cce_compile(spin_system,spin_one_p,'labframe');
 states=struct('bath_ids',[],'bath_rho',{{}});
 [~,physical_aux]=controlled(spin_one,[],states,q,@refocusing_train);
 q.refocusing={struct('spins',1,'time',0,'operator',pi*[0 1 0;1 0 0;0 0 0]/2)};
@@ -513,9 +516,10 @@ p.cce.meanfield='none';
 p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 p.drive=struct('spins',1,'duration',0.1,'axis','x','amplitude',7,'detuning',3);
 p=cce_options(spin_system,p,@finite_drive,'labframe');
-model=cce_compile(spin_system,p,'labframe');
+model_p=cce_options(spin_system,p,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
 configuration=struct('bath_ids',2,'bath_rho',{{diag([1 0])}},'state_id',1,'configuration_id',1,'weight',1);
-local=cce_subsystem(model,2,configuration,[]);
+local=cce_subsystem(model,model_p,2,configuration,[]);
 ensemble.spin_configs=rmfield(local.configuration,{'exterior_ids','exterior_expectations'});
 
 end
@@ -525,8 +529,9 @@ function [answer,aux]=controlled(model,sites,configuration,p,experiment)
 
 % Construct the conditioned subsystem and execute its native experiment
 p=cce_options(model,p,experiment,'labframe');
-model=cce_compile(model,p,'labframe');
-local=cce_subsystem(model,sites,configuration,[]);
+model_p=cce_options(model,p,@cce_compile,'labframe');
+model=cce_compile(model,model_p,'labframe');
+local=cce_subsystem(model,model_p,sites,configuration,[]);
 [H,R,K,p]=cce_generators(local,p,[]);
 [answer,aux]=experiment(local,p,H,R,K);
 

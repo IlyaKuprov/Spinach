@@ -48,8 +48,9 @@ p.cce.interlaced=struct('max_states',16,'reference_state',1);
 p.cce.numerics=struct('atol',1e-9,'rtol',1e-9,'max_memory_bytes',2^26);
 [~,details]=clexpn(spin_system,@free_evolution,p,'labframe');
 p=details.parameters;
-model=cce_compile(spin_system,p,'labframe');
-model.cce.clusters=details.clusters;
+model_p=cce_options(spin_system,p,@cce_compile,'labframe');
+model=cce_compile(spin_system,model_p,'labframe');
+model_clusters=details.clusters;
 ensemble=details.ensemble;
 schedule=@free_evolution;
 
@@ -66,7 +67,7 @@ q.cce.interlaced=struct('max_states',8,'reference_state',1,...
 probe=struct('id',uint64(0),'sites',[],'groups',[]);
 refused=false;
 try
-    cce_interlace(model,probe,ensemble,schedule,q);
+    cce_interlace(model,probe,model_clusters,ensemble,schedule,q);
 catch exception
     refused=strcmp(exception.identifier,'cce_interlace:memory');
 end
@@ -103,14 +104,14 @@ ensemble.spin_config(1).assignment=[1 1 1];
 ensemble.spin_config(1).bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
 p.cce.interlaced=struct('reference_state',1,'max_states',16,'condition_sites',{{[2 3],[2 4]}});
 cluster=struct('id',uint64(1),'sites',2);
-raw=cce_interlace(model,cluster,ensemble,schedule,p);
+raw=cce_interlace(model,cluster,model_clusters,ensemble,schedule,p);
 
 % Reject reference states inconsistent with their declared product assignment
 rejected=false;
 supplied=ensemble;
 supplied.spin_config(1).bath_rho{1}=eye(2)/2;
 try
-    cce_interlace(model,cluster,supplied,schedule,p);
+    cce_interlace(model,cluster,model_clusters,supplied,schedule,p);
 catch exception
     rejected=strcmp(exception.identifier,'cce:spin_config');
 end
@@ -122,7 +123,7 @@ supplied=ensemble;
 supplied.spin_config(1).assignment=[2 1 1];
 rejected=false;
 try
-    cce_interlace(model,cluster,supplied,schedule,p);
+    cce_interlace(model,cluster,model_clusters,supplied,schedule,p);
 catch exception
     rejected=strcmp(exception.identifier,'cce:spin_config');
 end
@@ -134,7 +135,7 @@ supplied=ensemble;
 supplied.spin_config(1).projection=eye(2);
 rejected=false;
 try
-    cce_interlace(model,cluster,supplied,schedule,p);
+    cce_interlace(model,cluster,model_clusters,supplied,schedule,p);
 catch exception
     rejected=strcmp(exception.identifier,'cce_subsystem:configuration');
 end
@@ -149,7 +150,7 @@ q.output='density';
 q.times=0;
 supplied=ensemble;
 q.rho0=diag([0.2 0.8]);
-initial=cce_interlace(model,cluster,supplied,schedule,q);
+initial=cce_interlace(model,cluster,model_clusters,supplied,schedule,q);
 expected=q.rho0;
 result=test_close(result,'Interlaced supplied observed state',initial.value,expected(:).',...
                   1e-12,1e-12,'The experiment-owned observed density survives the projected bath average.');
@@ -163,8 +164,9 @@ baseline_ok=true;
 baseline_error=Inf;
 try
     empty_model=model;
-    empty_model.cce.clusters=model.cce.clusters([]);
-    baseline=cce_interlace(empty_model,empty_cluster,ensemble,schedule,q);
+    empty_model_p=model_p;
+    empty_model_clusters=model_clusters([]);
+    baseline=cce_interlace(empty_model,empty_cluster,empty_model_clusters,ensemble,schedule,q);
     reference=ensemble.spin_config(1);
     reference.bath_rho={diag([1 0]),diag([1 0]),diag([1 0])};
     direct=cce_evaluate(model,empty_cluster,reference,schedule,q);
@@ -256,12 +258,13 @@ probe.cce.interlaced.raw_only=true;
 probe.cce.interlaced.condition_sites={[2 3 4]};
 probe.cce.bath_state.basis={eye(2),[0 1;1 0],eye(2)};
 probe_model=model;
+probe_model_p=model_p;
 probe_model.cce.zeeman{2}(3,:)=[0.731 0.473 0.122];
 sample=probe;
 sample.cce.interlaced.raw_only=false;
 [~,probe_details]=clexpn(probe_model,@free_evolution,sample,'labframe');
 probe_ensemble=probe_details.ensemble;
-measured=cce_interlace(probe_model,cluster,probe_ensemble,schedule,probe);
+measured=cce_interlace(probe_model,cluster,[],probe_ensemble,schedule,probe);
 residual=0;
 orthogonality=0;
 for k=1:size(measured.assignments,1)
@@ -281,21 +284,21 @@ result=test_close(result,'Interlaced worst orthogonality retained',max(measured.
 
 % Denominator subclusters are conditioned on exactly the numerator distribution
 empty=struct('id',uint64(0),'sites',[]);
-baseline=cce_interlace(model,empty,ensemble,schedule,p);
+baseline=cce_interlace(model,empty,model_clusters,ensemble,schedule,p);
 result=test_true(result,...
                  'Explicit shared K is identical in numerator and empty denominator',isequal(raw.assignments,baseline.assignments)&&isequal(raw.weights,baseline.weights),...
                  'Explicit shared K is identical in numerator and empty denominator');
 p.cce.interlaced.max_states=7;
 refused=false;
 try
-    cce_interlace(model,cluster,ensemble,schedule,p);
+    cce_interlace(model,cluster,model_clusters,ensemble,schedule,p);
 catch exception
     refused=strcmp(exception.identifier,'cce_interlace:budget');
 end
 result=test_true(result,'Enumeration work exceeding the declared budget is refused',refused,'Enumeration work exceeding the declared budget is refused');
 p.cce.interlaced.max_states=16;
 p.cce.interlaced=rmfield(p.cce.interlaced,'condition_sites');
-automatic=cce_interlace(model,cluster,ensemble,schedule,p);
+automatic=cce_interlace(model,cluster,model_clusters,ensemble,schedule,p);
 result=test_true(result,'Included-supercluster family generates the same K automatically',isequal(automatic.assignments,expected),'Included-supercluster family generates the same K automatically');
 
 % At full order every conditioning cylinder is the full bath and W12 is exact

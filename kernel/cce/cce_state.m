@@ -26,10 +26,10 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function rho=cce_state(cluster_system,states,spins)
+function rho=cce_state(cluster_system,parameters,states,spins)
 
 % Validate descriptors before changing the local representation
-grumble(cluster_system,states,spins);
+grumble(cluster_system,parameters,states,spins);
 formalism=cluster_system.formalism;
 cluster_system.formalism='zeeman-hilb';
 if ischar(states)||(iscell(states)&&all(cellfun(@ischar,states)))
@@ -61,7 +61,7 @@ end
 end
 
 % Keep operator descriptors separate from explicit physical populations
-function grumble(system,states,spins)
+function grumble(system,parameters,states,spins)
 if ~isstruct(system)||~isscalar(system)||~isfield(system,'kind')||...
    ~strcmp(system.kind,'cce_subsystem')||...
    ~ismember(system.formalism,{'zeeman-hilb','zeeman-liouv'})
@@ -99,7 +99,7 @@ if ~iscell(states)||~isrow(states)||~isnumeric(spins)||~isrow(spins)||...
     error('cce_state:descriptor','Explicit states must specify every retained physical spin once.');
 end
 [~,order]=ismember(system.physical_ids,spins);
-numerics=system.model.cce.parameters.cce.numerics;
+numerics=parameters.cce.numerics;
 for n=1:numel(system.physical_ids)
     d=system.multiplicities(n);
     local=states{order(n)};

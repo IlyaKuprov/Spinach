@@ -34,13 +34,13 @@
 %
 % ilya.kuprov@weizmann.ac.il
 
-function [cluster_system,cache]=cce_subsystem(model,sites,configuration,cache)
+function [cluster_system,cache]=cce_subsystem(model,parameters,sites,configuration,cache)
 
 % Reject malformed ownership and configuration before consulting the cache
-grumble(model,sites,configuration,cache);
+grumble(model,parameters,sites,configuration,cache);
 
 % An exact key avoids hash collisions and stale model or representation data
-signature=struct('model',model,'sites',sites,'configuration',configuration);
+signature=struct('model',model,'parameters',parameters,'sites',sites,'configuration',configuration);
 if ~isempty(cache)&&isequaln(cache.signature,signature)
     cluster_system=cache.cluster_system;
     cache.hits=cache.hits+1;
@@ -48,7 +48,7 @@ if ~isempty(cache)&&isequaln(cache.signature,signature)
 end
 
 % Preserve observed-first tensor-product order and explicit physical mappings
-ids=[model.cce.parameters.observed sites];
+ids=[parameters.observed sites];
 dims=model.comp.mults(ids);
 cluster_system.kind='cce_subsystem';
 cluster_system.model=model;
@@ -60,17 +60,20 @@ cluster_system.physical_to_local=zeros(1,model.comp.nspins);
 cluster_system.physical_to_local(ids)=1:numel(ids);
 cluster_system.multiplicities=dims;
 cluster_system.dimension=prod(dims);
-cluster_system.observed_dimension=prod(model.comp.mults(model.cce.parameters.observed));
+cluster_system.observed_dimension=prod(model.comp.mults(parameters.observed));
 cluster_system.bath_dimension=prod(model.comp.mults(sites));
 cluster_system.isotopes=model.comp.isotopes(ids);
 cluster_system.assumptions=model.cce.assumptions;
-cluster_system.groups=cellfun(@(group)group(ismember(group,ids)),...
-                              model.cce.groups,'UniformOutput',false);
+cluster_system.groups={};
+if isfield(parameters.cce,'groups')
+    cluster_system.groups=cellfun(@(group)group(ismember(group,ids)),...
+                                  parameters.cce.groups,'UniformOutput',false);
+end
 cluster_system.local_operators=cellfun(@pauli,num2cell(dims),'UniformOutput',false);
 
 % Bind a declared product bath density, never an inferred population
-bath_ids=model.cce.parameters.cce.bath_spins;
-state=model.cce.parameters.cce.bath_state;
+bath_ids=parameters.cce.bath_spins;
+state=parameters.cce.bath_state;
 if isfield(configuration,'bath_rho')
     bath_ids=configuration.bath_ids;
     densities=configuration.bath_rho;
@@ -92,7 +95,7 @@ for n=1:numel(bath_ids)
 
 end
 if isfield(configuration,'expectations')&&...
-   ~close_values(configuration.expectations,expectations,model.cce.parameters.cce.numerics)
+   ~close_values(configuration.expectations,expectations,parameters.cce.numerics)
     error('cce_subsystem:expectations','Spin expectations disagree with the supplied density.');
 end
 
@@ -107,7 +110,7 @@ if isfield(configuration,'exterior_ids')
     [present,indices]=ismember(supplied,exterior_ids);
     if ~all(present)||numel(indices)~=numel(exterior_ids)||...
        ~close_values(configuration.exterior_expectations,...
-                     exterior_values(indices,:),model.cce.parameters.cce.numerics)
+                     exterior_values(indices,:),parameters.cce.numerics)
         error('cce_subsystem:exterior','Exterior fields must match the common bath configuration.');
     end
 end
@@ -117,15 +120,15 @@ cluster_system.configuration.bath_rho=densities;
 cluster_system.configuration.expectations=expectations;
 cluster_system.configuration.exterior_ids=[];
 cluster_system.configuration.exterior_expectations=zeros(0,3);
-if strcmp(model.cce.parameters.cce.meanfield,'static')
-    if isfield(model.cce.parameters.cce,'meanfield_radius')&&...
-       isfinite(model.cce.parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
+if strcmp(parameters.cce.meanfield,'static')
+    if isfield(parameters.cce,'meanfield_radius')&&...
+       isfinite(parameters.cce.meanfield_radius)&&~isempty(exterior_ids)
         distance=inf(1,numel(exterior_ids));
-        for id=model.cce.parameters.observed
+        for id=parameters.observed
             delta=vertcat(model.inter.coordinates{exterior_ids})-model.inter.coordinates{id};
             distance=min(distance,sqrt(sum(delta.^2,2)).');
         end
-        keep=distance<=model.cce.parameters.cce.meanfield_radius;
+        keep=distance<=parameters.cce.meanfield_radius;
         exterior_ids=exterior_ids(keep);
         exterior_values=exterior_values(keep,:);
     end
@@ -153,12 +156,12 @@ answer=isnumeric(left)&&isequal(size(left),size(right))&&...
 end
 
 % Validate the complete public service boundary
-function grumble(model,sites,configuration,cache)
+function grumble(model,parameters,sites,configuration,cache)
 if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')
     error('cce_subsystem:model','model must be returned by cce_compile.');
 end
 if ~isnumeric(sites)||~isreal(sites)||(~isempty(sites)&&~isrow(sites))||...
-   any(~ismember(sites,model.cce.parameters.cce.bath_spins))||numel(unique(sites))~=numel(sites)
+   any(~ismember(sites,parameters.cce.bath_spins))||numel(unique(sites))~=numel(sites)
     error('cce_subsystem:sites','sites must be distinct physical bath IDs in the requested order.');
 end
 if ~isstruct(configuration)||~isscalar(configuration)
@@ -175,7 +178,7 @@ end
 if isfield(configuration,'bath_ids')
     ids=configuration.bath_ids;
     if ~isnumeric(ids)||(~isempty(ids)&&~isrow(ids))||...
-       ~isequal(sort(ids),sort(model.cce.parameters.cce.bath_spins))
+       ~isequal(sort(ids),sort(parameters.cce.bath_spins))
         error('cce_subsystem:configuration','bath_ids must list the selected bath exactly once.');
     end
 end
@@ -200,14 +203,14 @@ if isfield(configuration,'bath_rho')
     for n=1:numel(bath_ids)
         d=model.comp.mults(bath_ids(n));
         rho=densities{n};
-        tolerance=model.cce.parameters.cce.numerics.atol+model.cce.parameters.cce.numerics.rtol*norm(rho,'fro');
+        tolerance=parameters.cce.numerics.atol+parameters.cce.numerics.rtol*norm(rho,'fro');
         if ~isnumeric(rho)||~isequal(size(rho),[d d])||any(~isfinite(rho),'all')||...
            norm(rho-rho','fro')>tolerance||abs(trace(rho)-1)>tolerance||...
            min(real(eig(full((rho+rho')/2))))<-tolerance
             error('cce_subsystem:density','Bath densities must be positive, Hermitian and trace one.');
         end
     end
-elseif ismember(model.cce.parameters.cce.bath_state.mode,{'sampled','interlaced'})
+elseif ismember(parameters.cce.bath_state.mode,{'sampled','interlaced'})
     error('cce_subsystem:configuration','Sampling requires explicit bath density matrices.');
 end
 if isfield(configuration,'exterior_ids')
@@ -217,12 +220,12 @@ if isfield(configuration,'exterior_ids')
         error('cce_subsystem:exterior','Exterior IDs must be a distinct physical-ID row.');
     end
 end
-if strcmp(model.cce.parameters.cce.meanfield,'static')&&...
-   isfield(model.cce.parameters.cce,'meanfield_radius')&&...
-   isfinite(model.cce.parameters.cce.meanfield_radius)
-    exterior=setdiff(model.cce.parameters.cce.bath_spins,sites);
+if strcmp(parameters.cce.meanfield,'static')&&...
+   isfield(parameters.cce,'meanfield_radius')&&...
+   isfinite(parameters.cce.meanfield_radius)
+    exterior=setdiff(parameters.cce.bath_spins,sites);
     if ~isempty(exterior)&&...
-       any(cellfun(@isempty,model.inter.coordinates([model.cce.parameters.observed exterior])))
+       any(cellfun(@isempty,model.inter.coordinates([parameters.observed exterior])))
         error('cce:coordinates','cce.meanfield_radius requires finite observed and exterior coordinates.');
     end
 end

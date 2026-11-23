@@ -44,7 +44,7 @@ grumble(cluster_system,parameters);
 model=cluster_system.model;
 dc=cluster_system.observed_dimension;
 db=cluster_system.bath_dimension;
-ids=model.cce.parameters.observed;
+ids=parameters.observed;
 local=cluster_system;
 local.physical_ids=ids;
 local.sites=[];
@@ -72,7 +72,7 @@ elseif isfield(parameters,'preparation')&&isequal(parameters.preparation,'transv
     observed=(eye(dc)+2*cce_operator(local,'Lx',ids))/2;
 elseif isfield(parameters,'preparation')&&isstruct(parameters.preparation)
     spec=parameters.preparation;
-    observed=cce_state(local,spec.states,spec.spins);
+    observed=cce_state(local,parameters,spec.states,spec.spins);
 else
     vector=(model.cce.transition.alpha+model.cce.transition.beta)/sqrt(2);
     observed=vector*vector';
@@ -181,7 +181,7 @@ for name={'preparation','detection'}
         if ischar(value)
             valid=strcmp(value,'transition')&&isfield(system.model.cce,'transition');
             if strcmp(name{1},'preparation')&&strcmp(value,'transverse')
-                valid=isscalar(system.model.cce.parameters.observed)&&system.observed_dimension==2;
+                valid=isscalar(parameters.observed)&&system.observed_dimension==2;
             end
         elseif isstruct(value)&&isscalar(value)
             if strcmp(name{1},'preparation')
@@ -233,7 +233,7 @@ if isfield(parameters,'coil')
     end
     count=numel(coil);
 end
-if 16*system.dimension^2*(4+count)>system.model.cce.parameters.cce.numerics.max_memory_bytes
+if 16*system.dimension^2*(4+count)>parameters.cce.numerics.max_memory_bytes
     error('cce:memory','Observation construction exceeds max_memory_bytes.');
 end
 if strcmp(parameters.cce.approximation,'projected')&&...

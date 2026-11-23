@@ -121,7 +121,7 @@ if isfield(parameters,'refocusing')
         positions=repmat(pulse.time,size(parameters.times));
     end
     if isfield(pulse,'axis')
-        if strcmp(parameters.cce.meanfield,'static')&&any(ismember(pulse.spins,model.cce.parameters.cce.bath_spins))
+        if strcmp(parameters.cce.meanfield,'static')&&any(ismember(pulse.spins,parameters.cce.bath_spins))
             parameters.cce.numerics.propagator='expm';
         end
         axis=pulse.axis;
@@ -156,11 +156,11 @@ if isfield(parameters,'refocusing')
                 configuration.bath_rho{index}=rotation*configuration.bath_rho{index}*rotation';
 
             end
-            [after,~]=cce_subsystem(model,spin_system.sites,configuration,[]);
+            [after,~]=cce_subsystem(model,parameters,spin_system.sites,configuration,[]);
             [h_after,~,~]=cce_generators(after,parameters,[]);
             parameters.cce.numerics.propagator='expm';
         end
-    elseif isequal(pulse.spins,model.cce.parameters.observed)
+    elseif isequal(pulse.spins,parameters.observed)
         generator=kron(pulse.operator,eye(db));
     else
         position=find(spin_system.physical_ids==pulse.spins,1);
@@ -710,7 +710,7 @@ if isfield(parameters,'refocusing')
     ids=pulse.spins;
     if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
        any(~ismember(ids,1:spin_system.model.comp.nspins))||numel(unique(ids))~=numel(ids)||...
-       ~(isscalar(ids)||isequal(ids,spin_system.model.cce.parameters.observed))
+       ~(isscalar(ids)||isequal(ids,parameters.observed))
         error('hahn_echo:operator_target','An operator pulse addresses the whole observed system or one physical site.');
     end
     d=prod(spin_system.model.comp.mults(ids));

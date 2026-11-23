@@ -65,12 +65,12 @@ if isfield(options,'parallel')&&isfield(options.parallel,'max_tasks')
 end
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
-    components=prod(model.comp.mults(model.cce.observed_ids))^2;
+    components=prod(model.comp.mults(model.cce.parameters.observed))^2;
 elseif isfield(parameters,'coil')&&iscell(parameters.coil)
     components=numel(parameters.coil);
 end
 nt=numel(parameters.times);
-dc=prod(model.comp.mults(model.cce.observed_ids));
+dc=prod(model.comp.mults(model.cce.parameters.observed));
 metadata=whos('model','clusters','ensemble','parameters');
 resident=3*ns*nc*(nt*(25*components+16*dc^2)+1024)+sum([metadata.bytes]);
 noise=isequal(pulse_sequence,@noise_correlation);
@@ -107,11 +107,11 @@ for k=0:numel(clusters)
     if k>0
         sites=clusters(k).sites;
     end
-    ids=[model.cce.observed_ids sites];
+    ids=[model.cce.parameters.observed sites];
     db=prod(model.comp.mults(sites));
     dimension=dc*db;
     copies=12+3*numel(ids);
-    if ~model.cce.direct_supported||strcmp(model.cce.backend,'stock')
+    if ~model.cce.direct_supported||strcmp(model.cce.parameters.cce.backend,'stock')
         ranks=max([2 cellfun(@numel,model.inter.giant.coeff).']);
         copies=copies+sum((2*(1:ranks)+1).^2);
     end
@@ -140,7 +140,7 @@ for k=0:numel(clusters)
         propagated=propagated^2;
 
     end
-    workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(model.cce.bath_ids)+8);
+    workspace=workspace+16*24*propagated^2+segment_count*(48*dimension^2+24*numel(model.cce.parameters.cce.bath_spins)+8);
     peak=max(peak,workspace);
 end
 if resident+min([workers batch_size ns*nc])*peak>options.numerics.max_memory_bytes
@@ -194,7 +194,6 @@ if isfield(options,'checkpoint')
     physical=payload;
     physical.parameters.cce.numerics=rmfield(physical.parameters.cce.numerics,'max_memory_bytes');
     physical.model.cce.parameters.cce.numerics=rmfield(physical.model.cce.parameters.cce.numerics,'max_memory_bytes');
-    physical.model.cce.numerics=rmfield(physical.model.cce.numerics,'max_memory_bytes');
     identity=struct('model',md5_hash(physical.model),'parameters',md5_hash(physical.parameters),...
                     'clusters',md5_hash(clusters),'schedule',md5_hash(payload.experiment),...
                     'samples',md5_hash(ensemble));
@@ -261,8 +260,8 @@ function raw=native_task(model,cluster,ensemble,pulse_sequence,parameters,config
 % Keep conditioned tasks on the same physical family and configuration
 if strcmp(parameters.cce.bath_state.mode,'interlaced')
     parameters.cce.interlaced.reference_state=config_id;
-    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.cce.bath_ids)),model.cce.clusters));
-    if complete&&~isequal(sort(cluster.sites),sort(model.cce.bath_ids))
+    complete=any(arrayfun(@(item)isequal(sort(item.sites),sort(model.cce.parameters.cce.bath_spins)),model.cce.clusters));
+    if complete&&~isequal(sort(cluster.sites),sort(model.cce.parameters.cce.bath_spins))
         channels=1;
         if isfield(parameters,'coil')&&iscell(parameters.coil)
             channels=numel(parameters.coil);
@@ -287,7 +286,7 @@ end
 
 % Consistency enforcement
 function grumble(model,clusters,ensemble,pulse_sequence,parameters)
-if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~isfield(model.cce,'observed_ids')||...
+if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||~isfield(model.cce,'parameters')||...
    ~isstruct(clusters)||(~isempty(clusters)&&~all(isfield(clusters,{'id','sites'})))||...
    ~isstruct(ensemble)||~isfield(ensemble,'spin_config')||isempty(ensemble.spin_config)||...
    ~isa(pulse_sequence,'function_handle')||...

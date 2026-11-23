@@ -79,9 +79,9 @@ for j=1:numel(cylinders)
     end
 end
 cylinders=cylinders(keep);
-nb=numel(model.cce.bath_ids);
-dimensions=model.comp.mults(model.cce.bath_ids);
-counts=cellfun(@(sites)prod(dimensions(ismember(model.cce.bath_ids,sites))),cylinders);
+nb=numel(model.cce.parameters.cce.bath_spins);
+dimensions=model.comp.mults(model.cce.parameters.cce.bath_spins);
+counts=cellfun(@(sites)prod(dimensions(ismember(model.cce.parameters.cce.bath_spins,sites))),cylinders);
 count=sum(counts);
 if count>spec.max_states
     error('cce_interlace:budget','Cylinder enumeration exceeds interlaced.max_states.');
@@ -95,7 +95,7 @@ end
 assignments=zeros(count,nb);
 position=0;
 for k=1:numel(cylinders)
-    varied=find(ismember(model.cce.bath_ids,cylinders{k}));
+    varied=find(ismember(model.cce.parameters.cce.bath_spins,cylinders{k}));
     for n=1:counts(k)
         position=position+1;
         assignments(position,:)=reference.assignment;
@@ -160,7 +160,7 @@ raw.factor_valid=[];
 raw.factor_abs_error_bound=[];
 raw.reference=raw.value;
 raw.reference_error=raw.abs_error_bound;
-raw.full_bath=isequal(sort(cluster.sites),sort(model.cce.bath_ids));
+raw.full_bath=isequal(sort(cluster.sites),sort(model.cce.parameters.cce.bath_spins));
 if isfield(spec,'raw_only')&&spec.raw_only
     return;
 end
@@ -230,7 +230,7 @@ end
 
 % Validate the resolved ensemble contract without a method-name fallback
 function grumble(model,cluster,ensemble,pulse_sequence,parameters)
-if ~isstruct(model)||~isfield(model,'cce')||~isfield(model.cce,'bath_ids')||...
+if ~isstruct(model)||~isfield(model,'cce')||~isfield(model.cce,'parameters')||...
    ~isstruct(cluster)||~all(isfield(cluster,{'id','sites'}))||...
    ~isstruct(ensemble)||~all(isfield(ensemble,{'spin_config','bases','probabilities'}))||...
    ~isa(pulse_sequence,'function_handle')||...
@@ -253,12 +253,12 @@ if ~isfield(spec,'max_states')||~isscalar(spec.max_states)||~isfinite(spec.max_s
     error('cce_interlace:budget','An explicit positive integer state budget is required.');
 end
 reference=ensemble.spin_config(spec.reference_state);
-if ~isequal(reference.bath_ids,model.cce.bath_ids)||...
-   numel(reference.assignment)~=numel(model.cce.bath_ids)
+if ~isequal(reference.bath_ids,model.cce.parameters.cce.bath_spins)||...
+   numel(reference.assignment)~=numel(model.cce.parameters.cce.bath_spins)
     error('cce:spin_config','Interlaced reference bath IDs and assignments must match the model.');
 end
-for j=1:numel(model.cce.bath_ids)
-    dimension=model.comp.mults(model.cce.bath_ids(j));
+for j=1:numel(model.cce.parameters.cce.bath_spins)
+    dimension=model.comp.mults(model.cce.parameters.cce.bath_spins(j));
     index=reference.assignment(j);
     if ~isfinite(index)||index~=fix(index)||index<1||index>dimension
         error('cce:spin_config','Interlaced reference assignments must select local basis states.');

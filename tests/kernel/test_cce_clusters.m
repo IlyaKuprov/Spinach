@@ -16,7 +16,9 @@ result=new_test_result('kernel/cce_clusters','CCE graphs and subsets',...
                        'Check frontier enumeration, closure, powers and physical group costs.');
 
 % Check count-scaled cluster metadata before constructing the family
-budget_model.cce=struct('bath_ids',2:7,'observed_ids',1);
+budget_model.cce=struct();
+budget_model.cce.parameters.observed=1;
+budget_model.cce.parameters.cce.bath_spins=2:7;
 budget_model.comp.mults=2*ones(1,7);
 budget_model.comp.nspins=numel(budget_model.comp.mults);
 budget_graph=struct('bath_ids',2:7,'adjacency',logical(ones(6)-eye(6)),...
@@ -39,7 +41,9 @@ manual=fileread(fullfile(root,'interfaces','agents','spinach-knowledge',...
 result=test_true(result,'Documented engine bath radius',contains(manual,'| `bath_radius` |')&&...
                  ~contains(manual,'graph.bath_radius'),...
                  'The retained engine table must name the root field consumed by cce_graph.');
-radius_model.cce=struct('bath_ids',[2 3],'observed_ids',1,'pairs',struct('ids',{},'tensor',{}));
+radius_model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+radius_model.cce.parameters.observed=1;
+radius_model.cce.parameters.cce.bath_spins=[2 3];
 radius_model.inter.coordinates=num2cell([0 0 0;1 0 0;3 0 0],2);
 radius_model.comp.mults=[2 2 2];
 radius_model.comp.nspins=numel(radius_model.comp.mults);
@@ -65,7 +69,9 @@ for n=0:7
                 adjacency(b,a)=edge;
             end
         end
-        model.cce=struct('observed_ids',1,'bath_ids',2:n+1,'pairs',struct('ids',{},'tensor',{}));
+        model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+        model.cce.parameters.observed=1;
+        model.cce.parameters.cce.bath_spins=2:n+1;
         model.inter.coordinates=num2cell([(0:n).' zeros(n+1,2)],2);
         model.comp.mults=2*ones(1,n+1);
         model.comp.nspins=numel(model.comp.mults);
@@ -137,7 +143,9 @@ for n=1:4
                 adjacency(edges(edge,2),edges(edge,1))=true;
             end
         end
-        model.cce=struct('observed_ids',1,'bath_ids',2:n+1);
+        model.cce=struct();
+        model.cce.parameters.observed=1;
+        model.cce.parameters.cce.bath_spins=2:n+1;
         model.comp.mults=2*ones(1,n+1);
         model.comp.nspins=numel(model.comp.mults);
         graph=struct('bath_ids',2:n+1,'adjacency',sparse(adjacency),'scores',double(adjacency));
@@ -176,7 +184,9 @@ result=test_true(result,'Every labelled graph through four vertices',all_graph_c
                  '360 graph/order cases exactly equal independent Boolean-transitive-closure enumeration');
 
 % Check named families against explicit signed coefficient references
-model.cce=struct('observed_ids',1,'bath_ids',2:4);
+model.cce=struct();
+model.cce.parameters.observed=1;
+model.cce.parameters.cce.bath_spins=2:4;
 model.comp.mults=[2 2 2 2];
 model.comp.nspins=numel(model.comp.mults);
 parameters=struct('order',2,'expansion','standard');
@@ -198,7 +208,9 @@ for topology=1:3
 end
 
 % Check cap selection, mandatory closure, and physical composite dimensions
-model.cce=struct('observed_ids',10,'bath_ids',[20 30 40 50],'pairs',struct('ids',{},'tensor',{}));
+model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+model.cce.parameters.observed=10;
+model.cce.parameters.cce.bath_spins=[20 30 40 50];
 model.inter.coordinates=num2cell(zeros(50,3),2);
 model.comp.mults=2*ones(1,50);
 model.comp.mults([10 30])=3;
@@ -275,7 +287,9 @@ result=test_true(result,'Union-of-centres bath radius',isequal(graph.bath_ids,[2
                  'bath filtering and the separate physical graph radius preserve ID ordering');
 
 % Supplied scores set deterministic cap selection before closure
-model.cce=struct('observed_ids',1,'bath_ids',2:5,'pairs',struct('ids',{},'tensor',{}));
+model.cce=struct('pairs',struct('ids',{},'tensor',{}));
+model.cce.parameters.observed=1;
+model.cce.parameters.cce.bath_spins=2:5;
 model.inter.coordinates=num2cell(zeros(5,3),2);
 model.comp.mults=2*ones(1,5);
 model.comp.nspins=numel(model.comp.mults);
@@ -305,7 +319,9 @@ result=test_true(result,'One-group exact physical cost',isscalar(grouped)&&...
 
 % One hundred sparse bath vertices do not trigger a global powerset
 large=100;
-model.cce=struct('observed_ids',1,'bath_ids',2:large+1);
+model.cce=struct();
+model.cce.parameters.observed=1;
+model.cce.parameters.cce.bath_spins=2:large+1;
 model.comp.mults=2*ones(1,large+1);
 model.comp.nspins=numel(model.comp.mults);
 graph=struct('bath_ids',2:large+1,'adjacency',sparse(false(large)),...
@@ -317,7 +333,9 @@ result=test_true(result,'Sparse large-bath capped enumeration',isscalar(large_fa
                  'frontier generation selects one singleton without allocating 2^N subsets');
 
 % Restore a small physical graph for input-refusal tests
-model.cce=struct('observed_ids',1,'bath_ids',2:3);
+model.cce=struct();
+model.cce.parameters.observed=1;
+model.cce.parameters.cce.bath_spins=2:3;
 model.comp.mults=[2 2 2];
 model.comp.nspins=numel(model.comp.mults);
 graph=struct('bath_ids',2:3,'adjacency',sparse(logical([0 1;1 0])),...

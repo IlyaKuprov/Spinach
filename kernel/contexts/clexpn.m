@@ -364,8 +364,8 @@ diagnostics.graph=graph;
 diagnostics.reduction=reduced;
 diagnostics.parameters=parameters;
 diagnostics.physical_ids=1:model.comp.nspins;
-diagnostics.observed_ids=model.cce.observed_ids;
-diagnostics.bath_ids=model.cce.bath_ids;
+diagnostics.observed_ids=model.cce.parameters.observed;
+diagnostics.bath_ids=model.cce.parameters.cce.bath_spins;
 diagnostics.ensemble=ensemble;
 if isfield(parameters,'spectrum')
     diagnostics.spectrum=cce_spectrum(parameters.times,reduced.value,...

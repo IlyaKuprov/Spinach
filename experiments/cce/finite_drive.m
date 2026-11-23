@@ -110,7 +110,7 @@ end
 for k=1:numel(parameters.drive)
     ids=parameters.drive(k).spins;
     if ~isnumeric(ids)||~isreal(ids)||~isrow(ids)||isempty(ids)||...
-       numel(unique(ids))~=numel(ids)||any(~ismember(ids,spin_system.model.cce.observed_ids))
+       numel(unique(ids))~=numel(ids)||any(~ismember(ids,spin_system.model.cce.parameters.observed))
         error('finite_drive:spins',...
               'Finite drives address unique observed-spin identifiers.');
     end

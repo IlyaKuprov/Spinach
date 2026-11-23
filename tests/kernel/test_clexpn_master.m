@@ -173,7 +173,7 @@ result=test_true(result,'Driven Liouville numerical budget is not exact',...
                  'Full-bath reductions propagate nonzero segment estimates into budget diagnostics.');
 
 % Independently sum the declared arithmetic estimate over all finite intervals
-[retained,~]=cce_subsystem(drive_model,drive_model.cce.bath_ids,struct(),[]);
+[retained,~]=cce_subsystem(drive_model,drive_model.cce.parameters.cce.bath_spins,struct(),[]);
 [H,R,K,local]=cce_generators(retained,request,[]);
 L=H+1i*R+1i*K;
 [~,aux]=finite_drive(retained,local,H,R,K);

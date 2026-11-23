@@ -120,7 +120,7 @@ if projected
         [~,selected(1)]=max(abs(vectors'*model.cce.transition.alpha).^2);
         [~,selected(2)]=max(abs(vectors'*model.cce.transition.beta).^2);
         second=parameters.cce.second_order;
-        observed=model.cce.observed_ids;
+        observed=model.cce.parameters.observed;
         ops=cell(1,3*numel(observed));
         fields=cell(size(ops));
         axes={'x','y','z'};
@@ -262,7 +262,7 @@ if strcmp(backend,'auto')
 end
 ids=system.physical_ids;
 conditional=isfield(parameters.cce,'projection')&&strcmp(parameters.cce.projection,'conditional');
-observed=ismember(ids,model.cce.observed_ids);
+observed=ismember(ids,model.cce.parameters.observed);
 locals=~(conditional&observed);
 dims=system.multiplicities;
 dimension=system.dimension;
@@ -396,7 +396,7 @@ else
     if conditional
 
         % Remove only pure-register terms before stock Hamiltonian construction
-        register=find(ismember(sort(ids),model.cce.observed_ids));
+        register=find(ismember(sort(ids),model.cce.parameters.observed));
         system.inter.zeeman.matrix(register)={zeros(3)};
         system.inter.basefrqs(register)=0;
         keys=reshape(cell2mat(system.inter.coupling.matrix(:,1:2)),[],2);
@@ -409,7 +409,7 @@ else
     system=basis(system,basis_parameters);
     system=assume(system,model.cce.assumptions{:});
     [H,Q]=hamiltonian(system);
-    H=H+orientation(Q,model.cce.orientation);
+    H=H+orientation(Q,model.cce.parameters.orientation);
 
     % Reorder the stock ascending physical indices into observed-first order
     sorted_ids=sort(ids);
@@ -467,14 +467,14 @@ H=(H+H')/2;
 meta.physical_ids=ids;
 meta.dimensions=dims;
 meta.dimension=dimension;
-meta.observed_dimension=prod(model.comp.mults(model.cce.observed_ids));
+meta.observed_dimension=prod(model.comp.mults(model.cce.parameters.observed));
 meta.bath_dimension=bath_dimension;
 meta.operators=ops;
 meta.backend=backend;
 meta.fallback_reason=model.cce.fallback_reason;
 meta.source_hash=model.cce.source_hash;
 meta.omitted_pairs=model.cce.omitted_pairs;
-meta.observable_budget=model.cce.numerics.atol+model.cce.numerics.rtol*norm(H,'fro');
+meta.observable_budget=model.cce.parameters.cce.numerics.atol+model.cce.parameters.cce.numerics.rtol*norm(H,'fro');
 
 end
 
@@ -618,7 +618,7 @@ if isfield(parameters,'bath_jumps')
         error('cce_options:jumps','bath_jumps must be a structure array.');
     end
     model=system.model;
-    selected=[model.cce.observed_ids model.cce.bath_ids];
+    selected=[model.cce.parameters.observed model.cce.parameters.cce.bath_spins];
     for k=1:numel(jumps)
         jump=jumps(k);
         required={'support','operator','rate'};

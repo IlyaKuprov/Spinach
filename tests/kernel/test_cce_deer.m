@@ -406,7 +406,7 @@ for method={'cce','gcce','mecce','megcce'}
     schedule=@free_evolution;
 
     % Distinguish missing observed and exterior sites from irrelevant included sites
-    for missing=[model.cce.observed_ids 3]
+    for missing=[model.cce.parameters.observed 3]
         partial=model;
         partial.inter.coordinates={[0 0 0];[1 0 0];[3 0 0]};
         partial.inter.coordinates{missing}=[];
@@ -630,7 +630,7 @@ if isfield(parameters.cce,'meanfield_radius')
 end
 model.cce.parameters=parameters;
 model.bas.formalism='zeeman-hilb';
-[system,~]=cce_subsystem(model,model.cce.bath_ids,struct(),[]);
+[system,~]=cce_subsystem(model,model.cce.parameters.cce.bath_spins,struct(),[]);
 [~,selected]=bath_pumped_hahn(system,parameters,zeros(system.dimension),0,0);
 
 end

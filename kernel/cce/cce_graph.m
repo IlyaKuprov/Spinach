@@ -47,9 +47,9 @@ function graph=cce_graph(model,parameters)
 grumble(model,parameters);
 
 % Locate physical sites without interpreting IDs as array subscripts
-[~,bath_pos]=ismember(model.cce.bath_ids,1:model.comp.nspins);
-[~,observed_pos]=ismember(model.cce.observed_ids,1:model.comp.nspins);
-ids=model.cce.bath_ids;
+[~,bath_pos]=ismember(model.cce.parameters.cce.bath_spins,1:model.comp.nspins);
+[~,observed_pos]=ismember(model.cce.parameters.observed,1:model.comp.nspins);
+ids=model.cce.parameters.cce.bath_spins;
 n=numel(ids);
 
 % Obtain physical two-spin operator norms before graph pruning
@@ -92,7 +92,7 @@ internal=all(bath>0,1);
 a=bath(1,internal);
 b=bath(2,internal);
 pair_norm=sparse([a b],[b a],[weights(internal) weights(internal)],n,n);
-observed=any(ismember(ends,model.cce.observed_ids),1);
+observed=any(ismember(ends,model.cce.parameters.observed),1);
 attachments=sum(bath(:,observed&(weights>0)),1);
 attached=sparse(attachments(attachments>0),1,true,n,1);
 
@@ -161,7 +161,7 @@ if strcmp(parameters.method,'noise')&&isfield(parameters,'noise')
         else
             support=[parameters.noise.descriptors.spins];
         end
-        observed=ismember(model.cce.bath_ids,support);
+        observed=ismember(model.cce.parameters.cce.bath_spins,support);
         adjacency(observed,observed)=true;
         adjacency(1:n+1:end)=false;
     end
@@ -191,19 +191,19 @@ end
 % Validate shapes, physical IDs, graph semantics, and physical units
 function grumble(model,parameters)
 if ~isstruct(model)||~isscalar(model)||~isfield(model,'cce')||...
-   ~all(isfield(model.cce,{'observed_ids','bath_ids','pairs'}))
+   ~all(isfield(model.cce,{'parameters','pairs'}))
     error('cce_graph:model','incomplete scalar model structure.');
 end
 ids=1:model.comp.nspins;
-n=numel(model.cce.bath_ids);
-for name={'observed_ids','bath_ids'}
-    values=model.cce.(name{1});
+n=numel(model.cce.parameters.cce.bath_spins);
+for name={model.cce.parameters.observed,model.cce.parameters.cce.bath_spins}
+    values=name{1};
     if ~isnumeric(values)||~isreal(values)||(~isrow(values)&&~isempty(values))||...
        numel(unique(values))~=numel(values)||~all(ismember(values,ids))
         error('cce_graph:ids','observed and bath IDs must be unique physical ID rows.');
     end
 end
-if ~isempty(intersect(model.cce.observed_ids,model.cce.bath_ids))||isempty(model.cce.observed_ids)
+if ~isempty(intersect(model.cce.parameters.observed,model.cce.parameters.cce.bath_spins))||isempty(model.cce.parameters.observed)
     error('cce_graph:ids','observed IDs must be nonempty and disjoint from bath IDs.');
 end
 if ~isstruct(model.cce.pairs)||(~isempty(model.cce.pairs)&&~all(isfield(model.cce.pairs,{'ids','tensor'})))

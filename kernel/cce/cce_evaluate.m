@@ -98,7 +98,7 @@ end
 if isfield(parameters.cce,'checkpoint')
     error('cce_options:checkpoint','Only the scheduler may consume checkpoint requests.');
 end
-dc=prod(model.comp.mults(model.cce.observed_ids));
+dc=prod(model.comp.mults(model.cce.parameters.observed));
 components=1;
 if isfield(parameters,'output')&&strcmp(parameters.output,'density')
     components=dc^2;

@@ -56,16 +56,11 @@ if isfield(parameters.cce,'groups')
     spin_system.cce.groups=parameters.cce.groups;
 end
 spin_system.cce.manifold_projectors=struct();
-spin_system.cce.observed_ids=parameters.observed;
-spin_system.cce.bath_ids=parameters.cce.bath_spins;
 spin_system.cce.assumptions=assumptions;
-spin_system.cce.orientation=parameters.orientation;
 spin_system.cce.interaction_cutoff=inf;
 if isfield(parameters.cce,'interaction_cutoff')
     spin_system.cce.interaction_cutoff=parameters.cce.interaction_cutoff;
 end
-spin_system.cce.numerics=parameters.cce.numerics;
-spin_system.cce.backend=parameters.cce.backend;
 
 nspins=spin_system.comp.nspins;
 
@@ -205,7 +200,7 @@ if isfield(spin_system.inter,'modes')
     spin_system.cce.direct_supported=false;
     spin_system.cce.fallback_reason='spin-boson terms';
 end
-if strcmp(spin_system.cce.backend,'direct')&&~spin_system.cce.direct_supported
+if strcmp(parameters.cce.backend,'direct')&&~spin_system.cce.direct_supported
     error('direct Hamiltonian is not validated for %s.',spin_system.cce.fallback_reason);
 end
 

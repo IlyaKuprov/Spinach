@@ -44,7 +44,7 @@ grumble(cluster_system,parameters);
 model=cluster_system.model;
 dc=cluster_system.observed_dimension;
 db=cluster_system.bath_dimension;
-ids=model.cce.observed_ids;
+ids=model.cce.parameters.observed;
 local=cluster_system;
 local.physical_ids=ids;
 local.sites=[];
@@ -181,7 +181,7 @@ for name={'preparation','detection'}
         if ischar(value)
             valid=strcmp(value,'transition')&&isfield(system.model.cce,'transition');
             if strcmp(name{1},'preparation')&&strcmp(value,'transverse')
-                valid=isscalar(system.model.cce.observed_ids)&&system.observed_dimension==2;
+                valid=isscalar(system.model.cce.parameters.observed)&&system.observed_dimension==2;
             end
         elseif isstruct(value)&&isscalar(value)
             if strcmp(name{1},'preparation')

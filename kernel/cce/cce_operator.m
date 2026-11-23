@@ -110,7 +110,7 @@ power=2;
 if strcmp(system.formalism,'zeeman-liouv')
     power=4;
 end
-if 16*system.dimension^power>system.model.cce.numerics.max_memory_bytes
+if 16*system.dimension^power>system.model.cce.parameters.cce.numerics.max_memory_bytes
     error('cce_operator:memory','Requested representation exceeds the memory budget.');
 end
 end

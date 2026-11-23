@@ -297,7 +297,7 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
         local.groups=local.groups(~cellfun(@isempty,local.groups));
 
         % Restrict bath-indexed graph data in the declared physical patch order
-        [~,indices]=ismember(sites,model.cce.bath_ids);
+        [~,indices]=ismember(sites,model.cce.parameters.cce.bath_spins);
         for field={'adjacency','scores','mismatch'}
             if isfield(local.graph,field{1})
                 matrix=local.graph.(field{1});
@@ -305,10 +305,10 @@ function [objective,errors,used,valid]=patches(candidate,spin_configs,used)
             end
         end
         local_model=model;
-        local_model.cce.bath_ids=sites;
+        local_model.cce.parameters.cce.bath_spins=sites;
         local_graph=cce_graph(local_model,local);
         family=cce_clusters(local_model,local_graph,local);
-        dc=prod(model.comp.mults(model.cce.observed_ids));
+        dc=prod(model.comp.mults(model.cce.parameters.observed));
         components=1;
         if isfield(native_parameters,'output')&&strcmp(native_parameters.output,'density')
             components=dc^2;

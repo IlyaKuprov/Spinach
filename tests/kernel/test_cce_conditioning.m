@@ -14,7 +14,9 @@ function result=test_cce_conditioning()
 % Set up a path pair expansion with a negative observed-vertex exponent
 result=new_test_result('kernel/cce_conditioning','CCE zero conditioning',...
                        'Expose unresolved ratios rather than regularise or lose phase.');
-model.cce=struct('observed_ids',1,'bath_ids',2:4);
+model.cce=struct();
+model.cce.parameters.observed=1;
+model.cce.parameters.cce.bath_spins=2:4;
 model.comp.mults=[2 2 2 2];
 model.comp.nspins=numel(model.comp.mults);
 adjacency=logical([0 1 0;1 0 1;0 1 0]);

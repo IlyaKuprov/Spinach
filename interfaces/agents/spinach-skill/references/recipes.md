@@ -517,6 +517,9 @@ spin_system=optimcon(spin_system,control);
 pulse=fmaxnewton(spin_system,@grape_xy,guess);
 ```
 
+For tied pulse repetitions, initialise the full timing and drift sequence with `optimcon`, then call `fmaxnewton(spin_system,@grape_repeat,guess)` with one short Cartesian block. Its column count must divide the full waveform length. The basis and freeze mask must be empty. Trajectories and waveform penalties apply to the expanded train.
+
+
 The state normalisation is not cosmetic: the fidelity functional assumes unit
 norm. `optimcon` distributes the drift generators over the workers of the pool
 that is open when it runs and records that pool's identity; each worker then

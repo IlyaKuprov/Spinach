@@ -493,6 +493,11 @@ experiments are `nmr_spen/ufcosy_2spin.m` and `ufdosy_1spin.m`.
 
 ## Optimal control
 
+For unequal drift quadrature, pass `control.drift_weights` in drift order to
+`optimcon`. Keep the full correlated catalog and equal replication per drift.
+The same normalised case weights apply to fidelity, derivatives, and averaged
+forward trajectories, but not to ordinary waveform penalties.
+
 `optimal_control/state_transfer_pro.m` is the full pattern: build the system,
 normalise initial and target states, collect control and offset operators,
 assemble the drift, hand a separate `control` structure to `optimcon`, optimise

@@ -76,18 +76,18 @@ if ismember('average',control.traj_opts)
     for n=2:numel(results.traj)
         ave_traj=ave_traj+results.traj{n}.forward;
     end
-    traj_data={struct('forward',{(1/n_cases)*ave_traj})};
+    traj_data={struct('forward',{ave_traj})};
 else
     traj_data=cell(n_cases,1); traj_data(order)=results.traj;
 end
 
 % Ensemble averages of fidelity, gradient, and Hessian
-fidelity=sum(fidelities)/n_cases;
+fidelity=fidelities*control.case_weights;
 if n_outputs>2
-    gradient=reshape(gradient/n_cases,size(waveform));
+    gradient=reshape(gradient,size(waveform));
 end
 if n_outputs>3
-    hessian=reshape(hessian/n_cases,numel(waveform)*[1 1]);
+    hessian=reshape(hessian,numel(waveform)*[1 1]);
 end
 
 % Run diagnostic plotting (expensive!)
@@ -125,7 +125,7 @@ function grumble(spin_system,waveform,n_outputs)
 if ~isfield(spin_system,'control')
     error('control data missing from spin_system, run optimcon() first.');
 end
-if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','drift_slices','frozen_fields','worker_cases','pool_id'}))
+if ~all(isfield(spin_system.control,{'catalog','ens_sizes','invariants','drift_slices','frozen_fields','worker_cases','pool_id','case_weights'}))
     error('ensemble catalog missing from spin_system, run optimcon() first.');
 end
 current_pool=gcp('nocreate'); pool_id=0;
